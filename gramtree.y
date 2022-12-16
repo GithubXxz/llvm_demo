@@ -22,8 +22,8 @@ double d;
 %token <a> GREAT GREATEQUAL LESS LESSEQUAL NOTEQUAL EQUAL 
 %token <a> PLUS MINUS STAR DIV AND OR DOT NOT LP RP LB RB LC RC AERROR
 %token <a> EOL
-%type  <a> Program ExtDefList ExtDef ExtDecList Specifire StructSpecifire
-OptTag  Tag VarDec  FunDec VarList ParamDec Compst StmtList Stmt DefList Def DecList Dec Exp Args
+%type  <a> Program ExtDefList ExtDef ExtDecList Specifire StructSpecifire TACList TAC
+OptTag  Tag VarDec  FunDec VarList ParamDec Compst StmtList Stmt DefList Def DecList Dec Exp Args 
 
 
 /*priority*/
@@ -45,9 +45,9 @@ Program:|ExtDefList {
 		exit(-1);
 	}
 
-    // eval_print($$,0);
+    eval_print($$,0);
 
-    eval($$,0);
+    // eval($$,0);
 
 }        
     ;
@@ -143,8 +143,16 @@ StmtList:
 */
 //基本块
 //格式:{定义、语句}
-Compst:LC DefList StmtList RC {$$=newast("Compst",4,$1,$2,$3,$4);}
+Compst:LC TACList RC {$$=newast("Compst",3,$1,$2,$3);}
 	;
+//用于解决 定义 语句 定义的情况
+TACList:TAC TACList {$$=newast("TACList",2,$1,$2);}
+    | {$$=newast("TACList",0,-1);}
+    ;
+
+TAC:DefList StmtList {$$=newast("TAC",2,$1,$2);}
+    ;
+
 //语句链推导出语句加语句链
 StmtList:Stmt StmtList{$$=newast("StmtList",2,$1,$2);}
 	| {$$=newast("StmtList",0,-1);}
@@ -159,8 +167,8 @@ StmtList:Stmt StmtList{$$=newast("StmtList",2,$1,$2);}
 Stmt:Exp SEMI {$$=newast("Stmt",2,$1,$2);}
     |Compst {$$=newast("Stmt",1,$1);}
 	|RETURN Exp SEMI {$$=newast("Stmt",3,$1,$2,$3);}
-	|IF LP Exp RP Stmt {$$=newast("Stmt",5,$1,$2,$3,$4,$5);}
-	|IF LP Exp RP Stmt ELSE Stmt {$$=newast("Stmt",7,$1,$2,$3,$4,$5,$6,$7);}
+	|IF Exp Stmt {$$=newast("Stmt",5,$1,$2,$3);}
+	|IF Exp Stmt ELSE Stmt {$$=newast("Stmt",7,$1,$2,$3,$4,$5);}
 	|WHILE LP Exp RP Stmt {$$=newast("Stmt",5,$1,$2,$3,$4,$5);}
 	;
 
