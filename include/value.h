@@ -13,9 +13,12 @@ struct _Use;
 
 #define NumUserOperandsBits 27
 
+typedef struct _Value Value;
+
 typedef union _PData {
+  // 跳转的目的地 跳转的条件放在use里
   struct {
-    int goto_location;  // 跳转位置
+    Value *goto_location;  // 跳转位置
   } instruction_pdata;
 
   struct {
@@ -32,7 +35,7 @@ typedef union _PData {
   } symtab_func_pdata;  // 目前只在我的符号表里用的结构，最终func结构还未完全确定
 } PData;
 
-typedef struct _Value {
+struct _Value {
   Type *VTy;
 
   struct _Use *use_list;
@@ -50,9 +53,11 @@ typedef struct _Value {
   unsigned HasName : 1;
   unsigned HasMetadata : 1;     // Has metadata attached to this?
   unsigned HasHungOffUses : 1;  // 用于指示有多少个操作数
-} Value;
+};
 
 void value_init(Value *this);
+
+void value_free(Value *this);
 
 void value_init_int(Value *this, TypeID type, int num);
 

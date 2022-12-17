@@ -15,4 +15,6 @@ void CleanKey(void* key);
 
 void CleanValue(void* value);
 
+void AllInit();
+
 #endif

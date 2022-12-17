@@ -9,6 +9,7 @@ typedef enum _TAC_OP {
   MulOP,
   DivOP,
   GotoOP,
+  GotoWithConditionOP,
   CallOP,
   FunBeginOP,
   FunEndOP,
@@ -20,7 +21,8 @@ typedef enum _TAC_OP {
   GreatThanOP,
   LessThanOP,
   GreatEqualOP,
-  LessEqualOP
+  LessEqualOP,
+  LABELOP
 } TAC_OP;
 
 struct _BasicBlock;
@@ -33,10 +35,15 @@ typedef struct _Instruction {
 
 Instruction *ins_new(int op_num, Value *self);
 
+// 用于标识跳转
+Instruction *ins_new_no_operator(Value *self, TAC_OP Op);
+
 Instruction *ins_new_single_operator(Value *self, TAC_OP Op, Value *S1);
 
 Instruction *ins_new_binary_operator(Value *self, TAC_OP Op, Value *S1,
                                      Value *S2);
+
+void free_ins(Instruction *self);
 
 Instruction *ins_new_one_operator(Value *S1);
 

@@ -14,6 +14,8 @@ typedef enum _TypeID {
   IntegerTyID,  ///< Arbitrary bit width integers
   FloatTyID,    ///< 32-bit floating point type
   StructTyID,   ///< Structures
+  LabelTyID,    ///< goto label
+  GotoTyID,
 
   // PrimitiveTypes
   HalfTyID,       ///< 16-bit floating point type
@@ -23,7 +25,6 @@ typedef enum _TypeID {
   FP128TyID,      ///< 128-bit floating point type (112-bit significand)
   PPC_FP128TyID,  ///< 128-bit floating point type (two 64-bits, PowerPC)
   VoidTyID,       ///< type with no size
-  LabelTyID,      ///< Labels
   MetadataTyID,   ///< Metadata
   X86_MMXTyID,    ///< MMX vectors (64 bits, X86 specific)
   X86_AMXTyID,    ///< AMX vectors (8192 bits, X86 specific)

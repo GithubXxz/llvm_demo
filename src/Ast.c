@@ -7,6 +7,8 @@
 
 extern Stack *stack_ast_pre;
 extern Stack *stack_symbol_table;
+extern Stack *stack_else_label;
+extern Stack *stack_then_label;
 extern ast *pre_astnode;
 extern List *ins_list;
 void CleanObject(void *element);
@@ -17,7 +19,9 @@ enum NowVarDecType { NowInt = 1, NowFloat, NowStruct } nowVarDecType;
 
 char *NowVarDecStr[] = {"default", "int", "float", "struct"};
 
-int temp_var_seed = 1;
+int temp_var_seed = 1;  // 用于标识变量的名字
+
+int label_var_seed = 1;  // 用于表示label的名字
 
 int i;
 
@@ -65,6 +69,8 @@ ast *newast(char *name, int num, ...)  // 抽象语法树建立
       a->idtype = t;
     } else if (!strcmp(a->name, "INTEGER")) {
       a->intgr = atoi(yytext);
+    } else if (!strcmp(a->name, "FLOAT")) {
+      a->flt = atoi(yytext);
     } else {
     }
   }
@@ -103,15 +109,8 @@ void eval_print(ast *a, int level) {
   }
 }
 
-Value *eval(ast *a, int level) {
+void pre_eval(ast *a) {
   if (a != NULL) {
-    // if (!strcmp(a->name, "SEMI")) {
-    //   printf("free a node\n");
-    //   free(a);
-    //   a = NULL;
-    //   return NULL;
-    // }
-
     if (!strcmp(a->name, "LC")) {
       cur_symboltable = (SymbolTable *)malloc(sizeof(SymbolTable));
       symbol_table_init(cur_symboltable);
@@ -128,18 +127,107 @@ Value *eval(ast *a, int level) {
       free(cur_symboltable);
       cur_symboltable = NULL;
       // 当前的符号表恢复到上一级的符号表
-      StackTop(stack_symbol_table, &cur_symboltable);
+      StackTop(stack_symbol_table, (void **)&cur_symboltable);
     }
 
-    // 将当前的ast节点如栈
-    StackPush(stack_ast_pre, a);
-    Value *left = eval(a->l, level + 1);  // 遍历左子树
-    Value *right = eval(a->r, level);     // 遍历右子树
+    if (!strcmp(a->name, "ELSE")) {
+      Instruction *else_label_ins = NULL;
+      StackTop(stack_else_label, (void **)&else_label_ins);
+      StackPop(stack_else_label);
+      ListPushBack(ins_list, (void *)else_label_ins);
+      printf("%s\n", else_label_ins->res->name);
+    }
+  }
+}
 
-    // 将当前的ast节点出栈
-    StackPop(stack_ast_pre);
+void in_eval(ast *a, Value *left) {
+  if (a->r && !strcmp(a->r->name, "assistIF")) {
+    Value *else_label = (Value *)malloc(sizeof(Value));
+    value_init(else_label);
+    char temp_str[15];
+    char text[10];
+    sprintf(text, "%d", label_var_seed);
+    ++label_var_seed;
+    strcpy(temp_str, "label");
+    strcat(temp_str, text);
 
-    StackTop(stack_ast_pre, (void **)&pre_astnode);
+    // 添加变量的名字
+    else_label->name = strdup(temp_str);
+    else_label->VTy->TID = LabelTyID;
+
+    // cur_symboltable->symbol_map->put(cur_symboltable->symbol_map,
+    //                                  strdup(temp_str), else_label);
+
+    Instruction *else_label_ins = ins_new_no_operator(else_label, LABELOP);
+
+    StackPush(stack_else_label, else_label_ins);
+
+    // printf("new instruction destination %s and push to the else_stack\n",
+    //        else_label->name);
+
+    Value *goto_else = (Value *)malloc(sizeof(Value));
+    value_init(goto_else);
+
+    goto_else->name = strdup("goto_else_or_then");
+    goto_else->VTy->TID = GotoTyID;
+    goto_else->pdata->instruction_pdata.goto_location = else_label;
+
+    // cur_symboltable->symbol_map->put(cur_symboltable->symbol_map,
+    //                                  strdup(temp_str), goto_else);
+
+    Instruction *goto_else_ins =
+        ins_new_single_operator(goto_else, GotoWithConditionOP, left);
+
+    ListPushBack(ins_list, (void *)goto_else_ins);
+
+    printf("new instruction goto %s with condition %s\n", else_label->name,
+           left->name);
+  }
+
+  if (a->r && !strcmp(a->r->name, "assistELSE")) {
+    Value *then_label = (Value *)malloc(sizeof(Value));
+    value_init(then_label);
+    char temp_str[15];
+    char text[10];
+    sprintf(text, "%d", label_var_seed);
+    ++label_var_seed;
+    strcpy(temp_str, "label");
+    strcat(temp_str, text);
+
+    // 添加变量的名字
+    then_label->name = strdup(temp_str);
+    then_label->VTy->TID = LabelTyID;
+
+    // cur_symboltable->symbol_map->put(cur_symboltable->symbol_map,
+    //                                  strdup(temp_str), else_label);
+
+    Instruction *then_label_ins = ins_new_no_operator(then_label, LABELOP);
+
+    StackPush(stack_then_label, then_label_ins);
+
+    // printf("new instruction destination %s and push to the then_stack\n",
+    //        then_label->name);
+
+    Value *goto_then = (Value *)malloc(sizeof(Value));
+    value_init(goto_then);
+
+    goto_then->name = strdup("goto_then");
+    goto_then->VTy->TID = GotoTyID;
+    goto_then->pdata->instruction_pdata.goto_location = then_label;
+
+    // cur_symboltable->symbol_map->put(cur_symboltable->symbol_map,
+    //                                  strdup(temp_str), goto_else);
+
+    Instruction *goto_else_ins = ins_new_no_operator(goto_then, GotoOP);
+
+    ListPushBack(ins_list, (void *)goto_else_ins);
+
+    printf("new instruction goto %s without condition\n", then_label->name);
+  }
+}
+
+Value *post_eval(ast *a, Value *left, Value *right) {
+  if (a != NULL) {
     // 如果要定义数据变量 判断当前定义的数据类型
     // 并且修改 NowVarDecType
     if (!strcmp(a->name, "TYPE")) {
@@ -156,10 +244,6 @@ Value *eval(ast *a, int level) {
 
     // 判断父节点是不是变量声明 如果是 则创建一个该变量对应的value并返回
     if (!strcmp(pre_astnode->name, "VarDec")) {
-      // if (a->l != NULL) {
-      //   printf("new instruction: %s = 0 type: %s\n", a->l->idtype,
-      //          NowVarDecStr[nowVarDecType]);
-      // }
       if (!strcmp(a->name, "ID")) {
         Value *cur = (Value *)malloc(sizeof(Value));
         value_init(cur);
@@ -180,20 +264,19 @@ Value *eval(ast *a, int level) {
       if (!strcmp(a->name, "ID")) {
         Value *cur = HashMapGet(cur_symboltable->symbol_map, (void *)a->idtype);
         if (cur) {
-          printf("successfully get %s\n", a->idtype);
+          // printf("successfully get %s\n", a->idtype);
           return cur;
         } else {
-          printf("cur symboltable can't find %s\n", a->idtype);
+          // printf("cur symboltable can't find %s\n", a->idtype);
         }
-
         SymbolTable *pre_symboltable = cur_symboltable->father;
         // 查表 取出名字所指代的Value*
         while (!cur) {
           // 如果当前表中没有且该表的父表为空 则报错语义错误
-          assert(pre_symboltable->father == NULL);
           // 向上一级查表
           cur = HashMapGet(pre_symboltable->symbol_map, (void *)a->idtype);
           pre_symboltable = pre_symboltable->father;
+          assert(pre_symboltable || cur);
         };
         return cur;
       } else if (!strcmp(a->name, "INTEGER")) {
@@ -218,9 +301,12 @@ Value *eval(ast *a, int level) {
       // 加减乘除的情况
       else if (!strcmp(a->name, "MINUS") || !strcmp(a->name, "PLUS") ||
                !strcmp(a->name, "STAR") || !strcmp(a->name, "DIV") ||
-               !strcmp(a->name, "ASSIGNOP")) {
+               !strcmp(a->name, "ASSIGNOP") || !strcmp(a->name, "EQUAL")) {
         // 返回当前节点的右节点
         return right;
+      } else if (!strcmp(a->name, "Stmt")) {
+        // 返回当前节点的右节点
+        return NULL;
       }
     }
 
@@ -234,11 +320,10 @@ Value *eval(ast *a, int level) {
         return NULL;
       } else {
         if (!strcmp(a->r->name, "ASSIGNOP")) {
-          Instruction *cur_inst =
-              ins_new_single_operator(left, AssignOP, right);
+          Instruction *cur_ins = ins_new_single_operator(left, AssignOP, right);
           cur_symboltable->symbol_map->put(cur_symboltable->symbol_map,
                                            var_name, left);
-          ListPushBack(ins_list, (void *)cur_inst);
+          ListPushBack(ins_list, (void *)cur_ins);
           printf("allocate storage for %s and %s = %s\n", var_name, var_name,
                  right->name);
           return NULL;
@@ -252,8 +337,8 @@ Value *eval(ast *a, int level) {
       if (right == NULL) {
         return left;
       } else if (!strcmp(a->r->name, "ASSIGNOP")) {
-        Instruction *cur_inst = ins_new_single_operator(left, AssignOP, right);
-        ListPushBack(ins_list, (void *)cur_inst);
+        Instruction *cur_ins = ins_new_single_operator(left, AssignOP, right);
+        ListPushBack(ins_list, (void *)cur_ins);
         printf("new instruction %s = %s\n", var_name, right->name);
         return left;
       } else {
@@ -275,37 +360,107 @@ Value *eval(ast *a, int level) {
         printf("allocate storage for %s\n", temp_str);
 
         if (!strcmp(a->r->name, "PLUS")) {
-          Instruction *cur_inst =
+          Instruction *cur_ins =
               ins_new_binary_operator(cur, AddOP, left, right);
-          ListPushBack(ins_list, (void *)cur_inst);
+          ListPushBack(ins_list, (void *)cur_ins);
           // 新建一个判断左值类型的函数
           printf("new instruction %s = %s + %s\n", cur->name, left->name,
                  right->name);
           return cur;
         } else if (!strcmp(a->r->name, "MINUS")) {
-          Instruction *cur_inst =
+          Instruction *cur_ins =
               ins_new_binary_operator(cur, SubOP, left, right);
-          ListPushBack(ins_list, (void *)cur_inst);
+          ListPushBack(ins_list, (void *)cur_ins);
           printf(" new instruction %s = %s - %s\n", cur->name, left->name,
                  right->name);
-          return left;
+          return cur;
         } else if (!strcmp(a->r->name, "STAR")) {
-          Instruction *cur_inst =
+          Instruction *cur_ins =
               ins_new_binary_operator(cur, MulOP, left, right);
-          ListPushBack(ins_list, (void *)cur_inst);
+          ListPushBack(ins_list, (void *)cur_ins);
           printf(" new instruction %s = %s * %s\n", cur->name, left->name,
                  right->name);
-          return left;
+          return cur;
         } else if (!strcmp(a->r->name, "DIV")) {
-          Instruction *cur_inst =
+          Instruction *cur_ins =
               ins_new_binary_operator(cur, DivOP, left, right);
-          ListPushBack(ins_list, (void *)cur_inst);
+          ListPushBack(ins_list, (void *)cur_ins);
           printf(" new instruction %s = %s / %s\n", cur->name, left->name,
                  right->name);
-          return left;
+          return cur;
+        } else if (!strcmp(a->r->name, "EQUAL")) {
+          Instruction *cur_ins =
+              ins_new_binary_operator(cur, EqualOP, left, right);
+          ListPushBack(ins_list, (void *)cur_ins);
+          printf("new instruction %s = %s equal %s\n", cur->name, left->name,
+                 right->name);
+          return cur;
         }
       }
     }
+
+    // 后续遍历到if标识该if管辖的全区域块结束 插入跳转点label
+    if (!strcmp(a->name, "IF")) {
+      Instruction *ins_back = NULL;
+      ListGetBack(ins_list, (void **)&ins_back);
+
+      if (ins_back->opcode == GotoOP) {
+        // printf(
+        //     "this 'if' without else statement and delete goto destination "
+        //     "label");
+        // 删除链尾 并且释放链尾ins的内存
+        ListPopBack(ins_list);
+        value_free(ins_back->res);
+        free(ins_back);
+
+        // 释放内存
+        Instruction *else_label_ins = NULL;
+        StackTop(stack_else_label, (void **)&else_label_ins);
+        StackPop(stack_else_label);
+        ListPushBack(ins_list, (void *)else_label_ins);
+        printf("%s\n", else_label_ins->res->name);
+
+        Instruction *then_label_ins = NULL;
+        StackTop(stack_then_label, (void **)&then_label_ins);
+        StackPop(stack_then_label);
+        // 释放label ins的内存
+        value_free(then_label_ins->res);
+        free(then_label_ins);
+        printf("delete the destination %s\n", then_label_ins->res->name);
+        return NULL;
+      } else {
+        // printf("this 'if' with else statement\n");
+        Instruction *then_label_ins = NULL;
+        StackTop(stack_then_label, (void **)&then_label_ins);
+        StackPop(stack_then_label);
+        ListPushBack(ins_list, (void *)then_label_ins);
+        printf("%s\n", then_label_ins->res->name);
+        return NULL;
+      }
+    }
+  }
+  return NULL;
+}
+
+Value *eval(ast *a) {
+  if (a != NULL) {
+    // 先序遍历
+    pre_eval(a);
+    // 将当前的ast节点如栈
+    StackPush(stack_ast_pre, a);
+    Value *left = eval(a->l);  // 遍历左子树
+    // 中序遍历
+    in_eval(a, left);
+
+    Value *right = eval(a->r);  // 遍历右子树
+
+    // 将当前的ast节点出栈
+    StackPop(stack_ast_pre);
+    // pre_astnode指向栈顶ast节点
+    StackTop(stack_ast_pre, (void **)&pre_astnode);
+
+    // 后序遍历
+    return post_eval(a, left, right);
   }
 
   return NULL;

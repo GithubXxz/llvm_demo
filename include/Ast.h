@@ -31,7 +31,13 @@ void eval_print(ast* a, int level);
 /*构造抽象语法树,变长参数，name:语法单元名字；num:变长参数中语法结点个数*/
 ast* newast(char* name, int num, ...);
 
+void pre_eval(ast*);
+
+void in_eval(ast*, Value*);
+
+Value* post_eval(ast*, Value*, Value*);
+
 /*遍历抽象语法树，level为树的层数*/
-Value* eval(ast*, int level);
+Value* eval(ast*);
 
 #endif  // LRPARSER_AST_H

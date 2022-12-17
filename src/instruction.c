@@ -19,6 +19,12 @@ Instruction *ins_new(int op_num, Value *self) {
   return (Instruction *)(storage + use_size);
 }
 
+Instruction *ins_new_no_operator(Value *self, TAC_OP Op) {
+  Instruction *inst = ins_new(0, self);
+  inst->opcode = Op;
+  return inst;
+}
+
 Instruction *ins_new_single_operator(Value *self, TAC_OP Op, Value *S1) {
   Instruction *inst = ins_new(1, self);
   inst->opcode = Op;
@@ -51,7 +57,10 @@ TypeID ins_res_type(Value *left, Value *right) {
       (s2_type == FloatTyID || s2_type == ConstFloatTyID)) {
     type_id = FloatTyID;
   }
+  return type_id;
 }
+
+void free_ins(Instruction *self) { free(self->res); }
 // zzq 判断一个value是否满足pdata里面的数据为0
 // bool is_zero(Value *this) {
 //   return (this->pdata != NULL && *((int *)(this->pdata)) == 0);

@@ -24,8 +24,10 @@ void value_init(Value *this) {
   this->name = NULL;
 }
 
-void value_deinit(Value *this) {
+void value_free(Value *this) {
   free(this->VTy);
+  free(this->pdata);
+  free(this->name);
   free(this);
 }
 

@@ -1,5 +1,15 @@
 #include "c_container_auxiliary.h"
 
+Stack* stack_ast_pre = NULL;
+
+Stack* stack_symbol_table = NULL;
+
+Stack* stack_else_label = NULL;
+
+Stack* stack_then_label = NULL;
+
+List* ins_list = NULL;
+
 // 出栈伴随运行的函数 我真他妈 心态崩了 学艺不精
 void CleanObject(void* element) {}
 
@@ -15,3 +25,25 @@ int CompareKey(void* lhs, void* rhs) {
 void CleanKey(void* key) { free(key); }
 
 void CleanValue(void* value) { free(value); }
+
+void AllInit() {
+  // 初始化指令链表
+  ins_list = ListInit();
+  ListSetClean(ins_list, CleanObject);
+
+  // 初始化前置ast节点栈
+  stack_ast_pre = StackInit();
+  StackSetClean(stack_ast_pre, CleanObject);
+
+  // 初始化符号表栈
+  stack_symbol_table = StackInit();
+  StackSetClean(stack_symbol_table, CleanObject);
+
+  // 初始化else的goto栈
+  stack_else_label = StackInit();
+  StackSetClean(stack_else_label, CleanObject);
+
+  // 初始化then的goto栈
+  stack_then_label = StackInit();
+  StackSetClean(stack_then_label, CleanObject);
+}

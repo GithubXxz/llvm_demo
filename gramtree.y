@@ -39,15 +39,9 @@ OptTag  Tag VarDec  FunDec VarList ParamDec Compst StmtList Stmt DefList Def Dec
 Program:|ExtDefList {
     $$=newast("Program",1,$1);
 
-    if(freopen("out.txt","w",stdout) == NULL)//标准输出流重定向至stdout.txt流
-	{
-		fprintf(stderr,"打开文件失败！");
-		exit(-1);
-	}
+    // eval_print($$,0);
 
-    eval_print($$,0);
-
-    // eval($$,0);
+    eval($$);
 
 }        
     ;
@@ -167,8 +161,8 @@ StmtList:Stmt StmtList{$$=newast("StmtList",2,$1,$2);}
 Stmt:Exp SEMI {$$=newast("Stmt",2,$1,$2);}
     |Compst {$$=newast("Stmt",1,$1);}
 	|RETURN Exp SEMI {$$=newast("Stmt",3,$1,$2,$3);}
-	|IF Exp Stmt {$$=newast("Stmt",5,$1,$2,$3);}
-	|IF Exp Stmt ELSE Stmt {$$=newast("Stmt",7,$1,$2,$3,$4,$5);}
+	|IF LP Exp RP Stmt {$$=newast("Stmt",5,$1,$3,newast("assistIF",0,-1),$5,newast("assistELSE",0,-1));}
+	|IF LP Exp RP Stmt ELSE Stmt {$$=newast("Stmt",7,$1,$3,newast("assistIF",0,-1),$5,newast("assistELSE",0,-1),$6,$7);}
 	|WHILE LP Exp RP Stmt {$$=newast("Stmt",5,$1,$2,$3,$4,$5);}
 	;
 

@@ -8,11 +8,7 @@
 #include "cds.h"
 #include "symbol_table.h"
 
-Stack *stack_ast_pre = NULL;
-
-Stack *stack_symbol_table = NULL;
-
-List *ins_list = NULL;
+extern List *ins_list;
 
 SymbolTable *cur_symboltable = NULL;
 
@@ -22,44 +18,29 @@ int yyparse(void);
 int parser(char *input);
 
 int main() {
-  // 初始化指令链表
-  ins_list = ListInit();
-  ListSetClean(ins_list, CleanObject);
-
-  // 初始化前置ast节点栈
-  stack_ast_pre = StackInit();
-  StackSetClean(stack_ast_pre, CleanObject);
-
-  // 初始化符号表栈
-  stack_symbol_table = StackInit();
-  StackSetClean(stack_symbol_table, CleanObject);
-
+  // 标准输出流重定向至stdout.txt流
+  if (freopen("out.txt", "w", stdout) == NULL) {
+    fprintf(stderr, "打开文件失败！");
+    exit(-1);
+  }
+  AllInit();
   printf("开始遍历\n");
   char *input1 =
-      "\
-  int main() {\
-    int a;\
-    int b;\
-    a = 5;\
-    b = 10;\
-    if (a == 5) {\
-      if (b == 10) a = 25;\
-    } else\
-      a = a + 15;\
-    return (a);\
-  }\
-  ";
+      "int main() {int a;int b;int c;a = 5;b = 10; if(a==5){ a = "
+      "30;b=40;c=a+b;if(b==20){c=19;a=233;}a=156; "
+      "}else{ a = "
+      "100; b=200;c=120+a;}int m=30,n=23;}";
 
   char *input2 = "int inc(){int a;float b;a= a + 20;}";
-  parser(input2);
 
-  void *element;
-  int num = 10;
-  ListFirst(ins_list, false);
-  while (ListNext(ins_list, &element)) {
-    // 打印出每条instruction的res的名字信息
-    printf("%s\n", ((Instruction *)element)->res->name);
-  }
+  parser(input1);
+
+  // void *element;
+  // ListFirst(ins_list, false);
+  // while (ListNext(ins_list, &element)) {
+  //   // 打印出每条instruction的res的名字信息
+  //   printf("%s\n", ((Instruction *)element)->res->name);
+  // }
 
   printf("遍历结束\n\n");
   ListDeinit(ins_list);
