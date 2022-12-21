@@ -26,7 +26,7 @@ int CompareKey(void* lhs, void* rhs) {
 
 void CleanKey(void* key) { free(key); }
 
-void CleanValue(void* value) { free(value); }
+void CleanValue(void* value) {}
 
 void AllInit() {
   // 初始化指令链表

@@ -80,7 +80,8 @@ int main() {
   ListFirst(ins_list, false);
   while (ListNext(ins_list, &element)) {
     // 打印出每条instruction的res的名字信息
-    printf("%s\n", op_string[((Instruction *)element)->opcode]);
+    printf("opcode: %s    ", op_string[((Instruction *)element)->opcode]);
+    printf("\tname: %s\n", ((Instruction *)element)->res->name);
   }
 
   printf("遍历结束\n\n");

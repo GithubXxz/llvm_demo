@@ -423,8 +423,7 @@ Value *post_eval(ast *a, Value *left, Value *right) {
       } else {
         if (!strcmp(a->r->name, "ASSIGNOP")) {
           // 将变量加入符号表
-          cur_symboltable->symbol_map->put(cur_symboltable->symbol_map,
-                                           var_name, left);
+          HashMapPut(cur_symboltable->symbol_map, var_name, left);
           // 新建赋值语句
           Instruction *cur_ins = ins_new_single_operator(left, AssignOP, right);
           ListPushBack(ins_list, (void *)cur_ins);
@@ -466,16 +465,15 @@ Value *post_eval(ast *a, Value *left, Value *right) {
         // 添加变量的名字
         cur->name = strdup(temp_str);
         cur->VTy->TID = ins_res_type(left, right);
+        // 放入符号表
+        HashMapPut(cur_symboltable->symbol_map, strdup(temp_str), cur);
 
-        cur_symboltable->symbol_map->put(cur_symboltable->symbol_map,
-                                         strdup(temp_str), cur);
         // printf("allocate storage for %s\n", temp_str);
 
         if (!strcmp(a->r->name, "PLUS")) {
           Instruction *cur_ins =
               ins_new_binary_operator(cur, AddOP, left, right);
           ListPushBack(ins_list, (void *)cur_ins);
-          // 新建一个判断左值类型的函数
           printf("new instruction %s = %s + %s\n", cur->name, left->name,
                  right->name);
           return cur;
