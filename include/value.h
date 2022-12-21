@@ -29,10 +29,18 @@ typedef union _PData {
   } var_pdata;
 
   struct {
-    Type return_type;           // 返回类型
-    Type param_type_lists[10];  // 参数的类型数组
-    // int param_num;           // 传入参数的个数
+    TypeID return_type;  // 返回类型
+    // Type param_type_lists[10];  // 参数的类型数组
+    int param_num;      // 传入参数的个数
   } symtab_func_pdata;  // 目前只在我的符号表里用的结构，最终func结构还未完全确定
+
+  struct {
+    Value *return_value;  // 返回值
+  } return_pdata;
+
+  struct {
+    Value *param_value;  // 返回值
+  } param_pdata;
 } PData;
 
 struct _Value {

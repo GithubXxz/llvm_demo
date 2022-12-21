@@ -11,11 +11,15 @@
 typedef enum _TypeID {
   // 默认值
   DefaultTyID = 0,
-  IntegerTyID,  ///< Arbitrary bit width integers
-  FloatTyID,    ///< 32-bit floating point type
-  StructTyID,   ///< Structures
-  LabelTyID,    ///< goto label
-  GotoTyID,
+  IntegerTyID,   ///< Arbitrary bit width integers
+  FloatTyID,     ///< 32-bit floating point type
+  StructTyID,    ///< Structures
+  LabelTyID,     ///< label
+  GotoTyID,      ///< goto label
+  FuncCallTyID,  ///< func call goto label
+  FuncEndTyID,
+  ReturnTyID,
+  ParamTyID,
 
   // PrimitiveTypes
   HalfTyID,       ///< 16-bit floating point type

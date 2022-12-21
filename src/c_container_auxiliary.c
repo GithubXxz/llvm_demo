@@ -8,9 +8,11 @@ Stack* stack_else_label = NULL;
 
 Stack* stack_then_label = NULL;
 
+HashMap* func_hashMap = NULL;
+
 List* ins_list = NULL;
 
-// 出栈伴随运行的函数 我真他妈 心态崩了 学艺不精
+// 出栈/链表删除 伴随运行的函数 我真他妈 心态崩了 学艺不精
 void CleanObject(void* element) {}
 
 unsigned HashKey(void* key) { return HashDjb2((char*)key); }
@@ -46,4 +48,11 @@ void AllInit() {
   // 初始化then的goto栈
   stack_then_label = StackInit();
   StackSetClean(stack_then_label, CleanObject);
+
+  func_hashMap = HashMapInit();
+  // 哈希表的初始化
+  HashMapSetHash(func_hashMap, HashKey);
+  HashMapSetCompare(func_hashMap, CompareKey);
+  HashMapSetCleanKey(func_hashMap, CleanKey);
+  HashMapSetCleanValue(func_hashMap, CleanValue);
 }

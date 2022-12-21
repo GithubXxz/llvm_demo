@@ -14,6 +14,7 @@ typedef enum _TAC_OP {
   FunBeginOP,
   FunEndOP,
   ReturnOP,
+  ParamOP,
   AssignOP,
   CallWithReturnValueOP,
   NotEqualOP,
@@ -22,7 +23,8 @@ typedef enum _TAC_OP {
   LessThanOP,
   GreatEqualOP,
   LessEqualOP,
-  LABELOP
+  LabelOP,
+  FuncEndOP
 } TAC_OP;
 
 struct _BasicBlock;

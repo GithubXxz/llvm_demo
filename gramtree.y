@@ -38,8 +38,13 @@ OptTag  Tag VarDec  FunDec VarList ParamDec Compst StmtList Stmt DefList Def Dec
 %%
 Program:|ExtDefList {
     $$=newast("Program",1,$1);
+    
+    //  if (freopen("out.txt", "w", stdout) == NULL) {
+    //    fprintf(stderr, "打开文件失败！");
+    //    exit(-1);
+    //  }
 
-    // eval_print($$,0);
+    // eval_print($$,0);    
 
     eval($$);
 
@@ -59,14 +64,14 @@ ExtDefList:ExtDef ExtDefList {$$=newast("ExtDefList",2,$1,$2);}
              或者
              struct myStructWithout */
 //定义函数 int main(int a,int b){}
-ExtDef:Specifire ExtDecList SEMI    {$$=newast("ExtDef",3,$1,$2,$3);}
-	|Specifire SEMI	{$$=newast("ExtDef",2,$1,$2);}
+ExtDef:Specifire ExtDecList SEMI    {$$=newast("ExtDef",2,$1,$2);}
+	|Specifire SEMI	{$$=newast("ExtDef",1,$1);}
 	|Specifire FunDec Compst	{$$=newast("ExtDef",3,$1,$2,$3);}
 	;
 
 //全局变量名
 ExtDecList:VarDec {$$=newast("ExtDecList",1,$1);}
-	|VarDec COMMA ExtDecList {$$=newast("ExtDecList",3,$1,$2,$3);}
+	|VarDec COMMA ExtDecList {$$=newast("ExtDecList",2,$1,$3);}
 	;
 
 
@@ -111,7 +116,7 @@ FunDec:ID LP VarList RP {$$=newast("FunDec",4,$1,$2,$3,$4);}
 	;
 //变量列表 声明单个变量的拼接 中间以逗号隔开
 //格式：int a,int b
-VarList:ParamDec COMMA VarList {$$=newast("VarList",3,$1,$2,$3);}
+VarList:ParamDec COMMA VarList {$$=newast("VarList",2,$1,$3);}
 	|ParamDec {$$=newast("VarList",1,$1);}
 	;
 //声明单个变量作为参数列表中的参数
@@ -158,9 +163,9 @@ StmtList:Stmt StmtList{$$=newast("StmtList",2,$1,$2);}
 //4.if(表达式)语句::=>{基本块}
 //5.if(表达式)语句::=>{基本块} else语句=>{基本块}
 //6.while(表达式)语句::=>{基本块}
-Stmt:Exp SEMI {$$=newast("Stmt",2,$1,$2);}
+Stmt:Exp SEMI {$$=newast("Stmt",1,$1);}
     |Compst {$$=newast("Stmt",1,$1);}
-	|RETURN Exp SEMI {$$=newast("Stmt",3,$1,$2,$3);}
+	|RETURN Exp SEMI {$$=newast("Stmt",2,$1,$2);}
 	|IF LP Exp RP Stmt {$$=newast("Stmt",5,$1,$3,newast("assistIF",0,-1),$5,newast("assistELSE",0,-1));}
 	|IF LP Exp RP Stmt ELSE Stmt {$$=newast("Stmt",7,$1,$3,newast("assistIF",0,-1),$5,newast("assistELSE",0,-1),$6,$7);}
 	|WHILE LP Exp RP Stmt {$$=newast("Stmt",5,$1,$2,$3,$4,$5);}
@@ -174,11 +179,11 @@ DefList:Def DefList{$$=newast("DefList",2,$1,$2);}
 	| {$$=newast("DefList",0,-1);}
 	;
 //格式:int a = m+n,b,c;
-Def:Specifire DecList SEMI {$$=newast("Def",3,$1,$2,$3);}
+Def:Specifire DecList SEMI {$$=newast("Def",2,$1,$2);}
 	;
 //格式: a = m+n , b, c
 DecList:Dec {$$=newast("DecList",1,$1);}
-	|Dec COMMA DecList {$$=newast("DecList",3,$1,$2,$3);}
+	|Dec COMMA DecList {$$=newast("DecList",2,$1,$3);}
 	;
 // ASSIGNOP是等号
 // VarDec 表示标识符或者数组 a、a[10]
@@ -202,11 +207,11 @@ Exp:Exp ASSIGNOP Exp{$$=newast("Exp",3,$1,$2,$3);} // Exp = Exp
         |Exp MINUS Exp{$$=newast("Exp",3,$1,$2,$3);} // Exp - Exp
         |Exp STAR Exp{$$=newast("Exp",3,$1,$2,$3);} // Exp * Exp
         |Exp DIV Exp{$$=newast("Exp",3,$1,$2,$3);} // Exp / Exp
-        |LP Exp RP{$$=newast("Exp",3,$1,$2,$3);}  // (Exp)
+        |LP Exp RP{$$=newast("Exp",1,$2);}  // (Exp)
         |MINUS Exp {$$=newast("Exp",2,$1,$2);} // -Exp
         |NOT Exp {$$=newast("Exp",2,$1,$2);} // !Exp
-        |ID LP Args RP {$$=newast("Exp",4,$1,$2,$3,$4);}//带有参数的函数调用
-        |ID LP RP {$$=newast("Exp",3,$1,$2,$3);}//没有参数的函数调用
+        |ID LP Args RP {$$=newast("Exp",3,newast("assistFuncCall",0,-1),$1,$3);}//带有参数的函数调用
+        |ID LP RP {$$=newast("Exp",2,newast("assistFuncCall",0,-1),$1);}//没有参数的函数调用
         |Exp LB Exp RB {$$=newast("Exp",4,$1,$2,$3,$4);} // Exp[Exp] 数组求值
         |Exp DOT ID {$$=newast("Exp",3,$1,$2,$3);} //Exp.ID 结构体调用结构体内部成员
         |ID {$$=newast("Exp",1,$1);} // ID 变量
@@ -215,8 +220,8 @@ Exp:Exp ASSIGNOP Exp{$$=newast("Exp",3,$1,$2,$3);} // Exp = Exp
         ;
 
 //函数调用中的参数表达
-Args:Exp COMMA Args {$$=newast("Args",3,$1,$2,$3);}
-        |Exp {$$=newast("Args",1,$1);}
+Args:Exp COMMA Args {$$=newast("Args",3,$1,newast("assistArgs",0,-1),$3);}
+        |Exp {$$=newast("Args",2,$1,newast("assistArgs",0,-1));}
         ;
 %%
 
