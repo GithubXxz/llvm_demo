@@ -41,8 +41,8 @@ User *user_construct(void *place, int use_num) {
   User *Obj = (User *)(End);
   // 将uselist执行第一条USE边的内存
   Obj->use_list = Start;
-  Obj->value.NumUserOperands = use_num;
-  Obj->value.HasHungOffUses = false;
+  Obj->res->NumUserOperands = use_num;
+  Obj->res->HasHungOffUses = false;
 
   for (; Start != End; Start++) {
     // 在 Start 地址上用构造 Use对象

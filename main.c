@@ -43,6 +43,11 @@ char *op_string[] = {"AddOP",
 
 int main() {
   AllInit();
+
+  if (freopen("out.txt", "w", stdout) == NULL) {
+    fprintf(stderr, "打开文件失败！");
+    exit(-1);
+  }
   printf("开始遍历\n");
 
   return_val = (Value *)malloc(sizeof(Value));
@@ -52,10 +57,29 @@ int main() {
 
   // if嵌套的例子
   char *input1 =
-      "int main() {int a;int b;int c;a = 5;b = 10; if(a==5){ a = "
-      "30;b=40;c=a+b;if(b==20){c=19;a=233;}a=156; "
-      "}else{ a = "
-      "100; b=200;c=120+a;}int m=30,n=23;}";
+      "int main() {"
+      "  int a;"
+      "  int b;"
+      "  int c;"
+      "  a = 5;"
+      "  b = 10;"
+      "  if (a == 5) {"
+      "    a = 30;"
+      "    b = 40;"
+      "    c = a + b;"
+      "    if (b == 20) {"
+      "      c = 19;"
+      "      a = 233;"
+      "    }"
+      "    a = 156;"
+      "  } else {"
+      "    a = 100;"
+      "    b = 200;"
+      "    c = 120 + a;"
+      "  }"
+      "  int m = 30, n = 23;"
+      "  return a;"
+      "}";
 
   // 函数调用的例子
   char *input2 =
@@ -73,7 +97,27 @@ int main() {
       "  a = binary_add(c,b);"
       "}";
 
-  parser(input2);
+  char *input3 =
+      "int if_if_Else() {"
+      "   int a;"
+      "   a = 5;"
+      "   int b;"
+      "   b = 10;"
+      "   if(a == 5){"
+      "     if (b == 10)"
+      "       a = 25;"
+      "   }"
+      "   else {"
+      "     a = a + 15;"
+      "   }"
+      "   return (a);"
+      " }"
+      " int main(){"
+      "   return (if_if_Else());"
+      " }";
+
+  parser(input1);
+  printf("遍历结束\n\n");
 
   printf("\npass the instruction list\n");
   void *element;
@@ -81,10 +125,18 @@ int main() {
   while (ListNext(ins_list, &element)) {
     // 打印出每条instruction的res的名字信息
     printf("opcode: %s    ", op_string[((Instruction *)element)->opcode]);
-    printf("\tname: %s\n", ((Instruction *)element)->res->name);
+    printf("\tname: %s    ", ((Instruction *)element)->user.res->name);
+    if (((Instruction *)element)->user.res->NumUserOperands == 2) {
+      printf("\t%s\t%s\n",
+             user_get_operand_use(((User *)element), 0)->Val->name,
+             user_get_operand_use(((User *)element), 1)->Val->name);
+    } else if (((Instruction *)element)->user.res->NumUserOperands == 1) {
+      printf("\t%s\n", user_get_operand_use(((User *)element), 0)->Val->name);
+    } else if (((Instruction *)element)->user.res->NumUserOperands == 0) {
+      printf("\t0\n");
+    }
   }
 
-  printf("遍历结束\n\n");
   ListDeinit(ins_list);
 
   return 0;

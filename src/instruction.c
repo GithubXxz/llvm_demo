@@ -11,10 +11,10 @@ Instruction *ins_new(int op_num, Value *self) {
   // use 是额外的，所以要单独计算大小
   // 为了 instruction 分配内存块 并且返回内存块的首地址
   uint8_t *storage = (uint8_t *)malloc(sizeof(Instruction) + use_size);
+  // 不考虑SSA形式下的instruction
+  ((User *)(storage + use_size))->res = self;
   // 将instruction里面的内容分布在内存块中
   user_construct(storage, op_num);
-  // 不考虑SSA形式下的instruction
-  ((Instruction *)(storage + use_size))->res = self;
   // 计算偏移量然后返回User的首地址 低地址存储的位Use
   return (Instruction *)(storage + use_size);
 }
@@ -60,7 +60,7 @@ TypeID ins_res_type(Value *left, Value *right) {
   return type_id;
 }
 
-void free_ins(Instruction *self) { free(self->res); }
+void free_ins(Instruction *self) { free(((User *)self)->res); }
 // zzq 判断一个value是否满足pdata里面的数据为0
 // bool is_zero(Value *this) {
 //   return (this->pdata != NULL && *((int *)(this->pdata)) == 0);

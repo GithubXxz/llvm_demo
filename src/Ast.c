@@ -153,7 +153,7 @@ void pre_eval(ast *a) {
       StackTop(stack_else_label, (void **)&else_label_ins);
       StackPop(stack_else_label);
       ListPushBack(ins_list, (void *)else_label_ins);
-      printf("%s\n", else_label_ins->res->name);
+      printf("%s\n", else_label_ins->user.res->name);
     }
   }
 }
@@ -233,6 +233,24 @@ void in_eval(ast *a, Value *left) {
 
     printf("new instruction goto %s with condition %s\n", else_label->name,
            left->name);
+
+    // 创建true条件下的label标签
+    Value *true_label = (Value *)malloc(sizeof(Value));
+    value_init(true_label);
+
+    sprintf(text, "%d", label_var_seed);
+    ++label_var_seed;
+    strcpy(temp_str, "label");
+    strcat(temp_str, text);
+
+    // 添加变量的名字
+    true_label->name = strdup(temp_str);
+    true_label->VTy->TID = LabelTyID;
+
+    Instruction *true_label_ins = ins_new_no_operator(true_label, LabelOP);
+    ListPushBack(ins_list, true_label_ins);
+
+    printf("%s\n", temp_str);
   }
 
   if (a->r && !strcmp(a->r->name, "assistELSE")) {
@@ -525,7 +543,7 @@ Value *post_eval(ast *a, Value *left, Value *right) {
         //     "label\n");
         // 删除链尾 并且释放链尾ins的内存
         ListPopBack(ins_list);
-        value_free(ins_back->res);
+        value_free(ins_back->user.res);
         free(ins_back);
 
         // 释放内存
@@ -533,14 +551,15 @@ Value *post_eval(ast *a, Value *left, Value *right) {
         StackTop(stack_else_label, (void **)&else_label_ins);
         StackPop(stack_else_label);
         ListPushBack(ins_list, (void *)else_label_ins);
-        printf("%s\n", else_label_ins->res->name);
+        printf("%s\n", else_label_ins->user.res->name);
 
         Instruction *then_label_ins = NULL;
         StackTop(stack_then_label, (void **)&then_label_ins);
         StackPop(stack_then_label);
         // 释放label ins的内存
-        printf("delete the destination %s\n", then_label_ins->res->name);
-        value_free(then_label_ins->res);
+        // printf("delete the destination %s\n",
+        // then_label_ins->user.res->name);
+        value_free(then_label_ins->user.res);
         free(then_label_ins);
         return NULL;
       } else {
@@ -549,7 +568,7 @@ Value *post_eval(ast *a, Value *left, Value *right) {
         StackTop(stack_then_label, (void **)&then_label_ins);
         StackPop(stack_then_label);
         ListPushBack(ins_list, (void *)then_label_ins);
-        printf("%s\n", then_label_ins->res->name);
+        printf("%s\n", then_label_ins->user.res->name);
         return NULL;
       }
     }

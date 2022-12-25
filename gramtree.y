@@ -39,10 +39,6 @@ OptTag  Tag VarDec  FunDec VarList ParamDec Compst StmtList Stmt DefList Def Dec
 Program:|ExtDefList {
     $$=newast("Program",1,$1);
     
-    //  if (freopen("out.txt", "w", stdout) == NULL) {
-    //    fprintf(stderr, "打开文件失败！");
-    //    exit(-1);
-    //  }
 
     // eval_print($$,0);    
 

@@ -32,7 +32,6 @@ typedef struct _Instruction {
   User user;
   TAC_OP opcode;  // 操作吗
   struct _BasicBlock *Parent;
-  Value *res;
 } Instruction;
 
 Instruction *ins_new(int op_num, Value *self);
