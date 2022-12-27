@@ -61,6 +61,7 @@ TypeID ins_res_type(Value *left, Value *right) {
 }
 
 void free_ins(Instruction *self) { free(((User *)self)->res); }
+
 // zzq 判断一个value是否满足pdata里面的数据为0
 // bool is_zero(Value *this) {
 //   return (this->pdata != NULL && *((int *)(this->pdata)) == 0);

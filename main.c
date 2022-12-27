@@ -4,6 +4,8 @@
 #include <string.h>
 
 #include "Ast.h"
+#include "Pass.h"
+#include "bblock.h"
 #include "c_container_auxiliary.h"
 #include "cds.h"
 #include "symbol_table.h"
@@ -16,35 +18,15 @@ Value *return_val = NULL;
 
 ast *pre_astnode = NULL;
 
+BasicBlock *cur_bblock = NULL;
+
 int yyparse(void);
 int parser(char *input);
-
-char *op_string[] = {"AddOP",
-                     "SubOP",
-                     "MulOP",
-                     "DivOP",
-                     "GotoOP",
-                     "GotoWithConditionOP",
-                     "CallOP",
-                     "FunBeginOP",
-                     "FunEndOP",
-                     "ReturnOP",
-                     "ParamOP",
-                     "AssignOP",
-                     "CallWithReturnValueOP",
-                     "NotEqualOP",
-                     "EqualOP",
-                     "GreatThanOP",
-                     "LessThanOP",
-                     "GreatEqualOP",
-                     "LessEqualOP",
-                     "LabelOP",
-                     "FuncEndOP"};
 
 int main() {
   AllInit();
 
-  if (freopen("out.txt", "w", stdout) == NULL) {
+  if (freopen("if-else.txt", "w", stdout) == NULL) {
     fprintf(stderr, "打开文件失败！");
     exit(-1);
   }
@@ -93,8 +75,8 @@ int main() {
       "  int c;"
       "  a = 10;"
       "  b = 20;"
-      "  c = binary_add(a,(b+c));"
-      "  a = binary_add(c,b);"
+      "  c = binary_add(a, (b + c));"
+      "  return c;"
       "}";
 
   char *input3 =
@@ -119,23 +101,7 @@ int main() {
   parser(input1);
   printf("遍历结束\n\n");
 
-  printf("\npass the instruction list\n");
-  void *element;
-  ListFirst(ins_list, false);
-  while (ListNext(ins_list, &element)) {
-    // 打印出每条instruction的res的名字信息
-    printf("opcode: %s    ", op_string[((Instruction *)element)->opcode]);
-    printf("\tname: %s    ", ((Instruction *)element)->user.res->name);
-    if (((Instruction *)element)->user.res->NumUserOperands == 2) {
-      printf("\t%s\t%s\n",
-             user_get_operand_use(((User *)element), 0)->Val->name,
-             user_get_operand_use(((User *)element), 1)->Val->name);
-    } else if (((Instruction *)element)->user.res->NumUserOperands == 1) {
-      printf("\t%s\n", user_get_operand_use(((User *)element), 0)->Val->name);
-    } else if (((Instruction *)element)->user.res->NumUserOperands == 0) {
-      printf("\t0\n");
-    }
-  }
+  print_ins_pass(ins_list);
 
   ListDeinit(ins_list);
 

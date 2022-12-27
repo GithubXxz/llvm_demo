@@ -171,28 +171,40 @@ void in_eval(ast *a, Value *left) {
 
     // 添加变量的名字
     func_label->name = strdup(temp_str);
-    func_label->VTy->TID = LabelTyID;
+    func_label->VTy->TID = FuncLabelTyID;
     // 设定返回值类型
     func_label->pdata->symtab_func_pdata.return_type = (int)nowVarDecType;
     func_label->pdata->symtab_func_pdata.param_num = num_of_param;
-    // 将参数的个人清零
+    // 将参数的个数清零
     num_of_param = 0;
 
-    // cur_symboltable->symbol_map->put(cur_symboltable->symbol_map,
-    //                                  strdup(temp_str), else_label);
-
-    Instruction *func_label_ins = ins_new_no_operator(func_label, LabelOP);
+    Instruction *func_label_ins = ins_new_no_operator(func_label, FuncLabelOP);
 
     // 插入
     ListPushBack(ins_list, (void *)func_label_ins);
 
+    printf("%s\n", temp_str);
+
     // 将函数的<name,label>插入函数表
     HashMapPut(func_hashMap, strdup(a->l->idtype), func_label);
 
-    printf("%s\n", temp_str);
+    // 创建true条件下的label标签
+    Value *entry_label = (Value *)malloc(sizeof(Value));
+    value_init(entry_label);
+
+    // 添加变量的名字
+    entry_label->name = strdup("entry");
+    entry_label->VTy->TID = LabelTyID;
+
+    Instruction *entry_label_ins = ins_new_no_operator(entry_label, LabelOP);
+
+    ListPushBack(ins_list, entry_label_ins);
+
+    printf("entry\n");
   }
 
   if (a->r && !strcmp(a->r->name, "assistIF")) {
+    // 创建false条件下的label标签
     Value *else_label = (Value *)malloc(sizeof(Value));
     value_init(else_label);
     char temp_str[15];
@@ -206,33 +218,10 @@ void in_eval(ast *a, Value *left) {
     else_label->name = strdup(temp_str);
     else_label->VTy->TID = LabelTyID;
 
-    // cur_symboltable->symbol_map->put(cur_symboltable->symbol_map,
-    //                                  strdup(temp_str), else_label);
-
     Instruction *else_label_ins = ins_new_no_operator(else_label, LabelOP);
 
+    // 将else-label入栈
     StackPush(stack_else_label, else_label_ins);
-
-    // printf("new instruction destination %s and push to the else_stack\n",
-    //        else_label->name);
-
-    Value *goto_else = (Value *)malloc(sizeof(Value));
-    value_init(goto_else);
-
-    goto_else->name = strdup("goto_else_or_then");
-    goto_else->VTy->TID = GotoTyID;
-    goto_else->pdata->instruction_pdata.goto_location = else_label;
-
-    // cur_symboltable->symbol_map->put(cur_symboltable->symbol_map,
-    //                                  strdup(temp_str), goto_else);
-
-    Instruction *goto_else_ins =
-        ins_new_single_operator(goto_else, GotoWithConditionOP, left);
-
-    ListPushBack(ins_list, (void *)goto_else_ins);
-
-    printf("new instruction goto %s with condition %s\n", else_label->name,
-           left->name);
 
     // 创建true条件下的label标签
     Value *true_label = (Value *)malloc(sizeof(Value));
@@ -248,6 +237,24 @@ void in_eval(ast *a, Value *left) {
     true_label->VTy->TID = LabelTyID;
 
     Instruction *true_label_ins = ins_new_no_operator(true_label, LabelOP);
+
+    // 创建跳转语句
+    Value *goto_condition = (Value *)malloc(sizeof(Value));
+    value_init(goto_condition);
+
+    goto_condition->name = strdup("goto_else_or_then");
+    goto_condition->VTy->TID = GotoTyID;
+    goto_condition->pdata->condition_goto.false_goto_location = else_label;
+    goto_condition->pdata->condition_goto.true_goto_location = true_label;
+
+    Instruction *goto_condition_ins =
+        ins_new_single_operator(goto_condition, GotoWithConditionOP, left);
+
+    ListPushBack(ins_list, (void *)goto_condition_ins);
+
+    printf("new instruction true: goto %s false : goto %s with condition %s\n",
+           true_label->name, else_label->name, left->name);
+
     ListPushBack(ins_list, true_label_ins);
 
     printf("%s\n", temp_str);
@@ -282,7 +289,7 @@ void in_eval(ast *a, Value *left) {
 
     goto_then->name = strdup("goto_then");
     goto_then->VTy->TID = GotoTyID;
-    goto_then->pdata->instruction_pdata.goto_location = then_label;
+    goto_then->pdata->no_condition_goto.goto_location = then_label;
 
     // cur_symboltable->symbol_map->put(cur_symboltable->symbol_map,
     //                                  strdup(temp_str), goto_else);
@@ -413,7 +420,7 @@ Value *post_eval(ast *a, Value *left, Value *right) {
 
         call_fun->name = strdup("call_func");
         call_fun->VTy->TID = FuncCallTyID;
-        call_fun->pdata->instruction_pdata.goto_location = func_label;
+        call_fun->pdata->no_condition_goto.goto_location = func_label;
 
         // cur_symboltable->symbol_map->put(cur_symboltable->symbol_map,
         //                                  strdup(temp_str), goto_else);
