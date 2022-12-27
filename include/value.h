@@ -18,9 +18,15 @@ typedef struct _Value Value;
 typedef union _PData {
   // 跳转的目的地 跳转的条件放在use里
   struct {
-    Value *goto_location;  // 跳转位置
-  } instruction_pdata;
+    Value *goto_location;  // 无条件跳转位置
+  } no_condition_goto;
 
+  struct {
+    Value *true_goto_location;   // 条件为真跳转位置
+    Value *false_goto_location;  // 条件为假跳转位置
+  } condition_goto;
+
+  // 常数字面量
   struct {
     union {
       int iVal;
@@ -39,7 +45,7 @@ typedef union _PData {
   } return_pdata;
 
   struct {
-    Value *param_value;  // 返回值
+    Value *param_value;  // 函数参数
   } param_pdata;
 } PData;
 

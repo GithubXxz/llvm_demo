@@ -17,33 +17,33 @@
 
 #ifndef BASIC_BLOCK_H
 #define BASIC_BLOCK_H
-#include "value.h"
+#include "cds.h"
+#include "function.h"
 #include "instruction.h"
-#include "sc_list.h"
+#include "value.h"
 
 struct _Function;
 typedef struct _Function Function;
-typedef struct _BasicBlock BasicBlock;
 
-struct _BasicBlock
-{
-    Value value;
-    //所属的函数
-    struct _Function *Parent;
-    struct sc_list inst_list;
-};
+typedef struct _BasicBlock {
+  // 指向label节点的value 等同于label节点里所包含的value*
+  Value* label;
+  // 所属的函数
+  // struct _Function* Parent;
+  // basicblock中的语句链
+  List* inst_list;
+  // 父块和子块
+  List* father_bblock;
 
-typedef struct _InstNode InstNode;
-struct _InstNode{
-    Instruction* inst;
-    struct sc_list list;
-};
+    struct _BasicBlock* true_bblock;
+  struct _BasicBlock* false_bblock;
+  Function* parent;
+} BasicBlock;
 
-void bblock_init(BasicBlock* this, Function* func);
+void bblock_init(BasicBlock* this);
 
 void bblock_add_inst_back(BasicBlock* this, Instruction* inst);
 
 Instruction* bblock_pop_inst_back(BasicBlock* this);
-
 
 #endif

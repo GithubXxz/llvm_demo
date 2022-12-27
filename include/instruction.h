@@ -1,3 +1,4 @@
+#include "cds.h"
 #include "user.h"
 
 #ifndef INSTRUCTION_H
@@ -24,6 +25,7 @@ typedef enum _TAC_OP {
   GreatEqualOP,
   LessEqualOP,
   LabelOP,
+  FuncLabelOP,
   FuncEndOP
 } TAC_OP;
 
