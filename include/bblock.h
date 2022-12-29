@@ -17,13 +17,11 @@
 
 #ifndef BASIC_BLOCK_H
 #define BASIC_BLOCK_H
+#include "c_container_auxiliary.h"
 #include "cds.h"
 #include "function.h"
 #include "instruction.h"
 #include "value.h"
-
-struct _Function;
-typedef struct _Function Function;
 
 typedef struct _BasicBlock {
   // 指向label节点的value 等同于label节点里所包含的value*
@@ -33,14 +31,14 @@ typedef struct _BasicBlock {
   // basicblock中的语句链
   List* inst_list;
   // 父块和子块
-  List* father_bblock;
+  List* father_bblock_list;
 
-    struct _BasicBlock* true_bblock;
+  struct _BasicBlock* true_bblock;
   struct _BasicBlock* false_bblock;
   Function* parent;
 } BasicBlock;
 
-void bblock_init(BasicBlock* this);
+void bblock_init(BasicBlock* this, Function* parent);
 
 void bblock_add_inst_back(BasicBlock* this, Instruction* inst);
 

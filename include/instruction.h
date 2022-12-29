@@ -46,7 +46,10 @@ Instruction *ins_new_single_operator(Value *self, TAC_OP Op, Value *S1);
 Instruction *ins_new_binary_operator(Value *self, TAC_OP Op, Value *S1,
                                      Value *S2);
 
-void free_ins(Instruction *self);
+void free_common_ins(Instruction *self);
+
+// set clean for the list clean
+void CommonCleanInstruction(void *element);
 
 Instruction *ins_new_one_operator(Value *S1);
 

@@ -545,9 +545,6 @@ Value *post_eval(ast *a, Value *left, Value *right) {
       ListGetBack(ins_list, (void **)&ins_back);
 
       if (ins_back->opcode == GotoOP) {
-        // printf(
-        //     "this 'if' without else statement and delete goto destination "
-        //     "label\n");
         // 删除链尾 并且释放链尾ins的内存
         ListPopBack(ins_list);
         value_free(ins_back->user.res);

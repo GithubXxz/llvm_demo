@@ -11,10 +11,14 @@ unsigned HashKey(void* key);
 // 将键类型强转位字符串然后来比较
 int CompareKey(void* lhs, void* rhs);
 
-void CleanKey(void* key);
+void CleanHashMapKey(void* key);
+
+void CleanHashSetKey(void* key);
 
 void CleanValue(void* value);
 
 void AllInit();
+
+void clear_list_nullptr(List* self);
 
 #endif

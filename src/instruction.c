@@ -60,7 +60,35 @@ TypeID ins_res_type(Value *left, Value *right) {
   return type_id;
 }
 
-void free_ins(Instruction *self) { free(((User *)self)->res); }
+void free_common_ins(Instruction *self) {
+  if (self->opcode == AddOP || self->opcode == SubOP || self->opcode == MulOP ||
+      self->opcode == DivOP || self->opcode == EqualOP ||
+      self->opcode == GreatThanOP || self->opcode == LessThanOP ||
+      self->opcode == ParamOP || self->opcode == NotEqualOP ||
+      self->opcode == GreatEqualOP || self->opcode == LessEqualOP) {
+    // 释放连接这条instruction的use链
+    for (int i = 0; i < self->user.num_oprands; i++) {
+      use_remove_from_list(user_get_operand_use((User *)self, i));
+      free(user_get_operand_use((User *)self, i));
+    }
+    free(self);
+  } else if (self->opcode == GotoOP || self->opcode == GotoWithConditionOP ||
+             self->opcode == CallOP || self->opcode == ReturnOP) {
+    // 释放连接这条instruction的use链
+    for (int i = 0; i < self->user.num_oprands; i++) {
+      use_remove_from_list(user_get_operand_use((User *)self, i));
+      free(user_get_operand_use((User *)self, i));
+    }
+    value_free(((User *)self)->res);
+    free(self);
+  }
+}
+
+// clean the instruction
+void CommonCleanInstruction(void *element) {
+  free_common_ins((Instruction *)element);
+  element = NULL;
+}
 
 // zzq 判断一个value是否满足pdata里面的数据为0
 // bool is_zero(Value *this) {

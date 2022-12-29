@@ -6,8 +6,6 @@
 
 // TODO this 重复包含头文件 malloc
 
-#define nullptr 0
-
 typedef enum _TypeID {
   // 默认值
   DefaultTyID = 0,

@@ -33,8 +33,7 @@ SET(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
 link_directories(${local}/lib)
 
 #生成可执行文件
-add_executable(${PROJECT_NAME} main.c  ${BISON_MyParser_OUTPUTS} ${FLEX_MyScanner_OUTPUTS}  ${DIR_SRC} ${DIR_STRUCT_DEMO} 
-include/Ast.h src/Ast.c include/symbol_table.h include/Pass.h include/function.h)
+add_executable(${PROJECT_NAME} main.c  ${BISON_MyParser_OUTPUTS} ${FLEX_MyScanner_OUTPUTS}  ${DIR_SRC} ${DIR_STRUCT_DEMO} )
   
 
 #链接动态库文件

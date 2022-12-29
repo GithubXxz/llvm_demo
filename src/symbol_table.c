@@ -9,7 +9,7 @@ void symbol_table_init(struct _SymbolTable* self) {
   // 哈希表的初始化
   HashMapSetHash(self->symbol_map, HashKey);
   HashMapSetCompare(self->symbol_map, CompareKey);
-  HashMapSetCleanKey(self->symbol_map, CleanKey);
+  HashMapSetCleanKey(self->symbol_map, CleanHashMapKey);
   HashMapSetCleanValue(self->symbol_map, CleanValue);
 
   // 如果栈不为空

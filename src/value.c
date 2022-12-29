@@ -26,7 +26,6 @@ void value_init(Value *this) {
 
 void value_free(Value *this) {
   free(this->VTy);
-  free(this->pdata);
   free(this->name);
   free(this);
 }

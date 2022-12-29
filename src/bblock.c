@@ -1,12 +1,14 @@
 #include "bblock.h"
 
-void bblock_init(BasicBlock* this) {
+void bblock_init(BasicBlock* this, Function* parent) {
   this->label = NULL;
-  this->inst_list = NULL;
-  this->father_bblock = NULL;
+  this->inst_list = ListInit();
+  ListSetClean(this->inst_list, CleanObject);
+  this->father_bblock_list = ListInit();
+  ListSetClean(this->father_bblock_list, CleanObject);
   this->true_bblock = NULL;
   this->false_bblock = NULL;
-  this->parent = NULL;
+  this->parent = parent;
 }
 
 // only used by bblock

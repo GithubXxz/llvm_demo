@@ -41,7 +41,7 @@ User *user_construct(void *place, int use_num) {
   User *Obj = (User *)(End);
   // 将uselist执行第一条USE边的内存
   Obj->use_list = Start;
-  Obj->res->NumUserOperands = use_num;
+  Obj->num_oprands = use_num;
   Obj->res->HasHungOffUses = false;
 
   for (; Start != End; Start++) {

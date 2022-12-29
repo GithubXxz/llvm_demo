@@ -84,6 +84,8 @@ struct _User {
   // 是隐式的创建，这里是显式的创建
   struct _Use *use_list;
 
+  int num_oprands;
+
   Value *res;
 };
 

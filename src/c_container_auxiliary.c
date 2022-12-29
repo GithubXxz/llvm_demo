@@ -8,9 +8,17 @@ Stack* stack_else_label = NULL;
 
 Stack* stack_then_label = NULL;
 
+// 哈希表的初始化 用于查找调用的函数名和对应的函数label
 HashMap* func_hashMap = NULL;
 
 List* ins_list = NULL;
+
+List* func_list = NULL;
+
+// 用于生成cfg图通过label的名字查询对应的bblock
+HashMap* bblock_hashmap = NULL;
+
+HashSet* bblock_pass_hashset = NULL;
 
 // 出栈/链表删除 伴随运行的函数 我真他妈 心态崩了 学艺不精
 void CleanObject(void* element) {}
@@ -24,7 +32,9 @@ int CompareKey(void* lhs, void* rhs) {
   return strcmp((char*)lhs, (char*)lhs);
 }
 
-void CleanKey(void* key) { free(key); }
+void CleanHashMapKey(void* key) { free(key); }
+
+void CleanHashSetKey(void* key) {}
 
 void CleanValue(void* value) {}
 
@@ -32,6 +42,10 @@ void AllInit() {
   // 初始化指令链表
   ins_list = ListInit();
   ListSetClean(ins_list, CleanObject);
+
+  // 初始化函数链表
+  func_list = ListInit();
+  ListSetClean(func_list, CleanObject);
 
   // 初始化前置ast节点栈
   stack_ast_pre = StackInit();
@@ -50,9 +64,21 @@ void AllInit() {
   StackSetClean(stack_then_label, CleanObject);
 
   func_hashMap = HashMapInit();
-  // 哈希表的初始化
+  // 哈希表的初始化 用于查找调用的函数名和对应的函数label
   HashMapSetHash(func_hashMap, HashKey);
   HashMapSetCompare(func_hashMap, CompareKey);
-  HashMapSetCleanKey(func_hashMap, CleanKey);
+  HashMapSetCleanKey(func_hashMap, CleanHashMapKey);
   HashMapSetCleanValue(func_hashMap, CleanValue);
+
+  bblock_hashmap = HashMapInit();
+  // 用于遍历生成cfg图结构时候查找bblock
+  HashMapSetHash(bblock_hashmap, HashKey);
+  HashMapSetCompare(bblock_hashmap, CompareKey);
+  HashMapSetCleanKey(bblock_hashmap, CleanHashMapKey);
+  HashMapSetCleanValue(bblock_hashmap, CleanValue);
+
+  bblock_pass_hashset = HashSetInit();
+  HashSetSetHash(bblock_pass_hashset, HashKey);
+  HashSetSetCompare(bblock_pass_hashset, CompareKey);
+  HashSetSetCleanKey(bblock_pass_hashset, CleanHashSetKey);
 }

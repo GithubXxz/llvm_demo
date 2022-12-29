@@ -14,19 +14,16 @@ struct _User;
 
 typedef struct _Use Use;
 struct _Use {
-
-    struct _Value *Val;
-    struct _Use *Next;
-    struct _Use **Prev;
-    struct _User *Parent;
-
+  struct _Value *Val;
+  struct _Use *Next;
+  struct _Use **Prev;
+  struct _User *Parent;
 };
-
 
 void use_create(Use *this, struct _User *Parent);
 
 void use_add_to_list(Use *this, Use **List);
 
-
+void use_remove_from_list(Use *this);
 
 #endif
