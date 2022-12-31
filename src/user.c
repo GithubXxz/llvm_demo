@@ -42,7 +42,7 @@ User *user_construct(void *place, int use_num) {
   // 将uselist执行第一条USE边的内存
   Obj->use_list = Start;
   Obj->num_oprands = use_num;
-  Obj->res->HasHungOffUses = false;
+  ((Value *)Obj)->HasHungOffUses = false;
 
   for (; Start != End; Start++) {
     // 在 Start 地址上用构造 Use对象

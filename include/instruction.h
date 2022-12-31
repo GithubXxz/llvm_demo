@@ -5,6 +5,7 @@
 #define INSTRUCTION_H
 
 typedef enum _TAC_OP {
+  DefaultOP,
   AddOP,
   SubOP,
   MulOP,
@@ -26,7 +27,10 @@ typedef enum _TAC_OP {
   LessEqualOP,
   LabelOP,
   FuncLabelOP,
-  FuncEndOP
+  FuncEndOP,
+  AllocateOP,
+  LoadOP,
+  StoreOP
 } TAC_OP;
 
 struct _BasicBlock;
@@ -51,11 +55,30 @@ void free_common_ins(Instruction *self);
 // set clean for the list clean
 void CommonCleanInstruction(void *element);
 
-Instruction *ins_new_one_operator(Value *S1);
-
+// 二元运算判断左值的类型
 TypeID ins_res_type(Value *left, Value *right);
 
-Value *ins_get_value(Instruction *this);
+/*
+SSA版本
+非Value*版本
+*/
+
+Instruction *ins_new_v2(int op_num);
+
+// 用于标识跳转
+Instruction *ins_new_no_operator_v2(TAC_OP Op);
+
+Instruction *ins_new_single_operator_v2(TAC_OP Op, Value *S1);
+
+Instruction *ins_new_binary_operator_v2(TAC_OP Op, Value *S1, Value *S2);
+
+void free_common_ins_v2(Instruction *self);
+
+// set clean for the list clean
+void CommonCleanInstruction_v2(void *element);
+
+// 二元运算判断左值的类型
+TypeID ins_res_type_v2(Value *left, Value *right);
 
 // https://llvm.org/doxygen/InstrTypes_8h_source.html
 /// Construct a binary instruction, given the opcode and the two
@@ -98,5 +121,9 @@ Value *ins_get_value(Instruction *this);
 //    op_iterator       op_end()         {
 //      return getOperandList() + NumUserOperands;
 //    }
+
+Instruction *ins_new_one_operator(Value *S1);
+
+Value *ins_get_value(Instruction *this);
 
 #endif

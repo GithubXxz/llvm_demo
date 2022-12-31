@@ -1,6 +1,7 @@
 #include "Pass.h"
 
-char *op_string[] = {"AddOP",
+char *op_string[] = {"DefaultOP",
+                     "AddOP",
                      "SubOP",
                      "MulOP",
                      "DivOP",
@@ -21,7 +22,10 @@ char *op_string[] = {"AddOP",
                      "LessEqualOP",
                      "LabelOP",
                      "FuncLabelOP",
-                     "FuncEndOP"};
+                     "FuncEndOP",
+                     "AllocateOP",
+                     "LoadOP",
+                     "StoreOP"};
 
 extern BasicBlock *cur_bblock;
 
@@ -48,7 +52,7 @@ void print_ins_pass(List *self) {
     // 打印出每条instruction的res的名字信息
     printf("%d: opcode: %s    ", i++,
            op_string[((Instruction *)element)->opcode]);
-    printf("\tname: %s    ", ((Instruction *)element)->user.res->name);
+    printf("\tname: %s    ", ((Value *)element)->name);
     if (((Instruction *)element)->user.num_oprands == 2) {
       printf("\t%s\t%s\n",
              user_get_operand_use(((User *)element), 0)->Val->name,
@@ -82,12 +86,12 @@ void ins_toBBlock_pass(List *self) {
       // 初始化函数 将函数里的label等同于Funclabel中的value*
       cur_func = (Function *)malloc(sizeof(Function));
       function_init(cur_func);
-      cur_func->label = ((User *)element)->res;
+      cur_func->label = (Value *)element;
       // 初始化entryLabel并且插入到函数的入口label
       ListNext(self, &element);
       cur_bblock = (BasicBlock *)malloc(sizeof(BasicBlock));
       bblock_init(cur_bblock, cur_func);
-      cur_bblock->label = ((User *)element)->res;
+      cur_bblock->label = (Value *)element;
 
       // 设置当前的函数的入口基本块
       cur_func->entry_bblock = cur_bblock;
@@ -100,13 +104,13 @@ void ins_toBBlock_pass(List *self) {
       bblock_init(end_bblock, cur_func);
 
       // 创建end条件下的label标签
-      Value *end_label = (Value *)malloc(sizeof(Value));
-      value_init(end_label);
+      Value *end_label_ins = (Value *)ins_new_no_operator_v2(LabelOP);
       // 添加变量的名字
-      end_label->name = strdup("end_label");
-      end_label->VTy->TID = LabelTyID;
-      Instruction *end_label_ins = ins_new_no_operator(end_label, LabelOP);
-      end_bblock->label = end_label;
+      end_label_ins->name = strdup("end_label");
+      end_label_ins->VTy->TID = LabelTyID;
+      end_bblock->label = end_label_ins;
+      ListPushBack(end_bblock->inst_list, end_label_ins);
+      // 设置当前函数的结束基本块
       cur_func->end_bblock = end_bblock;
       // printf("successfully initialization functionblock\n");
 
@@ -123,19 +127,18 @@ void ins_toBBlock_pass(List *self) {
             cur_bblock->false_bblock = (BasicBlock *)malloc(sizeof(BasicBlock));
             bblock_init(cur_bblock->true_bblock, cur_func);
             bblock_init(cur_bblock->false_bblock, cur_func);
+            // 将当前bblock置为后续bblock的父基本块
             ListPushBack(cur_bblock->true_bblock->father_bblock_list,
                          cur_bblock);
             ListPushBack(cur_bblock->false_bblock->father_bblock_list,
                          cur_bblock);
             cur_bblock->true_bblock->label =
-                ((User *)element)
-                    ->res->pdata->condition_goto.true_goto_location;
+                ((Value *)element)->pdata->condition_goto.true_goto_location;
             HashMapPut(bblock_hashmap,
                        strdup(cur_bblock->true_bblock->label->name),
                        cur_bblock->true_bblock);
             cur_bblock->false_bblock->label =
-                ((User *)element)
-                    ->res->pdata->condition_goto.false_goto_location;
+                ((Value *)element)->pdata->condition_goto.false_goto_location;
             HashMapPut(bblock_hashmap,
                        strdup(cur_bblock->false_bblock->label->name),
                        cur_bblock->false_bblock);
@@ -151,7 +154,7 @@ void ins_toBBlock_pass(List *self) {
             ListPushBack(cur_bblock->true_bblock->father_bblock_list,
                          cur_bblock);
             cur_bblock->true_bblock->label =
-                ((User *)element)->res->pdata->no_condition_goto.goto_location;
+                ((Value *)element)->pdata->no_condition_goto.goto_location;
             HashMapPut(bblock_hashmap,
                        strdup(cur_bblock->true_bblock->label->name),
                        cur_bblock->true_bblock);
@@ -165,12 +168,12 @@ void ins_toBBlock_pass(List *self) {
               // printf("%s is cur label %s is next label \n",
               //        cur_bblock->label->name, ((User *)element)->res->name);
               cur_bblock->true_bblock =
-                  name_get_bblock(((User *)element)->res->name);
-              ListPushBack(name_get_bblock(((User *)element)->res->name)
-                               ->father_bblock_list,
-                           cur_bblock);
+                  name_get_bblock(((Value *)element)->name);
+              ListPushBack(
+                  name_get_bblock(((Value *)element)->name)->father_bblock_list,
+                  cur_bblock);
             }
-            cur_bblock = name_get_bblock(((User *)element)->res->name);
+            cur_bblock = name_get_bblock(((Value *)element)->name);
 
             ListPushBack(cur_bblock->inst_list, element);
             break;
@@ -179,7 +182,6 @@ void ins_toBBlock_pass(List *self) {
             if (pre_op != ReturnOP) {
               cur_bblock->true_bblock = end_bblock;
             }
-            ListPushBack(end_bblock->inst_list, end_label_ins);
             ListPushBack(end_bblock->inst_list, element);
             break;
 

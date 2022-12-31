@@ -24,10 +24,20 @@ void value_init(Value *this) {
   this->name = NULL;
 }
 
+void value_copy(Value *this, Value *copy) {
+  // 拷贝类型
+  *(this->VTy) = *(copy->VTy);
+  // 拷贝内容
+  *(this->pdata) = *(copy->pdata);
+  // 无名
+  this->HasName = 0;
+}
+
 void value_free(Value *this) {
   free(this->VTy);
   free(this->name);
-  free(this);
+  free(this->pdata);
+  free(this->use_list);
 }
 
 Value *value_init_int_with_initial(int num) {
@@ -87,7 +97,7 @@ Value *value_init_const_int(int num) {
   // 初始化的作用全部置零
   Value *const_int = (Value *)malloc(sizeof(Value));
   value_init(const_int);
-  const_int->VTy->TID = ConstIntTyID;
+  const_int->VTy->TID = ImmediateIntTyID;
   const_int->pdata = malloc(sizeof(int));
   *((int *)const_int->pdata) = num;
   return const_int;
@@ -98,7 +108,7 @@ Value *value_init_const_float(float num) {
   // 初始化的作用全部置零
   Value *const_float = (Value *)malloc(sizeof(Value));
   value_init(const_float);
-  const_float->VTy->TID = ConstFloatTyID;
+  const_float->VTy->TID = ImmediateFloatTyID;
   const_float->pdata = malloc(sizeof(float));
   *((float *)const_float->pdata) = num;
   return const_float;

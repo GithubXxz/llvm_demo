@@ -9,12 +9,15 @@
 typedef enum _TypeID {
   // 默认值
   DefaultTyID = 0,
-  IntegerTyID,   ///< Arbitrary bit width integers
-  FloatTyID,     ///< 32-bit floating point type
-  StructTyID,    ///< Structures
-  LabelTyID,     ///< label
-  GotoTyID,      ///< goto label
-  FuncCallTyID,  ///< func call goto label
+  IntegerTyID,         ///< Arbitrary bit width integers
+  FloatTyID,           ///< 32-bit floating point type
+  StructTyID,          ///< Structures
+  PointerTyID,         ///< Pointers
+  ImmediateIntTyID,    ///< Pointers
+  ImmediateFloatTyID,  ///< Pointers
+  LabelTyID,           ///< label
+  GotoTyID,            ///< goto label
+  FuncCallTyID,        ///< func call goto label
   FuncEndTyID,
   ReturnTyID,
   ParamTyID,
@@ -35,14 +38,10 @@ typedef enum _TypeID {
 
   // Derived types... see DerivedTypes.h file.
   FunctionTyID,  ///< Functions
-  PointerTyID,   ///< Pointers
   ArrayTyID,     ///< Arrays
 
   // 常量
-  // 整数字面量常量
-  ConstIntTyID,
-  // 浮点数字面量敞亮
-  ConstFloatTyID,
+
 } TypeID;
 
 typedef struct _Type {

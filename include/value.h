@@ -48,6 +48,11 @@ typedef union _PData {
   struct {
     Value *param_value;  // 函数参数
   } param_pdata;
+
+  struct {
+    Value *point_value;  // 分配内存的变量
+  } allocate_pdata;
+
 } PData;
 
 struct _Value {
@@ -75,6 +80,8 @@ void value_init(Value *this);
 void value_free(Value *this);
 
 void value_init_int(Value *this, TypeID type, int num);
+
+void value_copy(Value *this, Value *copy);
 
 Value *value_init_int_with_initial(int num);
 

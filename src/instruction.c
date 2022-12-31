@@ -48,19 +48,94 @@ TypeID ins_res_type(Value *left, Value *right) {
   TypeID type_id = DefaultTyID;
   TypeID s1_type = left->VTy->TID;
   TypeID s2_type = right->VTy->TID;
-  if ((s1_type == IntegerTyID || s1_type == ConstIntTyID) &&
-      (s2_type == IntegerTyID || s2_type == ConstIntTyID)) {
+  if ((s1_type == IntegerTyID || s1_type == ImmediateIntTyID) &&
+      (s2_type == IntegerTyID || s2_type == ImmediateIntTyID)) {
     type_id = IntegerTyID;
   }
 
-  if ((s1_type == FloatTyID || s1_type == ConstFloatTyID) &&
-      (s2_type == FloatTyID || s2_type == ConstFloatTyID)) {
+  if ((s1_type == FloatTyID || s1_type == ImmediateFloatTyID) &&
+      (s2_type == FloatTyID || s2_type == ImmediateFloatTyID)) {
     type_id = FloatTyID;
   }
   return type_id;
 }
 
 void free_common_ins(Instruction *self) {
+  // 释放连接这条instruction的use链
+  for (int i = 0; i < self->user.num_oprands; i++) {
+    use_remove_from_list(user_get_operand_use((User *)self, i));
+    free(user_get_operand_use((User *)self, i));
+  }
+  free(self);
+}
+
+// clean the instruction
+void CommonCleanInstruction(void *element) {
+  free_common_ins((Instruction *)element);
+  element = NULL;
+}
+
+/*
+SSA版本
+非Value*版本
+*/
+
+Instruction *ins_new_v2(int op_num) {
+  // 计算use的大小
+  // 二元运算就是两个use所需要的内存空间拼接到Instruction中构成Instruction的use链表
+  int user_size = user_get_size(op_num);
+  int use_size = user_size - sizeof(User);
+  // use 是额外的，所以要单独计算大小
+  // 为了 instruction 分配内存块 并且返回内存块的首地址
+  uint8_t *storage = (uint8_t *)malloc(sizeof(Instruction) + use_size);
+  value_init(storage + use_size);
+  // 将instruction里面的内容分布在内存块中
+  user_construct(storage, op_num);
+  // 计算偏移量然后返回User的首地址 低地址存储的位Use
+  return (Instruction *)(storage + use_size);
+}
+
+Instruction *ins_new_no_operator_v2(TAC_OP Op) {
+  Instruction *inst = ins_new_v2(0);
+  inst->opcode = Op;
+  return inst;
+}
+
+Instruction *ins_new_single_operator_v2(TAC_OP Op, Value *S1) {
+  Instruction *inst = ins_new_v2(1);
+  inst->opcode = Op;
+  Use *puse = user_get_operand_use((User *)inst, 0);
+  value_add_use(S1, puse);
+  return inst;
+}
+
+Instruction *ins_new_binary_operator_v2(TAC_OP Op, Value *S1, Value *S2) {
+  Instruction *inst = ins_new_v2(2);
+  inst->opcode = Op;
+  Use *puse = user_get_operand_use((User *)inst, 0);
+  value_add_use(S1, puse);
+  puse = user_get_operand_use((User *)inst, 1);
+  value_add_use(S2, puse);
+  return inst;
+}
+
+TypeID ins_res_type_v2(Value *left, Value *right) {
+  TypeID type_id = DefaultTyID;
+  TypeID s1_type = left->VTy->TID;
+  TypeID s2_type = right->VTy->TID;
+  if ((s1_type == IntegerTyID || s1_type == ImmediateIntTyID) &&
+      (s2_type == IntegerTyID || s2_type == ImmediateIntTyID)) {
+    type_id = IntegerTyID;
+  }
+
+  if ((s1_type == FloatTyID || s1_type == ImmediateFloatTyID) &&
+      (s2_type == FloatTyID || s2_type == ImmediateFloatTyID)) {
+    type_id = FloatTyID;
+  }
+  return type_id;
+}
+
+void free_common_ins_v2(Instruction *self) {
   if (self->opcode == AddOP || self->opcode == SubOP || self->opcode == MulOP ||
       self->opcode == DivOP || self->opcode == EqualOP ||
       self->opcode == GreatThanOP || self->opcode == LessThanOP ||
@@ -85,7 +160,7 @@ void free_common_ins(Instruction *self) {
 }
 
 // clean the instruction
-void CommonCleanInstruction(void *element) {
+void CommonCleanInstruction_v2(void *element) {
   free_common_ins((Instruction *)element);
   element = NULL;
 }

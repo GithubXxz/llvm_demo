@@ -29,6 +29,11 @@ int parser(char *input);
 int main() {
   AllInit();
 
+  // if (freopen("out.txt", "w", stdout) == NULL) {
+  //   fprintf(stderr, "打开文件失败！");
+  //   exit(-1);
+  // }
+
   printf("开始遍历\n");
 
   return_val = (Value *)malloc(sizeof(Value));
@@ -62,81 +67,20 @@ int main() {
       "  return a;"
       "}";
 
-  // 函数调用的例子
-  char *input2 =
-      "int binary_add(int x, int y) {"
-      "  int z = x + y;"
-      "  return z;"
-      "  z = 10 ;"
-      "}"
-      "int main() {"
-      "  int a;"
-      "  int b;"
-      "  int c;"
-      "  a = 10;"
-      "  b = 20;"
-      "  c = binary_add(a, (b + c));"
-      "  return c;"
-      "}";
-
-  char *input3 =
-      "int if_if_Else() {"
-      "   int a;"
-      "   a = 5;"
-      "   int b;"
-      "   b = 10;"
-      "   if(a == 5){"
-      "     if (b == 10)"
-      "       a = 25;"
-      "   }"
-      "   else {"
-      "     a = a + 15;"
-      "   }"
-      "   return (a);"
-      " }"
-      " int main(){"
-      "   return (if_if_Else());"
-      " }";
-
-  // 模拟多个return的情况
-  char *input4 =
-      "int main() {"
-      "int a = 55;"
-      "int b = 46;"
-      "if (a > 50) {"
-      "return a;"
-      "a = 111;"
-      "a = 222;"
-      "a = 333;"
-      "} else {"
-      "return b;"
-      "b = 444;"
-      "b = 555;"
-      "}"
-      "a = 666;"
-      "a = 777;"
-      "a = 888;"
-      "return a;"
-      "}";
-
   parser(input1);
+
+  print_ins_pass(ins_list);
   printf("遍历结束\n\n");
 
   // 清除return语句和label或者functionEnd之间语句之间的不可达语句的pass
   delete_return_deadcode_pass(ins_list);
 
-  if (freopen("if-else.txt", "w", stdout) == NULL) {
+  if (freopen("out.txt", "w", stdout) == NULL) {
     fprintf(stderr, "打开文件失败！");
     exit(-1);
   }
 
-  // print_ins_pass(ins_list);
-
-  //   printf("begin ins to block pass!\n");
-
   ins_toBBlock_pass(ins_list);
-
-  //   printf("successfully ins to block pass!\n");
 
   print_bblock_pass(cur_func->entry_bblock);
 
