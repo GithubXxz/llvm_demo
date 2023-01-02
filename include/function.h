@@ -12,6 +12,7 @@ typedef struct _Function {
   Value* label;
   struct _BasicBlock* entry_bblock;
   struct _BasicBlock* end_bblock;
+  int num_of_block;
 } Function;
 
 void function_init(Function* this);

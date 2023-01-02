@@ -230,7 +230,13 @@ void in_eval(ast *a, Value *left) {
     Value *goto_condition_ins =
         (Value *)ins_new_single_operator_v2(GotoWithConditionOP, left);
 
-    goto_condition_ins->name = strdup("goto_else_or_then");
+    char temp_br_label_name[40];
+    strcpy(temp_br_label_name, "true:");
+    strcat(temp_br_label_name, true_label_ins->name);
+    strcat(temp_br_label_name, "  false:");
+    strcat(temp_br_label_name, else_label_ins->name);
+
+    goto_condition_ins->name = strdup(temp_br_label_name);
     goto_condition_ins->VTy->TID = GotoTyID;
     goto_condition_ins->pdata->condition_goto.false_goto_location =
         else_label_ins;
@@ -639,8 +645,7 @@ Value *post_eval(ast *a, Value *left, Value *right) {
     if (!strcmp(a->name, "RETURN")) {
       char temp_str[20];
 
-      strcpy(temp_str, "return ");
-      strcat(temp_str, right->name);
+      strcpy(temp_str, right->name);
 
       Value *func_return_ins = (Value *)ins_new_no_operator_v2(ReturnOP);
       // 添加变量的名字 类型 和返回值

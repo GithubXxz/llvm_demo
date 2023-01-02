@@ -5,9 +5,33 @@
 #include "c_container_auxiliary.h"
 #include "cds.h"
 
+// 使用邻接矩阵也可以做简单的替代，更简洁 二维数组也可以简单的替代
+typedef struct _HeadNode {
+  BasicBlock *bblock_head;
+  // 邻接的边集
+  HashSet *edge_list;
+  bool is_visited;
+  // 他支配的节点集
+  HashSet *dom_set;
+  // 他的支配边界集合
+  HashSet *dom_frontier_set;
+  // 立即支配他的节点
+  struct _HeadNode *idom_node;
+  // 他的前驱节点链表
+  List *pre_node_list;
+} HeadNode;  // 定义头结点
+
+// 邻接表表示法的图
+typedef struct {
+  HeadNode **node_set;
+  // 顶点数目和边的数目
+  int node_num, edge_num;
+} ALGraph;  // 定义邻接表
+
 void print_ins_pass(List *self);
 void ins_toBBlock_pass(List *self);
 void delete_return_deadcode_pass(List *self);
 void print_bblock_pass(BasicBlock *self);
+void bblock_to_dom_graph_pass(Function *self);
 
 #endif

@@ -20,6 +20,11 @@ HashMap* bblock_hashmap = NULL;
 
 HashSet* bblock_pass_hashset = NULL;
 
+// 用于block的链状结构转换为CFG图结构
+// dfs判断一个节点是否经过如果经过还需要取出节点建立边
+// (char *name,HeadNode *node)
+HashMap* bblock_to_dom_graph_hashmap = NULL;
+
 // 出栈/链表删除 伴随运行的函数 我真他妈 心态崩了 学艺不精
 void CleanObject(void* element) {}
 
@@ -37,6 +42,13 @@ void CleanHashMapKey(void* key) { free(key); }
 void CleanHashSetKey(void* key) {}
 
 void CleanValue(void* value) {}
+
+void hashset_init(HashSet** self) {
+  *self = HashSetInit();
+  HashSetSetHash(*self, HashKey);
+  HashSetSetCompare(*self, CompareKey);
+  HashSetSetCleanKey(*self, CleanHashSetKey);
+}
 
 void AllInit() {
   // 初始化指令链表
@@ -76,6 +88,13 @@ void AllInit() {
   HashMapSetCompare(bblock_hashmap, CompareKey);
   HashMapSetCleanKey(bblock_hashmap, CleanHashMapKey);
   HashMapSetCleanValue(bblock_hashmap, CleanValue);
+
+  bblock_to_dom_graph_hashmap = HashMapInit();
+  // 用于遍历生成cfg图结构时候查找bblock
+  HashMapSetHash(bblock_to_dom_graph_hashmap, HashKey);
+  HashMapSetCompare(bblock_to_dom_graph_hashmap, CompareKey);
+  HashMapSetCleanKey(bblock_to_dom_graph_hashmap, CleanHashMapKey);
+  HashMapSetCleanValue(bblock_to_dom_graph_hashmap, CleanValue);
 
   bblock_pass_hashset = HashSetInit();
   HashSetSetHash(bblock_pass_hashset, HashKey);

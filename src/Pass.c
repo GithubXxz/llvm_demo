@@ -37,10 +37,252 @@ extern HashMap *bblock_hashmap;
 
 extern HashSet *bblock_pass_hashset;
 
+extern HashMap *bblock_to_dom_graph_hashmap;
+
+ALGraph *graph_for_dom_tree = NULL;
+
+HashSet *graph_head_set = NULL;
+
 TAC_OP pre_op;
 
 BasicBlock *name_get_bblock(char *name) {
   return (BasicBlock *)HashMapGet(bblock_hashmap, name);
+}
+
+void dom_tree_pass(List *self) {
+  int i = 0;
+  // printf("\nbegin print the instruction: \n");
+  void *element;
+  ListFirst(self, false);
+  while (ListNext(self, &element)) {
+    // 打印出每条instruction的res的名字信息
+    printf("%9s\t     %d: %20s ", "", i++,
+           op_string[((Instruction *)element)->opcode]);
+    printf("\t%25s ", ((Value *)element)->name);
+    if (((Instruction *)element)->user.num_oprands == 2) {
+      printf("\t%10s, %10s\n",
+             user_get_operand_use(((User *)element), 0)->Val->name,
+             user_get_operand_use(((User *)element), 1)->Val->name);
+    } else if (((Instruction *)element)->user.num_oprands == 1) {
+      printf("\t%10s\n", user_get_operand_use(((User *)element), 0)->Val->name);
+    } else if (((Instruction *)element)->user.num_oprands == 0) {
+      printf("\t%10s\n", "null");
+    }
+  }
+}
+
+// bblock关系图转化为CFG邻接表图形式
+int bblock_to_dom_graph_dfs_pass(HeadNode *self, int n) {
+  // if (self != NULL &&
+  //     HashSetFind(bblock_pass_hashset, self->bblock_head) == false) {
+  graph_for_dom_tree->node_set[n++] = self;
+
+  HashMapPut(bblock_to_dom_graph_hashmap,
+             strdup(self->bblock_head->label->name), self);
+
+  printf("%s\n", self->bblock_head->label->name);
+
+  if (self->bblock_head->true_bblock) {
+    if (HashMapContain(bblock_to_dom_graph_hashmap,
+                       self->bblock_head->true_bblock->label->name)) {
+      HeadNode *true_situation_headnode =
+          HashMapGet(bblock_to_dom_graph_hashmap,
+                     self->bblock_head->true_bblock->label->name);
+
+      HashSetAdd(self->edge_list, true_situation_headnode);
+      ListPushBack(true_situation_headnode->pre_node_list, self);
+    } else {
+      HeadNode *true_situation_headnode = (HeadNode *)malloc(sizeof(HeadNode));
+      true_situation_headnode->bblock_head = self->bblock_head->true_bblock;
+      true_situation_headnode->is_visited = false;
+
+      // 初始化哈希集 并且将true条件下跳转的的bblock加入当前表头的hash集中
+      // 需要更改指针的指向所以需要传递指针的地址
+      hashset_init(&(true_situation_headnode->edge_list));
+      hashset_init(&(true_situation_headnode->dom_set));
+
+      // 初始化前驱链表
+      true_situation_headnode->pre_node_list = ListInit();
+      ListSetClean(true_situation_headnode->pre_node_list, CleanObject);
+      ListPushBack(true_situation_headnode->pre_node_list, self);
+
+      HashSetAdd(self->edge_list, true_situation_headnode);
+      n = bblock_to_dom_graph_dfs_pass(true_situation_headnode, n);
+    }
+  }
+  if (self->bblock_head->false_bblock) {
+    if (HashMapContain(bblock_to_dom_graph_hashmap,
+                       self->bblock_head->false_bblock->label->name)) {
+      HeadNode *false_situation_headnode =
+          HashMapGet(bblock_to_dom_graph_hashmap,
+                     self->bblock_head->false_bblock->label->name);
+
+      HashSetAdd(self->edge_list, false_situation_headnode);
+      ListPushBack(false_situation_headnode->pre_node_list, self);
+    } else {
+      HeadNode *false_situation_headnode = (HeadNode *)malloc(sizeof(HeadNode));
+      false_situation_headnode->bblock_head = self->bblock_head->false_bblock;
+      false_situation_headnode->is_visited = false;
+      hashset_init(&(false_situation_headnode->edge_list));
+      hashset_init(&(false_situation_headnode->dom_set));
+      // 初始化前驱链表
+      false_situation_headnode->pre_node_list = ListInit();
+      ListSetClean(false_situation_headnode->pre_node_list, CleanObject);
+      ListPushBack(false_situation_headnode->pre_node_list, self);
+
+      HashSetAdd(self->edge_list, false_situation_headnode);
+      n = bblock_to_dom_graph_dfs_pass(false_situation_headnode, n);
+    }
+  }
+
+  return n;
+}
+
+void dom_relation_pass_help(HeadNode *self) {
+  self->is_visited = true;
+  void *element;
+  HashSetFirst(self->edge_list);
+  while ((element = HashSetNext(self->edge_list)) &&
+         !((HeadNode *)element)->is_visited) {
+    // printf("cur node %s next node %s\n", self->bblock_head->label->name,
+    //        ((HeadNode *)element)->bblock_head->label->name);
+    dom_relation_pass_help((HeadNode *)element);
+  }
+}
+
+bool is_subset(HashSet *self, HashSet *other) {
+  // 求交集
+  HashSet *inter = HashSetIntersect(self, other);
+  bool is_self_subset_to_other = (HashSetSize(inter) == HashSetSize(self));
+  HashSetDeinit(inter);
+  return is_self_subset_to_other;
+}
+
+void dom_relation_pass() {
+  int node_num = graph_for_dom_tree->node_num;
+  printf("node entry dom ");
+  for (int j = 0; j < node_num; j++) {
+    printf("%s,", graph_for_dom_tree->node_set[j]->bblock_head->label->name);
+  }
+  printf("\n");
+
+  for (int i = 1; i < node_num; i++) {
+    // 删除该节点的入边和出边 计算出根节点的不可达节点便是该节点的支配节点
+    int delete_marked[node_num];
+    // 数组内容全部初始化为0
+    memset(delete_marked, 0, node_num * sizeof(int));
+
+    for (int j = 0; j < node_num; j++) {
+      if (j == i) {
+        // 自己需不需要支配自己 不需要就将自己的visited置为true
+        continue;
+      }
+      if (HashSetFind(graph_for_dom_tree->node_set[j]->edge_list,
+                      graph_for_dom_tree->node_set[i])) {
+        // 谁remove了谁就要添加回来
+        delete_marked[j] = 1;
+        HashSetRemove(graph_for_dom_tree->node_set[j]->edge_list,
+                      graph_for_dom_tree->node_set[i]);
+      }
+    }
+
+    dom_relation_pass_help(graph_for_dom_tree->node_set[0]);
+
+    for (int j = 0; j < node_num; j++) {
+      if (delete_marked[j] == 1) {
+        HashSetAdd(graph_for_dom_tree->node_set[j]->edge_list,
+                   graph_for_dom_tree->node_set[i]);
+        // printf("fix %s to %s\n",
+        //        graph_for_dom_tree->node_set[j]->bblock_head->label->name,
+        //        graph_for_dom_tree->node_set[i]->bblock_head->label->name);
+      }
+    }
+
+    printf("node %s dom ",
+           graph_for_dom_tree->node_set[i]->bblock_head->label->name);
+    for (int j = 0; j < node_num; j++) {
+      if (!graph_for_dom_tree->node_set[j]->is_visited) {
+        // printf("%s\n",graph_for_dom_tree->node_set[j]->bblock_head->label->name);
+        // 添加支配节点
+        HashSetAdd(graph_for_dom_tree->node_set[i]->dom_set,
+                   graph_for_dom_tree->node_set[j]);
+        printf("%s,",
+               graph_for_dom_tree->node_set[j]->bblock_head->label->name);
+      } else {
+        graph_for_dom_tree->node_set[j]->is_visited = false;
+      }
+    }
+    printf("\n");
+  }
+
+  printf("\n");
+  // 计算每个节点的idom
+  for (int i = 1; i < node_num; i++) {
+    int cur_idom_nodeset_num = INT_MAX;
+    int cur_subscript = 0;
+
+    for (int j = 1; j < node_num; j++) {
+      if (i == j) {
+        // 忽略自己 自己的idom不能是自己
+        continue;
+      }
+      if (is_subset(graph_for_dom_tree->node_set[i]->dom_set,
+                    graph_for_dom_tree->node_set[j]->dom_set) &&
+          (HashSetSize(graph_for_dom_tree->node_set[j]->edge_list) <
+           cur_idom_nodeset_num)) {
+        cur_subscript = j;
+        cur_idom_nodeset_num =
+            HashSetSize(graph_for_dom_tree->node_set[j]->edge_list);
+      }
+    }
+
+    graph_for_dom_tree->node_set[i]->idom_node =
+        graph_for_dom_tree->node_set[cur_subscript];
+    printf(
+        "idom(%s) = %s\n",
+        graph_for_dom_tree->node_set[i]->bblock_head->label->name,
+        graph_for_dom_tree->node_set[i]->idom_node->bblock_head->label->name);
+  }
+
+  printf("\n");
+}
+
+// void print_dom_graph_test(HeadNode *self) {
+//   if (self != NULL && HashSetFind(bblock_pass_hashset, self) == false) {
+//     printf("%s:\n", self->name);
+//     HashSetAdd(bblock_pass_hashset, self);
+//     ListFirst(self->edge_list, false);
+//     void *element;
+//     while (ListNext(self->edge_list, &element)) {
+//       printf("%s->", ((VNode *)element)->pdata.data);
+//       print_bblock_pass(self->true_bblock);
+//     }
+//   }
+// }
+
+// 生成支配树的pass
+void bblock_to_dom_graph_pass(Function *self) {
+  int num_of_block = self->num_of_block;
+  // 设置支配树对应图的邻接表头
+  hashset_init(&(graph_head_set));
+  graph_for_dom_tree = (ALGraph *)malloc(sizeof(ALGraph));
+  graph_for_dom_tree->node_set =
+      (HeadNode **)malloc(num_of_block * sizeof(HeadNode));
+  graph_for_dom_tree->node_num = num_of_block;
+
+  // 设置CFG图的入口基本块表头 并且初始化链表
+  HeadNode *init_headnode = (HeadNode *)malloc(sizeof(HeadNode));
+  init_headnode->bblock_head = self->entry_bblock;
+  init_headnode->is_visited = false;
+  hashset_init(&(init_headnode->edge_list));
+  hashset_init(&(init_headnode->dom_set));
+  init_headnode->pre_node_list = NULL;
+
+  bblock_to_dom_graph_dfs_pass(init_headnode, 0);
+  HashMapDeinit(bblock_to_dom_graph_hashmap);
+  printf("\n");
+
+  dom_relation_pass();
 }
 
 void print_ins_pass(List *self) {
@@ -50,23 +292,24 @@ void print_ins_pass(List *self) {
   ListFirst(self, false);
   while (ListNext(self, &element)) {
     // 打印出每条instruction的res的名字信息
-    printf("%d: opcode: %s    ", i++,
+    printf("%9s\t     %d: %20s ", "", i++,
            op_string[((Instruction *)element)->opcode]);
-    printf("\tname: %s    ", ((Value *)element)->name);
+    printf("\t%25s ", ((Value *)element)->name);
     if (((Instruction *)element)->user.num_oprands == 2) {
-      printf("\t%s\t%s\n",
+      printf("\t%10s, %10s\n",
              user_get_operand_use(((User *)element), 0)->Val->name,
              user_get_operand_use(((User *)element), 1)->Val->name);
     } else if (((Instruction *)element)->user.num_oprands == 1) {
-      printf("\t%s\n", user_get_operand_use(((User *)element), 0)->Val->name);
+      printf("\t%10s\n", user_get_operand_use(((User *)element), 0)->Val->name);
     } else if (((Instruction *)element)->user.num_oprands == 0) {
-      printf("\t0\n");
+      printf("\t%10s\n", "null");
     }
   }
 }
 
 void print_bblock_pass(BasicBlock *self) {
   if (self != NULL && HashSetFind(bblock_pass_hashset, self) == false) {
+    printf("\t%s:\n", self->label->name);
     HashSetAdd(bblock_pass_hashset, self);
     print_ins_pass(self->inst_list);
     printf("\n");
@@ -76,11 +319,13 @@ void print_bblock_pass(BasicBlock *self) {
 }
 
 void ins_toBBlock_pass(List *self) {
-  void *element;
   // 顺序遍历
+  void *element;
   ListFirst(self, false);
 
   while (ListNext(self, &element)) {
+    // 初始包含入口基本块和结束基本块
+    int num_of_block = 2;
     // 进入一个函数
     if (((Instruction *)element)->opcode == FuncLabelOP) {
       // 初始化函数 将函数里的label等同于Funclabel中的value*
@@ -161,12 +406,14 @@ void ins_toBBlock_pass(List *self) {
             break;
 
           case LabelOP:
+            num_of_block++;
             // printf(" %s ins is printed\n",
             //        op_string[((Instruction *)element)->opcode]);
             if (pre_op != GotoOP && pre_op != ReturnOP &&
                 pre_op != GotoWithConditionOP) {
               // printf("%s is cur label %s is next label \n",
-              //        cur_bblock->label->name, ((User *)element)->res->name);
+              //        cur_bblock->label->name, ((User
+              //        *)element)->res->name);
               cur_bblock->true_bblock =
                   name_get_bblock(((Value *)element)->name);
               ListPushBack(
@@ -203,6 +450,12 @@ void ins_toBBlock_pass(List *self) {
         }
       }
     }
+    cur_func->num_of_block = num_of_block;
+    // 打印当前函数的基本块
+    print_bblock_pass(cur_func->entry_bblock);
+    // 清空哈希表 然后重新初始化供后面使用
+    HashSetDeinit(bblock_pass_hashset);
+    hashset_init(&(bblock_pass_hashset));
   }
 }
 

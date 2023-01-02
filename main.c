@@ -67,6 +67,24 @@ int main() {
       "  return a;"
       "}";
 
+  char *input2 =
+      "int main() {"
+      "  int a;"
+      "  int b;"
+      "  int c;"
+      "  a = 5;"
+      "  b = 10;"
+      "  if (a == 5) {"
+      "    a = 111;"
+      "    b = 222;"
+      "  } else {"
+      "    a = 444;"
+      "    b = 555;"
+      "  }"
+      "  c = a + b;"
+      "  return c;"
+      "}";
+
   parser(input1);
 
   print_ins_pass(ins_list);
@@ -75,14 +93,15 @@ int main() {
   // 清除return语句和label或者functionEnd之间语句之间的不可达语句的pass
   delete_return_deadcode_pass(ins_list);
 
-  if (freopen("out.txt", "w", stdout) == NULL) {
-    fprintf(stderr, "打开文件失败！");
-    exit(-1);
-  }
-
+  // if (freopen("out.txt", "w", stdout) == NULL) {
+  //   fprintf(stderr, "打开文件失败！");
+  //   exit(-1);
+  // }
+  printf("\t%s\tnumber: %20s \t%25s \t%10s\n", "labelID", "opcode", "name",
+         "use");
   ins_toBBlock_pass(ins_list);
 
-  print_bblock_pass(cur_func->entry_bblock);
+  bblock_to_dom_graph_pass(cur_func);
 
   ListSetClean(ins_list, CleanObject);
   ListDeinit(ins_list);
