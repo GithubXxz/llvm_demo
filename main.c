@@ -29,10 +29,10 @@ int parser(char *input);
 int main() {
   AllInit();
 
-  // if (freopen("out.txt", "w", stdout) == NULL) {
-  //   fprintf(stderr, "打开文件失败！");
-  //   exit(-1);
-  // }
+  if (freopen("out.txt", "w", stdout) == NULL) {
+    fprintf(stderr, "打开文件失败！");
+    exit(-1);
+  }
 
   printf("开始遍历\n");
 
@@ -85,7 +85,33 @@ int main() {
       "  return c;"
       "}";
 
-  parser(input1);
+  char *input3 =
+      "int main() {"
+      "  int a,b =10;"
+      "  int c;"
+      "  a = 10 + 15;"
+      "  c = a + b + 3;"
+      "}";
+
+  char *input4 =
+      "int main() {"
+      "  int a, b;"
+      "  a = 15;"
+      "  if (a == 10) {"
+      "    b = 111;"
+      "  } else {"
+      "    b = 222;"
+      "  }"
+      "  return b;"
+      "}";
+
+  char *input5 =
+      "int main() {"
+      "  int a, b = 10;"
+      "  a = 10 + b;"
+      "}";
+
+  parser(input5);
 
   print_ins_pass(ins_list);
   printf("遍历结束\n\n");
@@ -97,11 +123,13 @@ int main() {
   //   fprintf(stderr, "打开文件失败！");
   //   exit(-1);
   // }
-  printf("\t%s\tnumber: %20s \t%25s \t%10s\n", "labelID", "opcode", "name",
-         "use");
-  ins_toBBlock_pass(ins_list);
 
-  bblock_to_dom_graph_pass(cur_func);
+  // // 打印表的表头信息
+  //  printf("\t%s\tnumber: %20s \t%25s \t%10s\n", "labelID", "opcode", "name",
+  //         "use");
+  // ins_toBBlock_pass(ins_list);
+
+  // bblock_to_dom_graph_pass(cur_func);
 
   ListSetClean(ins_list, CleanObject);
   ListDeinit(ins_list);

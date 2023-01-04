@@ -250,7 +250,7 @@ void in_eval(ast *a, Value *left) {
 
     ListPushBack(ins_list, true_label_ins);
 
-    printf("%s\n", temp_str);
+    printf("%s\n1", temp_str);
   }
 
   if (a->r && !strcmp(a->r->name, "assistELSE")) {
@@ -283,6 +283,7 @@ void in_eval(ast *a, Value *left) {
     ListPushBack(ins_list, (void *)goto_else_ins);
 
     printf("br %s \n", then_label_ins->name);
+    ;
   }
 
   if (a->r && !strcmp(a->r->name, "assistArgs")) {
@@ -350,6 +351,7 @@ Value *post_eval(ast *a, Value *left, Value *right) {
         cur_ins->name = strdup(temp_str);
         // 设定allocate语句的指针所指向的value*
         cur_ins->pdata->allocate_pdata.point_value = cur_var;
+
         printf("%s = alloca %s,align 4\n", temp_str,
                NowVarDecStr[nowVarDecType]);
 
@@ -411,7 +413,25 @@ Value *post_eval(ast *a, Value *left, Value *right) {
                                                    : load_ins->VTy->TID - 4],
                load_var_pointer->name);
 
-        return (Value *)load_ins;
+        return load_ins;
+      } else if (!strcmp(a->name, "ID") && pre_astnode->r &&
+                 !strcmp(pre_astnode->r->name, "ASSIGNOP")) {
+        // 被赋值变量的名字
+        char *assign_var_name = strdup(a->idtype);
+        // 指向被赋值变量的指针
+        Value *assign_var_pointer =
+            HashMapGet(cur_symboltable->symbol_map, assign_var_name);
+        SymbolTable *pre_symboltable = cur_symboltable->father;
+        // 查表 取出名字所指代的Value*
+        while (!assign_var_pointer) {
+          // 如果当前表中没有且该表的父表为空 则报错语义错误
+          // 向上一级查表
+          assign_var_pointer =
+              HashMapGet(pre_symboltable->symbol_map, assign_var_name);
+          pre_symboltable = pre_symboltable->father;
+          assert(pre_symboltable || assign_var_pointer);
+        };
+        return assign_var_pointer;
       } else if (!strcmp(a->name, "INTEGER")) {
         Value *cur = (Value *)malloc(sizeof(Value));
         value_init(cur);
@@ -470,10 +490,10 @@ Value *post_eval(ast *a, Value *left, Value *right) {
       if (right == NULL) {
         return NULL;
       } else {
-        if (!strcmp(a->r->name, "ASSIGNOP")) {
+        if (a->r && !strcmp(a->r->name, "ASSIGNOP")) {
           // 把right存给left left是赋值号左边操作数的地址
-          Instruction *store_ins =
-              ins_new_binary_operator_v2(StoreOP, left, right);
+          Value *store_ins =
+              (Value *)ins_new_binary_operator_v2(StoreOP, left, right);
           ListPushBack(ins_list, (void *)store_ins);
           printf("store %s %s, %s,align 4\n",
                  NowVarDecStr[right->VTy->TID < 4 ? right->VTy->TID
@@ -497,30 +517,15 @@ Value *post_eval(ast *a, Value *left, Value *right) {
       if (right == NULL) {
         return left;
       } else if (!strcmp(a->r->name, "ASSIGNOP")) {
-        // 被赋值变量的名字
-        char *assign_var_name = strdup(a->l->idtype);
-        // 指向被赋值变量的指针
-        Value *assign_var_pointer =
-            HashMapGet(cur_symboltable->symbol_map, assign_var_name);
-        SymbolTable *pre_symboltable = cur_symboltable->father;
-        // 查表 取出名字所指代的Value*
-        while (!assign_var_pointer) {
-          // 如果当前表中没有且该表的父表为空 则报错语义错误
-          // 向上一级查表
-          assign_var_pointer =
-              HashMapGet(pre_symboltable->symbol_map, assign_var_name);
-          pre_symboltable = pre_symboltable->father;
-          assert(pre_symboltable || assign_var_pointer);
-        };
-
         // assign_var_pointer是赋值号左边操作数的地址
         Instruction *store_ins =
-            ins_new_binary_operator_v2(StoreOP, assign_var_pointer, right);
+            ins_new_binary_operator_v2(StoreOP, left, right);
         ListPushBack(ins_list, (void *)store_ins);
         printf("store %s %s, %s,align 4\n",
                NowVarDecStr[right->VTy->TID < 4 ? right->VTy->TID
                                                 : right->VTy->TID - 4],
-               right->name, assign_var_pointer->name);
+               right->name, left->name);
+        // TODO 返回值是什么有待考虑
         return right;
       } else {
         char temp_str[15];

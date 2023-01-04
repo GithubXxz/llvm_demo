@@ -10,7 +10,6 @@ typedef struct _HeadNode {
   BasicBlock *bblock_head;
   // 邻接的边集
   HashSet *edge_list;
-  bool is_visited;
   // 他支配的节点集
   HashSet *dom_set;
   // 他的支配边界集合
@@ -19,6 +18,7 @@ typedef struct _HeadNode {
   struct _HeadNode *idom_node;
   // 他的前驱节点链表
   List *pre_node_list;
+  bool is_visited;
 } HeadNode;  // 定义头结点
 
 // 邻接表表示法的图
