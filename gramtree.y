@@ -41,7 +41,7 @@ OptTag  Tag VarDec  FunDec VarList ParamDec Compst StmtList Stmt DefList Def Dec
 Program:|ExtDefList {
     $$=newast("Program",1,$1);
     
-    eval_print($$,0);    
+    // eval_print($$,0);    
 
     printf("\n");
 

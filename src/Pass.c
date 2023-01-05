@@ -1,5 +1,8 @@
 #include "Pass.h"
 
+#include <stdarg.h>  //变长参数函数所需的头文件
+#include <stdio.h>
+
 char *op_string[] = {"DefaultOP",
                      "AddOP",
                      "SubOP",
@@ -44,6 +47,8 @@ ALGraph *graph_for_dom_tree = NULL;
 HashSet *graph_head_set = NULL;
 
 TAC_OP pre_op;
+
+int phi_var_seed = 1;  // 用于phi函数产生变量的名字
 
 BasicBlock *name_get_bblock(char *name) {
   return (BasicBlock *)HashMapGet(bblock_hashmap, name);
@@ -91,8 +96,6 @@ int bblock_to_dom_graph_dfs_pass(HeadNode *self, int n) {
   HashMapPut(bblock_to_dom_graph_hashmap,
              strdup(self->bblock_head->label->name), self);
 
-  printf("%s\n", self->bblock_head->label->name);
-
   if (self->bblock_head->true_bblock) {
     if (HashMapContain(bblock_to_dom_graph_hashmap,
                        self->bblock_head->true_bblock->label->name)) {
@@ -122,6 +125,7 @@ int bblock_to_dom_graph_dfs_pass(HeadNode *self, int n) {
       n = bblock_to_dom_graph_dfs_pass(true_situation_headnode, n);
     }
   }
+
   if (self->bblock_head->false_bblock) {
     if (HashMapContain(bblock_to_dom_graph_hashmap,
                        self->bblock_head->false_bblock->label->name)) {
@@ -165,11 +169,32 @@ void dom_relation_pass_help(HeadNode *self) {
 
 void dom_relation_pass() {
   int node_num = graph_for_dom_tree->node_num;
+
+  //// 打印图中的每个节点的后继的名字和地址信息
+  // for (int i = 0; i < node_num; i++) {
+  //   printf("%s: ",
+  //   graph_for_dom_tree->node_set[i]->bblock_head->label->name); void
+  //   *element; HashSetFirst(graph_for_dom_tree->node_set[i]->edge_list); while
+  //   ((element = HashSetNext(
+  //               graph_for_dom_tree->node_set[i]->edge_list)) != NULL) {
+  //     printf("%s|%8x,", ((HeadNode *)element)->bblock_head->label->name,
+  //            element);
+  //   }
+  //   printf("\n");
+  // }
+
+  printf("\n");
+
+  //// 打印当前函数含有的bblock的数量
+  // printf("cur graph has %d node\n", node_num);
+
+  // 打印入口节点的支配节点信息和地址
   printf("node entry dom ");
   for (int j = 0; j < node_num; j++) {
-    printf("%s,", graph_for_dom_tree->node_set[j]->bblock_head->label->name);
+    printf("%s|%p,", graph_for_dom_tree->node_set[j]->bblock_head->label->name,
+           graph_for_dom_tree->node_set[j]);
   }
-  printf("\n");
+  printf("\n\n");
 
   for (int i = 1; i < node_num; i++) {
     // 删除该节点的入边和出边 计算出根节点的不可达节点便是该节点的支配节点
@@ -177,6 +202,8 @@ void dom_relation_pass() {
     // 数组内容全部初始化为0
     memset(delete_marked, 0, node_num * sizeof(int));
 
+    //// 打印删除的边的辅助信息
+    // printf("delete edge ");
     for (int j = 0; j < node_num; j++) {
       if (j == i) {
         // 自己需不需要支配自己 不需要就将自己的visited置为true
@@ -188,8 +215,17 @@ void dom_relation_pass() {
         delete_marked[j] = 1;
         HashSetRemove(graph_for_dom_tree->node_set[j]->edge_list,
                       graph_for_dom_tree->node_set[i]);
+        // //打印删除的边
+        // printf("%s|%8x,",
+        //        graph_for_dom_tree->node_set[j]->bblock_head->label->name,
+        //        graph_for_dom_tree->node_set[j]);
       }
     }
+
+    //// 打印删除的边的辅助信息
+    //  printf(" to %s|%8x\n",
+    //         graph_for_dom_tree->node_set[i]->bblock_head->label->name,
+    //         graph_for_dom_tree->node_set[i]);
 
     dom_relation_pass_help(graph_for_dom_tree->node_set[0]);
 
@@ -197,6 +233,7 @@ void dom_relation_pass() {
       if (delete_marked[j] == 1) {
         HashSetAdd(graph_for_dom_tree->node_set[j]->edge_list,
                    graph_for_dom_tree->node_set[i]);
+        ////打印修复的边
         // printf("fix %s to %s\n",
         //        graph_for_dom_tree->node_set[j]->bblock_head->label->name,
         //        graph_for_dom_tree->node_set[i]->bblock_head->label->name);
@@ -263,14 +300,15 @@ void dom_relation_pass() {
     // }
     // printf("\n");
     if (ListSize(graph_for_dom_tree->node_set[i]->pre_node_list) > 1) {
-      HeadNode *runner;
+      void *runner;
       ListFirst(graph_for_dom_tree->node_set[i]->pre_node_list, false);
       while (
           ListNext(graph_for_dom_tree->node_set[i]->pre_node_list, &runner)) {
         while (runner != graph_for_dom_tree->node_set[i]->idom_node) {
           // printf("%s,", runner->bblock_head->label->name);
-          HashSetAdd(runner->dom_frontier_set, graph_for_dom_tree->node_set[i]);
-          runner = runner->idom_node;
+          HashSetAdd(((HeadNode *)(runner))->dom_frontier_set,
+                     graph_for_dom_tree->node_set[i]);
+          runner = ((HeadNode *)(runner))->idom_node;
         }
         // printf("\n");
       }
@@ -292,9 +330,119 @@ void dom_relation_pass() {
   }
 }
 
-void insert_phi_func() {}
+void find_bblock_store_ins_pass(HeadNode *self, Value *pointer) {
+  void *element;
+  ListFirst(self->bblock_head->inst_list, false);
 
-// 生成支配树的pass
+  while (ListNext(self->bblock_head->inst_list, &element)) {
+    if (((Instruction *)element)->opcode == StoreOP &&
+        user_get_operand_use(((User *)element), 0)->Val == pointer) {
+      // printf("%s is def in %s\n",
+      //        pointer->pdata->allocate_pdata.point_value->name,
+      //        self->bblock_head->label->name);
+      self->is_visited = true;
+      return;
+    }
+  }
+}
+
+// hashset的并集会不会造成重大的内存泄漏？
+// 找到要插入phi函数的bblock并且插入空的phi函数
+void insert_phi_func_pass(Function *self) {
+  int num_of_block = self->num_of_block;
+  BasicBlock *entry_bblock = self->entry_bblock;
+  void *bblock_ins = NULL;
+  ListFirst(entry_bblock->inst_list, false);
+
+  // &&!strcmp(((Value *)bblock_ins)->name, "\%point1")
+  while (ListNext(entry_bblock->inst_list, &bblock_ins)) {
+    if (((Instruction *)bblock_ins)->opcode == AllocateOP) {
+      // 也就是迭代支配边界集合
+      HashSet *phi_insert_bblock = NULL;
+      hashset_init(&(phi_insert_bblock));
+
+      for (int i = 1; i < num_of_block; i++) {
+        find_bblock_store_ins_pass(graph_for_dom_tree->node_set[i],
+                                   (Value *)bblock_ins);
+      }
+
+      for (int i = 1; i < num_of_block; i++) {
+        if (graph_for_dom_tree->node_set[i]->is_visited) {
+          graph_for_dom_tree->node_set[i]->is_visited = false;
+          phi_insert_bblock =
+              HashSetUnion(phi_insert_bblock,
+                           graph_for_dom_tree->node_set[i]->dom_frontier_set);
+        }
+      }
+
+      unsigned phi_insert_bblock_element_num = 0;
+      while (phi_insert_bblock_element_num != HashSetSize(phi_insert_bblock)) {
+        phi_insert_bblock_element_num = HashSetSize(phi_insert_bblock);
+
+        HashSet *cur_pass_add_phi_insert_bblock = NULL;
+        hashset_init(&(cur_pass_add_phi_insert_bblock));
+
+        void *element;
+        HashSetFirst(phi_insert_bblock);
+
+        while ((element = HashSetNext(phi_insert_bblock)) != NULL) {
+          cur_pass_add_phi_insert_bblock =
+              HashSetUnion(cur_pass_add_phi_insert_bblock,
+                           ((HeadNode *)element)->dom_frontier_set);
+        }
+        phi_insert_bblock =
+            HashSetUnion(phi_insert_bblock, cur_pass_add_phi_insert_bblock);
+      }
+
+      // 根据 phi_insert_bblock 这个集合插入phi函数
+      HeadNode *element;
+      HashSetFirst(phi_insert_bblock);
+
+      while ((element = HashSetNext(phi_insert_bblock)) != NULL) {
+        //// 打印要插入phi函数的基本块的名字信息
+        // printf("%s\n", element->bblock_head->label->name);
+        // 在内存中为phi函数分配空间
+        Value *cur_var = (Value *)malloc(sizeof(Value));
+        value_init(cur_var);
+        // 添加变量类型
+        cur_var->VTy->TID = PhiFuncTyID;
+        // 添加变量的名字
+        cur_var->name = strdup("phi_func");
+
+        cur_var->pdata->phi_func_pdata.phi_value = HashMapInit();
+
+        HashMapSetHash(cur_var->pdata->phi_func_pdata.phi_value, HashKey);
+        HashMapSetCompare(cur_var->pdata->phi_func_pdata.phi_value, CompareKey);
+        HashMapSetCleanKey(cur_var->pdata->phi_func_pdata.phi_value,
+                           CleanHashMapKey);
+        HashMapSetCleanValue(cur_var->pdata->phi_func_pdata.phi_value,
+                             CleanValue);
+
+        // 给phi函数返回的 Value* 变量命名
+        char temp_str[15];
+        char text[10];
+        sprintf(text, "%d", phi_var_seed);
+        ++phi_var_seed;
+        strcpy(temp_str, "\%phi_var");
+        strcat(temp_str, text);
+
+        // 创建指针
+        Value *cur_ins = (Value *)ins_new_single_operator_v2(AssignOP, cur_var);
+        // 添加变量类型
+        cur_ins->VTy->TID =
+            ((Value *)bblock_ins)->pdata->allocate_pdata.point_value->VTy->TID;
+        // 添加变量的名字
+        cur_ins->name = strdup(temp_str);
+
+        // printf("%s = phi,align 4\n", temp_str);
+
+        ListInsert(element->bblock_head->inst_list, 1, cur_ins);
+      }
+    }
+  }
+}
+
+// 生成支配树的pass和插入phi节点的pass
 void bblock_to_dom_graph_pass(Function *self) {
   int num_of_block = self->num_of_block;
   // 设置支配树对应图的邻接表头
@@ -318,6 +466,19 @@ void bblock_to_dom_graph_pass(Function *self) {
   printf("\n");
 
   dom_relation_pass();
+
+  insert_phi_func_pass(self);
+
+  printf("\n");
+
+  // 打印表的表头信息
+  printf("\t%s\tnumber: %20s \t%25s \t%10s\n", "labelID", "opcode", "name",
+         "use");
+  // 打印当前函数的基本块
+  print_bblock_pass(cur_func->entry_bblock);
+  // 清空哈希表 然后重新初始化供后面使用
+  HashSetDeinit(bblock_pass_hashset);
+  hashset_init(&(bblock_pass_hashset));
 }
 
 // ins_list
@@ -360,10 +521,8 @@ void ins_toBBlock_pass(List *self) {
   void *element;
   ListFirst(self, false);
   // 迭代下标
-  int iterate_subscript = -1;
 
   while (ListNext(self, &element)) {
-    iterate_subscript++;
     // 初始包含入口基本块和结束基本块
     int num_of_block = 2;
     //  进入一个函数
@@ -372,9 +531,10 @@ void ins_toBBlock_pass(List *self) {
       cur_func = (Function *)malloc(sizeof(Function));
       function_init(cur_func);
       cur_func->label = (Value *)element;
+
       // 初始化entryLabel并且插入到函数的入口label
       ListNext(self, &element);
-      iterate_subscript++;
+
       cur_bblock = (BasicBlock *)malloc(sizeof(BasicBlock));
       bblock_init(cur_bblock, cur_func);
       cur_bblock->label = (Value *)element;
@@ -402,11 +562,11 @@ void ins_toBBlock_pass(List *self) {
 
       // 插入instruction
       while (ListNext(self, &element)) {
-        iterate_subscript++;
         TAC_OP cur_ins_opcode = ((Instruction *)element)->opcode;
         switch (cur_ins_opcode) {
           case GotoWithConditionOP:
-            // printf("%s label %s ins is printed\n", cur_bblock->label->name,
+            // printf("%s label %s ins is printed\n",
+            // cur_bblock->label->name,
             //        op_string[((Instruction *)element)->opcode]);
             ListPushBack(cur_bblock->inst_list, element);
             // 初始化要跳转的两个基本块
@@ -432,7 +592,8 @@ void ins_toBBlock_pass(List *self) {
             break;
 
           case GotoOP:
-            // printf("%s label %s ins is printed\n", cur_bblock->label->name,
+            // printf("%s label %s ins is printed\n",
+            // cur_bblock->label->name,
             //        op_string[((Instruction *)element)->opcode]);
             ListPushBack(cur_bblock->inst_list, element);
             // 初始化要跳转的一个基本块
@@ -478,8 +639,9 @@ void ins_toBBlock_pass(List *self) {
             cur_bblock->true_bblock = end_bblock;
             ListPushBack(cur_bblock->inst_list, element);
             break;
-          // case AllocateOP:
-          //   ListRemove()
+          case AllocateOP:
+            ListInsert(cur_func->entry_bblock->inst_list, 1, element);
+            break;
           default:
             // printf("%s label %s ins push back\n", cur_bblock->label->name,
             //        op_string[((Instruction *)element)->opcode]);

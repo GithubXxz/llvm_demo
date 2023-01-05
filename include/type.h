@@ -22,6 +22,7 @@ typedef enum _TypeID {
   ReturnTyID,
   ParamTyID,
   FuncLabelTyID,  ///< func entry
+  PhiFuncTyID,
 
   // PrimitiveTypes
   HalfTyID,       ///< 16-bit floating point type

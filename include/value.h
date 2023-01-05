@@ -6,6 +6,7 @@
 // #include <stddef.h>
 #include <stdint.h>
 
+#include "cds.h"
 #include "type.h"
 
 struct _Symtab;
@@ -52,6 +53,10 @@ typedef union _PData {
   struct {
     Value *point_value;  // 分配内存的变量
   } allocate_pdata;
+
+  struct {
+    HashMap *phi_value;
+  } phi_func_pdata;
 
 } PData;
 

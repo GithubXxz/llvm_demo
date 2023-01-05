@@ -37,6 +37,9 @@ int CompareKey(void* lhs, void* rhs) {
   return strcmp((char*)lhs, (char*)lhs);
 }
 
+// 因为数据结构心态再一次崩掉
+int CompareKeyAddress(void* lhs, void* rhs) { return lhs != rhs; }
+
 void CleanHashMapKey(void* key) { free(key); }
 
 void CleanHashSetKey(void* key) {}
@@ -46,7 +49,7 @@ void CleanValue(void* value) {}
 void hashset_init(HashSet** self) {
   *self = HashSetInit();
   HashSetSetHash(*self, HashKey);
-  HashSetSetCompare(*self, CompareKey);
+  HashSetSetCompare(*self, CompareKeyAddress);
   HashSetSetCleanKey(*self, CleanHashSetKey);
 }
 

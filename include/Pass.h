@@ -18,6 +18,7 @@ typedef struct _HeadNode {
   struct _HeadNode *idom_node;
   // 他的前驱节点链表
   List *pre_node_list;
+  // 是否被访问过
   bool is_visited;
 } HeadNode;  // 定义头结点
 
