@@ -29,6 +29,11 @@ typedef struct {
   int node_num, edge_num;
 } ALGraph;  // 定义邻接表
 
+typedef struct _dom_tree {
+  List *child;
+  HeadNode *bblock_node;  // 分管的basicblock
+} dom_tree;
+
 void print_ins_pass(List *self);
 void ins_toBBlock_pass(List *self);
 void delete_return_deadcode_pass(List *self);

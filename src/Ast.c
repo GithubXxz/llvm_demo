@@ -276,7 +276,7 @@ void in_eval(ast *a, Value *left) {
     //                                  strdup(temp_str), goto_else);
 
     Value *goto_else_ins = (Value *)ins_new_no_operator_v2(GotoOP);
-    goto_else_ins->name = strdup("goto_then");
+    goto_else_ins->name = strdup("goto ");
     goto_else_ins->VTy->TID = GotoTyID;
     goto_else_ins->pdata->no_condition_goto.goto_location = then_label_ins;
 
@@ -436,8 +436,10 @@ Value *post_eval(ast *a, Value *left, Value *right) {
         Value *cur = (Value *)malloc(sizeof(Value));
         value_init(cur);
         cur->VTy->TID = ImmediateIntTyID;
+        char text[10];
+        sprintf(text, "%d", a->intgr);
         // 添加变量的名字
-        cur->name = strdup("immediateInt");
+        cur->name = strdup(text);
         // 为padata里的整数字面量常量赋值
         cur->pdata->var_pdata.iVal = a->intgr;
         return cur;
@@ -445,8 +447,10 @@ Value *post_eval(ast *a, Value *left, Value *right) {
         Value *cur = (Value *)malloc(sizeof(Value));
         value_init(cur);
         cur->VTy->TID = ImmediateFloatTyID;
+        char text[10];
+        sprintf(text, "%f", a->flt);
         // 添加变量的名字
-        cur->name = strdup("immediateFloat");
+        cur->name = strdup(text);
         // 为padata里的浮点数字面量常量赋值
         cur->pdata->var_pdata.fVal = a->flt;
         return cur;
@@ -587,14 +591,21 @@ Value *post_eval(ast *a, Value *left, Value *right) {
 
       if (ins_back->opcode == GotoOP) {
         // 删除链尾 并且释放链尾ins的内存
-        ListPopBack(ins_list);
-        value_free((Value *)ins_back);
-        free(ins_back);
+        // ListPopBack(ins_list);
+        // value_free((Value *)ins_back);
+        // free(ins_back);
 
-        // 释放内存
         Value *else_label_ins = NULL;
         StackTop(stack_else_label, (void **)&else_label_ins);
         StackPop(stack_else_label);
+        // 重定向无条件跳转的指向
+        char temp_str[15];
+        strcpy(temp_str, ((Value *)ins_back)->name);
+        strcat(temp_str, ((Value *)else_label_ins)->name);
+        free(((Value *)ins_back)->name);
+        ((Value *)ins_back)->name = strdup(temp_str);
+        ((Value *)ins_back)->pdata->no_condition_goto.goto_location =
+            else_label_ins;
         ListPushBack(ins_list, (void *)else_label_ins);
         printf("%s\n", else_label_ins->name);
 
@@ -608,7 +619,6 @@ Value *post_eval(ast *a, Value *left, Value *right) {
         free(then_label_ins);
         return NULL;
       } else {
-        // printf("this 'if' with else statement\n");
         Value *then_label_ins = NULL;
         StackTop(stack_then_label, (void **)&then_label_ins);
         StackPop(stack_then_label);
@@ -638,8 +648,8 @@ Value *post_eval(ast *a, Value *left, Value *right) {
       // 添加变量的名字
       func_end_ins->name = strdup(temp_str);
       func_end_ins->VTy->TID = FuncEndTyID;
-      // pdata不需要数据所以释放掉
-      free(func_end_ins->pdata);
+      // // pdata不需要数据所以释放掉
+      // free(func_end_ins->pdata);
 
       // 插入
       ListPushBack(ins_list, (void *)func_end_ins);
@@ -650,19 +660,37 @@ Value *post_eval(ast *a, Value *left, Value *right) {
     if (!strcmp(a->name, "RETURN")) {
       char temp_str[20];
 
-      strcpy(temp_str, right->name);
-
-      Value *func_return_ins = (Value *)ins_new_no_operator_v2(ReturnOP);
+      Value *func_return_ins =
+          (Value *)ins_new_single_operator_v2(ReturnOP, right);
       // 添加变量的名字 类型 和返回值
-      func_return_ins->name = strdup(temp_str);
+      func_return_ins->name = strdup("return");
       func_return_ins->VTy->TID = ReturnTyID;
-      func_return_ins->pdata->return_pdata.return_value = right;
 
       // 插入
       ListPushBack(ins_list, (void *)func_return_ins);
 
       printf("%s\n", func_return_ins->name);
     }
+
+    // if (!strcmp(a->name, "ELSE")) {
+    //   printf("gggggggg1\n");
+    // Value *then_label_ins = NULL;
+    // StackTop(stack_then_label, (void **)&then_label_ins);
+    // char temp_str[15];
+    // strcpy(temp_str, "goto ");
+    // strcat(temp_str, then_label_ins->name);
+    // printf("gggggggg2\n");
+
+    // Value *goto_then_ins = (Value *)ins_new_no_operator_v2(GotoOP);
+    // printf("gggggggg3\n");
+    // goto_then_ins->name = strdup(temp_str);
+    // goto_then_ins->VTy->TID = GotoTyID;
+    // goto_then_ins->pdata->no_condition_goto.goto_location = then_label_ins;
+    // printf("gggggggg4\n");
+
+    // ListPushBack(ins_list, (void *)goto_then_ins);
+    // printf("gggggggg5\n");
+    // }
   }
   return NULL;
 }

@@ -9,12 +9,12 @@
 typedef enum _TypeID {
   // 默认值
   DefaultTyID = 0,
-  IntegerTyID,         ///< Arbitrary bit width integers
-  FloatTyID,           ///< 32-bit floating point type
+  IntegerTyID,         ///< int a;
+  FloatTyID,           ///< float b;
   StructTyID,          ///< Structures
   PointerTyID,         ///< Pointers
-  ImmediateIntTyID,    ///< Pointers
-  ImmediateFloatTyID,  ///< Pointers
+  ImmediateIntTyID,    ///< 立即数整数
+  ImmediateFloatTyID,  ///< 立即数浮点数
   LabelTyID,           ///< label
   GotoTyID,            ///< goto label
   FuncCallTyID,        ///< func call goto label

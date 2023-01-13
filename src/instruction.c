@@ -64,9 +64,9 @@ void free_common_ins(Instruction *self) {
   // 释放连接这条instruction的use链
   for (int i = 0; i < self->user.num_oprands; i++) {
     use_remove_from_list(user_get_operand_use((User *)self, i));
-    free(user_get_operand_use((User *)self, i));
   }
-  free(self);
+  value_free((Value *)self);
+  free(user_get_operand_use((User *)self, 0));
 }
 
 // clean the instruction
@@ -88,7 +88,10 @@ Instruction *ins_new_v2(int op_num) {
   // use 是额外的，所以要单独计算大小
   // 为了 instruction 分配内存块 并且返回内存块的首地址
   uint8_t *storage = (uint8_t *)malloc(sizeof(Instruction) + use_size);
-  value_init(storage + use_size);
+  if (storage == NULL) {
+    printf("no no no no no!!!!!!\n");
+  }
+  value_init((Value *)(storage + use_size));
   // 将instruction里面的内容分布在内存块中
   user_construct(storage, op_num);
   // 计算偏移量然后返回User的首地址 低地址存储的位Use
@@ -163,6 +166,74 @@ void free_common_ins_v2(Instruction *self) {
 void CommonCleanInstruction_v2(void *element) {
   free_common_ins((Instruction *)element);
   element = NULL;
+}
+
+void use_relation_test() {
+  printf("this is the user and use test\n");
+  List *ins_list = ListInit();
+  ListSetClean(ins_list, CleanObject);
+
+  Value *temp1 = (Value *)malloc(sizeof(Value));
+  value_init(temp1);
+  temp1->VTy->TID = IntegerTyID;
+  temp1->name = strdup("temp1");
+
+  Value *temp2 = (Value *)malloc(sizeof(Value));
+  value_init(temp2);
+  temp2->VTy->TID = IntegerTyID;
+  temp2->name = strdup("temp2");
+
+  // 创建指针
+  Value *temp3 = (Value *)ins_new_single_operator_v2(AddOP, temp1);
+  // 添加变量类型
+  temp3->VTy->TID = IntegerTyID;
+  // 添加指针的名字 映射进哈希表 放入symbol_tabel里面 用于索引
+  temp3->name = strdup("temp3");
+
+  // 创建指针
+  Value *temp4 = (Value *)ins_new_single_operator_v2(AddOP, temp1);
+  // 添加变量类型
+  temp4->VTy->TID = IntegerTyID;
+  // 添加指针的名字 映射进哈希表 放入symbol_tabel里面 用于索引
+  temp4->name = strdup("temp4");
+
+  // 创建指针
+  Value *temp5 = (Value *)ins_new_single_operator_v2(AddOP, temp2);
+  // 添加变量类型
+  temp5->VTy->TID = IntegerTyID;
+  // 添加指针的名字 映射进哈希表 放入symbol_tabel里面 用于索引
+  temp5->name = strdup("temp5");
+
+  printf("this %s used by ", temp1->name);
+  printf("%s,", ((Value *)temp1->use_list->Parent)->name);
+  printf("%s\n", ((Value *)temp1->use_list->Next->Parent)->name);
+
+  printf("this %s use ", temp3->name);
+  printf("%s,", user_get_operand_use(((User *)temp3), 0)->Val->name);
+  printf("\n");
+
+  if (temp1->use_list != NULL) {
+    Use *u1 = (Use *)(temp1->use_list);
+    Use *u2 = u1->Next;
+    while (u1 != NULL) {
+      value_add_use(temp2, u1);
+      u1 = u2;
+      u2 = (u2 == NULL ? NULL : u2->Next);
+    }
+  }
+
+  temp1->use_list = NULL;
+
+  printf("this %s used by ", temp2->name);
+  printf("%s,", ((Value *)temp2->use_list->Parent)->name);
+  printf(" %s,", ((Value *)temp2->use_list->Next->Parent)->name);
+  printf(" %s\n", ((Value *)temp2->use_list->Next->Next->Parent)->name);
+
+  printf("this %s use ", temp3->name);
+  printf("%s,", user_get_operand_use(((User *)temp3), 0)->Val->name);
+  printf("\n");
+
+  ListPushBack(ins_list, temp2);
 }
 
 // zzq 判断一个value是否满足pdata里面的数据为0

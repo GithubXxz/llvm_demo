@@ -29,4 +29,5 @@ Instruction* bblock_pop_inst_back(BasicBlock* this) {
   // struct sc_list *tmp = sc_list_pop_tail(&this->inst_list);
   // InstNode* pnode = sc_list_entry(tmp, InstNode, list);
   // return pnode->inst;
+  return NULL;
 }

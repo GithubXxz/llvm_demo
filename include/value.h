@@ -43,10 +43,6 @@ typedef union _PData {
   } symtab_func_pdata;  // 目前只在我的符号表里用的结构，最终func结构还未完全确定
 
   struct {
-    Value *return_value;  // 返回值
-  } return_pdata;
-
-  struct {
     Value *param_value;  // 函数参数
   } param_pdata;
 
@@ -55,7 +51,8 @@ typedef union _PData {
   } allocate_pdata;
 
   struct {
-    HashMap *phi_value;
+    HashMap
+        *phi_value;  // phi函数对饮value的pdata 里面存有<block*,value*>的kv对
   } phi_func_pdata;
 
 } PData;

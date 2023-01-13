@@ -1,3 +1,4 @@
+#include "c_container_auxiliary.h"
 #include "cds.h"
 #include "user.h"
 
@@ -30,7 +31,8 @@ typedef enum _TAC_OP {
   FuncEndOP,
   AllocateOP,
   LoadOP,
-  StoreOP
+  StoreOP,
+  PhiFuncOp
 } TAC_OP;
 
 struct _BasicBlock;
@@ -79,6 +81,8 @@ void CommonCleanInstruction_v2(void *element);
 
 // 二元运算判断左值的类型
 TypeID ins_res_type_v2(Value *left, Value *right);
+
+void use_relation_test();
 
 // https://llvm.org/doxygen/InstrTypes_8h_source.html
 /// Construct a binary instruction, given the opcode and the two

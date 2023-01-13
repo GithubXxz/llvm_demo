@@ -99,8 +99,5 @@ void AllInit() {
   HashMapSetCleanKey(bblock_to_dom_graph_hashmap, CleanHashMapKey);
   HashMapSetCleanValue(bblock_to_dom_graph_hashmap, CleanValue);
 
-  bblock_pass_hashset = HashSetInit();
-  HashSetSetHash(bblock_pass_hashset, HashKey);
-  HashSetSetCompare(bblock_pass_hashset, CompareKey);
-  HashSetSetCleanKey(bblock_pass_hashset, CleanHashSetKey);
+  hashset_init(&bblock_pass_hashset);
 }

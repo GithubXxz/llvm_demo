@@ -37,7 +37,6 @@ void value_free(Value *this) {
   free(this->VTy);
   free(this->name);
   free(this->pdata);
-  free(this->use_list);
 }
 
 Value *value_init_int_with_initial(int num) {

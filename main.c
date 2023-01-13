@@ -93,34 +93,37 @@ int main() {
 
   char *input4 =
       "int main() {"
-      "  int a, b;"
-      "  a = 15;"
-      "  if (a == 10) {"
+      "  int b,a;"
+      "  b = 15;"
+      "  a = 333;"
+      "  if (b == 10) {"
+      "    a = 333;"
       "    b = 111;"
       "  } else {"
       "    b = 222;"
+      "    a = 444;"
       "  }"
+      "  b = a;"
       "  return b;"
       "}";
 
   char *input5 =
       "int main() {"
-      "  int a, b = 10;"
-      "  a = 10 + b;"
+      "  float a, b = 10.1;"
       "}";
 
-  parser(input2);
+  parser(input1);
 
   //   print_ins_pass(ins_list);
-  printf("遍历结束\n\n");
+  printf("遍历结束");
 
   // 清除return语句和label或者functionEnd之间语句之间的不可达语句的pass
   delete_return_deadcode_pass(ins_list);
 
-  if (freopen("out.txt", "w", stdout) == NULL) {
-    fprintf(stderr, "打开文件失败！");
-    exit(-1);
-  }
+  //   if (freopen("out.txt", "w", stdout) == NULL) {
+  //     fprintf(stderr, "打开文件失败！");
+  //     exit(-1);
+  //   }
 
   ins_toBBlock_pass(ins_list);
 
@@ -128,6 +131,10 @@ int main() {
 
   ListSetClean(ins_list, CleanObject);
   ListDeinit(ins_list);
+
+  printf("\n");
+
+  //   use_relation_test();
 
   return 0;
 }
