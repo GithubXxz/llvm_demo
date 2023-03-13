@@ -8,6 +8,12 @@ Stack* stack_else_label = NULL;
 
 Stack* stack_then_label = NULL;
 
+// while条件为false时所要跳转的label栈
+Stack* stack_while_then_label = NULL;
+
+// while循环头(条件判断)
+Stack* stack_while_head_label = NULL;
+
 // 哈希表的初始化 用于查找调用的函数名和对应的函数label
 HashMap* func_hashMap = NULL;
 
@@ -30,6 +36,9 @@ void CleanObject(void* element) {}
 
 unsigned HashKey(void* key) { return HashDjb2((char*)key); }
 
+// 直接使用地址进行hash计算
+unsigned HashKeyAddress(void* key) { return HashDjb2(key); }
+
 // 设置一个hash_map的比较方式 示例为通过字符串排序
 // 将键类型强转位字符串然后来比较
 int CompareKey(void* lhs, void* rhs) {
@@ -38,19 +47,34 @@ int CompareKey(void* lhs, void* rhs) {
 }
 
 // 因为数据结构心态再一次崩掉
-int CompareKeyAddress(void* lhs, void* rhs) { return lhs != rhs; }
+int CompareKeyAddress(void* lhs, void* rhs) {
+  // 保证内容相同的同时地址相同 内容相同的先决条件
+  return lhs != rhs;
+}
 
 void CleanHashMapKey(void* key) { free(key); }
+
+void CleanHashMapKeyNotFree(void* key) {}
 
 void CleanHashSetKey(void* key) {}
 
 void CleanValue(void* value) {}
 
+void CleanIntValue(void* value) { free((int*)value); }
+
 void hashset_init(HashSet** self) {
   *self = HashSetInit();
-  HashSetSetHash(*self, HashKey);
+  HashSetSetHash(*self, HashKeyAddress);
   HashSetSetCompare(*self, CompareKeyAddress);
   HashSetSetCleanKey(*self, CleanHashSetKey);
+}
+
+void hashmap_init(HashMap** self) {
+  *self = HashMapInit();
+  HashMapSetHash(*self, HashKey);
+  HashMapSetCompare(*self, CompareKey);
+  HashMapSetCleanKey(*self, CleanHashMapKey);
+  HashMapSetCleanValue(*self, CleanValue);
 }
 
 void AllInit() {
@@ -74,9 +98,17 @@ void AllInit() {
   stack_else_label = StackInit();
   StackSetClean(stack_else_label, CleanObject);
 
-  // 初始化then的goto栈
+  // while条件为false时所要跳转的label栈
   stack_then_label = StackInit();
   StackSetClean(stack_then_label, CleanObject);
+
+  // while循环头(条件判断)
+  stack_while_head_label = StackInit();
+  StackSetClean(stack_while_head_label, CleanObject);
+
+  // 初始化then的goto栈
+  stack_while_then_label = StackInit();
+  StackSetClean(stack_while_then_label, CleanObject);
 
   func_hashMap = HashMapInit();
   // 哈希表的初始化 用于查找调用的函数名和对应的函数label

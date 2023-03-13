@@ -98,6 +98,13 @@ Instruction *ins_new_v2(int op_num) {
   return (Instruction *)(storage + use_size);
 }
 
+Instruction *ins_new_phi_func_v2(TAC_OP Op, int num_of_predecessor) {
+  Instruction *inst = ins_new_v2(num_of_predecessor);
+  ((Value *)inst)->HasHungOffUses = true;
+  inst->opcode = Op;
+  return inst;
+}
+
 Instruction *ins_new_no_operator_v2(TAC_OP Op) {
   Instruction *inst = ins_new_v2(0);
   inst->opcode = Op;
@@ -121,6 +128,8 @@ Instruction *ins_new_binary_operator_v2(TAC_OP Op, Value *S1, Value *S2) {
   value_add_use(S2, puse);
   return inst;
 }
+
+void phi_node_copy(TAC_OP Op, Value *res, Value *S1) {}
 
 TypeID ins_res_type_v2(Value *left, Value *right) {
   TypeID type_id = DefaultTyID;

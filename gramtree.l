@@ -24,6 +24,8 @@ RETURN return
 IF if
 ELSE else
 WHILE while
+BREAK break
+CONTINUE continue
 PLUS \+
 MINUS \-
 INTEGER [1-9]+[0-9]*|0
@@ -63,6 +65,8 @@ AERROR .
 {IF}             {yylval.a=newast("IF",0,yylineno);return IF;}
 {ELSE}           {yylval.a=newast("ELSE",0,yylineno); return ELSE;}
 {WHILE}          {yylval.a=newast("WHILE",0,yylineno); return WHILE;}
+{BREAK}          {yylval.a=newast("BREAK",0,yylineno); return BREAK;}
+{CONTINUE}       {yylval.a=newast("CONTINUE",0,yylineno); return CONTINUE;}
 {PLUS}           {yylval.a=newast("PLUS",0,yylineno); return PLUS;}
 {MINUS}          {yylval.a=newast("MINUS",0,yylineno); return MINUS;}
 {INTEGER}        {yylval.a=newast("INTEGER",0,yylineno); return INTEGER;}

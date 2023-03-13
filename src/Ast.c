@@ -9,30 +9,29 @@ extern Stack *stack_ast_pre;
 extern Stack *stack_symbol_table;
 extern Stack *stack_else_label;
 extern Stack *stack_then_label;
+extern Stack *stack_while_head_label;  // while循环头(条件判断)
+extern Stack *stack_while_then_label;  // while条件为false时所要跳转的label栈
 extern ast *pre_astnode;
 extern List *ins_list;
 extern HashMap *func_hashMap;
 extern SymbolTable *cur_symboltable;
 extern Value *return_val;
+
 void CleanObject(void *element);
 
 enum NowVarDecType { NowInt = 1, NowFloat, NowStruct } nowVarDecType;
 
 char *NowVarDecStr[] = {"default", "int", "float", "struct"};
 
-int temp_var_seed = 1;  // 用于标识变量的名字
+static int temp_var_seed = 1;    // 用于标识变量的名字
+static int label_var_seed = 1;   // 用于标识label的名字
+static int label_func_seed = 1;  // 用于表示func_label的名字
+static int param_seed = 1;       // 用于表示函数参数的变量名
+static int point_seed = 1;       // 用于表示指针变量名 用于alloca
+static int num_of_param = 0;     // 用于标识函数参数的个数
 
-int label_var_seed = 1;  // 用于标识label的名字
-
-int label_func_seed = 1;  // 用于表示func_label的名字
-
-int param_seed = 1;
-
-int point_seed = 1;
-
-int num_of_param = 0;  // 用于标识函数参数的个数
-
-int i;
+// 判断当前if是否含有else
+bool have_else = false;
 
 ast *newast(char *name, int num, ...)  // 抽象语法树建立
 {
@@ -57,7 +56,7 @@ ast *newast(char *name, int num, ...)  // 抽象语法树建立
 
     if (num >= 2)  // 可以规约到a的语法单元>=2
     {
-      for (i = 0; i < num - 1;
+      for (int i = 0; i < num - 1;
            ++i)  // 取变长参数列表中的剩余结点，依次设置成兄弟结点
       {
         temp->r = va_arg(valist, ast *);
@@ -89,7 +88,7 @@ ast *newast(char *name, int num, ...)  // 抽象语法树建立
 void eval_print(ast *a, int level) {
   // 打印该节点
   if (a != NULL) {
-    for (i = 0; i < level; ++i)  // 孩子结点相对父节点缩进2个空格
+    for (int i = 0; i < level; ++i)  // 孩子结点相对父节点缩进2个空格
       printf("  ");
     if (a->line != -1) {  // 产生空的语法单元不需要打印信息
       printf("%s ",
@@ -156,6 +155,42 @@ void pre_eval(ast *a) {
       StackPop(stack_else_label);
       ListPushBack(ins_list, (void *)else_label_ins);
       printf("%s\n", else_label_ins->name);
+    }
+
+    // 全局变量的符号表
+    if (!strcmp(a->name, "ExtDecList") && StackSize(stack_symbol_table) == 0) {
+      cur_symboltable = (SymbolTable *)malloc(sizeof(SymbolTable));
+      symbol_table_init(cur_symboltable);
+    }
+
+    if (a->r && !strcmp(a->r->name, "assistWHILE")) {
+      // 创建while这条语句的label，用于返回循环头
+      char temp_str[30];
+      char text[10];
+      sprintf(text, "%d", label_var_seed);
+      ++label_var_seed;
+      strcpy(temp_str, "label");
+      strcat(temp_str, text);
+
+      Value *while_head_label_ins = (Value *)ins_new_no_operator_v2(LabelOP);
+      while_head_label_ins->name = strdup(temp_str);
+      while_head_label_ins->VTy->TID = LabelTyID;
+      StackPush(stack_while_head_label, while_head_label_ins);
+
+      // 创建llvm 模式goto语句
+      Value *goto_label_ins = (Value *)ins_new_no_operator_v2(GotoOP);
+      strcpy(temp_str, "goto ");
+      strcat(temp_str, while_head_label_ins->name);
+      goto_label_ins->name = strdup(temp_str);
+      goto_label_ins->VTy->TID = GotoTyID;
+      goto_label_ins->pdata->no_condition_goto.goto_location =
+          while_head_label_ins;
+      printf("br %s\n", while_head_label_ins->name);
+      printf("%s\n", while_head_label_ins->name);
+      // 插入跳转语句
+      ListPushBack(ins_list, goto_label_ins);
+      // 插入while循环头的label
+      ListPushBack(ins_list, while_head_label_ins);
     }
   }
 }
@@ -226,7 +261,7 @@ void in_eval(ast *a, Value *left) {
     true_label_ins->name = strdup(temp_str);
     true_label_ins->VTy->TID = LabelTyID;
 
-    // 创建跳转语句
+    // 创建跳转语句 left是跳转条件
     Value *goto_condition_ins =
         (Value *)ins_new_single_operator_v2(GotoWithConditionOP, left);
 
@@ -250,11 +285,11 @@ void in_eval(ast *a, Value *left) {
 
     ListPushBack(ins_list, true_label_ins);
 
-    printf("%s\n1", temp_str);
+    printf("%s\n", temp_str);
   }
 
   if (a->r && !strcmp(a->r->name, "assistELSE")) {
-    char temp_str[15];
+    char temp_str[30];
     char text[10];
     sprintf(text, "%d", label_var_seed);
     ++label_var_seed;
@@ -276,7 +311,9 @@ void in_eval(ast *a, Value *left) {
     //                                  strdup(temp_str), goto_else);
 
     Value *goto_else_ins = (Value *)ins_new_no_operator_v2(GotoOP);
-    goto_else_ins->name = strdup("goto ");
+    strcpy(temp_str, "goto ");
+    strcat(temp_str, then_label_ins->name);
+    goto_else_ins->name = strdup(temp_str);
     goto_else_ins->VTy->TID = GotoTyID;
     goto_else_ins->pdata->no_condition_goto.goto_location = then_label_ins;
 
@@ -305,6 +342,59 @@ void in_eval(ast *a, Value *left) {
     ListPushBack(ins_list, (void *)func_param_ins);
 
     printf("%s %s insert\n", func_param_ins->name, left->name);
+  }
+
+  if (a->r && !strcmp(a->r->name, "assistWHILE")) {
+    char temp_str[30];
+    char text[10];
+    // 创建false条件下的label标签
+    sprintf(text, "%d", label_var_seed);
+    ++label_var_seed;
+    strcpy(temp_str, "label");
+    strcat(temp_str, text);
+
+    Value *while_false_label_ins = (Value *)ins_new_no_operator_v2(LabelOP);
+    while_false_label_ins->name = strdup(temp_str);
+    while_false_label_ins->VTy->TID = LabelTyID;
+    // 将 while_then_label入栈
+    StackPush(stack_while_then_label, while_false_label_ins);
+
+    // 创建true条件下的label标签
+    sprintf(text, "%d", label_var_seed);
+    ++label_var_seed;
+    strcpy(temp_str, "label");
+    strcat(temp_str, text);
+
+    Value *while_true_label_ins = (Value *)ins_new_no_operator_v2(LabelOP);
+    // 添加变量的名字
+    while_true_label_ins->name = strdup(temp_str);
+    while_true_label_ins->VTy->TID = LabelTyID;
+
+    // 创建跳转语句
+    Value *goto_condition_ins =
+        (Value *)ins_new_single_operator_v2(GotoWithConditionOP, left);
+
+    char temp_br_label_name[40];
+    strcpy(temp_br_label_name, "true:");
+    strcat(temp_br_label_name, while_true_label_ins->name);
+    strcat(temp_br_label_name, "  false:");
+    strcat(temp_br_label_name, while_false_label_ins->name);
+
+    goto_condition_ins->name = strdup(temp_br_label_name);
+    goto_condition_ins->VTy->TID = GotoTyID;
+    goto_condition_ins->pdata->condition_goto.false_goto_location =
+        while_false_label_ins;
+    goto_condition_ins->pdata->condition_goto.true_goto_location =
+        while_true_label_ins;
+
+    ListPushBack(ins_list, (void *)goto_condition_ins);
+
+    printf("while br %s, true: %s  false : %s \n", left->name,
+           while_true_label_ins->name, while_false_label_ins->name);
+
+    ListPushBack(ins_list, while_true_label_ins);
+
+    printf("%s\n", temp_str);
   }
 }
 
@@ -458,7 +548,10 @@ Value *post_eval(ast *a, Value *left, Value *right) {
       // 加减乘除的情况
       else if (!strcmp(a->name, "MINUS") || !strcmp(a->name, "PLUS") ||
                !strcmp(a->name, "STAR") || !strcmp(a->name, "DIV") ||
-               !strcmp(a->name, "ASSIGNOP") || !strcmp(a->name, "EQUAL")) {
+               !strcmp(a->name, "ASSIGNOP") || !strcmp(a->name, "EQUAL") ||
+               !strcmp(a->name, "NOTEQUAL") || !strcmp(a->name, "GREAT") ||
+               !strcmp(a->name, "GREATEQUAL") ||
+               !strcmp(a->name, "LESSEQUAL") || !strcmp(a->name, "LESS")) {
         // 返回当前节点的右节点
         return right;
       } else if (!strcmp(a->name, "Stmt")) {
@@ -512,7 +605,7 @@ Value *post_eval(ast *a, Value *left, Value *right) {
     if (!strcmp(a->name, "Exp")) {
       char *var_name = NULL;
       if (left) {
-        var_name = strdup(left->name);
+        var_name = left->name;
       }
       // else {
       //   printf("left name is null\n");
@@ -549,31 +642,52 @@ Value *post_eval(ast *a, Value *left, Value *right) {
         cur_ins->name = strdup(temp_str);
         cur_ins->VTy->TID = ins_res_type(left, right);
 
-        char *ins_opcode =
+        char *oprand_type =
             NowVarDecStr[cur_ins->VTy->TID < 4 ? cur_ins->VTy->TID
                                                : cur_ins->VTy->TID - 4];
 
         if (!strcmp(a->r->name, "PLUS")) {
           ((Instruction *)cur_ins)->opcode = AddOP;
-          printf("%s = add nsw %s %s, %s\n", cur_ins->name, ins_opcode,
+          printf("%s = add nsw %s %s, %s\n", cur_ins->name, oprand_type,
                  left->name, right->name);
         } else if (!strcmp(a->r->name, "MINUS")) {
           ((Instruction *)cur_ins)->opcode = SubOP;
-          printf("%s = sub nsw %s %s, %s\n", cur_ins->name, ins_opcode,
+          printf("%s = sub nsw %s %s, %s\n", cur_ins->name, oprand_type,
                  left->name, right->name);
         } else if (!strcmp(a->r->name, "STAR")) {
           ((Instruction *)cur_ins)->opcode = MulOP;
-          printf("%s = mul nsw %s %s, %s\n", cur_ins->name, ins_opcode,
+          printf("%s = mul nsw %s %s, %s\n", cur_ins->name, oprand_type,
                  left->name, right->name);
         } else if (!strcmp(a->r->name, "DIV")) {
           ((Instruction *)cur_ins)->opcode = DivOP;
-          printf("%s = div nsw %s %s, %s\n", cur_ins->name, ins_opcode,
+          printf("%s = div nsw %s %s, %s\n", cur_ins->name, oprand_type,
                  left->name, right->name);
         } else if (!strcmp(a->r->name, "EQUAL")) {
           ((Instruction *)cur_ins)->opcode = EqualOP;
-          printf("%s = icmp eq %s %s, %s\n", cur_ins->name, ins_opcode,
+          printf("%s = icmp eq %s %s, %s\n", cur_ins->name, oprand_type,
+                 left->name, right->name);
+        } else if (!strcmp(a->r->name, "NOTEQUAL")) {
+          ((Instruction *)cur_ins)->opcode = NotEqualOP;
+          printf("%s = icmp neq %s %s, %s\n", cur_ins->name, oprand_type,
+                 left->name, right->name);
+        } else if (!strcmp(a->r->name, "GREAT")) {
+          ((Instruction *)cur_ins)->opcode = GreatThanOP;
+          printf("%s = icmp > %s %s, %s\n", cur_ins->name, oprand_type,
+                 left->name, right->name);
+        } else if (!strcmp(a->r->name, "LESS")) {
+          ((Instruction *)cur_ins)->opcode = LessThanOP;
+          printf("%s = icmp < %s %s, %s\n", cur_ins->name, oprand_type,
+                 left->name, right->name);
+        } else if (!strcmp(a->r->name, "GREATEQUAL")) {
+          ((Instruction *)cur_ins)->opcode = GreatEqualOP;
+          printf("%s = icmp >= %s %s, %s\n", cur_ins->name, oprand_type,
+                 left->name, right->name);
+        } else if (!strcmp(a->r->name, "LESSEQUAL")) {
+          ((Instruction *)cur_ins)->opcode = LessEqualOP;
+          printf("%s = icmp <= %s %s, %s\n", cur_ins->name, oprand_type,
                  left->name, right->name);
         }
+
         ListPushBack(ins_list, (void *)cur_ins);
         return cur_ins;
       }
@@ -589,7 +703,8 @@ Value *post_eval(ast *a, Value *left, Value *right) {
       Instruction *ins_back = NULL;
       ListGetBack(ins_list, (void **)&ins_back);
 
-      if (ins_back->opcode == GotoOP) {
+      // 当前的if不含else的情况
+      if (!have_else) {
         // 删除链尾 并且释放链尾ins的内存
         // ListPopBack(ins_list);
         // value_free((Value *)ins_back);
@@ -599,8 +714,8 @@ Value *post_eval(ast *a, Value *left, Value *right) {
         StackTop(stack_else_label, (void **)&else_label_ins);
         StackPop(stack_else_label);
         // 重定向无条件跳转的指向
-        char temp_str[15];
-        strcpy(temp_str, ((Value *)ins_back)->name);
+        char temp_str[30];
+        strcpy(temp_str, "goto ");
         strcat(temp_str, ((Value *)else_label_ins)->name);
         free(((Value *)ins_back)->name);
         ((Value *)ins_back)->name = strdup(temp_str);
@@ -619,6 +734,7 @@ Value *post_eval(ast *a, Value *left, Value *right) {
         free(then_label_ins);
         return NULL;
       } else {
+        have_else = false;
         Value *then_label_ins = NULL;
         StackTop(stack_then_label, (void **)&then_label_ins);
         StackPop(stack_then_label);
@@ -672,26 +788,97 @@ Value *post_eval(ast *a, Value *left, Value *right) {
       printf("%s\n", func_return_ins->name);
     }
 
-    // if (!strcmp(a->name, "ELSE")) {
-    //   printf("gggggggg1\n");
-    // Value *then_label_ins = NULL;
-    // StackTop(stack_then_label, (void **)&then_label_ins);
-    // char temp_str[15];
-    // strcpy(temp_str, "goto ");
-    // strcat(temp_str, then_label_ins->name);
-    // printf("gggggggg2\n");
+    if (!strcmp(a->name, "ELSE")) {
+      have_else = true;
+      Value *then_label_ins = NULL;
+      StackTop(stack_then_label, (void **)&then_label_ins);
+      char temp_str[30];
+      strcpy(temp_str, "goto ");
+      strcat(temp_str, then_label_ins->name);
 
-    // Value *goto_then_ins = (Value *)ins_new_no_operator_v2(GotoOP);
-    // printf("gggggggg3\n");
-    // goto_then_ins->name = strdup(temp_str);
-    // goto_then_ins->VTy->TID = GotoTyID;
-    // goto_then_ins->pdata->no_condition_goto.goto_location = then_label_ins;
-    // printf("gggggggg4\n");
+      Value *goto_then_ins = (Value *)ins_new_no_operator_v2(GotoOP);
+      goto_then_ins->name = strdup(temp_str);
+      goto_then_ins->VTy->TID = GotoTyID;
+      goto_then_ins->pdata->no_condition_goto.goto_location = then_label_ins;
 
-    // ListPushBack(ins_list, (void *)goto_then_ins);
-    // printf("gggggggg5\n");
-    // }
+      ListPushBack(ins_list, (void *)goto_then_ins);
+    }
+
+    if (!strcmp(a->name, "WHILE")) {
+      Value *while_head_label_ins = NULL;
+      StackTop(stack_while_head_label, (void **)&while_head_label_ins);
+      StackPop(stack_while_head_label);
+
+      char temp_str[30];
+      strcpy(temp_str, "goto ");
+      strcat(temp_str, while_head_label_ins->name);
+
+      // 跳出while循环
+      Value *goto_out_while_ins = (Value *)ins_new_no_operator_v2(GotoOP);
+      goto_out_while_ins->name = strdup(temp_str);
+      goto_out_while_ins->VTy->TID = GotoTyID;
+      goto_out_while_ins->pdata->no_condition_goto.goto_location =
+          while_head_label_ins;
+
+      ListPushBack(ins_list, (void *)goto_out_while_ins);
+
+      // 跳出while循环后紧接着语句的label
+      Value *while_then_label_ins = NULL;
+      StackTop(stack_while_then_label, (void **)&while_then_label_ins);
+      StackPop(stack_while_then_label);
+      ListPushBack(ins_list, (void *)while_then_label_ins);
+
+      printf("%s\n", while_then_label_ins->name);
+      return NULL;
+    }
+
+    if (!strcmp(a->name, "BREAK")) {
+      Value *goto_break_label_ins = NULL;
+      if (StackSize(stack_while_then_label) == 0) {
+        // 没有地方可以去 报错？
+        return NULL;
+      }
+
+      StackTop(stack_while_then_label, (void **)&goto_break_label_ins);
+
+      char temp_str[30];
+      strcpy(temp_str, "(break)br :");
+      strcat(temp_str, goto_break_label_ins->name);
+
+      Value *break_ins = (Value *)ins_new_no_operator_v2(GotoOP);
+      // 添加变量的名字 类型 和返回值
+      break_ins->name = strdup(temp_str);
+      break_ins->VTy->TID = GotoTyID;
+      break_ins->pdata->no_condition_goto.goto_location = goto_break_label_ins;
+
+      ListPushBack(ins_list, (void *)break_ins);
+      printf("break :br %s \n", goto_break_label_ins->name);
+    }
+
+    if (!strcmp(a->name, "CONTINUE")) {
+      Value *goto_head_label_ins = NULL;
+      if (StackSize(stack_while_head_label) == 0) {
+        // 没有地方可以去 报错？
+        return NULL;
+      }
+
+      StackTop(stack_while_head_label, (void **)&goto_head_label_ins);
+
+      char temp_str[30];
+      strcpy(temp_str, "(continue)br :");
+      strcat(temp_str, goto_head_label_ins->name);
+
+      Value *break_ins = (Value *)ins_new_no_operator_v2(GotoOP);
+      // 添加变量的名字 类型 和返回值
+      break_ins->name = strdup(temp_str);
+      break_ins->VTy->TID = GotoTyID;
+      break_ins->pdata->no_condition_goto.goto_location = goto_head_label_ins;
+
+      ListPushBack(ins_list, (void *)break_ins);
+      printf("continue :br %s \n", goto_head_label_ins->name);
+    }
   }
+
   return NULL;
 }
 

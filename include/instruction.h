@@ -40,6 +40,7 @@ typedef struct _Instruction {
   User user;
   TAC_OP opcode;  // 操作吗
   struct _BasicBlock *Parent;
+  unsigned ins_id;
 } Instruction;
 
 Instruction *ins_new(int op_num, Value *self);
@@ -66,6 +67,8 @@ SSA版本
 */
 
 Instruction *ins_new_v2(int op_num);
+
+Instruction *ins_new_phi_func_v2(TAC_OP Op, int num_of_predecessor);
 
 // 用于标识跳转
 Instruction *ins_new_no_operator_v2(TAC_OP Op);

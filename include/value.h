@@ -40,7 +40,7 @@ typedef union _PData {
     // Type param_type_lists[10];  // 参数的类型数组
     int param_num;  // 传入参数的个数
 
-  } symtab_func_pdata;  // 目前只在我的符号表里用的结构，最终func结构还未完全确定
+  } symtab_func_pdata;
 
   struct {
     Value *param_value;  // 函数参数
@@ -51,9 +51,17 @@ typedef union _PData {
   } allocate_pdata;
 
   struct {
-    HashMap
-        *phi_value;  // phi函数对饮value的pdata 里面存有<block*,value*>的kv对
+    // phi函数对饮value的pdata 里面存有<block*,value*>的kv对
+    HashMap *phi_value;
+    Value *phi_pointer;
+    HashMap *phi_assign_choose;
+    int num_of_predecessor;
+    int offset_var_use;
   } phi_func_pdata;
+
+  struct {
+    Value *phi_replace_value;
+  } phi_replace_pdata;
 
 } PData;
 

@@ -9,6 +9,10 @@ void bblock_init(BasicBlock* this, Function* parent) {
   this->true_bblock = NULL;
   this->false_bblock = NULL;
   this->parent = parent;
+  hashset_init(&(this->live_def));
+  hashset_init(&(this->live_use));
+  hashset_init(&(this->live_in));
+  hashset_init(&(this->live_out));
 }
 
 // only used by bblock

@@ -18,7 +18,7 @@ double d;
 
 /*declare tokens*/
 %token  <a> INTEGER FLOAT
-%token <a> TYPE STRUCT RETURN IF ELSE WHILE ID SPACE SEMI COMMA ASSIGNOP 
+%token <a> TYPE STRUCT RETURN IF ELSE WHILE ID SPACE SEMI COMMA ASSIGNOP BREAK CONTINUE
 %token <a> GREAT GREATEQUAL LESS LESSEQUAL NOTEQUAL EQUAL 
 %token <a> PLUS MINUS STAR DIV AND OR DOT NOT LP RP LB RB LC RC AERROR
 %token <a> EOL
@@ -43,7 +43,7 @@ Program:|ExtDefList {
     
     // eval_print($$,0);    
 
-    printf("\n");
+    // printf("\nprint over\n");
 
     eval($$);
 
@@ -165,9 +165,11 @@ StmtList:Stmt StmtList{$$=newast("StmtList",2,$1,$2);}
 Stmt:Exp SEMI {$$=newast("Stmt",1,$1);}
     |Compst {$$=newast("Stmt",1,$1);}
 	|RETURN Exp SEMI {$$=newast("Stmt",2,$1,$2);}
+    |BREAK SEMI{$$=newast("Stmt",1,$1);}
+    |CONTINUE SEMI{$$=newast("Stmt",1,$1);}
 	|IF LP Exp RP Stmt {$$=newast("Stmt",5,$1,$3,newast("assistIF",0,-1),$5,newast("assistELSE",0,-1));}
 	|IF LP Exp RP Stmt ELSE Stmt {$$=newast("Stmt",7,$1,$3,newast("assistIF",0,-1),$5,newast("assistELSE",0,-1),$6,$7);}
-	|WHILE LP Exp RP Stmt {$$=newast("Stmt",5,$1,$2,$3,$4,$5);}
+	|WHILE LP Exp RP Stmt {$$=newast("Stmt",4,$1,$3,newast("assistWHILE",0,-1),$5);}
 	;
 
 

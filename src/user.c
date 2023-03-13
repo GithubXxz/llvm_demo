@@ -61,12 +61,8 @@ int user_get_size(int use_num) {
 }
 
 Use *user_get_operand_use(User *this, unsigned ind) {
-  if (this->value.HasHungOffUses)
-    return this->use_list;
-  else {
-    // 通过数组来表示地址偏移量
-    return this->use_list + ind;
-  }
+  // 通过数组来表示地址偏移量
+  return this->use_list + ind;
 }
 
 Use *get_operand(User *this, int ind) {

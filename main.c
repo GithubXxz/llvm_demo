@@ -24,15 +24,11 @@ BasicBlock *cur_bblock = NULL;
 Function *cur_func = NULL;
 
 int yyparse(void);
+
 int parser(char *input);
 
 int main() {
   AllInit();
-
-  //   if (freopen("out.txt", "w", stdout) == NULL) {
-  //     fprintf(stderr, "打开文件失败！");
-  //     exit(-1);
-  //   }
 
   printf("开始遍历\n");
 
@@ -69,18 +65,15 @@ int main() {
 
   char *input2 =
       "int main() {"
-      "  int a;"
-      "  int b;"
-      "  int c;"
-      "  a = 222;"
-      "  b = 333;"
-      "  if (a == 5) {"
-      "    a = 111;"
-      "  } else {"
-      "    b = 111;"
+      "  int a = 10;"
+      "  if (a == 10) {"
+      "    a = 20;"
+      "    if (a == 20) {"
+      "      a = 30;"
+      "    }"
+      "  int b = a;"
       "  }"
-      "  c = a + b;"
-      "  return c;"
+      "  return 0;"
       "}";
 
   char *input3 =
@@ -95,12 +88,9 @@ int main() {
       "int main() {"
       "  int b,a;"
       "  b = 15;"
-      "  a = 333;"
       "  if (b == 10) {"
       "    a = 333;"
-      "    b = 111;"
       "  } else {"
-      "    b = 222;"
       "    a = 444;"
       "  }"
       "  b = a;"
@@ -109,32 +99,63 @@ int main() {
 
   char *input5 =
       "int main() {"
-      "  float a, b = 10.1;"
+      "  int a, b;"
+      "  a = 10;"
+      "  b = 120;"
+      "  while (a < 5) {"
+      "    a = a - 1;"
+      "    if (b < 70) {"
+      "      b = 100;"
+      "      continue;"
+      "    } else {"
+      "      b = b -10;"
+      "      break;"
+      "    }"
+      "  }"
+      "  return b;"
       "}";
 
-  parser(input1);
+  char *input6 =
+      "int main() {"
+      "  int a = 10;"
+      "  int b = 111;"
+      "  int c = 222;"
+      "  while (a > 5) {"
+      "    int d = b;"
+      "    b = c;"
+      "    c = d;"
+      "  }"
+      "  return c;"
+      "}";
+
+  if (freopen("printf_ast.txt", "w", stdout) == NULL) {
+    fprintf(stderr, "打开文件失败！");
+    exit(-1);
+  }
+
+  parser(input6);
 
   //   print_ins_pass(ins_list);
-  printf("遍历结束");
-
-  // 清除return语句和label或者functionEnd之间语句之间的不可达语句的pass
-  delete_return_deadcode_pass(ins_list);
+  printf("遍历结束\n");
 
   //   if (freopen("out.txt", "w", stdout) == NULL) {
   //     fprintf(stderr, "打开文件失败！");
   //     exit(-1);
   //   }
+  // 清除return语句和label或者functionEnd之间语句之间的不可达语句的pass
+  print_ins_pass(ins_list);
+  printf("\n");
+  //   delete_return_deadcode_pass(ins_list);
 
   ins_toBBlock_pass(ins_list);
 
   bblock_to_dom_graph_pass(cur_func);
 
-  ListSetClean(ins_list, CleanObject);
-  ListDeinit(ins_list);
-
-  printf("\n");
+  //   ListDeinit(ins_list);
 
   //   use_relation_test();
+
+  printf("All over!\n");
 
   return 0;
 }

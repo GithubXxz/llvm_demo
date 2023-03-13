@@ -45,40 +45,42 @@ extern HashMap *bblock_to_dom_graph_hashmap;
 
 ALGraph *graph_for_dom_tree = NULL;
 
-dom_tree *dom_tree_root = NULL;
+static dom_tree *dom_tree_root = NULL;
 
-TAC_OP pre_op;
+static TAC_OP pre_op;
 
-int phi_var_seed = 1;  // 用于phi函数产生变量的名字
+static int phi_var_seed = 1;   // 用于phi函数产生变量的名字
+static int temp_var_seed = 1;  // 用于标识变量的名字
 
 // 通过bblock的名字获得bblock的指针
 BasicBlock *name_get_bblock(char *name) {
   return (BasicBlock *)HashMapGet(bblock_hashmap, name);
 }
 
-void dom_tree_pass(List *self) {
-  int i = 0;
-  // printf("\nbegin print the instruction: \n");
-  void *element;
-  ListFirst(self, false);
-  while (ListNext(self, &element)) {
-    // 打印出每条instruction的res的名字信息
-    printf("%9s\t     %d: %20s ", "", i++,
-           op_string[((Instruction *)element)->opcode]);
+// void dom_tree_pass(List *self) {
+//   int i = 0;
+//   // printf("\nbegin print the instruction: \n");
+//   void *element;
+//   ListFirst(self, false);
+//   while (ListNext(self, &element)) {
+//     // 打印出每条instruction的res的名字信息
+//     printf("%9s\t     %d: %20s ", "", i++,
+//            op_string[((Instruction *)element)->opcode]);
 
-    printf("\t%25s ", ((Value *)element)->name);
+//     printf("\t%25s ", ((Value *)element)->name);
 
-    if (((Instruction *)element)->user.num_oprands == 2) {
-      printf("\t%10s, %10s\n",
-             user_get_operand_use(((User *)element), 0)->Val->name,
-             user_get_operand_use(((User *)element), 1)->Val->name);
-    } else if (((Instruction *)element)->user.num_oprands == 1) {
-      printf("\t%10s\n", user_get_operand_use(((User *)element), 0)->Val->name);
-    } else if (((Instruction *)element)->user.num_oprands == 0) {
-      printf("\t%10s\n", "null");
-    }
-  }
-}
+//     if (((Instruction *)element)->user.num_oprands == 2) {
+//       printf("\t%10s, %10s\n",
+//              user_get_operand_use(((User *)element), 0)->Val->name,
+//              user_get_operand_use(((User *)element), 1)->Val->name);
+//     } else if (((Instruction *)element)->user.num_oprands == 1) {
+//       printf("\t%10s\n", user_get_operand_use(((User *)element),
+//       0)->Val->name);
+//     } else if (((Instruction *)element)->user.num_oprands == 0) {
+//       printf("\t%10s\n", "null");
+//     }
+//   }
+// }
 
 // 判断self是否为other的子集
 bool is_subset(HashSet *self, HashSet *other) {
@@ -189,14 +191,14 @@ void dom_relation_pass() {
 
   //// 打印当前函数含有的bblock的数量
   // printf("cur graph has %d node\n", node_num);
-
+  printf("打印基本块之间的支配关系\n");
   // 打印入口节点的支配节点信息和地址
   printf("node entry dom ");
   for (int j = 0; j < node_num; j++) {
     printf("%s|%p,", graph_for_dom_tree->node_set[j]->bblock_head->label->name,
            graph_for_dom_tree->node_set[j]);
   }
-  printf("\n\n");
+  printf("\n");
 
   for (int i = 1; i < node_num; i++) {
     // 删除该节点的入边和出边 计算出根节点的不可达节点便是该节点的支配节点
@@ -231,6 +233,7 @@ void dom_relation_pass() {
 
     dom_relation_pass_help(graph_for_dom_tree->node_set[0]);
 
+    // 将删除的边添加回来
     for (int j = 0; j < node_num; j++) {
       if (delete_marked[j] == 1) {
         HashSetAdd(graph_for_dom_tree->node_set[j]->edge_list,
@@ -244,6 +247,7 @@ void dom_relation_pass() {
 
     printf("node %s dom ",
            graph_for_dom_tree->node_set[i]->bblock_head->label->name);
+    // 把没有被访问的节点添加到当前节点的支配节点
     for (int j = 0; j < node_num; j++) {
       if (!graph_for_dom_tree->node_set[j]->is_visited) {
         // printf("%s\n",graph_for_dom_tree->node_set[j]->bblock_head->label->name);
@@ -259,7 +263,7 @@ void dom_relation_pass() {
     printf("\n");
   }
 
-  printf("\n");
+  printf("\n打印每个节点的立即支配节点\n");
   // 计算每个节点的idom
   for (int i = 1; i < node_num; i++) {
     int cur_idom_nodeset_num = INT_MAX;
@@ -288,6 +292,7 @@ void dom_relation_pass() {
         graph_for_dom_tree->node_set[i]->idom_node->bblock_head->label->name);
   }
 
+  printf("\n打印支配树中的层级关系\n");
   Stack *dom_tree_stack = NULL;
   dom_tree_stack = StackInit();
   StackSetClean(dom_tree_stack, CleanObject);
@@ -315,7 +320,7 @@ void dom_relation_pass() {
     printf("\n");
   }
 
-  printf("\n");
+  printf("\n打印每个基本块的支配边界节点\n");
 
   // 每个节点的前驱节点
   for (int i = 1; i < node_num; i++) {
@@ -347,7 +352,7 @@ void dom_relation_pass() {
     }
   }
 
-  // 打印每个节点和对饮的支配边界
+  // 打印每个节点和对应的支配边界
   for (int i = 1; i < node_num; i++) {
     printf("cur node %s's dom frontier is ",
            graph_for_dom_tree->node_set[i]->bblock_head->label->name);
@@ -378,12 +383,51 @@ void find_bblock_store_ins_pass(HeadNode *self, Value *pointer) {
   }
 }
 
+void find_non_locals_var_help(BasicBlock *self, HashSet *non_locals) {
+  if (self != NULL && HashSetFind(bblock_pass_hashset, self) == false) {
+    HashSet *killed = NULL;
+    hashset_init(&(killed));
+    ListFirst(self->inst_list, false);
+    void *element = NULL;
+    while (ListNext(self->inst_list, &element)) {
+      if (((Instruction *)element)->opcode == LoadOP &&
+          !HashSetFind(killed, user_get_operand_use(element, 0)->Val)) {
+        HashSetAdd(non_locals, user_get_operand_use(element, 0)->Val);
+      } else if (((Instruction *)element)->opcode == StoreOP) {
+        HashSetAdd(killed, user_get_operand_use(element, 0)->Val);
+      }
+    }
+    HashSetAdd(bblock_pass_hashset, self);
+    find_non_locals_var_help(self->true_bblock, non_locals);
+    find_non_locals_var_help(self->false_bblock, non_locals);
+    HashSetDeinit(killed);
+    killed = NULL;
+  }
+}
+
 // hashset的并集会不会造成重大的内存泄漏？
 // 找到要插入phi函数的bblock并且插入空的phi函数
 void insert_phi_func_pass(Function *self) {
   int num_of_block = self->num_of_block;
   BasicBlock *entry_bblock = self->entry_bblock;
   void *bblock_ins = NULL;
+
+  HashSet *non_locals = NULL;
+  hashset_init(&(non_locals));
+
+  find_non_locals_var_help(entry_bblock, non_locals);
+
+  // void *temp_element = NULL;
+  // HashSetFirst(non_locals);
+
+  // while ((temp_element = HashSetNext(non_locals)) != NULL) {
+  //   printf("%s 1111\n", ((Value *)temp_element)->name);
+  // }
+
+  // 清空哈希表 然后重新初始化供后面使用
+  HashSetDeinit(bblock_pass_hashset);
+  hashset_init(&(bblock_pass_hashset));
+
   ListFirst(entry_bblock->inst_list, false);
 
   // &&!strcmp(((Value *)bblock_ins)->name, "\%point1")
@@ -398,16 +442,19 @@ void insert_phi_func_pass(Function *self) {
                                    (Value *)bblock_ins);
       }
 
+      // 找出对变量进行赋值的基本块
       for (int i = 1; i < num_of_block; i++) {
         if (graph_for_dom_tree->node_set[i]->is_visited) {
           graph_for_dom_tree->node_set[i]->is_visited = false;
           phi_insert_bblock =
+
               HashSetUnion(phi_insert_bblock,
                            graph_for_dom_tree->node_set[i]->dom_frontier_set);
         }
       }
 
       unsigned phi_insert_bblock_element_num = 0;
+      // 寻找迭代支配边界
       while (phi_insert_bblock_element_num != HashSetSize(phi_insert_bblock)) {
         phi_insert_bblock_element_num = HashSetSize(phi_insert_bblock);
 
@@ -427,29 +474,31 @@ void insert_phi_func_pass(Function *self) {
       }
 
       // 根据 phi_insert_bblock 这个集合插入phi函数
+      // 插入的是bblock_ins作为指针指向的地址空间
       HeadNode *element;
       HashSetFirst(phi_insert_bblock);
-
-      while ((element = HashSetNext(phi_insert_bblock)) != NULL) {
+      while ((element = HashSetNext(phi_insert_bblock)) != NULL &&
+             HashSetFind(non_locals, bblock_ins)) {
         //// 打印要插入phi函数的基本块的名字信息
         // printf("%s\n", element->bblock_head->label->name);
         // 在内存中为phi函数分配空间
-        Value *cur_var = (Value *)malloc(sizeof(Value));
-        value_init(cur_var);
-        // 添加变量类型
-        cur_var->VTy->TID = PhiFuncTyID;
-        // 添加变量的名字
-        cur_var->name = strdup("phi_func");
+        // Value *cur_var = (Value *)malloc(sizeof(Value));
+        // value_init(cur_var);
+        // // 添加变量类型
+        // cur_var->VTy->TID = PhiFuncTyID;
+        // // 添加变量的名字
+        // cur_var->name = strdup("phi_func");
 
-        // 初始化phi函数的hashmap
-        cur_var->pdata->phi_func_pdata.phi_value = HashMapInit();
+        // // 初始化phi函数的hashmap
+        // cur_var->pdata->phi_func_pdata.phi_value = HashMapInit();
 
-        HashMapSetHash(cur_var->pdata->phi_func_pdata.phi_value, HashKey);
-        HashMapSetCompare(cur_var->pdata->phi_func_pdata.phi_value, CompareKey);
-        HashMapSetCleanKey(cur_var->pdata->phi_func_pdata.phi_value,
-                           CleanHashMapKey);
-        HashMapSetCleanValue(cur_var->pdata->phi_func_pdata.phi_value,
-                             CleanValue);
+        // HashMapSetHash(cur_var->pdata->phi_func_pdata.phi_value, HashKey);
+        // HashMapSetCompare(cur_var->pdata->phi_func_pdata.phi_value,
+        // CompareKey);
+        // HashMapSetCleanKey(cur_var->pdata->phi_func_pdata.phi_value,
+        //                    CleanHashMapKey);
+        // HashMapSetCleanValue(cur_var->pdata->phi_func_pdata.phi_value,
+        //                      CleanValue);
 
         // 给phi函数返回的 Value* 变量命名
         char temp_str[15];
@@ -461,13 +510,19 @@ void insert_phi_func_pass(Function *self) {
 
         // 创建phi函数语句 左值是被定义的变量 可以被引用
         // 第一个操作数是phi函数 第二个操作数是phi函数所对应的变量的指针
-        Value *cur_ins = (Value *)ins_new_binary_operator_v2(
-            PhiFuncOp, cur_var, (Value *)bblock_ins);
+        Value *cur_ins = (Value *)ins_new_phi_func_v2(
+            PhiFuncOp, ListSize(element->pre_node_list));
         // 添加变量类型
         cur_ins->VTy->TID =
             ((Value *)bblock_ins)->pdata->allocate_pdata.point_value->VTy->TID;
         // 添加变量的名字
         cur_ins->name = strdup(temp_str);
+        cur_ins->pdata->phi_func_pdata.num_of_predecessor =
+            ListSize(element->pre_node_list);
+        cur_ins->pdata->phi_func_pdata.offset_var_use = 0;
+        cur_ins->pdata->phi_func_pdata.phi_pointer = (Value *)bblock_ins;
+        hashmap_init(&(cur_ins->pdata->phi_func_pdata.phi_value));
+        hashmap_init(&(cur_ins->pdata->phi_func_pdata.phi_assign_choose));
 
         // printf("%s = phi,align 4\n", temp_str);
 
@@ -475,6 +530,8 @@ void insert_phi_func_pass(Function *self) {
       }
     }
   }
+  HashSetDeinit(non_locals);
+  non_locals = NULL;
 }
 
 // 将所有用到other的地方全部用self替换
@@ -492,40 +549,61 @@ void replace_use_other_by_self(Value *self, Value *other) {
   other->use_list = NULL;
 }
 
-// 重命名算法的递归辅助
-void rename_pass_help(Value *rename_var_pointer, Stack *rename_var_stack,
-                      dom_tree *cur_bblock) {
-  int num_of_def = 0;
-  // printf("%s\n", cur_bblock->bblock_node->bblock_head->label->name);
+void rename_pass_help_new(HashMap *rename_var_stack_hashmap,
+                          dom_tree *cur_bblock) {
+  HashMap *num_of_var_def = NULL;
+  hashmap_init(&num_of_var_def);
+  printf("%s\n", cur_bblock->bblock_node->bblock_head->label->name);
   ListFirst(cur_bblock->bblock_node->bblock_head->inst_list, false);
   void *element;
   // 遍历当前bblock的instruction找出赋值语句
   while (ListNext(cur_bblock->bblock_node->bblock_head->inst_list, &element)) {
     // 如果是赋值语句则将操作数放在栈顶 用于后续的替换
-    if (((Instruction *)element)->opcode == StoreOP &&
-        user_get_operand_use(((User *)element), 0)->Val == rename_var_pointer) {
-      // printf("store %s\n",
-      //        user_get_operand_use(((User *)element), 0)->Val->name);
-      num_of_def++;
-      StackPush(rename_var_stack,
-                user_get_operand_use(((User *)element), 1)->Val);
-    } else if ((((Instruction *)element)->opcode == PhiFuncOp &&
-                user_get_operand_use(((User *)element), 1)->Val ==
-                    rename_var_pointer)) {
-      // 如果是phi函数语句 因为phi函数语句和store语句同样是对变量的定义语句
-      // 将phi函数instruction对应的value入栈
-      // printf("store %s\n",
-      //        user_get_operand_use(((User *)element), 1)->Val->name);
-      num_of_def++;
-      StackPush(rename_var_stack, element);
-    } else if ((((Instruction *)element)->opcode == LoadOP &&
-                user_get_operand_use(((User *)element), 0)->Val ==
-                    rename_var_pointer)) {
-      // printf("load %s\n",
-      //        user_get_operand_use(((User *)element), 0)->Val->name);
-      // 取出栈顶元素
+    if (((Instruction *)element)->opcode == StoreOP) {
+      if (HashMapContain(
+              num_of_var_def,
+              user_get_operand_use(((User *)element), 0)->Val->name)) {
+        (*((int *)HashMapGet(
+            num_of_var_def,
+            user_get_operand_use(((User *)element), 0)->Val->name)))++;
+      } else {
+        int *num_of_this_var = (int *)malloc(sizeof(int));
+        *num_of_this_var = 1;
+        HashMapPut(
+            num_of_var_def,
+            strdup(user_get_operand_use(((User *)element), 0)->Val->name),
+            num_of_this_var);
+      }
+      StackPush(
+          HashMapGet(rename_var_stack_hashmap,
+                     user_get_operand_use(((User *)element), 0)->Val->name),
+          user_get_operand_use(((User *)element), 1)->Val);
+    } else if (((Instruction *)element)->opcode == PhiFuncOp) {
+      if (HashMapContain(
+              num_of_var_def,
+              ((Value *)element)->pdata->phi_func_pdata.phi_pointer->name)) {
+        (*((int *)HashMapGet(
+            num_of_var_def,
+            ((Value *)element)->pdata->phi_func_pdata.phi_pointer->name)))++;
+      } else {
+        int *num_of_this_var = (int *)malloc(sizeof(int));
+        *num_of_this_var = 1;
+        HashMapPut(
+            num_of_var_def,
+            strdup(((Value *)element)->pdata->phi_func_pdata.phi_pointer->name),
+            num_of_this_var);
+      }
+      StackPush(
+          HashMapGet(
+              rename_var_stack_hashmap,
+              ((Value *)element)->pdata->phi_func_pdata.phi_pointer->name),
+          element);
+    } else if (((Instruction *)element)->opcode == LoadOP) {
       void *stack_top_var;
-      StackTop(rename_var_stack, &stack_top_var);
+      StackTop(
+          HashMapGet(rename_var_stack_hashmap,
+                     user_get_operand_use(((User *)element), 0)->Val->name),
+          &stack_top_var);
 
       // 使用栈顶Value替换使用当前instruction的value
       replace_use_other_by_self(stack_top_var, element);
@@ -533,7 +611,7 @@ void rename_pass_help(Value *rename_var_pointer, Stack *rename_var_stack,
   }
 
   // 遍历邻接边集合 修改phi函数中的参数
-  void *neighbor_bblock;
+  void *neighbor_bblock = NULL;
   HashSetFirst(cur_bblock->bblock_node->edge_list);
   while ((neighbor_bblock = HashSetNext(cur_bblock->bblock_node->edge_list)) !=
          NULL) {
@@ -546,16 +624,20 @@ void rename_pass_help(Value *rename_var_pointer, Stack *rename_var_stack,
     // 三种情况同时满足则说明邻接bblock中需要修改含有该指针指向内存变量的phi函数
     while (ListNext(((HeadNode *)neighbor_bblock)->bblock_head->inst_list,
                     &neighbor_bblock_ins)) {
-      if (((Instruction *)neighbor_bblock_ins)->opcode == PhiFuncOp &&
-          user_get_operand_use(((User *)neighbor_bblock_ins), 1)->Val ==
-              rename_var_pointer) {
+      if (((Instruction *)neighbor_bblock_ins)->opcode == PhiFuncOp) {
         void *stack_top_var;
-        StackTop(rename_var_stack, &stack_top_var);
-        HashMapPut(user_get_operand_use(((User *)neighbor_bblock_ins), 0)
-                       ->Val->pdata->phi_func_pdata.phi_value,
-                   strdup(cur_bblock->bblock_node->bblock_head->label->name),
-                   stack_top_var);
-        break;
+        StackTop(HashMapGet(rename_var_stack_hashmap,
+                            ((Value *)neighbor_bblock_ins)
+                                ->pdata->phi_func_pdata.phi_pointer->name),
+                 &stack_top_var);
+        // printf("%p:phinode %s add %s from bblock %s\n", neighbor_bblock_ins,
+        //        ((Value *)neighbor_bblock_ins)->name,
+        //        ((Value *)stack_top_var)->name,
+        //        cur_bblock->bblock_node->bblock_head->label->name);
+        HashMapPut(
+            ((Value *)neighbor_bblock_ins)->pdata->phi_func_pdata.phi_value,
+            strdup(cur_bblock->bblock_node->bblock_head->label->name),
+            stack_top_var);
       }
     }
   }
@@ -563,15 +645,22 @@ void rename_pass_help(Value *rename_var_pointer, Stack *rename_var_stack,
   // 遍历dom_tree中的的孩子节点
   ListFirst(cur_bblock->child, false);
   void *child_node;
+  // TODO有问题
   while (ListNext(cur_bblock->child, &child_node)) {
-    rename_pass_help(rename_var_pointer, rename_var_stack,
-                     (dom_tree *)child_node);
+    rename_pass_help_new(rename_var_stack_hashmap, (dom_tree *)child_node);
   }
 
-  // 该基本块中的将定义全部出栈
-  for (int i = 0; i < num_of_def; i++) {
-    StackPop(rename_var_stack);
+  Pair *ptr_pair;
+
+  HashMapFirst(num_of_var_def);
+  while ((ptr_pair = HashMapNext(num_of_var_def)) != NULL) {
+    for (int i = 0; i < *((int *)ptr_pair->value); i++) {
+      StackPop((Stack *)HashMapGet(rename_var_stack_hashmap,
+                                   ((char *)ptr_pair->key)));
+    }
   }
+
+  HashMapDeinit(num_of_var_def);
 }
 
 // 重命名算法
@@ -584,32 +673,63 @@ void rename_pass(Function *self) {
   ListFirst(entry_bblock->inst_list, false);
   int memory_iter = 0;
 
+  // 初始化所有局部变量的变量栈
+  HashMap *var_stack_hashmap = NULL;
+  hashmap_init(&var_stack_hashmap);
+
   while (ListNext(entry_bblock->inst_list, &bblock_ins)) {
-    memory_iter++;
     if (((Instruction *)bblock_ins)->opcode == AllocateOP) {
       // 指向变量的指针 同时也是store_ins的第一个use对象
       Value *cur_rename_var = (Value *)bblock_ins;
       // 遍历树结构了
       Stack *rename_var_stack = StackInit();
       StackSetClean(rename_var_stack, CleanObject);
-      rename_pass_help(cur_rename_var, rename_var_stack, dom_tree_root);
-      ListFirst(entry_bblock->inst_list, false);
-      for (int i = 0; i < memory_iter; i++) {
-        ListNext(entry_bblock->inst_list, &bblock_ins);
-      }
-    } else if (memory_iter > 1) {
-      break;
+      HashMapPut(var_stack_hashmap, strdup(cur_rename_var->name),
+                 rename_var_stack);
     }
   }
+
+  rename_pass_help_new(var_stack_hashmap, dom_tree_root);
+
+  HashMapDeinit(var_stack_hashmap);
+  // Pair *ptr_pair;
+
+  // while ((ptr_pair = HashMapNext(var_stack_hashmap)) != NULL) {
+  //   printf("size is %d\n", StackSize((Stack *)ptr_pair->value));
+  // }
+  // printf("\n");
+
+  // while (ListNext(entry_bblock->inst_list, &bblock_ins)) {
+  //   memory_iter++;
+  //   if (((Instruction *)bblock_ins)->opcode == AllocateOP) {
+  //     // 指向变量的指针 同时也是store_ins的第一个use对象
+  //     Value *cur_rename_var = (Value *)bblock_ins;
+  //     // 遍历树结构了
+  //     Stack *rename_var_stack = StackInit();
+  //     StackSetClean(rename_var_stack, CleanObject);
+  //     rename_pass_help(cur_rename_var, rename_var_stack, dom_tree_root);
+  //     ListFirst(entry_bblock->inst_list, false);
+  //     for (int i = 0; i < memory_iter; i++) {
+  //       ListNext(entry_bblock->inst_list, &bblock_ins);
+  //     }
+  //   } else if (memory_iter > 1) {
+  //     break;
+  //   }
+  // }
 }
 
+// 删除alloca store load语句
 void delete_alloca_store_load_ins_pass(BasicBlock *self) {
   if (self != NULL && HashSetFind(bblock_pass_hashset, self) == false) {
+    // printf("begin %s: %p\n", self->label->name, self->label);
+
     unsigned i = 0;
     void *element;
     ListFirst(self->inst_list, false);
     ListSetClean(self->inst_list, CommonCleanInstruction);
+
     while (i != ListSize(self->inst_list)) {
+      // printf("in %s: %p\n", self->label->name, self->label);
       ListGetAt(self->inst_list, i, &element);
       switch (((Instruction *)element)->opcode) {
         case AllocateOP:
@@ -622,8 +742,8 @@ void delete_alloca_store_load_ins_pass(BasicBlock *self) {
           ListRemove(self->inst_list, i);
           break;
         case PhiFuncOp:
-          memset(user_get_operand_use((User *)self, 1), 0, sizeof(Use));
-          ((Instruction *)element)->user.num_oprands--;
+          // memset(user_get_operand_use((User *)self, 1), 0, sizeof(Use));
+          // ((Instruction *)element)->user.num_oprands--;
           i++;
           break;
         default:
@@ -631,13 +751,605 @@ void delete_alloca_store_load_ins_pass(BasicBlock *self) {
           break;
       }
     }
+
+    // if (entry->false_bblock != false_situation ||
+    //     entry->true_bblock != true_situation) {
+    //   printf("!11\n");
+    // }
+
     HashSetAdd(bblock_pass_hashset, self);
+
     delete_alloca_store_load_ins_pass(self->true_bblock);
+
     delete_alloca_store_load_ins_pass(self->false_bblock);
   }
 }
 
-// 生成支配树的pass和插入phi节点的pass
+void printf_cur_func_ins(Function *self) {
+  // 打印表的表头信息
+  printf("\t%s\tnumber: %20s \t%25s \t%10s\n", "labelID", "opcode", "name",
+         "use");
+  // 打印当前函数的基本块
+  print_bblock_pass(self->entry_bblock);
+  printf("\n\n");
+  // 清空哈希表 然后重新初始化供后面使用
+  HashSetDeinit(bblock_pass_hashset);
+  bblock_pass_hashset = NULL;
+  hashset_init(&(bblock_pass_hashset));
+}
+
+void insert_copies_help(HashMap *insert_copies_stack_hashmap,
+                        HashMap *num_of_var_def, dom_tree *cur_bblock) {
+  // Pass One:Initialize the data structures
+  HashSet *copy_set = NULL;
+  hashset_init(&(copy_set));
+
+  HashSet *worklist = NULL;
+  hashset_init(&(worklist));
+
+  // 伪代码中的map
+  HashMap *var_replace_hashmap = NULL;
+  hashmap_init(&var_replace_hashmap);
+  // 伪代码中的used_by_another[src]
+  HashSet *used_by_another = NULL;
+  hashset_init(&used_by_another);
+
+  // printf("cur bblock is %s\n",
+  //        cur_bblock->bblock_node->bblock_head->label->name);
+
+  // For all successors s of block
+  void *neighbor_bblock = NULL;
+  HashSetFirst(cur_bblock->bblock_node->edge_list);
+  while ((neighbor_bblock = HashSetNext(cur_bblock->bblock_node->edge_list)) !=
+         NULL) {
+    void *neighbor_bblock_ins = NULL;
+    ListFirst(((HeadNode *)neighbor_bblock)->bblock_head->inst_list, false);
+
+    while (ListNext(((HeadNode *)neighbor_bblock)->bblock_head->inst_list,
+                    &neighbor_bblock_ins)) {
+      if (((Instruction *)neighbor_bblock_ins)->opcode == PhiFuncOp &&
+          HashMapContain(
+              ((Value *)neighbor_bblock_ins)->pdata->phi_func_pdata.phi_value,
+              cur_bblock->bblock_node->bblock_head->label->name)) {
+        copy_pair *cur_copy_pair = (copy_pair *)malloc(sizeof(copy_pair));
+        cur_copy_pair->src = (Value *)(HashMapGet(
+            ((Value *)neighbor_bblock_ins)->pdata->phi_func_pdata.phi_value,
+            cur_bblock->bblock_node->bblock_head->label->name));
+        cur_copy_pair->dest = (Value *)neighbor_bblock_ins;
+
+        // printf("<%s,%s> is added\n", cur_copy_pair->src->name,
+        //        cur_copy_pair->dest->name);
+
+        HashSetAdd(copy_set, cur_copy_pair);
+        HashMapPut(var_replace_hashmap, strdup(cur_copy_pair->src->name),
+                   cur_copy_pair->src);
+        HashMapPut(var_replace_hashmap, strdup(cur_copy_pair->dest->name),
+                   cur_copy_pair->dest);
+        HashSetAdd(used_by_another, cur_copy_pair->src);
+      }
+    }
+  }
+  copy_pair *cur_dest_used = NULL;
+  HashSetFirst(copy_set);
+  while ((cur_dest_used = HashSetNext(copy_set)) != NULL) {
+    if (!HashSetFind(used_by_another, cur_dest_used->dest)) {
+      HashSetAdd(worklist, cur_dest_used);
+    }
+  }
+  HashSet *deleted_copy_pair = HashSetDifference(copy_set, worklist);
+
+  HashSetDeinit(copy_set);
+  copy_set = deleted_copy_pair;
+
+  while ((HashSetSize(worklist) != 0) || (HashSetSize(copy_set) != 0)) {
+    while (HashSetSize(worklist) != 0) {
+      // Pick a <src,dest> from worklist
+      HashSetFirst(worklist);
+      copy_pair *cur_pick_pair = HashSetNext(worklist);
+      HashSetRemove(worklist, cur_pick_pair);
+      // If dest ∈ live_outb
+
+      int *cur_assign_value_offset = (int *)malloc(sizeof(int));
+
+      *cur_assign_value_offset =
+          cur_pick_pair->dest->pdata->phi_func_pdata.offset_var_use;
+      cur_pick_pair->dest->pdata->phi_func_pdata.offset_var_use++;
+      assert(*cur_assign_value_offset !=
+             cur_pick_pair->dest->pdata->phi_func_pdata.num_of_predecessor);
+      HashMapPut(cur_pick_pair->dest->pdata->phi_func_pdata.phi_assign_choose,
+                 strdup(cur_bblock->bblock_node->bblock_head->label->name),
+                 cur_assign_value_offset);
+
+      Use *puse = user_get_operand_use((User *)cur_pick_pair->dest,
+                                       *cur_assign_value_offset);
+      value_add_use(HashMapGet(var_replace_hashmap, cur_pick_pair->src->name),
+                    puse);
+
+      // Insert a copy operation from map[src] to dest at the end of cur_bblock
+      ListInsert(cur_bblock->bblock_node->bblock_head->inst_list,
+                 ListSize(cur_bblock->bblock_node->bblock_head->inst_list) - 1,
+                 cur_pick_pair->dest);
+
+      // if (!strcmp(cur_bblock->bblock_node->bblock_head->label->name,
+      //             "label3")) {
+      //   Value *element = NULL;
+      //   ListGetAt(cur_bblock->bblock_node->bblock_head->inst_list,
+      //             ListSize(cur_bblock->bblock_node->bblock_head->inst_list) -
+      //             2, (void *)&element);
+      //   printf("cur bblock tail name is %s\n", element->name);
+      // }
+
+      // map[src] <- dest
+      HashMapPut(var_replace_hashmap, strdup(cur_pick_pair->src->name),
+                 cur_pick_pair->dest);
+      // If src is the name of a destination in copy_set
+      // Add that copy to worklist
+      HashSetFirst(copy_set);
+      copy_pair *iter_copy_set;
+      while ((iter_copy_set = HashSetNext(copy_set)) != NULL) {
+        if (!strcmp(cur_pick_pair->src->name, iter_copy_set->dest->name))
+          HashSetAdd(worklist, iter_copy_set);
+      }
+      HashSet *deleted_copy_pair_w = HashSetDifference(copy_set, worklist);
+      HashSetDeinit(copy_set);
+      copy_set = deleted_copy_pair_w;
+    }
+    if (HashSetSize(copy_set) != 0) {
+      // Pick a <src,dest> from copy_set
+      HashSetFirst(copy_set);
+      copy_pair *cur_pick_pair = HashSetNext(copy_set);
+      // copy_set <- copy_set - {<src,dest>}
+      HashSetRemove(copy_set, cur_pick_pair);
+      Instruction *assign_dest_to_temp =
+          ins_new_single_operator_v2(AssignOP, cur_pick_pair->dest);
+      char temp_str[20];
+      char text[10];
+      sprintf(text, "%d", temp_var_seed++);
+      strcpy(temp_str, "phi_temp");
+      strcat(temp_str, text);
+      ((Value *)assign_dest_to_temp)->name = strdup(temp_str);
+      ((Value *)assign_dest_to_temp)->VTy->TID = cur_pick_pair->dest->VTy->TID;
+      ListInsert(cur_bblock->bblock_node->bblock_head->inst_list,
+                 ListSize(cur_bblock->bblock_node->bblock_head->inst_list) - 1,
+                 assign_dest_to_temp);
+
+      // printf("insert %s =%s\n", ((Value *)assign_dest_to_temp)->name,
+      //        cur_pick_pair->dest->name);
+
+      HashMapPut(var_replace_hashmap, strdup(cur_pick_pair->dest->name),
+                 (Value *)assign_dest_to_temp);
+      HashSetAdd(worklist, cur_pick_pair);
+    }
+  }
+}
+
+void insert_copies(HashMap *insert_copies_stack_hashmap, dom_tree *cur_bblock) {
+  HashMap *num_of_var_def = NULL;
+  hashmap_init(&num_of_var_def);
+
+  insert_copies_help(insert_copies_stack_hashmap, num_of_var_def, cur_bblock);
+
+  // 遍历dom_tree中的的孩子节点
+  ListFirst(cur_bblock->child, false);
+  void *child_node;
+
+  while (ListNext(cur_bblock->child, &child_node)) {
+    insert_copies(insert_copies_stack_hashmap, (dom_tree *)child_node);
+  }
+}
+
+void replace_phi_nodes(dom_tree *cur_bblock) {
+  // Perform live analysis
+
+  // For each variable v
+  //     Stack[v]<-emptystack()
+  HashMap *var_stack_hashmap = NULL;
+  hashmap_init(&var_stack_hashmap);
+  insert_copies(var_stack_hashmap, cur_bblock);
+}
+
+void calculate_live_use_def(BasicBlock *self) {
+  if (self != NULL && HashSetFind(bblock_pass_hashset, self) == false) {
+    ListFirst(self->inst_list, false);
+    Instruction *element;
+    while (ListNext(self->inst_list, &element)) {
+      if (element->opcode != GotoOP && element->opcode != GotoWithConditionOP &&
+          element->opcode != LabelOP && element->opcode != FuncEndOP &&
+          element->opcode != FuncLabelOP && element->opcode != PhiFuncOp &&
+          element->opcode != CallOP &&
+          element->opcode != CallWithReturnValueOP) {
+        if (((User *)element)->num_oprands == 2) {
+          if (!HashSetFind(self->live_def,
+                           user_get_operand_use((User *)element, 0)->Val)) {
+            printf("%s live use add %s\n", self->label->name,
+                   user_get_operand_use((User *)element, 0)->Val->name);
+            HashSetAdd(self->live_use,
+                       user_get_operand_use((User *)element, 0)->Val);
+          }
+          if (!HashSetFind(self->live_def,
+                           user_get_operand_use((User *)element, 1)->Val)) {
+            printf("%s live use add %s\n", self->label->name,
+                   user_get_operand_use((User *)element, 1)->Val->name);
+            HashSetAdd(self->live_use,
+                       user_get_operand_use((User *)element, 1)->Val);
+          }
+        } else if (((User *)element)->num_oprands == 1) {
+          if (!HashSetFind(self->live_def,
+                           user_get_operand_use((User *)element, 0)->Val)) {
+            HashSetAdd(self->live_use,
+                       user_get_operand_use((User *)element, 0)->Val);
+          }
+        }
+        if (((Value *)element) != NULL && element->opcode != ReturnOP) {
+          printf("%s live def add %s\n", self->label->name,
+                 ((Value *)element)->name);
+          HashSetAdd(self->live_def, (Value *)element);
+        }
+      } else if (element->opcode == PhiFuncOp) {
+        if (HashMapContain(
+                ((Value *)element)->pdata->phi_func_pdata.phi_assign_choose,
+                self->label->name)) {
+          int cur_assign_var_offset = *((int *)HashMapGet(
+              ((Value *)element)->pdata->phi_func_pdata.phi_assign_choose,
+              self->label->name));
+          if (!HashSetFind(
+                  self->live_def,
+                  user_get_operand_use((User *)element, cur_assign_var_offset)
+                      ->Val)) {
+            HashSetAdd(
+                self->live_use,
+                user_get_operand_use((User *)element, cur_assign_var_offset)
+                    ->Val);
+            printf("%s live use add %s\n", self->label->name,
+                   user_get_operand_use((User *)element, cur_assign_var_offset)
+                       ->Val->name);
+          }
+          HashSetAdd(self->live_def, (Value *)element);
+          printf("%s live def add %s\n", self->label->name,
+                 ((Value *)element)->name);
+        }
+      }
+    }
+    HashSetAdd(bblock_pass_hashset, self);
+    calculate_live_use_def(self->true_bblock);
+    calculate_live_use_def(self->false_bblock);
+  }
+}
+
+void calculate_live_use_def_by_graph(ALGraph *self) {
+  for (int i = 0; i < self->node_num; i++) {
+    ListFirst((self->node_set)[i]->bblock_head->inst_list, false);
+    Instruction *element;
+    while (ListNext((self->node_set)[i]->bblock_head->inst_list, &element)) {
+      if (element->opcode != GotoOP && element->opcode != GotoWithConditionOP &&
+          element->opcode != LabelOP && element->opcode != FuncEndOP &&
+          element->opcode != FuncLabelOP && element->opcode != PhiFuncOp &&
+          element->opcode != CallOP &&
+          element->opcode != CallWithReturnValueOP) {
+        if (((User *)element)->num_oprands == 2) {
+          if (!HashSetFind((self->node_set)[i]->bblock_head->live_def,
+                           user_get_operand_use((User *)element, 0)->Val)) {
+            printf("%s live use add %s\n",
+                   (self->node_set)[i]->bblock_head->label->name,
+                   user_get_operand_use((User *)element, 0)->Val->name);
+            HashSetAdd((self->node_set)[i]->bblock_head->live_use,
+                       user_get_operand_use((User *)element, 0)->Val);
+          }
+          if (!HashSetFind((self->node_set)[i]->bblock_head->live_def,
+                           user_get_operand_use((User *)element, 1)->Val)) {
+            printf("%s live use add %s\n",
+                   (self->node_set)[i]->bblock_head->label->name,
+                   user_get_operand_use((User *)element, 1)->Val->name);
+            HashSetAdd((self->node_set)[i]->bblock_head->live_use,
+                       user_get_operand_use((User *)element, 1)->Val);
+          }
+        } else if (((User *)element)->num_oprands == 1) {
+          if (!HashSetFind((self->node_set)[i]->bblock_head->live_def,
+                           user_get_operand_use((User *)element, 0)->Val)) {
+            HashSetAdd((self->node_set)[i]->bblock_head->live_use,
+                       user_get_operand_use((User *)element, 0)->Val);
+          }
+        }
+        if (((Value *)element) != NULL && element->opcode != ReturnOP) {
+          printf("%s live def add %s\n",
+                 (self->node_set)[i]->bblock_head->label->name,
+                 ((Value *)element)->name);
+          HashSetAdd((self->node_set)[i]->bblock_head->live_def,
+                     (Value *)element);
+        }
+      } else if (element->opcode == PhiFuncOp) {
+        if (HashMapContain(
+                ((Value *)element)->pdata->phi_func_pdata.phi_assign_choose,
+                (self->node_set)[i]->bblock_head->label->name)) {
+          int cur_assign_var_offset = *((int *)HashMapGet(
+              ((Value *)element)->pdata->phi_func_pdata.phi_assign_choose,
+              (self->node_set)[i]->bblock_head->label->name));
+          if (!HashSetFind(
+                  (self->node_set)[i]->bblock_head->live_def,
+                  user_get_operand_use((User *)element, cur_assign_var_offset)
+                      ->Val)) {
+            HashSetAdd(
+                (self->node_set)[i]->bblock_head->live_use,
+                user_get_operand_use((User *)element, cur_assign_var_offset)
+                    ->Val);
+            printf("%s live use add %s\n",
+                   (self->node_set)[i]->bblock_head->label->name,
+                   user_get_operand_use((User *)element, cur_assign_var_offset)
+                       ->Val->name);
+          }
+          HashSetAdd((self->node_set)[i]->bblock_head->live_def,
+                     (Value *)element);
+          printf("%s live def add %s\n",
+                 (self->node_set)[i]->bblock_head->label->name,
+                 ((Value *)element)->name);
+        }
+      }
+    }
+  }
+}
+
+void calculate_live_in_out(ALGraph *self) {
+  while (1) {
+    bool no_liveout_changed = true;
+    for (int i = 0; i < self->node_num; i++) {
+      BasicBlock *cur_bblock = (self->node_set)[i]->bblock_head;
+      HashSet *store_live_out = cur_bblock->live_out;
+      cur_bblock->live_out = NULL;
+      hashset_init(&(cur_bblock->live_out));
+
+      HashSetFirst((self->node_set)[i]->edge_list);
+      HeadNode *element;
+      while ((element = HashSetNext((self->node_set)[i]->edge_list)) != NULL) {
+        HashSet *union_set =
+            HashSetUnion(cur_bblock->live_out, element->bblock_head->live_in);
+        HashSetDeinit(cur_bblock->live_out);
+        cur_bblock->live_out = union_set;
+      }
+      HashSet *out_del_def =
+          HashSetDifference(cur_bblock->live_out, cur_bblock->live_def);
+      HashSet *res_union_use = HashSetUnion(out_del_def, cur_bblock->live_use);
+      HashSetDeinit(out_del_def);
+      HashSetDeinit(cur_bblock->live_in);
+      cur_bblock->live_in = res_union_use;
+      HashSet *intersert =
+          HashSetIntersect(store_live_out, cur_bblock->live_out);
+      unsigned intersertsize = HashSetSize(intersert);
+      if (intersertsize != HashSetSize(cur_bblock->live_out) ||
+          intersertsize != HashSetSize(store_live_out))
+        no_liveout_changed = false;
+      HashSetDeinit(intersert);
+      HashSetDeinit(store_live_out);
+    }
+    if (no_liveout_changed) break;
+  }
+
+  for (int i = 0; i < self->node_num; i++) {
+    HashSetFirst((self->node_set)[i]->bblock_head->live_def);
+    Value *live_def = NULL;
+    printf("bblock %s's live def are ",
+           (self->node_set)[i]->bblock_head->label->name);
+    while ((live_def = HashSetNext(
+                (self->node_set)[i]->bblock_head->live_def)) != NULL) {
+      printf("\t%s", live_def->name);
+    }
+    printf("\n");
+
+    HashSetFirst((self->node_set)[i]->bblock_head->live_use);
+    Value *live_use = NULL;
+    printf("bblock %s's live use are ",
+           (self->node_set)[i]->bblock_head->label->name);
+    while ((live_use = HashSetNext(
+                (self->node_set)[i]->bblock_head->live_use)) != NULL) {
+      printf("\t%s", live_use->name);
+    }
+    printf("\n");
+  }
+  printf("\n\n\n");
+  for (int i = 0; i < self->node_num; i++) {
+    HashSetFirst((self->node_set)[i]->bblock_head->live_out);
+    Value *live_out = NULL;
+    printf("bblock %s's live out are ",
+           (self->node_set)[i]->bblock_head->label->name);
+    while ((live_out = HashSetNext(
+                (self->node_set)[i]->bblock_head->live_out)) != NULL) {
+      printf("\t%s", live_out->name);
+    }
+    printf("\n");
+
+    HashSetFirst((self->node_set)[i]->bblock_head->live_in);
+    Value *live_in = NULL;
+    printf("bblock %s's live in are ",
+           (self->node_set)[i]->bblock_head->label->name);
+    while ((live_in = HashSetNext((self->node_set)[i]->bblock_head->live_in)) !=
+           NULL) {
+      printf("\t%s", live_in->name);
+    }
+    printf("\n");
+  }
+}
+
+var_live_interval *is_list_contain_item(List *self, void *item) {
+  ListFirst(self, false);
+  var_live_interval *element;
+  while (ListNext(self, &element)) {
+    if (element->self == item) return element;
+  }
+  return NULL;
+}
+
+void calculate_live_interval(ALGraph *self_cfg, Function *self_func) {
+  unsigned ins_id_seed = 0;
+  // 对所有的指令进行编号
+  // 如果是PHIFUNC的编号根据上下文信息计算偏移量
+  for (int i = 0; i < self_cfg->node_num; i++) {
+    ListFirst((self_cfg->node_set)[i]->bblock_head->inst_list, false);
+    Instruction *element;
+    while (ListNext((self_cfg->node_set)[i]->bblock_head->inst_list, &element))
+      element->ins_id = ins_id_seed++;
+  }
+
+  for (int i = self_cfg->node_num; i >= 0; i--) {
+    HashSetFirst((self_cfg->node_set)[i]->bblock_head->live_out);
+    Value *live_out_var = NULL;
+    while ((live_out_var = HashSetNext(
+                (self_cfg->node_set)[i]->bblock_head->live_out)) != NULL) {
+      // 当前live_out取出的变量是否已经存在在链条中了
+      var_live_interval *cur_var_live_interval = NULL;
+
+      if ((cur_var_live_interval = is_list_contain_item(
+               self_func->all_var_live_interval, live_out_var)) != NULL) {
+        // 存在的情况 先取出
+        // 判断当前位置时候与取出的首活跃区间相邻来判断是新建还是延长
+        live_interval *cur_var_front_live_interval = NULL;
+        ListGetFront(cur_var_live_interval->this_var_discrete_live_interval,
+                     &cur_var_front_live_interval);
+        // 判断是否相邻
+        if (((Instruction *)(self_cfg->node_set)[i + 1]->bblock_head->label)
+                ->ins_id == cur_var_front_live_interval->begin) {
+          cur_var_front_live_interval->begin =
+              ((Instruction *)(self_cfg->node_set)[i]->bblock_head->label)
+                  ->ins_id;
+        } else {
+          // 不相邻的情况 新建
+          live_interval *add_live_interval =
+              (live_interval *)malloc(sizeof(live_interval));
+          add_live_interval->begin =
+              ((Instruction *)(self_cfg->node_set)[i]->bblock_head->label)
+                  ->ins_id;
+          add_live_interval->end =
+              ((Instruction *)(self_cfg->node_set)[i + 1]->bblock_head->label)
+                  ->ins_id -
+              1;
+          ListPushFront(cur_var_live_interval->this_var_discrete_live_interval,
+                        add_live_interval);
+        }
+      } else {
+        cur_var_live_interval =
+            (var_live_interval *)malloc(sizeof(var_live_interval));
+        cur_var_live_interval->self = live_out_var;
+        ListInit(cur_var_live_interval->this_var_discrete_live_interval);
+        // 不相邻的情况 新建
+        live_interval *add_live_interval =
+            (live_interval *)malloc(sizeof(live_interval));
+        add_live_interval->begin =
+            ((Instruction *)(self_cfg->node_set)[i]->bblock_head->label)
+                ->ins_id;
+        add_live_interval->end =
+            ((Instruction *)(self_cfg->node_set)[i + 1]->bblock_head->label)
+                ->ins_id -
+            1;
+        ListPushFront(cur_var_live_interval->this_var_discrete_live_interval,
+                      add_live_interval);
+      }
+    }
+    ListFirst((self_cfg->node_set)[i]->bblock_head->inst_list, true);
+    Instruction *element;
+    while (
+        ListNext((self_cfg->node_set)[i]->bblock_head->inst_list, &element)) {
+      if (element->opcode != GotoOP && element->opcode != GotoWithConditionOP &&
+          element->opcode != LabelOP && element->opcode != FuncEndOP &&
+          element->opcode != FuncLabelOP && element->opcode != PhiFuncOp &&
+          element->opcode != CallOP &&
+          element->opcode != CallWithReturnValueOP) {
+        if (((Value *)element) != NULL && element->opcode != ReturnOP) {
+          var_live_interval *cur_var_live_interval = NULL;
+
+          if ((cur_var_live_interval = is_list_contain_item(
+                   self_func->all_var_live_interval, element)) != NULL) {
+            // 截断
+            live_interval *cur_var_front_live_interval = NULL;
+            ListGetFront(cur_var_live_interval->this_var_discrete_live_interval,
+                         &cur_var_front_live_interval);
+            cur_var_front_live_interval->begin = element->ins_id;
+          }
+        }
+
+        for (int i = 0; i < ((User *)element)->num_oprands; i++) {
+          // 当前live_out取出的变量是否已经存在在链条中了
+          var_live_interval *cur_var_live_interval = NULL;
+
+          if ((cur_var_live_interval = is_list_contain_item(
+                   self_func->all_var_live_interval,
+                   user_get_operand_use((User *)element, i)->Val)) != NULL) {
+            // 存在的情况 先取出
+            // 判断当前位置时候与取出的首活跃区间相邻来判断是新建还是延长
+            live_interval *cur_var_front_live_interval = NULL;
+            ListGetFront(cur_var_live_interval->this_var_discrete_live_interval,
+                         &cur_var_front_live_interval);
+            // 判断是否相邻
+            if (element->ins_id <
+                cur_var_front_live_interval->begin) {  // 不相邻的情况 新建
+              live_interval *add_live_interval =
+                  (live_interval *)malloc(sizeof(live_interval));
+              add_live_interval->begin =
+                  ((Instruction *)(self_cfg->node_set)[i]->bblock_head->label)
+                      ->ins_id;
+              add_live_interval->end = element->ins_id;
+              ListPushFront(
+                  cur_var_live_interval->this_var_discrete_live_interval,
+                  add_live_interval);
+            }
+          } else {
+            cur_var_live_interval =
+                (var_live_interval *)malloc(sizeof(var_live_interval));
+            cur_var_live_interval->self = (Value *)element;
+            ListInit(cur_var_live_interval->this_var_discrete_live_interval);
+            // 不相邻的情况 新建
+            live_interval *add_live_interval =
+                (live_interval *)malloc(sizeof(live_interval));
+            add_live_interval->begin =
+                ((Instruction *)(self_cfg->node_set)[i]->bblock_head->label)
+                    ->ins_id;
+            add_live_interval->end = element->ins_id;
+            ListPushFront(
+                cur_var_live_interval->this_var_discrete_live_interval,
+                add_live_interval);
+          }
+        }
+
+      } else if (element->opcode == PhiFuncOp) {
+        var_live_interval *cur_var_live_interval = NULL;
+
+        if ((cur_var_live_interval = is_list_contain_item(
+                 self_func->all_var_live_interval, element)) != NULL) {
+          // 截断
+          live_interval *cur_var_front_live_interval = NULL;
+          ListGetFront(cur_var_live_interval->this_var_discrete_live_interval,
+                       &cur_var_front_live_interval);
+          cur_var_front_live_interval->begin = element->ins_id;
+        }
+        int cur_assign_var_offset = *((int *)HashMapGet(
+            ((Value *)element)->pdata->phi_func_pdata.phi_assign_choose,
+            (self_cfg->node_set)[i]->bblock_head->label->name));
+        if ((cur_var_live_interval = is_list_contain_item(
+                 self_func->all_var_live_interval,
+                 user_get_operand_use((User *)element, cur_assign_var_offset)
+                     ->Val)) != NULL) {
+          // 存在的情况 先取出
+          // 判断当前位置时候与取出的首活跃区间相邻来判断是新建还是延长
+          live_interval *cur_var_front_live_interval = NULL;
+          ListGetFront(cur_var_live_interval->this_var_discrete_live_interval,
+                       &cur_var_front_live_interval);
+          // 判断是否相邻
+          if (element->ins_id < cur_var_front_live_interval->begin) {
+            // 不相邻的情况 新建
+            live_interval *add_live_interval =
+                (live_interval *)malloc(sizeof(live_interval));
+            add_live_interval->begin =
+                ((Instruction *)(self_cfg->node_set)[i]->bblock_head->label)
+                    ->ins_id;
+            add_live_interval->end = element->ins_id;
+            ListPushFront(
+                cur_var_live_interval->this_var_discrete_live_interval,
+                add_live_interval);
+          }
+        }
+      }
+    }
+  }
+}
+
+// 生成支配树的pass和插入phi节点的pass和重命名函数的pass
 void bblock_to_dom_graph_pass(Function *self) {
   int num_of_block = self->num_of_block;
   // // 设置支配树对应图的邻接表头
@@ -659,52 +1371,122 @@ void bblock_to_dom_graph_pass(Function *self) {
   bblock_to_dom_graph_dfs_pass(init_headnode, 0);
   HashMapDeinit(bblock_to_dom_graph_hashmap);
 
+  // 初始化dom_tree树根
   dom_tree_root = (dom_tree *)malloc(sizeof(dom_tree));
   dom_tree_root->bblock_node = init_headnode;
   dom_tree_root->child = ListInit();
   ListSetClean(dom_tree_root->child, CleanObject);
 
+  // 建立支配关系的函数
   dom_relation_pass();
 
+  // 插入phi函数
   insert_phi_func_pass(self);
 
   printf("\n");
+
+  printf_cur_func_ins(cur_func);
+
+  printf("begin rename pass and delete alloca,store,load instruction!\n");
+
+  rename_pass(cur_func);
+
+  printf("rename pass over\n");
+
+  // 删除alloca store load语句
+  delete_alloca_store_load_ins_pass(cur_func->entry_bblock);
+
+  printf("delete alloca,store,load instruction over\n");
+
+  // 清空哈希表 然后重新初始化供后面使用
+  HashSetDeinit(bblock_pass_hashset);
+  bblock_pass_hashset = NULL;
+  hashset_init(&(bblock_pass_hashset));
 
   // if (freopen("instruction_list.txt", "w", stdout) == NULL) {
   //   fprintf(stderr, "打开文件失败！");
   //   exit(-1);
   // }
 
+  printf_cur_func_ins(cur_func);
+
+  replace_phi_nodes(dom_tree_root);
+
+  printf("\n\n\n");
+
   // 打印表的表头信息
   printf("\t%s\tnumber: %20s \t%25s \t%10s\n", "labelID", "opcode", "name",
          "use");
   // 打印当前函数的基本块
-  print_bblock_pass(cur_func->entry_bblock);
+  print_bblock_pass_phi(cur_func->entry_bblock);
   printf("\n\n");
+
   // 清空哈希表 然后重新初始化供后面使用
   HashSetDeinit(bblock_pass_hashset);
   bblock_pass_hashset = NULL;
   hashset_init(&(bblock_pass_hashset));
 
-  printf("after rename pass and delete alloca store load\n");
-  rename_pass(cur_func);
+  calculate_live_use_def_by_graph(graph_for_dom_tree);
 
-  // 删除alloca store load语句
-  delete_alloca_store_load_ins_pass(cur_func->entry_bblock);
-  // 清空哈希表 然后重新初始化供后面使用
-  HashSetDeinit(bblock_pass_hashset);
-  bblock_pass_hashset = NULL;
-  hashset_init(&(bblock_pass_hashset));
+  calculate_live_in_out(graph_for_dom_tree);
+}
 
-  // 打印表的表头信息
-  printf("\t%s\tnumber: %20s \t%25s \t%10s\n", "labelID", "opcode", "name",
-         "use");
-  // 打印当前函数的基本块
-  print_bblock_pass(cur_func->entry_bblock);
-  // 清空哈希表 然后重新初始化供后面使用
-  HashSetDeinit(bblock_pass_hashset);
-  bblock_pass_hashset = NULL;
-  hashset_init(&(bblock_pass_hashset));
+void print_ins_pass_phi(List *self, char *cur_bblock_name) {
+  int i = 0;
+  // printf("\nbegin print the instruction: \n");
+  void *element;
+  ListSetClean(self, CleanObject);
+  while (i < ListSize(self)) {
+    ListGetAt(self, i, &element);
+    if (((Instruction *)element)->opcode == PhiFuncOp) {
+      if (HashMapContain(
+              ((Value *)element)->pdata->phi_func_pdata.phi_assign_choose,
+              cur_bblock_name)) {
+        // 打印出每条instruction的res的名字信息
+        printf("%9s\t     %d: %20s ", "", i++,
+               op_string[((Instruction *)element)->opcode]);
+
+        printf("\t%25s ", ((Value *)element)->name);
+        int cur_assign_var_offset = *((int *)HashMapGet(
+            ((Value *)element)->pdata->phi_func_pdata.phi_assign_choose,
+            cur_bblock_name));
+        printf("\t%10s",
+               user_get_operand_use((User *)element, cur_assign_var_offset)
+                   ->Val->name);
+        printf("\n");
+      } else {
+        ListRemove(self, i);
+      }
+    } else {
+      // 打印出每条instruction的res的名字信息
+      printf("%9s\t     %d: %20s ", "", i++,
+             op_string[((Instruction *)element)->opcode]);
+
+      printf("\t%25s ", ((Value *)element)->name);
+      if (((Instruction *)element)->user.num_oprands == 2) {
+        printf("\t%10s, %10s",
+               user_get_operand_use(((User *)element), 0)->Val->name,
+               user_get_operand_use(((User *)element), 1)->Val->name);
+      } else if (((Instruction *)element)->user.num_oprands == 1) {
+        printf("\t%10s", user_get_operand_use(((User *)element), 0)->Val->name);
+      } else if (((Instruction *)element)->user.num_oprands == 0) {
+        printf("\t%10s", "null");
+      }
+      printf("\n");
+    }
+  }
+}
+
+void print_bblock_pass_phi(BasicBlock *self) {
+  if (self != NULL && HashSetFind(bblock_pass_hashset, self) == false) {
+    printf("\taddress:%p", self->label);
+    printf("\t%s:\n", self->label->name);
+    HashSetAdd(bblock_pass_hashset, self);
+    print_ins_pass_phi(self->inst_list, self->label->name);
+    printf("\n");
+    print_bblock_pass_phi(self->true_bblock);
+    print_bblock_pass_phi(self->false_bblock);
+  }
 }
 
 // ins_list
@@ -719,30 +1501,28 @@ void print_ins_pass(List *self) {
            op_string[((Instruction *)element)->opcode]);
 
     printf("\t%25s ", ((Value *)element)->name);
-    if (((Instruction *)element)->user.num_oprands == 2) {
+
+    if (((Instruction *)element)->opcode == PhiFuncOp) {
+      printf("\tsize: %d ",
+             ((Value *)element)->pdata->phi_func_pdata.num_of_predecessor);
+      Pair *ptr_pair;
+      HashMapFirst(((Value *)element)->pdata->phi_func_pdata.phi_value);
+      while ((ptr_pair = HashMapNext(
+                  ((Value *)element)->pdata->phi_func_pdata.phi_value)) !=
+             NULL) {
+        printf("\tbblock: %s value: %s, ", (char *)(ptr_pair->key),
+               ((Value *)ptr_pair->value)->name);
+      }
+    } else if (((Instruction *)element)->user.num_oprands == 2) {
       printf("\t%10s, %10s",
              user_get_operand_use(((User *)element), 0)->Val->name,
              user_get_operand_use(((User *)element), 1)->Val->name);
-      if (((Instruction *)element)->opcode == PhiFuncOp) {
-        // printf(" %u", HashMapSize(user_get_operand_use(((User *)element), 0)
-        //                               ->Val->pdata->phi_func_pdata.phi_value));
-
-        Pair *ptr_pair;
-        HashMapFirst(user_get_operand_use(((User *)element), 0)
-                         ->Val->pdata->phi_func_pdata.phi_value);
-        while ((ptr_pair = HashMapNext(
-                    user_get_operand_use(((User *)element), 0)
-                        ->Val->pdata->phi_func_pdata.phi_value)) != NULL) {
-          printf("\tbblock: %s value: %s, ", (char *)(ptr_pair->key),
-                 ((Value *)ptr_pair->value)->name);
-        }
-      }
-      printf("\n");
     } else if (((Instruction *)element)->user.num_oprands == 1) {
-      printf("\t%10s\n", user_get_operand_use(((User *)element), 0)->Val->name);
+      printf("\t%10s", user_get_operand_use(((User *)element), 0)->Val->name);
     } else if (((Instruction *)element)->user.num_oprands == 0) {
-      printf("\t%10s\n", "null");
+      printf("\t%10s", "null");
     }
+    printf("\n");
   }
 }
 
@@ -784,6 +1564,7 @@ void ins_toBBlock_pass(List *self) {
       // 设置当前的函数的入口基本块
       cur_func->entry_bblock = cur_bblock;
       ListPushBack(cur_bblock->inst_list, element);
+
       // 插入函数链表中
       ListPushBack(func_list, cur_func);
 
@@ -796,8 +1577,10 @@ void ins_toBBlock_pass(List *self) {
       // 添加变量的名字
       end_label_ins->name = strdup("end_label");
       end_label_ins->VTy->TID = LabelTyID;
+
       end_bblock->label = end_label_ins;
       ListPushBack(end_bblock->inst_list, end_label_ins);
+
       // 设置当前函数的结束基本块
       cur_func->end_bblock = end_bblock;
       // printf("successfully initialization functionblock\n");
@@ -806,6 +1589,8 @@ void ins_toBBlock_pass(List *self) {
       while (ListNext(self, &element)) {
         TAC_OP cur_ins_opcode = ((Instruction *)element)->opcode;
         switch (cur_ins_opcode) {
+          // TODO 修改代码逻辑 使用标志flag替换hashset
+          // 先遍历一次建立所有基本块应该是更优而且易理解的算法
           case GotoWithConditionOP:
             // printf("%s label %s ins is printed\n",
             // cur_bblock->label->name,
@@ -915,7 +1700,17 @@ void ins_toBBlock_pass(List *self) {
 
           case FuncEndOP:
             if (pre_op != ReturnOP) {
+              char temp_str[30];
+              strcpy(temp_str, "goto ");
+              strcat(temp_str, end_bblock->label->name);
+              Value *goto_end_bblock_ins =
+                  (Value *)ins_new_no_operator_v2(GotoOP);
+              goto_end_bblock_ins->name = strdup(temp_str);
+              goto_end_bblock_ins->VTy->TID = GotoTyID;
+              goto_end_bblock_ins->pdata->no_condition_goto.goto_location =
+                  end_bblock->label;
               cur_bblock->true_bblock = end_bblock;
+              ListPushBack(cur_bblock->inst_list, goto_end_bblock_ins);
             }
             ListPushBack(end_bblock->inst_list, element);
             break;
@@ -943,11 +1738,11 @@ void ins_toBBlock_pass(List *self) {
     }
     cur_func->num_of_block = num_of_block;
 
-    // // 打印当前函数的基本块
-    // print_bblock_pass(cur_func->entry_bblock);
-    // // 清空哈希表 然后重新初始化供后面使用
-    // HashSetDeinit(bblock_pass_hashset);
-    // hashset_init(&(bblock_pass_hashset));
+    // 打印当前函数的基本块
+    print_bblock_pass(cur_func->entry_bblock);
+    // 清空哈希表 然后重新初始化供后面使用
+    HashSetDeinit(bblock_pass_hashset);
+    hashset_init(&(bblock_pass_hashset));
   }
 }
 

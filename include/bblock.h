@@ -26,8 +26,7 @@
 typedef struct _BasicBlock {
   // 指向label节点的value 等同于label节点里所包含的value*
   Value* label;
-  // 所属的函数
-  // struct _Function* Parent;
+
   // basicblock中的语句链
   List* inst_list;
   // 父块和子块
@@ -35,7 +34,14 @@ typedef struct _BasicBlock {
 
   struct _BasicBlock* true_bblock;
   struct _BasicBlock* false_bblock;
+
+  // 所属的函数
   Function* parent;
+
+  HashSet* live_def;
+  HashSet* live_use;
+  HashSet* live_in;
+  HashSet* live_out;
 } BasicBlock;
 
 void bblock_init(BasicBlock* this, Function* parent);
