@@ -54,9 +54,9 @@ typedef union _PData {
     // phi函数对饮value的pdata 里面存有<block*,value*>的kv对
     HashMap *phi_value;
     Value *phi_pointer;
-    HashMap *phi_assign_choose;
-    int num_of_predecessor;
-    int offset_var_use;
+    // HashMap *phi_assign_choose;
+    // int num_of_predecessor;
+    // int offset_var_use;
   } phi_func_pdata;
 
   struct {

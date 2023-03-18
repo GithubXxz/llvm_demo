@@ -7,6 +7,8 @@ void CleanObject(void* element);
 
 unsigned HashKey(void* key);
 
+unsigned HashKeyAddress(void* key);
+
 // 设置一个hash_map的比较方式 示例为通过字符串排序
 // 将键类型强转位字符串然后来比较
 int CompareKey(void* lhs, void* rhs);

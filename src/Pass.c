@@ -8,28 +8,35 @@ char *op_string[] = {"DefaultOP",
                      "SubOP",
                      "MulOP",
                      "DivOP",
-                     "GotoOP",
-                     "GotoWithConditionOP",
-                     "CallOP",
-                     "FunBeginOP",
-                     "FunEndOP",
-                     "ReturnOP",
-                     "ParamOP",
-                     "AssignOP",
-                     "CallWithReturnValueOP",
-                     "NotEqualOP",
                      "EqualOP",
+                     "NotEqualOP",
                      "GreatThanOP",
                      "LessThanOP",
                      "GreatEqualOP",
                      "LessEqualOP",
-                     "LabelOP",
-                     "FuncLabelOP",
-                     "FuncEndOP",
+                     "AssignOP",
+                     "PhiAssignOp",
+                     "ReturnOP",
                      "AllocateOP",
                      "LoadOP",
                      "StoreOP",
-                     "PhiFuncOp"};
+                     "GotoWithConditionOP",
+                     "ParamOP",
+                     "GotoOP",
+                     "CallOP",
+                     "CallWithReturnValueOP",
+                     "LabelOP",
+                     "FuncLabelOP",
+                     "FuncEndOP",
+                     "PhiFuncOp"
+
+};
+
+const int REGISTER_NUM = 2;
+
+char *location_string[] = {"null", "R1", "R2", "M"};
+
+typedef enum _LOCATION { R1 = 1, R2, MEMORY } LOCATION;
 
 extern BasicBlock *cur_bblock;
 
@@ -507,22 +514,16 @@ void insert_phi_func_pass(Function *self) {
         ++phi_var_seed;
         strcpy(temp_str, "\%phi_var");
         strcat(temp_str, text);
-
         // 创建phi函数语句 左值是被定义的变量 可以被引用
         // 第一个操作数是phi函数 第二个操作数是phi函数所对应的变量的指针
-        Value *cur_ins = (Value *)ins_new_phi_func_v2(
-            PhiFuncOp, ListSize(element->pre_node_list));
+        Value *cur_ins = (Value *)ins_new_no_operator_v2(PhiFuncOp);
         // 添加变量类型
         cur_ins->VTy->TID =
             ((Value *)bblock_ins)->pdata->allocate_pdata.point_value->VTy->TID;
         // 添加变量的名字
         cur_ins->name = strdup(temp_str);
-        cur_ins->pdata->phi_func_pdata.num_of_predecessor =
-            ListSize(element->pre_node_list);
-        cur_ins->pdata->phi_func_pdata.offset_var_use = 0;
         cur_ins->pdata->phi_func_pdata.phi_pointer = (Value *)bblock_ins;
         hashmap_init(&(cur_ins->pdata->phi_func_pdata.phi_value));
-        hashmap_init(&(cur_ins->pdata->phi_func_pdata.phi_assign_choose));
 
         // printf("%s = phi,align 4\n", temp_str);
 
@@ -849,32 +850,22 @@ void insert_copies_help(HashMap *insert_copies_stack_hashmap,
       HashSetRemove(worklist, cur_pick_pair);
       // If dest ∈ live_outb
 
-      int *cur_assign_value_offset = (int *)malloc(sizeof(int));
-
-      *cur_assign_value_offset =
-          cur_pick_pair->dest->pdata->phi_func_pdata.offset_var_use;
-      cur_pick_pair->dest->pdata->phi_func_pdata.offset_var_use++;
-      assert(*cur_assign_value_offset !=
-             cur_pick_pair->dest->pdata->phi_func_pdata.num_of_predecessor);
-      HashMapPut(cur_pick_pair->dest->pdata->phi_func_pdata.phi_assign_choose,
-                 strdup(cur_bblock->bblock_node->bblock_head->label->name),
-                 cur_assign_value_offset);
-
-      Use *puse = user_get_operand_use((User *)cur_pick_pair->dest,
-                                       *cur_assign_value_offset);
-      value_add_use(HashMapGet(var_replace_hashmap, cur_pick_pair->src->name),
-                    puse);
+      Value *phi_assign_ins = (Value *)ins_new_single_operator_v2(
+          PhiAssignOp,
+          HashMapGet(var_replace_hashmap, cur_pick_pair->src->name));
+      phi_assign_ins->pdata->phi_replace_pdata.phi_replace_value =
+          cur_pick_pair->dest;
 
       // Insert a copy operation from map[src] to dest at the end of cur_bblock
       ListInsert(cur_bblock->bblock_node->bblock_head->inst_list,
                  ListSize(cur_bblock->bblock_node->bblock_head->inst_list) - 1,
-                 cur_pick_pair->dest);
+                 phi_assign_ins);
 
       // if (!strcmp(cur_bblock->bblock_node->bblock_head->label->name,
       //             "label3")) {
       //   Value *element = NULL;
       //   ListGetAt(cur_bblock->bblock_node->bblock_head->inst_list,
-      //             ListSize(cur_bblock->bblock_node->bblock_head->inst_list) -
+      // ListSize(cur_bblock->bblock_node->bblock_head->inst_list) -
       //             2, (void *)&element);
       //   printf("cur bblock tail name is %s\n", element->name);
       // }
@@ -948,150 +939,51 @@ void replace_phi_nodes(dom_tree *cur_bblock) {
   insert_copies(var_stack_hashmap, cur_bblock);
 }
 
-void calculate_live_use_def(BasicBlock *self) {
-  if (self != NULL && HashSetFind(bblock_pass_hashset, self) == false) {
-    ListFirst(self->inst_list, false);
-    Instruction *element;
-    while (ListNext(self->inst_list, &element)) {
-      if (element->opcode != GotoOP && element->opcode != GotoWithConditionOP &&
-          element->opcode != LabelOP && element->opcode != FuncEndOP &&
-          element->opcode != FuncLabelOP && element->opcode != PhiFuncOp &&
-          element->opcode != CallOP &&
-          element->opcode != CallWithReturnValueOP) {
-        if (((User *)element)->num_oprands == 2) {
-          if (!HashSetFind(self->live_def,
-                           user_get_operand_use((User *)element, 0)->Val)) {
-            printf("%s live use add %s\n", self->label->name,
-                   user_get_operand_use((User *)element, 0)->Val->name);
-            HashSetAdd(self->live_use,
-                       user_get_operand_use((User *)element, 0)->Val);
-          }
-          if (!HashSetFind(self->live_def,
-                           user_get_operand_use((User *)element, 1)->Val)) {
-            printf("%s live use add %s\n", self->label->name,
-                   user_get_operand_use((User *)element, 1)->Val->name);
-            HashSetAdd(self->live_use,
-                       user_get_operand_use((User *)element, 1)->Val);
-          }
-        } else if (((User *)element)->num_oprands == 1) {
-          if (!HashSetFind(self->live_def,
-                           user_get_operand_use((User *)element, 0)->Val)) {
-            HashSetAdd(self->live_use,
-                       user_get_operand_use((User *)element, 0)->Val);
-          }
-        }
-        if (((Value *)element) != NULL && element->opcode != ReturnOP) {
-          printf("%s live def add %s\n", self->label->name,
-                 ((Value *)element)->name);
-          HashSetAdd(self->live_def, (Value *)element);
-        }
-      } else if (element->opcode == PhiFuncOp) {
-        if (HashMapContain(
-                ((Value *)element)->pdata->phi_func_pdata.phi_assign_choose,
-                self->label->name)) {
-          int cur_assign_var_offset = *((int *)HashMapGet(
-              ((Value *)element)->pdata->phi_func_pdata.phi_assign_choose,
-              self->label->name));
-          if (!HashSetFind(
-                  self->live_def,
-                  user_get_operand_use((User *)element, cur_assign_var_offset)
-                      ->Val)) {
-            HashSetAdd(
-                self->live_use,
-                user_get_operand_use((User *)element, cur_assign_var_offset)
-                    ->Val);
-            printf("%s live use add %s\n", self->label->name,
-                   user_get_operand_use((User *)element, cur_assign_var_offset)
-                       ->Val->name);
-          }
-          HashSetAdd(self->live_def, (Value *)element);
-          printf("%s live def add %s\n", self->label->name,
-                 ((Value *)element)->name);
-        }
-      }
-    }
-    HashSetAdd(bblock_pass_hashset, self);
-    calculate_live_use_def(self->true_bblock);
-    calculate_live_use_def(self->false_bblock);
-  }
-}
-
 void calculate_live_use_def_by_graph(ALGraph *self) {
   for (int i = 0; i < self->node_num; i++) {
     ListFirst((self->node_set)[i]->bblock_head->inst_list, false);
-    Instruction *element;
+    void *element;
     while (ListNext((self->node_set)[i]->bblock_head->inst_list, &element)) {
-      if (element->opcode != GotoOP && element->opcode != GotoWithConditionOP &&
-          element->opcode != LabelOP && element->opcode != FuncEndOP &&
-          element->opcode != FuncLabelOP && element->opcode != PhiFuncOp &&
-          element->opcode != CallOP &&
-          element->opcode != CallWithReturnValueOP) {
-        if (((User *)element)->num_oprands == 2) {
+      if (((Instruction *)element)->opcode <= 18) {
+        for (int j = 0; j < ((User *)element)->num_oprands; j++) {
           if (!HashSetFind((self->node_set)[i]->bblock_head->live_def,
-                           user_get_operand_use((User *)element, 0)->Val)) {
+                           user_get_operand_use((User *)element, j)->Val) &&
+              (user_get_operand_use((User *)element, j)->Val->VTy->TID !=
+                   ImmediateIntTyID &&
+               user_get_operand_use((User *)element, j)->Val->VTy->TID !=
+                   ImmediateFloatTyID)) {
             printf("%s live use add %s\n",
                    (self->node_set)[i]->bblock_head->label->name,
-                   user_get_operand_use((User *)element, 0)->Val->name);
+                   user_get_operand_use((User *)element, j)->Val->name);
             HashSetAdd((self->node_set)[i]->bblock_head->live_use,
-                       user_get_operand_use((User *)element, 0)->Val);
-          }
-          if (!HashSetFind((self->node_set)[i]->bblock_head->live_def,
-                           user_get_operand_use((User *)element, 1)->Val)) {
-            printf("%s live use add %s\n",
-                   (self->node_set)[i]->bblock_head->label->name,
-                   user_get_operand_use((User *)element, 1)->Val->name);
-            HashSetAdd((self->node_set)[i]->bblock_head->live_use,
-                       user_get_operand_use((User *)element, 1)->Val);
-          }
-        } else if (((User *)element)->num_oprands == 1) {
-          if (!HashSetFind((self->node_set)[i]->bblock_head->live_def,
-                           user_get_operand_use((User *)element, 0)->Val)) {
-            HashSetAdd((self->node_set)[i]->bblock_head->live_use,
-                       user_get_operand_use((User *)element, 0)->Val);
+                       user_get_operand_use((User *)element, j)->Val);
           }
         }
-        if (((Value *)element) != NULL && element->opcode != ReturnOP) {
+        if (((Instruction *)element)->opcode == PhiAssignOp) {
+          HashSetAdd(
+              (self->node_set)[i]->bblock_head->live_def,
+              ((Value *)element)->pdata->phi_replace_pdata.phi_replace_value);
+          printf("%s live def add %s\n",
+                 (self->node_set)[i]->bblock_head->label->name,
+                 ((Value *)element)
+                     ->pdata->phi_replace_pdata.phi_replace_value->name);
+        } else if (((Instruction *)element)->opcode < 13) {
           printf("%s live def add %s\n",
                  (self->node_set)[i]->bblock_head->label->name,
                  ((Value *)element)->name);
           HashSetAdd((self->node_set)[i]->bblock_head->live_def,
                      (Value *)element);
-        }
-      } else if (element->opcode == PhiFuncOp) {
-        if (HashMapContain(
-                ((Value *)element)->pdata->phi_func_pdata.phi_assign_choose,
-                (self->node_set)[i]->bblock_head->label->name)) {
-          int cur_assign_var_offset = *((int *)HashMapGet(
-              ((Value *)element)->pdata->phi_func_pdata.phi_assign_choose,
-              (self->node_set)[i]->bblock_head->label->name));
-          if (!HashSetFind(
-                  (self->node_set)[i]->bblock_head->live_def,
-                  user_get_operand_use((User *)element, cur_assign_var_offset)
-                      ->Val)) {
-            HashSetAdd(
-                (self->node_set)[i]->bblock_head->live_use,
-                user_get_operand_use((User *)element, cur_assign_var_offset)
-                    ->Val);
-            printf("%s live use add %s\n",
-                   (self->node_set)[i]->bblock_head->label->name,
-                   user_get_operand_use((User *)element, cur_assign_var_offset)
-                       ->Val->name);
-          }
-          HashSetAdd((self->node_set)[i]->bblock_head->live_def,
-                     (Value *)element);
-          printf("%s live def add %s\n",
-                 (self->node_set)[i]->bblock_head->label->name,
-                 ((Value *)element)->name);
         }
       }
     }
   }
+  printf("\n\n\n");
 }
 
 void calculate_live_in_out(ALGraph *self) {
   while (1) {
     bool no_liveout_changed = true;
-    for (int i = 0; i < self->node_num; i++) {
+    for (int i = self->node_num - 1; i >= 0; i--) {
       BasicBlock *cur_bblock = (self->node_set)[i]->bblock_head;
       HashSet *store_live_out = cur_bblock->live_out;
       cur_bblock->live_out = NULL;
@@ -1105,12 +997,14 @@ void calculate_live_in_out(ALGraph *self) {
         HashSetDeinit(cur_bblock->live_out);
         cur_bblock->live_out = union_set;
       }
+
       HashSet *out_del_def =
           HashSetDifference(cur_bblock->live_out, cur_bblock->live_def);
       HashSet *res_union_use = HashSetUnion(out_del_def, cur_bblock->live_use);
       HashSetDeinit(out_del_def);
       HashSetDeinit(cur_bblock->live_in);
       cur_bblock->live_in = res_union_use;
+
       HashSet *intersert =
           HashSetIntersect(store_live_out, cur_bblock->live_out);
       unsigned intersertsize = HashSetSize(intersert);
@@ -1180,17 +1074,18 @@ var_live_interval *is_list_contain_item(List *self, void *item) {
 void calculate_live_interval(ALGraph *self_cfg, Function *self_func) {
   unsigned ins_id_seed = 0;
   // 对所有的指令进行编号
-  // 如果是PHIFUNC的编号根据上下文信息计算偏移量
   for (int i = 0; i < self_cfg->node_num; i++) {
     ListFirst((self_cfg->node_set)[i]->bblock_head->inst_list, false);
     Instruction *element;
     while (ListNext((self_cfg->node_set)[i]->bblock_head->inst_list, &element))
       element->ins_id = ins_id_seed++;
+    print_ins_pass_phi((self_cfg->node_set)[i]->bblock_head->inst_list);
   }
 
-  for (int i = self_cfg->node_num; i >= 0; i--) {
+  for (int i = self_cfg->node_num - 1; i >= 0; i--) {
     HashSetFirst((self_cfg->node_set)[i]->bblock_head->live_out);
     Value *live_out_var = NULL;
+    // iter the live_out_var of cur bblock
     while ((live_out_var = HashSetNext(
                 (self_cfg->node_set)[i]->bblock_head->live_out)) != NULL) {
       // 当前live_out取出的变量是否已经存在在链条中了
@@ -1217,8 +1112,9 @@ void calculate_live_interval(ALGraph *self_cfg, Function *self_func) {
               ((Instruction *)(self_cfg->node_set)[i]->bblock_head->label)
                   ->ins_id;
           add_live_interval->end =
-              ((Instruction *)(self_cfg->node_set)[i + 1]->bblock_head->label)
-                  ->ins_id -
+              add_live_interval->begin +
+              ListSize((Instruction *)(self_cfg->node_set)[i]
+                           ->bblock_head->inst_list) -
               1;
           ListPushFront(cur_var_live_interval->this_var_discrete_live_interval,
                         add_live_interval);
@@ -1227,7 +1123,9 @@ void calculate_live_interval(ALGraph *self_cfg, Function *self_func) {
         cur_var_live_interval =
             (var_live_interval *)malloc(sizeof(var_live_interval));
         cur_var_live_interval->self = live_out_var;
-        ListInit(cur_var_live_interval->this_var_discrete_live_interval);
+        cur_var_live_interval->this_var_discrete_live_interval = ListInit();
+        cur_var_live_interval->this_var_total_live_interval =
+            (live_interval *)malloc(sizeof(live_interval));
         // 不相邻的情况 新建
         live_interval *add_live_interval =
             (live_interval *)malloc(sizeof(live_interval));
@@ -1235,27 +1133,32 @@ void calculate_live_interval(ALGraph *self_cfg, Function *self_func) {
             ((Instruction *)(self_cfg->node_set)[i]->bblock_head->label)
                 ->ins_id;
         add_live_interval->end =
-            ((Instruction *)(self_cfg->node_set)[i + 1]->bblock_head->label)
-                ->ins_id -
+            add_live_interval->begin +
+            ListSize(((Instruction *)(self_cfg->node_set)[i]
+                          ->bblock_head->inst_list)) -
             1;
         ListPushFront(cur_var_live_interval->this_var_discrete_live_interval,
                       add_live_interval);
+        ListPushBack(self_func->all_var_live_interval, cur_var_live_interval);
       }
     }
+
     ListFirst((self_cfg->node_set)[i]->bblock_head->inst_list, true);
     Instruction *element;
-    while (
-        ListNext((self_cfg->node_set)[i]->bblock_head->inst_list, &element)) {
-      if (element->opcode != GotoOP && element->opcode != GotoWithConditionOP &&
-          element->opcode != LabelOP && element->opcode != FuncEndOP &&
-          element->opcode != FuncLabelOP && element->opcode != PhiFuncOp &&
-          element->opcode != CallOP &&
-          element->opcode != CallWithReturnValueOP) {
-        if (((Value *)element) != NULL && element->opcode != ReturnOP) {
+    while (ListReverseNext((self_cfg->node_set)[i]->bblock_head->inst_list,
+                           &element)) {
+      if (element->opcode < 19) {
+        if (((Instruction *)element)->opcode < 13) {
           var_live_interval *cur_var_live_interval = NULL;
-
-          if ((cur_var_live_interval = is_list_contain_item(
-                   self_func->all_var_live_interval, element)) != NULL) {
+          if (element->opcode == PhiAssignOp) {
+            cur_var_live_interval = is_list_contain_item(
+                self_func->all_var_live_interval,
+                ((Value *)element)->pdata->phi_replace_pdata.phi_replace_value);
+          } else {
+            cur_var_live_interval =
+                is_list_contain_item(self_func->all_var_live_interval, element);
+          }
+          if (cur_var_live_interval != NULL) {
             // 截断
             live_interval *cur_var_front_live_interval = NULL;
             ListGetFront(cur_var_live_interval->this_var_discrete_live_interval,
@@ -1264,13 +1167,12 @@ void calculate_live_interval(ALGraph *self_cfg, Function *self_func) {
           }
         }
 
-        for (int i = 0; i < ((User *)element)->num_oprands; i++) {
+        for (int j = 0; j < ((User *)element)->num_oprands; j++) {
           // 当前live_out取出的变量是否已经存在在链条中了
           var_live_interval *cur_var_live_interval = NULL;
-
+          Value *cur_handle = user_get_operand_use((User *)element, j)->Val;
           if ((cur_var_live_interval = is_list_contain_item(
-                   self_func->all_var_live_interval,
-                   user_get_operand_use((User *)element, i)->Val)) != NULL) {
+                   self_func->all_var_live_interval, cur_handle)) != NULL) {
             // 存在的情况 先取出
             // 判断当前位置时候与取出的首活跃区间相邻来判断是新建还是延长
             live_interval *cur_var_front_live_interval = NULL;
@@ -1289,11 +1191,15 @@ void calculate_live_interval(ALGraph *self_cfg, Function *self_func) {
                   cur_var_live_interval->this_var_discrete_live_interval,
                   add_live_interval);
             }
-          } else {
+          } else if (cur_handle->VTy->TID != ImmediateFloatTyID &&
+                     cur_handle->VTy->TID != ImmediateIntTyID) {
             cur_var_live_interval =
                 (var_live_interval *)malloc(sizeof(var_live_interval));
-            cur_var_live_interval->self = (Value *)element;
-            ListInit(cur_var_live_interval->this_var_discrete_live_interval);
+            cur_var_live_interval->self =
+                user_get_operand_use((User *)element, j)->Val;
+            cur_var_live_interval->this_var_discrete_live_interval = ListInit();
+            cur_var_live_interval->this_var_total_live_interval =
+                (live_interval *)malloc(sizeof(live_interval));
             // 不相邻的情况 新建
             live_interval *add_live_interval =
                 (live_interval *)malloc(sizeof(live_interval));
@@ -1304,48 +1210,148 @@ void calculate_live_interval(ALGraph *self_cfg, Function *self_func) {
             ListPushFront(
                 cur_var_live_interval->this_var_discrete_live_interval,
                 add_live_interval);
-          }
-        }
-
-      } else if (element->opcode == PhiFuncOp) {
-        var_live_interval *cur_var_live_interval = NULL;
-
-        if ((cur_var_live_interval = is_list_contain_item(
-                 self_func->all_var_live_interval, element)) != NULL) {
-          // 截断
-          live_interval *cur_var_front_live_interval = NULL;
-          ListGetFront(cur_var_live_interval->this_var_discrete_live_interval,
-                       &cur_var_front_live_interval);
-          cur_var_front_live_interval->begin = element->ins_id;
-        }
-        int cur_assign_var_offset = *((int *)HashMapGet(
-            ((Value *)element)->pdata->phi_func_pdata.phi_assign_choose,
-            (self_cfg->node_set)[i]->bblock_head->label->name));
-        if ((cur_var_live_interval = is_list_contain_item(
-                 self_func->all_var_live_interval,
-                 user_get_operand_use((User *)element, cur_assign_var_offset)
-                     ->Val)) != NULL) {
-          // 存在的情况 先取出
-          // 判断当前位置时候与取出的首活跃区间相邻来判断是新建还是延长
-          live_interval *cur_var_front_live_interval = NULL;
-          ListGetFront(cur_var_live_interval->this_var_discrete_live_interval,
-                       &cur_var_front_live_interval);
-          // 判断是否相邻
-          if (element->ins_id < cur_var_front_live_interval->begin) {
-            // 不相邻的情况 新建
-            live_interval *add_live_interval =
-                (live_interval *)malloc(sizeof(live_interval));
-            add_live_interval->begin =
-                ((Instruction *)(self_cfg->node_set)[i]->bblock_head->label)
-                    ->ins_id;
-            add_live_interval->end = element->ins_id;
-            ListPushFront(
-                cur_var_live_interval->this_var_discrete_live_interval,
-                add_live_interval);
+            ListPushBack(self_func->all_var_live_interval,
+                         cur_var_live_interval);
           }
         }
       }
     }
+  }
+
+  var_live_interval *element;
+  ListFirst(self_func->all_var_live_interval, false);
+  while (ListNext(self_func->all_var_live_interval, &element)) {
+    live_interval *total_live_interval = NULL;
+    ListGetFront(element->this_var_discrete_live_interval,
+                 &total_live_interval);
+    element->this_var_total_live_interval->begin = total_live_interval->begin;
+    ListGetBack(element->this_var_discrete_live_interval, &total_live_interval);
+    element->this_var_total_live_interval->end = total_live_interval->end;
+  }
+
+  int num_of_var_live_interval = ListSize(self_func->all_var_live_interval);
+  for (int i = 0; i < num_of_var_live_interval; i++) {
+    var_live_interval *cur_index_var_live_interval = NULL;
+    ListGetAt(self_func->all_var_live_interval, i,
+              &cur_index_var_live_interval);
+    for (int j = i + 1; j < num_of_var_live_interval; j++) {
+      var_live_interval *cur_iter_var_live_interval = NULL;
+      ListGetAt(self_func->all_var_live_interval, j,
+                &cur_iter_var_live_interval);
+      if (cur_index_var_live_interval->this_var_total_live_interval->begin >=
+          cur_iter_var_live_interval->this_var_total_live_interval->begin) {
+        ListSetAt(self_func->all_var_live_interval, i,
+                  cur_iter_var_live_interval);
+        ListSetAt(self_func->all_var_live_interval, j,
+                  cur_index_var_live_interval);
+        cur_index_var_live_interval = cur_iter_var_live_interval;
+      }
+    }
+  }
+
+  ListFirst(self_func->all_var_live_interval, false);
+  while (ListNext(self_func->all_var_live_interval, &element)) {
+    printf("\tval:%s \tbegin:%d \tend:%d \n", element->self->name,
+           element->this_var_total_live_interval->begin,
+           element->this_var_total_live_interval->end);
+  }
+}
+
+void line_scan_register_allocation(ALGraph *self_cfg, Function *self_func) {
+  List *active = ListInit();
+  ListSetClean(active, CleanObject);
+  // 0代表空闲 1代表被占用
+  bool register_situation[6];
+  for (int i = 0; i < 6; i++) {
+    register_situation[i] = false;
+  }
+  var_live_interval *cur_handle = NULL;
+  ListFirst(self_func->all_var_live_interval, false);
+
+  HashMap *var_location = HashMapInit();
+  HashMapSetCleanValue(var_location, CleanObject);
+  HashMapSetHash(var_location, HashKeyAddress);
+  HashMapSetCleanKey(var_location, CleanHashSetKey);
+  HashMapSetCompare(var_location, CompareKeyAddress);
+
+  ListNext(self_func->all_var_live_interval, &cur_handle);
+  LOCATION *cur_add_var_location = (LOCATION *)malloc(sizeof(LOCATION));
+  *cur_add_var_location = 1;
+  register_situation[1] = true;
+  HashMapPut(var_location, cur_handle->self, cur_add_var_location);
+  ListPushBack(active, cur_handle);
+
+  while (ListNext(self_func->all_var_live_interval, &cur_handle)) {
+    // Expire OLD Intervals
+    var_live_interval *iter_active = NULL;
+    while (ListSize(active) != 0) {
+      ListGetFront(active, &iter_active);
+      if (iter_active->this_var_total_live_interval->end >=
+          cur_handle->this_var_total_live_interval->begin)
+        break;
+      LOCATION *cur_var_location =
+          (LOCATION *)HashMapGet(var_location, iter_active->self);
+      register_situation[*cur_var_location] = false;
+      ListPopFront(active);
+    }
+    iter_active = NULL;
+
+    if (ListSize(active) == REGISTER_NUM) {
+      var_live_interval *active_tail_live_interval = NULL;
+      ListGetBack(active, &active_tail_live_interval);
+      if (active_tail_live_interval->this_var_total_live_interval->end >
+          cur_handle->this_var_total_live_interval->end) {
+        LOCATION *cur_spill_var_location = (LOCATION *)HashMapGet(
+            var_location, active_tail_live_interval->self);
+        LOCATION *cur_add_var_location = (LOCATION *)malloc(sizeof(LOCATION));
+        *cur_add_var_location = *cur_spill_var_location;
+        *cur_spill_var_location = MEMORY;
+        HashMapPut(var_location, cur_handle->self, cur_add_var_location);
+        ListPopBack(active);
+        for (int i = 0; i < ListSize(active); i++) {
+          var_live_interval *iter_active_live_interval = NULL;
+          ListGetAt(active, i, &iter_active_live_interval);
+          if (cur_handle->this_var_total_live_interval->end <
+              iter_active_live_interval->this_var_total_live_interval->end) {
+            ListInsert(active, i, cur_handle);
+            break;
+          }
+        }
+      } else {
+        LOCATION *cur_add_var_location = (LOCATION *)malloc(sizeof(LOCATION));
+        *cur_add_var_location = MEMORY;
+        HashMapPut(var_location, cur_handle->self, cur_add_var_location);
+      }
+    } else {
+      for (int i = 1; i <= REGISTER_NUM; i++) {
+        if (!register_situation[i]) {
+          LOCATION *cur_add_var_location = (LOCATION *)malloc(sizeof(LOCATION));
+          *cur_add_var_location = i;
+          HashMapPut(var_location, cur_handle->self, cur_add_var_location);
+          int j = 0;
+          for (; j < ListSize(active); j++) {
+            var_live_interval *iter_active_live_interval = NULL;
+            ListGetAt(active, j, &iter_active_live_interval);
+            if (cur_handle->this_var_total_live_interval->end <
+                iter_active_live_interval->this_var_total_live_interval->end) {
+              ListInsert(active, j, cur_handle);
+              break;
+            }
+          }
+          if (j == ListSize(active)) ListPushBack(active, cur_handle);
+
+          register_situation[i] = true;
+          break;
+        }
+      }
+    }
+  }
+
+  Pair *ptr_pair;
+  HashMapFirst(var_location);
+  while ((ptr_pair = HashMapNext(var_location)) != NULL) {
+    printf("\tvar:%s\taddress:%s\n ", ((Value *)ptr_pair->key)->name,
+           location_string[*((LOCATION *)ptr_pair->value)]);
   }
 }
 
@@ -1429,9 +1435,14 @@ void bblock_to_dom_graph_pass(Function *self) {
   calculate_live_use_def_by_graph(graph_for_dom_tree);
 
   calculate_live_in_out(graph_for_dom_tree);
+
+  calculate_live_interval(graph_for_dom_tree, cur_func);
+  printf("begin line scan allocaton register\n\n");
+
+  line_scan_register_allocation(graph_for_dom_tree, cur_func);
 }
 
-void print_ins_pass_phi(List *self, char *cur_bblock_name) {
+void print_ins_pass_phi(List *self) {
   int i = 0;
   // printf("\nbegin print the instruction: \n");
   void *element;
@@ -1439,30 +1450,19 @@ void print_ins_pass_phi(List *self, char *cur_bblock_name) {
   while (i < ListSize(self)) {
     ListGetAt(self, i, &element);
     if (((Instruction *)element)->opcode == PhiFuncOp) {
-      if (HashMapContain(
-              ((Value *)element)->pdata->phi_func_pdata.phi_assign_choose,
-              cur_bblock_name)) {
-        // 打印出每条instruction的res的名字信息
-        printf("%9s\t     %d: %20s ", "", i++,
-               op_string[((Instruction *)element)->opcode]);
-
-        printf("\t%25s ", ((Value *)element)->name);
-        int cur_assign_var_offset = *((int *)HashMapGet(
-            ((Value *)element)->pdata->phi_func_pdata.phi_assign_choose,
-            cur_bblock_name));
-        printf("\t%10s",
-               user_get_operand_use((User *)element, cur_assign_var_offset)
-                   ->Val->name);
-        printf("\n");
-      } else {
-        ListRemove(self, i);
-      }
+      ListRemove(self, i);
     } else {
+      i++;
       // 打印出每条instruction的res的名字信息
-      printf("%9s\t     %d: %20s ", "", i++,
+      printf("%9p\t     %d: %20s ", element, ((Instruction *)element)->ins_id,
              op_string[((Instruction *)element)->opcode]);
-
-      printf("\t%25s ", ((Value *)element)->name);
+      if (((Instruction *)element)->opcode == PhiAssignOp) {
+        printf("\t%25s ",
+               ((Value *)element)
+                   ->pdata->phi_replace_pdata.phi_replace_value->name);
+      } else {
+        printf("\t%25s ", ((Value *)element)->name);
+      }
       if (((Instruction *)element)->user.num_oprands == 2) {
         printf("\t%10s, %10s",
                user_get_operand_use(((User *)element), 0)->Val->name,
@@ -1482,7 +1482,7 @@ void print_bblock_pass_phi(BasicBlock *self) {
     printf("\taddress:%p", self->label);
     printf("\t%s:\n", self->label->name);
     HashSetAdd(bblock_pass_hashset, self);
-    print_ins_pass_phi(self->inst_list, self->label->name);
+    print_ins_pass_phi(self->inst_list);
     printf("\n");
     print_bblock_pass_phi(self->true_bblock);
     print_bblock_pass_phi(self->false_bblock);
@@ -1504,7 +1504,7 @@ void print_ins_pass(List *self) {
 
     if (((Instruction *)element)->opcode == PhiFuncOp) {
       printf("\tsize: %d ",
-             ((Value *)element)->pdata->phi_func_pdata.num_of_predecessor);
+             HashMapSize(((Value *)element)->pdata->phi_func_pdata.phi_value));
       Pair *ptr_pair;
       HashMapFirst(((Value *)element)->pdata->phi_func_pdata.phi_value);
       while ((ptr_pair = HashMapNext(

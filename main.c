@@ -128,10 +128,10 @@ int main() {
       "  return c;"
       "}";
 
-  if (freopen("printf_ast.txt", "w", stdout) == NULL) {
-    fprintf(stderr, "打开文件失败！");
-    exit(-1);
-  }
+  //   if (freopen("printf_ast.txt", "w", stdout) == NULL) {
+  //     fprintf(stderr, "打开文件失败！");
+  //     exit(-1);
+  //   }
 
   parser(input6);
 

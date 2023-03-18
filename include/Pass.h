@@ -59,5 +59,6 @@ void print_bblock_pass_temp(BasicBlock *self);
 void delete_alloca_store_load_ins_pass(BasicBlock *self);
 
 void print_bblock_pass_phi(BasicBlock *self);
+void print_ins_pass_phi(List *self);
 
 #endif
