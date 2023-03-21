@@ -32,11 +32,11 @@ char *op_string[] = {"DefaultOP",
 
 };
 
-const int REGISTER_NUM = 2;
+const int REGISTER_NUM = 3;
 
-char *location_string[] = {"null", "R1", "R2", "M"};
+char *location_string[] = {"null", "R1", "R2", "R3", "M"};
 
-typedef enum _LOCATION { R1 = 1, R2, MEMORY } LOCATION;
+typedef enum _LOCATION { R1 = 1, R2, R3, MEMORY } LOCATION;
 
 extern BasicBlock *cur_bblock;
 
@@ -853,6 +853,7 @@ void insert_copies_help(HashMap *insert_copies_stack_hashmap,
       Value *phi_assign_ins = (Value *)ins_new_single_operator_v2(
           PhiAssignOp,
           HashMapGet(var_replace_hashmap, cur_pick_pair->src->name));
+
       phi_assign_ins->pdata->phi_replace_pdata.phi_replace_value =
           cur_pick_pair->dest;
 
@@ -1257,190 +1258,7 @@ void calculate_live_interval(ALGraph *self_cfg, Function *self_func) {
   }
 }
 
-void line_scan_register_allocation(ALGraph *self_cfg, Function *self_func) {
-  List *active = ListInit();
-  ListSetClean(active, CleanObject);
-  // 0代表空闲 1代表被占用
-  bool register_situation[6];
-  for (int i = 0; i < 6; i++) {
-    register_situation[i] = false;
-  }
-  var_live_interval *cur_handle = NULL;
-  ListFirst(self_func->all_var_live_interval, false);
-
-  HashMap *var_location = HashMapInit();
-  HashMapSetCleanValue(var_location, CleanObject);
-  HashMapSetHash(var_location, HashKeyAddress);
-  HashMapSetCleanKey(var_location, CleanHashSetKey);
-  HashMapSetCompare(var_location, CompareKeyAddress);
-
-  ListNext(self_func->all_var_live_interval, &cur_handle);
-  LOCATION *cur_add_var_location = (LOCATION *)malloc(sizeof(LOCATION));
-  *cur_add_var_location = 1;
-  register_situation[1] = true;
-  HashMapPut(var_location, cur_handle->self, cur_add_var_location);
-  ListPushBack(active, cur_handle);
-
-  while (ListNext(self_func->all_var_live_interval, &cur_handle)) {
-    // Expire OLD Intervals
-    var_live_interval *iter_active = NULL;
-    while (ListSize(active) != 0) {
-      ListGetFront(active, &iter_active);
-      if (iter_active->this_var_total_live_interval->end >=
-          cur_handle->this_var_total_live_interval->begin)
-        break;
-      LOCATION *cur_var_location =
-          (LOCATION *)HashMapGet(var_location, iter_active->self);
-      register_situation[*cur_var_location] = false;
-      ListPopFront(active);
-    }
-    iter_active = NULL;
-
-    if (ListSize(active) == REGISTER_NUM) {
-      var_live_interval *active_tail_live_interval = NULL;
-      ListGetBack(active, &active_tail_live_interval);
-      if (active_tail_live_interval->this_var_total_live_interval->end >
-          cur_handle->this_var_total_live_interval->end) {
-        LOCATION *cur_spill_var_location = (LOCATION *)HashMapGet(
-            var_location, active_tail_live_interval->self);
-        LOCATION *cur_add_var_location = (LOCATION *)malloc(sizeof(LOCATION));
-        *cur_add_var_location = *cur_spill_var_location;
-        *cur_spill_var_location = MEMORY;
-        HashMapPut(var_location, cur_handle->self, cur_add_var_location);
-        ListPopBack(active);
-        for (int i = 0; i < ListSize(active); i++) {
-          var_live_interval *iter_active_live_interval = NULL;
-          ListGetAt(active, i, &iter_active_live_interval);
-          if (cur_handle->this_var_total_live_interval->end <
-              iter_active_live_interval->this_var_total_live_interval->end) {
-            ListInsert(active, i, cur_handle);
-            break;
-          }
-        }
-      } else {
-        LOCATION *cur_add_var_location = (LOCATION *)malloc(sizeof(LOCATION));
-        *cur_add_var_location = MEMORY;
-        HashMapPut(var_location, cur_handle->self, cur_add_var_location);
-      }
-    } else {
-      for (int i = 1; i <= REGISTER_NUM; i++) {
-        if (!register_situation[i]) {
-          LOCATION *cur_add_var_location = (LOCATION *)malloc(sizeof(LOCATION));
-          *cur_add_var_location = i;
-          HashMapPut(var_location, cur_handle->self, cur_add_var_location);
-          int j = 0;
-          for (; j < ListSize(active); j++) {
-            var_live_interval *iter_active_live_interval = NULL;
-            ListGetAt(active, j, &iter_active_live_interval);
-            if (cur_handle->this_var_total_live_interval->end <
-                iter_active_live_interval->this_var_total_live_interval->end) {
-              ListInsert(active, j, cur_handle);
-              break;
-            }
-          }
-          if (j == ListSize(active)) ListPushBack(active, cur_handle);
-
-          register_situation[i] = true;
-          break;
-        }
-      }
-    }
-  }
-
-  Pair *ptr_pair;
-  HashMapFirst(var_location);
-  while ((ptr_pair = HashMapNext(var_location)) != NULL) {
-    printf("\tvar:%s\taddress:%s\n ", ((Value *)ptr_pair->key)->name,
-           location_string[*((LOCATION *)ptr_pair->value)]);
-  }
-}
-
 // 生成支配树的pass和插入phi节点的pass和重命名函数的pass
-void bblock_to_dom_graph_pass(Function *self) {
-  int num_of_block = self->num_of_block;
-  // // 设置支配树对应图的邻接表头
-  // hashset_init(&(graph_head_set));
-  graph_for_dom_tree = (ALGraph *)malloc(sizeof(ALGraph));
-  graph_for_dom_tree->node_set =
-      (HeadNode **)malloc(num_of_block * sizeof(HeadNode));
-  graph_for_dom_tree->node_num = num_of_block;
-
-  // 设置CFG图的入口基本块表头 并且初始化链表
-  HeadNode *init_headnode = (HeadNode *)malloc(sizeof(HeadNode));
-  init_headnode->bblock_head = self->entry_bblock;
-  init_headnode->is_visited = false;
-  hashset_init(&(init_headnode->edge_list));
-  hashset_init(&(init_headnode->dom_set));
-  hashset_init(&(init_headnode->dom_frontier_set));
-  init_headnode->pre_node_list = NULL;
-
-  bblock_to_dom_graph_dfs_pass(init_headnode, 0);
-  HashMapDeinit(bblock_to_dom_graph_hashmap);
-
-  // 初始化dom_tree树根
-  dom_tree_root = (dom_tree *)malloc(sizeof(dom_tree));
-  dom_tree_root->bblock_node = init_headnode;
-  dom_tree_root->child = ListInit();
-  ListSetClean(dom_tree_root->child, CleanObject);
-
-  // 建立支配关系的函数
-  dom_relation_pass();
-
-  // 插入phi函数
-  insert_phi_func_pass(self);
-
-  printf("\n");
-
-  printf_cur_func_ins(cur_func);
-
-  printf("begin rename pass and delete alloca,store,load instruction!\n");
-
-  rename_pass(cur_func);
-
-  printf("rename pass over\n");
-
-  // 删除alloca store load语句
-  delete_alloca_store_load_ins_pass(cur_func->entry_bblock);
-
-  printf("delete alloca,store,load instruction over\n");
-
-  // 清空哈希表 然后重新初始化供后面使用
-  HashSetDeinit(bblock_pass_hashset);
-  bblock_pass_hashset = NULL;
-  hashset_init(&(bblock_pass_hashset));
-
-  // if (freopen("instruction_list.txt", "w", stdout) == NULL) {
-  //   fprintf(stderr, "打开文件失败！");
-  //   exit(-1);
-  // }
-
-  printf_cur_func_ins(cur_func);
-
-  replace_phi_nodes(dom_tree_root);
-
-  printf("\n\n\n");
-
-  // 打印表的表头信息
-  printf("\t%s\tnumber: %20s \t%25s \t%10s\n", "labelID", "opcode", "name",
-         "use");
-  // 打印当前函数的基本块
-  print_bblock_pass_phi(cur_func->entry_bblock);
-  printf("\n\n");
-
-  // 清空哈希表 然后重新初始化供后面使用
-  HashSetDeinit(bblock_pass_hashset);
-  bblock_pass_hashset = NULL;
-  hashset_init(&(bblock_pass_hashset));
-
-  calculate_live_use_def_by_graph(graph_for_dom_tree);
-
-  calculate_live_in_out(graph_for_dom_tree);
-
-  calculate_live_interval(graph_for_dom_tree, cur_func);
-  printf("begin line scan allocaton register\n\n");
-
-  line_scan_register_allocation(graph_for_dom_tree, cur_func);
-}
 
 void print_ins_pass_phi(List *self) {
   int i = 0;
@@ -1763,4 +1581,229 @@ void delete_return_deadcode_pass(List *self) {
     i++;
   }
   ListSetClean(self, CleanObject);
+}
+
+void line_scan_register_allocation(ALGraph *self_cfg, Function *self_func,
+                                   HashMap *var_location) {
+  List *active = ListInit();
+  ListSetClean(active, CleanObject);
+  // 0代表空闲 1代表被占用
+  bool register_situation[6];
+  for (int i = 0; i < 6; i++) {
+    register_situation[i] = false;
+  }
+  var_live_interval *cur_handle = NULL;
+  ListFirst(self_func->all_var_live_interval, false);
+
+  ListNext(self_func->all_var_live_interval, &cur_handle);
+  LOCATION *cur_add_var_location = (LOCATION *)malloc(sizeof(LOCATION));
+  *cur_add_var_location = 1;
+  register_situation[1] = true;
+  HashMapPut(var_location, cur_handle->self, cur_add_var_location);
+  ListPushBack(active, cur_handle);
+
+  while (ListNext(self_func->all_var_live_interval, &cur_handle)) {
+    // Expire OLD Intervals
+    var_live_interval *iter_active = NULL;
+    while (ListSize(active) != 0) {
+      ListGetFront(active, &iter_active);
+      if (iter_active->this_var_total_live_interval->end >=
+          cur_handle->this_var_total_live_interval->begin)
+        break;
+      LOCATION *cur_var_location =
+          (LOCATION *)HashMapGet(var_location, iter_active->self);
+      register_situation[*cur_var_location] = false;
+      ListPopFront(active);
+    }
+    iter_active = NULL;
+
+    if (ListSize(active) == REGISTER_NUM) {
+      var_live_interval *active_tail_live_interval = NULL;
+      ListGetBack(active, &active_tail_live_interval);
+      if (active_tail_live_interval->this_var_total_live_interval->end >
+          cur_handle->this_var_total_live_interval->end) {
+        LOCATION *cur_spill_var_location = (LOCATION *)HashMapGet(
+            var_location, active_tail_live_interval->self);
+        LOCATION *cur_add_var_location = (LOCATION *)malloc(sizeof(LOCATION));
+        *cur_add_var_location = *cur_spill_var_location;
+        *cur_spill_var_location = MEMORY;
+        HashMapPut(var_location, cur_handle->self, cur_add_var_location);
+        ListPopBack(active);
+        for (int i = 0; i < ListSize(active); i++) {
+          var_live_interval *iter_active_live_interval = NULL;
+          ListGetAt(active, i, &iter_active_live_interval);
+          if (cur_handle->this_var_total_live_interval->end <
+              iter_active_live_interval->this_var_total_live_interval->end) {
+            ListInsert(active, i, cur_handle);
+            break;
+          }
+        }
+      } else {
+        LOCATION *cur_add_var_location = (LOCATION *)malloc(sizeof(LOCATION));
+        *cur_add_var_location = MEMORY;
+        HashMapPut(var_location, cur_handle->self, cur_add_var_location);
+      }
+    } else {
+      for (int i = 1; i <= REGISTER_NUM; i++) {
+        if (!register_situation[i]) {
+          LOCATION *cur_add_var_location = (LOCATION *)malloc(sizeof(LOCATION));
+          *cur_add_var_location = i;
+          HashMapPut(var_location, cur_handle->self, cur_add_var_location);
+          int j = 0;
+          for (; j < ListSize(active); j++) {
+            var_live_interval *iter_active_live_interval = NULL;
+            ListGetAt(active, j, &iter_active_live_interval);
+            if (cur_handle->this_var_total_live_interval->end <
+                iter_active_live_interval->this_var_total_live_interval->end) {
+              ListInsert(active, j, cur_handle);
+              break;
+            }
+          }
+          if (j == ListSize(active)) ListPushBack(active, cur_handle);
+
+          register_situation[i] = true;
+          break;
+        }
+      }
+    }
+  }
+}
+
+void register_replace(ALGraph *self_cfg, Function *self_func,
+                      HashMap *var_location) {
+  Pair *ptr_pair;
+  HashMapFirst(var_location);
+  while ((ptr_pair = HashMapNext(var_location)) != NULL) {
+    printf("\tvar:%s\taddress:%s\n ", ((Value *)ptr_pair->key)->name,
+           location_string[*((LOCATION *)ptr_pair->value)]);
+  }
+
+  for (int i = 0; i < self_cfg->node_num; i++) {
+    ListFirst((self_cfg->node_set)[i]->bblock_head->inst_list, false);
+    Instruction *element;
+    while (
+        ListNext((self_cfg->node_set)[i]->bblock_head->inst_list, &element)) {
+      for (int j = 0; j < ((User *)element)->num_oprands; j++) {
+        Value *cur_handle = user_get_operand_use((User *)element, j)->Val;
+      }
+
+      if (element->opcode < 19) {
+        if (((Instruction *)element)->opcode < 13) {
+          if (element->opcode == PhiAssignOp) {
+            if (*((LOCATION *)HashMapGet(
+                    var_location,
+                    ((Value *)element)
+                        ->pdata->phi_replace_pdata.phi_replace_value)) ==
+                MEMORY) {
+              // 将当前语句改成store语句
+            } else {
+              ((Value *)element)->name =
+                  strdup(location_string[*((LOCATION *)HashMapGet(
+                      var_location,
+                      ((Value *)element)
+                          ->pdata->phi_replace_pdata.phi_replace_value))]);
+            }
+          } else {
+            free(((Value *)element)->name);
+            ((Value *)element)->name = strdup(location_string[*(
+                (LOCATION *)HashMapGet(var_location, (Value *)element))]);
+          }
+        }
+      }
+    }
+  }
+}
+
+void bblock_to_dom_graph_pass(Function *self) {
+  int num_of_block = self->num_of_block;
+  // // 设置支配树对应图的邻接表头
+  // hashset_init(&(graph_head_set));
+  graph_for_dom_tree = (ALGraph *)malloc(sizeof(ALGraph));
+  graph_for_dom_tree->node_set =
+      (HeadNode **)malloc(num_of_block * sizeof(HeadNode));
+  graph_for_dom_tree->node_num = num_of_block;
+
+  // 设置CFG图的入口基本块表头 并且初始化链表
+  HeadNode *init_headnode = (HeadNode *)malloc(sizeof(HeadNode));
+  init_headnode->bblock_head = self->entry_bblock;
+  init_headnode->is_visited = false;
+  hashset_init(&(init_headnode->edge_list));
+  hashset_init(&(init_headnode->dom_set));
+  hashset_init(&(init_headnode->dom_frontier_set));
+  init_headnode->pre_node_list = NULL;
+
+  bblock_to_dom_graph_dfs_pass(init_headnode, 0);
+  HashMapDeinit(bblock_to_dom_graph_hashmap);
+
+  // 初始化dom_tree树根
+  dom_tree_root = (dom_tree *)malloc(sizeof(dom_tree));
+  dom_tree_root->bblock_node = init_headnode;
+  dom_tree_root->child = ListInit();
+  ListSetClean(dom_tree_root->child, CleanObject);
+
+  // 建立支配关系的函数
+  dom_relation_pass();
+
+  // 插入phi函数
+  insert_phi_func_pass(self);
+
+  printf("\n");
+
+  printf_cur_func_ins(cur_func);
+
+  printf("begin rename pass and delete alloca,store,load instruction!\n");
+
+  rename_pass(cur_func);
+
+  printf("rename pass over\n");
+
+  // 删除alloca store load语句
+  delete_alloca_store_load_ins_pass(cur_func->entry_bblock);
+
+  printf("delete alloca,store,load instruction over\n");
+
+  // 清空哈希表 然后重新初始化供后面使用
+  HashSetDeinit(bblock_pass_hashset);
+  bblock_pass_hashset = NULL;
+  hashset_init(&(bblock_pass_hashset));
+
+  // if (freopen("instruction_list.txt", "w", stdout) == NULL) {
+  //   fprintf(stderr, "打开文件失败！");
+  //   exit(-1);
+  // }
+
+  printf_cur_func_ins(cur_func);
+
+  replace_phi_nodes(dom_tree_root);
+
+  printf("\n\n\n");
+
+  // 打印表的表头信息
+  printf("\t%s\tnumber: %20s \t%25s \t%10s\n", "labelID", "opcode", "name",
+         "use");
+  // 打印当前函数的基本块
+  print_bblock_pass_phi(cur_func->entry_bblock);
+  printf("\n\n");
+
+  // 清空哈希表 然后重新初始化供后面使用
+  HashSetDeinit(bblock_pass_hashset);
+  bblock_pass_hashset = NULL;
+  hashset_init(&(bblock_pass_hashset));
+
+  calculate_live_use_def_by_graph(graph_for_dom_tree);
+
+  calculate_live_in_out(graph_for_dom_tree);
+
+  calculate_live_interval(graph_for_dom_tree, cur_func);
+
+  // <Value*,*LOCATION>
+  HashMap *var_location = HashMapInit();
+  HashMapSetCleanValue(var_location, CleanObject);
+  HashMapSetHash(var_location, HashKeyAddress);
+  HashMapSetCleanKey(var_location, CleanHashSetKey);
+  HashMapSetCompare(var_location, CompareKeyAddress);
+
+  line_scan_register_allocation(graph_for_dom_tree, cur_func, var_location);
+
+  register_replace(graph_for_dom_tree, cur_func, var_location);
 }
