@@ -7,6 +7,8 @@
 
 struct _BasicBlock;
 
+typedef struct _ALGraph ALGraph;  // 声明邻接表
+
 typedef struct _Function {
   // 指向label节点的value 等同于funcLabel节点里所包含的value*
   Value* label;
@@ -18,6 +20,8 @@ typedef struct _Function {
   int num_of_block;
   // 每个变量的活跃区间
   List* all_var_live_interval;
+  // 函数对应的cfg图
+  ALGraph* self_cfg;
 } Function;
 
 void function_init(Function* this);

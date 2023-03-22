@@ -23,7 +23,7 @@ typedef struct _HeadNode {
 } HeadNode;  // 定义头结点
 
 // 邻接表表示法的图
-typedef struct {
+typedef struct _ALGraph {
   HeadNode **node_set;
   // 顶点数目和边的数目
   int node_num, edge_num;

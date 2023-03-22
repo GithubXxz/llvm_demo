@@ -129,7 +129,7 @@ int main() {
   //     exit(-1);
   //   }
 
-  parser(input1);
+  parser(input5);
 
   //   print_ins_pass(ins_list);
   printf("遍历结束\n");

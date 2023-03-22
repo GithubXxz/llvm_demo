@@ -1294,13 +1294,7 @@ void print_ins_pass(List *self) {
     // 打印出每条instruction的res的名字信息
     printf("%9s\t     %d: %20s ", "", ((Instruction *)element)->ins_id,
            op_string[((Instruction *)element)->opcode]);
-    if (((Instruction *)element)->opcode == PhiAssignOp) {
-      printf(
-          "\t%25s ",
-          ((Value *)element)->pdata->phi_replace_pdata.phi_replace_value->name);
-    } else {
-      printf("\t%25s ", ((Value *)element)->name);
-    }
+    printf("\t%25s ", ((Value *)element)->name);
 
     if (((Instruction *)element)->opcode == PhiFuncOp) {
       printf("\tsize: %d ",
@@ -1715,6 +1709,7 @@ void bblock_to_dom_graph_pass(Function *self) {
   graph_for_dom_tree->node_set =
       (HeadNode **)malloc(num_of_block * sizeof(HeadNode));
   graph_for_dom_tree->node_num = num_of_block;
+  self->self_cfg = graph_for_dom_tree;
 
   // 设置CFG图的入口基本块表头 并且初始化链表
   HeadNode *init_headnode = (HeadNode *)malloc(sizeof(HeadNode));
