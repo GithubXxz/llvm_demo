@@ -29,27 +29,6 @@ typedef struct {
   int node_num, edge_num;
 } ALGraph;  // 定义邻接表
 
-typedef struct _dom_tree {
-  List *child;
-  HeadNode *bblock_node;  // 分管的basicblock
-} dom_tree;
-
-typedef struct _copy_pair {
-  Value *src;
-  Value *dest;
-} copy_pair;
-
-typedef struct _live_interval {
-  unsigned begin;
-  unsigned end;
-} live_interval;
-
-typedef struct _var_live_interval {
-  Value *self;
-  List *this_var_discrete_live_interval;
-  live_interval *this_var_total_live_interval;
-} var_live_interval;
-
 void print_ins_pass(List *self);
 void ins_toBBlock_pass(List *self);
 void delete_return_deadcode_pass(List *self);
@@ -57,8 +36,5 @@ void print_bblock_pass(BasicBlock *self);
 void bblock_to_dom_graph_pass(Function *self);
 void print_bblock_pass_temp(BasicBlock *self);
 void delete_alloca_store_load_ins_pass(BasicBlock *self);
-
-void print_bblock_pass_phi(BasicBlock *self);
-void print_ins_pass_phi(List *self);
 
 #endif

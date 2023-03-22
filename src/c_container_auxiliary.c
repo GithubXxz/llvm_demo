@@ -69,6 +69,13 @@ void hashset_init(HashSet** self) {
   HashSetSetCleanKey(*self, CleanHashSetKey);
 }
 
+void hashset_init_string(HashSet** self) {
+  *self = HashSetInit();
+  HashSetSetHash(*self, HashKey);
+  HashSetSetCompare(*self, CompareKey);
+  HashSetSetCleanKey(*self, CleanHashMapKey);
+}
+
 void hashmap_init(HashMap** self) {
   *self = HashMapInit();
   HashMapSetHash(*self, HashKey);

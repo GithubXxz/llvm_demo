@@ -19,10 +19,6 @@ Value *return_val = NULL;
 
 ast *pre_astnode = NULL;
 
-BasicBlock *cur_bblock = NULL;
-
-Function *cur_func = NULL;
-
 int yyparse(void);
 
 int parser(char *input);
@@ -133,7 +129,7 @@ int main() {
   //     exit(-1);
   //   }
 
-  parser(input6);
+  parser(input1);
 
   //   print_ins_pass(ins_list);
   printf("遍历结束\n");
@@ -149,7 +145,11 @@ int main() {
 
   ins_toBBlock_pass(ins_list);
 
-  bblock_to_dom_graph_pass(cur_func);
+  ListFirst(func_list, false);
+  void *element;
+  while (ListNext(func_list, &element)) {
+    bblock_to_dom_graph_pass((Function *)element);
+  }
 
   //   ListDeinit(ins_list);
 

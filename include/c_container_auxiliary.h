@@ -31,6 +31,8 @@ void clear_list_nullptr(List* self);
 
 void hashset_init(HashSet** self);
 
+void hashset_init_string(HashSet** self);
+
 void hashmap_init(HashMap** self);
 
 #endif
