@@ -35,6 +35,6 @@ void delete_return_deadcode_pass(List *self);
 void print_bblock_pass(BasicBlock *self);
 void bblock_to_dom_graph_pass(Function *self);
 void print_bblock_pass_temp(BasicBlock *self);
-void delete_alloca_store_load_ins_pass(BasicBlock *self);
+void delete_alloca_store_load_ins_pass(ALGraph *self);
 
 #endif

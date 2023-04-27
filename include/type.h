@@ -23,6 +23,7 @@ typedef enum _TypeID {
   ParamTyID,
   FuncLabelTyID,  ///< func entry
   PhiFuncTyID,
+  ArrayTyID,  ///< Arrays
 
   // PrimitiveTypes
   HalfTyID,       ///< 16-bit floating point type
@@ -39,7 +40,6 @@ typedef enum _TypeID {
 
   // Derived types... see DerivedTypes.h file.
   FunctionTyID,  ///< Functions
-  ArrayTyID,     ///< Arrays
 
   // 常量
 

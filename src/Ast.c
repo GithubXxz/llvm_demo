@@ -28,7 +28,10 @@ static int label_var_seed = 1;   // 用于标识label的名字
 static int label_func_seed = 1;  // 用于表示func_label的名字
 static int param_seed = 1;       // 用于表示函数参数的变量名
 static int point_seed = 1;       // 用于表示指针变量名 用于alloca
+static int array_seed = 1;       // 用于表示数组变量名 用于alloca
 static int num_of_param = 0;     // 用于标识函数参数的个数
+static int total_array_member = 1;
+static List *array_list = NULL;
 
 // 判断当前if是否含有else
 bool have_else = false;
@@ -404,9 +407,9 @@ Value *post_eval(ast *a, Value *left, Value *right) {
     // 并且修改 NowVarDecType
     if (!strcmp(a->name, "TYPE")) {
       if (!strcmp(pre_astnode->name, "Specifire")) {
-        if (!strcmp(a->idtype, NowVarDecStr[1]))
+        if (!strcmp(a->idtype, NowVarDecStr[1])) {
           nowVarDecType = NowInt;
-        else if (!strcmp(a->idtype, NowVarDecStr[2]))
+        } else if (!strcmp(a->idtype, NowVarDecStr[2]))
           nowVarDecType = NowFloat;
         else if (!strcmp(a->idtype, NowVarDecStr[3]))
           nowVarDecType = NowStruct;
@@ -417,44 +420,78 @@ Value *post_eval(ast *a, Value *left, Value *right) {
     // 判断父节点是不是变量声明 如果是 则创建一个该变量对应的value并返回
     if (!strcmp(pre_astnode->name, "VarDec")) {
       if (!strcmp(a->name, "ID")) {
-        // 在内存中为变量分配空间
-        Value *cur_var = (Value *)malloc(sizeof(Value));
-        value_init(cur_var);
-        // 添加变量类型
-        cur_var->VTy->TID = (int)nowVarDecType;
-        // 添加变量的名字
-        cur_var->name = strdup(a->idtype);
+        // allocate for array
+        if (pre_astnode->r && !strcmp(pre_astnode->r->name, "LB")) {
+          // 给指针变量命名
+          char temp_str[15];
+          char text[10];
+          sprintf(text, "%d", array_seed);
+          ++array_seed;
+          strcpy(temp_str, "\%array");
+          strcat(temp_str, text);
 
-        // 给指针变量命名
-        char temp_str[15];
-        char text[10];
-        sprintf(text, "%d", point_seed);
-        ++point_seed;
-        strcpy(temp_str, "\%point");
-        strcat(temp_str, text);
+          // 创建指针
+          Value *cur_ins = (Value *)ins_new_no_operator_v2(AllocateOP);
+          // 添加变量类型
+          cur_ins->VTy->TID = ArrayTyID;
+          // 添加指针的名字 映射进哈希表 放入symbol_tabel里面 用于索引
+          cur_ins->name = strdup(temp_str);
 
-        // 创建指针
-        Value *cur_ins = (Value *)ins_new_no_operator_v2(AllocateOP);
-        // 添加变量类型
-        cur_ins->VTy->TID = PointerTyID;
-        // 添加指针的名字 映射进哈希表 放入symbol_tabel里面 用于索引
-        cur_ins->name = strdup(temp_str);
-        // 设定allocate语句的指针所指向的value*
-        cur_ins->pdata->allocate_pdata.point_value = cur_var;
+          array_list = ListInit();
+          ListSetClean(array_list, CleanObject);
 
-        printf("%s = alloca %s,align 4\n", temp_str,
-               NowVarDecStr[nowVarDecType]);
+          printf("%s = alloca %s array,align 4\n", temp_str,
+                 NowVarDecStr[nowVarDecType]);
 
-        ListPushBack(ins_list, cur_ins);
+          ListPushBack(ins_list, cur_ins);
 
-        char *var_name = strdup(a->idtype);
-        // 将变量加入符号表
-        HashMapPut(cur_symboltable->symbol_map, var_name, cur_ins);
-        // 返回指针
-        return cur_ins;
+          char *var_name = strdup(a->idtype);
+          // 将变量加入符号表
+          HashMapPut(cur_symboltable->symbol_map, var_name, cur_ins);
+          // 返回指针
+          return cur_ins;
+        } else {
+          // 在内存中为变量分配空间
+          Value *cur_var = (Value *)malloc(sizeof(Value));
+          value_init(cur_var);
+          // 添加变量类型
+          cur_var->VTy->TID = (int)nowVarDecType;
+          // 添加变量的名字
+          cur_var->name = strdup(a->idtype);
 
+          // 给指针变量命名
+          char temp_str[15];
+          char text[10];
+          sprintf(text, "%d", point_seed);
+          ++point_seed;
+          strcpy(temp_str, "\%point");
+          strcat(temp_str, text);
+
+          // 创建指针
+          Value *cur_ins = (Value *)ins_new_no_operator_v2(AllocateOP);
+          // 添加变量类型
+          cur_ins->VTy->TID = PointerTyID;
+          // 添加指针的名字 映射进哈希表 放入symbol_tabel里面 用于索引
+          cur_ins->name = strdup(temp_str);
+          // 设定allocate语句的指针所指向的value*
+          cur_ins->pdata->allocate_pdata.point_value = cur_var;
+
+          printf("%s = alloca %s,align 4\n", temp_str,
+                 NowVarDecStr[nowVarDecType]);
+
+          ListPushBack(ins_list, cur_ins);
+
+          char *var_name = strdup(a->idtype);
+          // 将变量加入符号表
+          HashMapPut(cur_symboltable->symbol_map, var_name, cur_ins);
+          // 返回指针
+          return cur_ins;
+        }
       } else if  // 变量声明的时候同时初始化
           (!strcmp(a->name, "ASSIGNOP")) {
+        return right;
+      } else if  // 变量声明的时候同时初始化
+          (!strcmp(a->name, "LB")) {
         return right;
       }
     }
@@ -479,31 +516,34 @@ Value *post_eval(ast *a, Value *left, Value *right) {
           pre_symboltable = pre_symboltable->father;
           assert(pre_symboltable || load_var_pointer);
         };
+        if (load_var_pointer->VTy->TID == ArrayTyID) {
+          return load_var_pointer;
+        } else {
+          // 给引用变量命名
+          char temp_str[15];
+          char text[10];
+          sprintf(text, "%d", temp_var_seed);
+          ++temp_var_seed;
+          strcpy(temp_str, "\%temp");
+          strcat(temp_str, text);
 
-        // 给引用变量命名
-        char temp_str[15];
-        char text[10];
-        sprintf(text, "%d", temp_var_seed);
-        ++temp_var_seed;
-        strcpy(temp_str, "\%temp");
-        strcat(temp_str, text);
+          // 内容与指针所指向的pdata完全一样 名字不一样 占用的内存地址也不一样
+          Value *load_ins =
+              (Value *)ins_new_single_operator_v2(LoadOP, load_var_pointer);
+          load_ins->name = strdup(temp_str);
+          // 将内容拷贝
+          value_copy(load_ins,
+                     load_var_pointer->pdata->allocate_pdata.point_value);
 
-        // 内容与指针所指向的pdata完全一样 名字不一样 占用的内存地址也不一样
-        Value *load_ins =
-            (Value *)ins_new_single_operator_v2(LoadOP, load_var_pointer);
-        load_ins->name = strdup(temp_str);
-        // 将内容拷贝
-        value_copy(load_ins,
-                   load_var_pointer->pdata->allocate_pdata.point_value);
+          ListPushBack(ins_list, (void *)load_ins);
 
-        ListPushBack(ins_list, (void *)load_ins);
+          printf("%s = load %s, %s,align 4\n", temp_str,
+                 NowVarDecStr[load_ins->VTy->TID < 4 ? load_ins->VTy->TID
+                                                     : load_ins->VTy->TID - 4],
+                 load_var_pointer->name);
 
-        printf("%s = load %s, %s,align 4\n", temp_str,
-               NowVarDecStr[load_ins->VTy->TID < 4 ? load_ins->VTy->TID
-                                                   : load_ins->VTy->TID - 4],
-               load_var_pointer->name);
-
-        return load_ins;
+          return load_ins;
+        }
       } else if (!strcmp(a->name, "ID") && pre_astnode->r &&
                  !strcmp(pre_astnode->r->name, "ASSIGNOP")) {
         // 被赋值变量的名字
@@ -551,7 +591,8 @@ Value *post_eval(ast *a, Value *left, Value *right) {
                !strcmp(a->name, "ASSIGNOP") || !strcmp(a->name, "EQUAL") ||
                !strcmp(a->name, "NOTEQUAL") || !strcmp(a->name, "GREAT") ||
                !strcmp(a->name, "GREATEQUAL") ||
-               !strcmp(a->name, "LESSEQUAL") || !strcmp(a->name, "LESS")) {
+               !strcmp(a->name, "LESSEQUAL") || !strcmp(a->name, "LESS") ||
+               !strcmp(a->name, "LB")) {
         // 返回当前节点的右节点
         return right;
       } else if (!strcmp(a->name, "Stmt")) {
@@ -584,20 +625,57 @@ Value *post_eval(ast *a, Value *left, Value *right) {
     // 判断当前节点是否是变量声明 如果是则生成一条声明变量的instruction
     if (!strcmp(a->name, "VarDec")) {
       char *var_name = strdup(left->name);
-      if (right == NULL) {
-        return NULL;
-      } else {
-        if (a->r && !strcmp(a->r->name, "ASSIGNOP")) {
-          // 把right存给left left是赋值号左边操作数的地址
-          Value *store_ins =
-              (Value *)ins_new_binary_operator_v2(StoreOP, left, right);
-          ListPushBack(ins_list, (void *)store_ins);
-          printf("store %s %s, %s,align 4\n",
-                 NowVarDecStr[right->VTy->TID < 4 ? right->VTy->TID
-                                                  : right->VTy->TID - 4],
-                 right->name, var_name);
+      if (left->VTy->TID != ArrayTyID) {
+        if (right == NULL) {
           return NULL;
+        } else {
+          if (a->r && !strcmp(a->r->name, "ASSIGNOP")) {
+            // 把right存给left left是赋值号左边操作数的地址
+            Value *store_ins =
+                (Value *)ins_new_binary_operator_v2(StoreOP, left, right);
+            ListPushBack(ins_list, (void *)store_ins);
+            printf("store %s %s, %s,align 4\n",
+                   NowVarDecStr[right->VTy->TID < 4 ? right->VTy->TID
+                                                    : right->VTy->TID - 4],
+                   right->name, var_name);
+            return NULL;
+          }
         }
+      } else {
+        // init the array
+        if (a->r && !strcmp(a->r->name, "LB")) {
+          total_array_member *= right->pdata->var_pdata.iVal;
+          // printf("total array member multiple %d\n",
+          //        right->pdata->var_pdata.iVal);
+          ListPushBack(array_list,
+                       (void *)(intptr_t)(right->pdata->var_pdata.iVal));
+        } else if (a->r && !strcmp(a->r->name, "ASSIGNOP")) {
+        } else {
+          // printf("%s have %d members\n", left->name, total_array_member);
+          left->pdata->array_pdata.list_para = array_list;
+          left->pdata->array_pdata.total_member = total_array_member;
+          left->pdata->array_pdata.array_value =
+              malloc(sizeof(Value) * total_array_member);
+          for (int ii = 0; ii < total_array_member; ii++) {
+            // 在内存中为变量分配空间
+            Value *cur_var = (Value *)malloc(sizeof(Value));
+            value_init(cur_var);
+            // 添加变量类型
+            cur_var->VTy->TID = (int)nowVarDecType;
+
+            // 创建指针
+            Value *cur_ins = &(left->pdata->array_pdata.array_value[ii]);
+            value_init(cur_ins);
+            cur_ins->name = strdup("array_memeber");
+            // 添加变量类型
+            cur_ins->VTy->TID = PointerTyID;
+            // 设定allocate语句的指针所指向的value*
+            cur_ins->pdata->allocate_pdata.point_value = cur_var;
+          }
+          total_array_member = 1;
+          array_list = NULL;
+        }
+        return left;
       }
     }
 
@@ -607,9 +685,6 @@ Value *post_eval(ast *a, Value *left, Value *right) {
       if (left) {
         var_name = left->name;
       }
-      // else {
-      //   printf("left name is null\n");
-      // }
 
       if (right == NULL) {
         return left;
@@ -624,6 +699,82 @@ Value *post_eval(ast *a, Value *left, Value *right) {
                right->name, left->name);
         // TODO 返回值是什么有待考虑
         return right;
+      } else if (!strcmp(a->r->name, "LB")) {
+        // oprand the array
+        char temp_str[15];
+        char text[10];
+        sprintf(text, "%d", temp_var_seed);
+        ++temp_var_seed;
+        strcpy(temp_str, "\%temp");
+        strcat(temp_str, text);
+        Value *cur_ins =
+            (Value *)ins_new_binary_operator_v2(GetelementptrOP, left, right);
+        // 将数组的信息拷贝一份
+        cur_ins->name = strdup(temp_str);
+        cur_ins->VTy->TID = ArrayTyID;
+        cur_ins->pdata->array_pdata.array_value =
+            left->pdata->array_pdata.array_value;
+        cur_ins->pdata->array_pdata.list_para = ListInit();
+        ListSetClean(cur_ins->pdata->array_pdata.list_para, CleanObject);
+        list_copy(cur_ins->pdata->array_pdata.list_para,
+                  left->pdata->array_pdata.list_para);
+        cur_ins->pdata->array_pdata.total_member =
+            left->pdata->array_pdata.total_member;
+        void *element;
+        ListGetFront(cur_ins->pdata->array_pdata.list_para, &element);
+        ListPopFront(cur_ins->pdata->array_pdata.list_para);
+        cur_ins->pdata->array_pdata.total_member /= (int)(element);
+        left->pdata->array_pdata.step_long =
+            cur_ins->pdata->array_pdata.total_member;
+        char para_buffer[50];
+        memset(para_buffer, 0, sizeof(para_buffer));
+        ListFirst(left->pdata->array_pdata.list_para, false);
+
+        while (ListNext(left->pdata->array_pdata.list_para, &element) != NULL) {
+          char text[10];
+          sprintf(text, "[%d x ", (int)element);
+          strcat(para_buffer, text);
+        }
+        strcat(para_buffer, "i32");
+        for (int ii = 0; ii < ListSize(left->pdata->array_pdata.list_para);
+             ii++) {
+          strcat(para_buffer, "]");
+        }
+        printf(
+            "%s = getelementptr inbounds %s, %s"
+            " * %s, i32 0, i32 %s, !dbg !24\n",
+            cur_ins->name, para_buffer, para_buffer, left->name, right->name);
+        ListPushBack(ins_list, cur_ins);
+        if (ListSize(cur_ins->pdata->array_pdata.list_para) == 0 &&
+            (pre_astnode->r ? strcmp(pre_astnode->r->name, "ASSIGNOP")
+                            : true)) {
+          // 链表为空 代表数组退化为普通的指针
+          // 如果不是对数组里面的成员赋值则要把内容load出来使用
+          char temp_str[15];
+          char text[10];
+          sprintf(text, "%d", temp_var_seed);
+          ++temp_var_seed;
+          strcpy(temp_str, "\%temp");
+          strcat(temp_str, text);
+          // cur_ins->VTy->TID = PointerTyID;
+          // 内容与指针所指向的pdata完全一样 名字不一样 占用的内存地址也不一样
+          Value *load_ins =
+              (Value *)ins_new_single_operator_v2(LoadOP, cur_ins);
+          load_ins->name = strdup(temp_str);
+          // 将内容拷贝
+          value_copy(load_ins, cur_ins->pdata->array_pdata.array_value[0]
+                                   .pdata->allocate_pdata.point_value);
+
+          ListPushBack(ins_list, (void *)load_ins);
+
+          printf("%s = load %s, %s,align 4\n", temp_str,
+                 NowVarDecStr[load_ins->VTy->TID < 4 ? load_ins->VTy->TID
+                                                     : load_ins->VTy->TID - 4],
+                 cur_ins->name);
+
+          return load_ins;
+        }
+        return cur_ins;
       } else {
         char temp_str[15];
         char text[10];
@@ -687,10 +838,10 @@ Value *post_eval(ast *a, Value *left, Value *right) {
           printf("%s = icmp <= %s %s, %s\n", cur_ins->name, oprand_type,
                  left->name, right->name);
         }
-
         ListPushBack(ins_list, (void *)cur_ins);
         return cur_ins;
       }
+      return left;
     }
 
     if (!strcmp(a->name, "assistFuncCall")) {

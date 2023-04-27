@@ -63,6 +63,17 @@ typedef union _PData {
     Value *phi_replace_value;
   } phi_replace_pdata;
 
+  struct {
+    // 指针
+    Value *array_value;
+    // 链表 各层数组的元素个数
+    List *list_para;
+    // 成员数量
+    int total_member;
+    // 步长
+    int step_long;
+  } array_pdata;
+
 } PData;
 
 struct _Value {

@@ -5,6 +5,8 @@
 #ifndef INSTRUCTION_H
 #define INSTRUCTION_H
 
+#define TWO_OPRANDS_INS 14
+
 typedef enum _TAC_OP {
   DefaultOP,
   AddOP,
@@ -19,7 +21,8 @@ typedef enum _TAC_OP {
   LessEqualOP,
   AssignOP,
   PhiAssignOp,
-  // 13
+  GetelementptrOP,
+  // 14
   ReturnOP,
   AllocateOP,
   LoadOP,

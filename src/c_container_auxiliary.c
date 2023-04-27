@@ -84,6 +84,22 @@ void hashmap_init(HashMap** self) {
   HashMapSetCleanValue(*self, CleanValue);
 }
 
+void hashmap_init_address(HashMap** self) {
+  *self = HashMapInit();
+  HashMapSetHash(*self, HashKeyAddress);
+  HashMapSetCompare(*self, CompareKeyAddress);
+  HashMapSetCleanKey(*self, CleanHashSetKey);
+  HashMapSetCleanValue(*self, CleanValue);
+}
+
+void list_copy(List* dest, List* src) {
+  void* element;
+  ListFirst(src, false);
+  while (ListNext(src, &element) != NULL) {
+    ListPushBack(dest, element);
+  }
+}
+
 void AllInit() {
   // 初始化指令链表
   ins_list = ListInit();

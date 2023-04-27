@@ -22,7 +22,7 @@ double d;
 %token <a> GREAT GREATEQUAL LESS LESSEQUAL NOTEQUAL EQUAL 
 %token <a> PLUS MINUS STAR DIV AND OR DOT NOT LP RP LB RB LC RC AERROR
 %token <a> EOL
-%type  <a> Program ExtDefList ExtDef ExtDecList Specifire StructSpecifire TACList TAC
+%type  <a> Program ExtDefList ExtDef ExtDecList Specifire StructSpecifire TACList TAC InitList
 OptTag  Tag VarDec  FunDec VarList ParamDec Compst StmtList Stmt DefList Def DecList Dec Exp Args 
 
 
@@ -41,12 +41,11 @@ OptTag  Tag VarDec  FunDec VarList ParamDec Compst StmtList Stmt DefList Def Dec
 Program:|ExtDefList {
     $$=newast("Program",1,$1);
     
-    // eval_print($$,0);    
+    eval_print($$,0);    
 
     // printf("\nprint over\n");
 
     eval($$);
-
 }        
     ;
 ExtDefList:ExtDef ExtDefList {$$=newast("ExtDefList",2,$1,$2);}
@@ -104,9 +103,10 @@ Tag:ID {$$=newast("Tag",1,$1);}
 
 /*Declarators*/
 //变量的声明
-//格式：a a[10]
+//格式：a a[10] a[]
 VarDec:ID {$$=newast("VarDec",1,$1);}
-	| VarDec LB INTEGER RB {$$=newast("VarDec",4,$1,$2,$3,$4);}
+	| VarDec LB Exp RB {$$=newast("VarDec",3,$1,$2,$3);}
+	| VarDec LB RB {$$=newast("VarDec",2,$1,$2);}
 	;
 //函数的声明
 //格式： main(int a,int b)
@@ -183,8 +183,8 @@ DefList:Def DefList{$$=newast("DefList",2,$1,$2);}
 Def:Specifire DecList SEMI {$$=newast("Def",2,$1,$2);}
 	;
 //格式: a = m+n , b, c
-DecList:Dec {$$=newast("DecList",1,$1);}
-	|Dec COMMA DecList {$$=newast("DecList",2,$1,$3);}
+DecList:Dec COMMA DecList {$$=newast("DecList",2,$1,$3);}
+    |Dec {$$=newast("DecList",1,$1);}
 	;
 // ASSIGNOP是等号
 // VarDec 表示标识符或者数组 a、a[10]
@@ -192,7 +192,12 @@ DecList:Dec {$$=newast("DecList",1,$1);}
 // a =10; a=b+c;
 Dec:VarDec {$$=newast("Dec",1,$1);}
 	|VarDec ASSIGNOP Exp {$$=newast("Dec",3,$1,$2,$3);}
+	|VarDec ASSIGNOP InitList {$$=newast("Dec",3,$1,$2,$3);}
 	;
+
+InitList:InitList COMMA InitList {$$=newast("InitList",3,$1,$2,$3);}
+    | LC InitList COMMA InitList RC  {$$=newast("InitList",2,$2,$4);}
+    | Exp  {$$=newast("InitList",1,$1);}
 
 /*Expressions*/
 Exp:Exp ASSIGNOP Exp{$$=newast("Exp",3,$1,$2,$3);} // Exp = Exp

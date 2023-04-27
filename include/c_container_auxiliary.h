@@ -35,4 +35,5 @@ void hashset_init_string(HashSet** self);
 
 void hashmap_init(HashMap** self);
 
+void list_copy(List* dest, List* src);
 #endif

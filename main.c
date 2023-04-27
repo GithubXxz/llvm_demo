@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
 
 #include "Ast.h"
 #include "Pass.h"
@@ -23,7 +24,12 @@ int yyparse(void);
 
 int parser(char *input);
 
+char *tty_path;
+
 int main() {
+  // 获取当前进程所在的终端设备路径
+  tty_path = ttyname(STDIN_FILENO);
+
   AllInit();
 
   printf("开始遍历\n");
@@ -33,115 +39,48 @@ int main() {
   return_val->name = strdup("return_val");
   return_val->VTy->TID = DefaultTyID;
 
-  // if嵌套的例子
-  char *input1 =
-      "int main() {"
-      "  int a;"
-      "  int b;"
-      "  int c;"
-      "  a = 5;"
-      "  b = 10;"
-      "  if (a == 5) {"
-      "    a = 30;"
-      "    b = 40;"
-      "    c = a + b;"
-      "    if (b == 20) {"
-      "      c = 19;"
-      "      a = 233;"
-      "    }"
-      "    a = 156;"
-      "  } else {"
-      "    a = 100;"
-      "    b = 200;"
-      "    c = 120 + a;"
-      "  }"
-      "  int m = 30, n = 23;"
-      "  return a;"
+  char *multi_add =
+      "int multi_add() {"
+      "int a = 1;"
+      "int b = 2;"
+      "int c = 3;"
+      "int d = 4;"
+      "int e = 5;"
+      "int f = a + b + c + d + e;"
       "}";
 
-  char *input2 =
+  // 多维度数组
+  char *multidimensional_arrays =
       "int main() {"
-      "  int a = 10;"
-      "  if (a == 10) {"
-      "    a = 20;"
-      "    if (a == 20) {"
-      "      a = 30;"
-      "    }"
-      "  int b = a;"
-      "  }"
-      "  return 0;"
+      "  int b = 10;"
+      "  int m = b + 10;"
+      "  int c = 233,arr[10][20][30];"
+      "  arr[3][5][m] = 100;"
+      "  int d = arr[3][5][b];"
+      "  return d;"
       "}";
 
-  char *input3 =
-      "int main() {"
-      "  int a,b =10;"
-      "  int c;"
-      "  a = 10 + 15;"
-      "  c = a + b + 3;"
-      "}";
+  if (freopen("printf_ast.txt", "w", stdout) == NULL) {
+    fprintf(stderr, "打开文件失败！");
+    exit(-1);
+  }
 
-  char *input4 =
-      "int main() {"
-      "  int b,a;"
-      "  b = 15;"
-      "  if (b == 10) {"
-      "    a = 333;"
-      "  } else {"
-      "    a = 444;"
-      "  }"
-      "  b = a;"
-      "  return b;"
-      "}";
+  parser(multidimensional_arrays);
 
-  char *input5 =
-      "int main() {"
-      "  int a, b;"
-      "  a = 10;"
-      "  b = 120;"
-      "  while (a < 5) {"
-      "    a = a - 1;"
-      "    if (b < 70) {"
-      "      b = 100;"
-      "      continue;"
-      "    } else {"
-      "      b = b -10;"
-      "      break;"
-      "    }"
-      "  }"
-      "  return b;"
-      "}";
+  // 重定向输出回终端
+  if (freopen(tty_path, "w", stdout) == NULL) {
+    fprintf(stderr, "打开文件失败！");
+    exit(-1);
+  }
 
-  char *input6 =
-      "int main() {"
-      "  int a = 10;"
-      "  int b = 111;"
-      "  int c = 222;"
-      "  while (a > 5) {"
-      "    int d = b;"
-      "    b = c;"
-      "    c = d;"
-      "  }"
-      "  return c;"
-      "}";
+  // print_ins_pass(ins_list);
 
-  //   if (freopen("printf_ast.txt", "w", stdout) == NULL) {
-  //     fprintf(stderr, "打开文件失败！");
-  //     exit(-1);
-  //   }
+  if (freopen("out.txt", "w", stdout) == NULL) {
+    fprintf(stderr, "打开文件失败！");
+    exit(-1);
+  }
 
-  parser(input5);
-
-  //   print_ins_pass(ins_list);
-  printf("遍历结束\n");
-
-  //   if (freopen("out.txt", "w", stdout) == NULL) {
-  //     fprintf(stderr, "打开文件失败！");
-  //     exit(-1);
-  //   }
-  // 清除return语句和label或者functionEnd之间语句之间的不可达语句的pass
-  print_ins_pass(ins_list);
-  printf("\n");
-  //   delete_return_deadcode_pass(ins_list);
+  // delete_return_deadcode_pass(ins_list);
 
   ins_toBBlock_pass(ins_list);
 
@@ -151,10 +90,7 @@ int main() {
     bblock_to_dom_graph_pass((Function *)element);
   }
 
-  //   ListDeinit(ins_list);
-
-  //   use_relation_test();
-
+  free(tty_path);
   printf("All over!\n");
 
   return 0;
