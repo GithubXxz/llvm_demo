@@ -8,7 +8,7 @@ void type_init(Type **this_addr) {
   Type *this = *this_addr;
   this = (Type *)malloc(sizeof(Type));
   printf("OX%p\n", this);
-  this->TID = DefaultTyID;
+  this->TID = VoidTyID;
   this->NumContainedTys = 1;
 }
 

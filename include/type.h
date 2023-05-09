@@ -8,7 +8,7 @@
 
 typedef enum _TypeID {
   // 默认值
-  DefaultTyID = 0,
+  VoidTyID = 0,
   IntegerTyID,         ///< int a;
   FloatTyID,           ///< float b;
   StructTyID,          ///< Structures
@@ -32,7 +32,6 @@ typedef enum _TypeID {
   X86_FP80TyID,   ///< 80-bit floating point type (X87)
   FP128TyID,      ///< 128-bit floating point type (112-bit significand)
   PPC_FP128TyID,  ///< 128-bit floating point type (two 64-bits, PowerPC)
-  VoidTyID,       ///< type with no size
   MetadataTyID,   ///< Metadata
   X86_MMXTyID,    ///< MMX vectors (64 bits, X86 specific)
   X86_AMXTyID,    ///< AMX vectors (8192 bits, X86 specific)

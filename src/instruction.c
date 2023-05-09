@@ -45,7 +45,7 @@ Instruction *ins_new_binary_operator(Value *self, TAC_OP Op, Value *S1,
 }
 
 TypeID ins_res_type(Value *left, Value *right) {
-  TypeID type_id = DefaultTyID;
+  TypeID type_id = VoidTyID;
   TypeID s1_type = left->VTy->TID;
   TypeID s2_type = right->VTy->TID;
   if ((s1_type == IntegerTyID || s1_type == ImmediateIntTyID) &&
@@ -132,7 +132,7 @@ Instruction *ins_new_binary_operator_v2(TAC_OP Op, Value *S1, Value *S2) {
 void phi_node_copy(TAC_OP Op, Value *res, Value *S1) {}
 
 TypeID ins_res_type_v2(Value *left, Value *right) {
-  TypeID type_id = DefaultTyID;
+  TypeID type_id = VoidTyID;
   TypeID s1_type = left->VTy->TID;
   TypeID s2_type = right->VTy->TID;
   if ((s1_type == IntegerTyID || s1_type == ImmediateIntTyID) &&
@@ -252,7 +252,7 @@ void use_relation_test() {
 
 // zzq
 // Instruction *ins_new_binary_operator(char Op, Value *S1, Value *S2) {
-//   TypeID type_id = DefaultTyID;
+//   TypeID type_id = VoidTyID;
 //   void *pdata = NULL;
 
 //   if ((S1->VTy->TID == IntegerTyID || S1->VTy->TID == ConstIntTyID) &&

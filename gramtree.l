@@ -18,7 +18,7 @@ int yyparse(void);
 */
 
 %option yylineno
-TYPE int|float
+TYPE int|float|void
 STRUCT struct
 RETURN return
 IF if
@@ -60,6 +60,7 @@ AERROR .
 
 "int"            {yylval.a=newast("TYPE",0,yylineno);return TYPE;}
 "float"          {yylval.a=newast("TYPE",0,yylineno);return TYPE;}
+"void"           {yylval.a=newast("TYPE",0,yylineno);return TYPE;}
 "struct"         {yylval.a=newast("STRUCT",0,yylineno);return STRUCT;}
 {RETURN}         {yylval.a=newast("RETURN",0,yylineno); return RETURN;}
 {IF}             {yylval.a=newast("IF",0,yylineno);return IF;}

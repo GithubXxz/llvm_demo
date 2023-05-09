@@ -16,7 +16,29 @@ struct _Use;
 
 typedef struct _Value Value;
 
-typedef union _PData {
+typedef union _PData PData;
+
+struct _Value {
+  Type *VTy;
+
+  struct _Use *use_list;
+
+  PData *pdata;
+
+  char *name;
+
+  unsigned char HasValueHandle : 1;  // Has a ValueHandle pointing to this?
+
+  unsigned NumUserOperands : NumUserOperandsBits;  // 用于指示被多少个user调用
+
+  // Use the same type as the bitfield above so that MSVC will pack them.
+  unsigned IsUsedByMD : 1;
+  unsigned HasName : 1;
+  unsigned IsInitArgs : 1;      // is cur ins the func param init?
+  unsigned HasHungOffUses : 1;  // 用于指示有多少个操作数
+};
+
+union _PData {
   // 跳转的目的地 跳转的条件放在use里
   struct {
     Value *goto_location;  // 无条件跳转位置
@@ -41,6 +63,9 @@ typedef union _PData {
     int param_num;  // 传入参数的个数
 
   } symtab_func_pdata;
+  struct {
+    char *name;
+  } func_call_pdata;
 
   struct {
     Value *param_value;  // 函数参数
@@ -64,6 +89,10 @@ typedef union _PData {
   } phi_replace_pdata;
 
   struct {
+    int the_param_index;
+  } param_init_pdata;
+
+  struct {
     // 指针
     Value *array_value;
     // 链表 各层数组的元素个数
@@ -73,27 +102,6 @@ typedef union _PData {
     // 步长
     int step_long;
   } array_pdata;
-
-} PData;
-
-struct _Value {
-  Type *VTy;
-
-  struct _Use *use_list;
-
-  PData *pdata;
-
-  char *name;
-
-  unsigned char HasValueHandle : 1;  // Has a ValueHandle pointing to this?
-
-  unsigned NumUserOperands : NumUserOperandsBits;  // 用于指示被多少个user调用
-
-  // Use the same type as the bitfield above so that MSVC will pack them.
-  unsigned IsUsedByMD : 1;
-  unsigned HasName : 1;
-  unsigned HasMetadata : 1;     // Has metadata attached to this?
-  unsigned HasHungOffUses : 1;  // 用于指示有多少个操作数
 };
 
 void value_init(Value *this);

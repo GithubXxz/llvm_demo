@@ -34,30 +34,17 @@ int main() {
 
   printf("开始遍历\n");
 
-  return_val = (Value *)malloc(sizeof(Value));
-  value_init(return_val);
-  return_val->name = strdup("return_val");
-  return_val->VTy->TID = DefaultTyID;
-
-  char *multi_add =
-      "int multi_add() {"
-      "int a = 1;"
-      "int b = 2;"
-      "int c = 3;"
-      "int d = 4;"
-      "int e = 5;"
-      "int f = a + b + c + d + e;"
-      "}";
-
-  // 多维度数组
-  char *multidimensional_arrays =
-      "int main() {"
-      "  int b = 10;"
-      "  int m = b + 10;"
-      "  int c = 233,arr[10][20][30];"
-      "  arr[3][5][m] = 100;"
-      "  int d = arr[3][5][b];"
-      "  return d;"
+  char *func_call =
+      "int add(int a, int b) {"
+      "a = 10;"
+      "int c = a + b;"
+      "return c;"
+      "}"
+      "void main() {"
+      "int a = 10;"
+      "int b = 20;"
+      "int c = add(add(a,b), b);"
+      "return c;"
       "}";
 
   if (freopen("printf_ast.txt", "w", stdout) == NULL) {
@@ -65,7 +52,7 @@ int main() {
     exit(-1);
   }
 
-  parser(multidimensional_arrays);
+  parser(func_call);
 
   // 重定向输出回终端
   if (freopen(tty_path, "w", stdout) == NULL) {
@@ -73,7 +60,7 @@ int main() {
     exit(-1);
   }
 
-  // print_ins_pass(ins_list);
+  print_ins_pass(ins_list);
 
   if (freopen("out.txt", "w", stdout) == NULL) {
     fprintf(stderr, "打开文件失败！");
@@ -87,6 +74,7 @@ int main() {
   ListFirst(func_list, false);
   void *element;
   while (ListNext(func_list, &element)) {
+    puts(((Function *)element)->label->name);
     bblock_to_dom_graph_pass((Function *)element);
   }
 

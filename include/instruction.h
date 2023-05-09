@@ -5,7 +5,8 @@
 #ifndef INSTRUCTION_H
 #define INSTRUCTION_H
 
-#define TWO_OPRANDS_INS 14
+#define RETURN_USED 16
+#define NULL_USED 22
 
 typedef enum _TAC_OP {
   DefaultOP,
@@ -22,21 +23,22 @@ typedef enum _TAC_OP {
   AssignOP,
   PhiAssignOp,
   GetelementptrOP,
-  // 14
+  CallWithReturnValueOP,
+  LoadOP,
+  // 16 该instruction的Value会被使用
   ReturnOP,
   AllocateOP,
-  LoadOP,
   StoreOP,
   GotoWithConditionOP,
   ParamOP,
-  // 19
+  // 22
   GotoOP,
   CallOP,
-  CallWithReturnValueOP,
   LabelOP,
   FuncLabelOP,
   FuncEndOP,
   PhiFuncOp,
+  InitArgOP
 } TAC_OP;
 
 struct _BasicBlock;
