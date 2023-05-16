@@ -219,28 +219,37 @@ void pre_eval(ast *a) {
 }
 
 void in_eval(ast *a, Value *left) {
+  // store the para
   if (!strcmp(a->name, "ParamDec")) {
-    // 新建一个符号表用于存放参数
-    // 在内存中为变量分配空间
-    Value *cur_var = (Value *)malloc(sizeof(Value));
-    value_init(cur_var);
-    // 添加变量类型
-    cur_var->VTy->TID = (int)nowVarDecType;
-    char param_name[30];
-    sprintf(param_name, "param%d", num_of_param);
-    // 添加变量的名字
-    cur_var->name = strdup(param_name);
-    // 返回指针
-    Value *store_ins =
-        (Value *)ins_new_binary_operator_v2(InitArgOP, left, cur_var);
-    store_ins->IsInitArgs = 1;
-    store_ins->pdata->param_init_pdata.the_param_index = num_of_param++;
-    printf("store %s %s, %s,align 4\n",
-           NowVarDecStr[cur_var->VTy->TID < 4 ? cur_var->VTy->TID
-                                              : cur_var->VTy->TID - 4],
-           cur_var->name, left->name);
-    ListPushBack(ins_list, store_ins);
-    return;
+    if (left->VTy->TID != ArrayTyID) {
+      // 新建一个符号表用于存放参数
+      // 在内存中为变量分配空间
+      Value *cur_var = (Value *)malloc(sizeof(Value));
+      value_init(cur_var);
+      // 添加变量类型
+      cur_var->VTy->TID = (int)nowVarDecType;
+      char param_name[30];
+      sprintf(param_name, "param%d", num_of_param);
+      // 添加变量的名字
+      cur_var->name = strdup(param_name);
+      // 返回指针
+      Value *store_ins =
+          (Value *)ins_new_binary_operator_v2(InitArgOP, left, cur_var);
+      store_ins->IsInitArgs = 1;
+      store_ins->pdata->param_init_pdata.the_param_index = num_of_param++;
+      printf("store %s %s, %s,align 4\n",
+             NowVarDecStr[cur_var->VTy->TID < 4 ? cur_var->VTy->TID
+                                                : cur_var->VTy->TID - 4],
+             cur_var->name, left->name);
+      ListPushBack(ins_list, store_ins);
+      return;
+    } else {
+      char param_name[30];
+      sprintf(param_name, "param%d", num_of_param);
+      free(left->name);
+      // 添加变量的名字
+      left->name = strdup(param_name);
+    }
   }
 
   if (!strcmp(a->name, "FunDec")) {
@@ -625,13 +634,19 @@ Value *post_eval(ast *a, Value *left, Value *right) {
         // 要跳转到的func_label
         Value *func_label = HashMapGet(func_hashMap, (void *)a->idtype);
 
+        // oprand the array
+        char temp_str[25];
+        char text[10];
+        sprintf(text, "%d", temp_var_seed);
+        ++temp_var_seed;
+        strcpy(temp_str, "\%temp");
+        strcat(temp_str, text);
+        HashMapPut(func_hashMap, strdup(temp_str), func_label);
+
         if (func_label->pdata->symtab_func_pdata.return_type == VoidTyID) {
           Value *call_fun_ins = (Value *)ins_new_no_operator_v2(CallOP);
-          call_fun_ins->pdata->func_call_pdata.name = strdup(a->idtype);
 
-          call_fun_ins->name = strdup("func_call");
-          call_fun_ins->VTy->TID =
-              func_label->pdata->symtab_func_pdata.return_type;
+          call_fun_ins->name = strdup(temp_str);
 
           ListPushBack(ins_list, (void *)call_fun_ins);
 
@@ -644,19 +659,8 @@ Value *post_eval(ast *a, Value *left, Value *right) {
         } else {
           Value *call_fun_ins =
               (Value *)ins_new_no_operator_v2(CallWithReturnValueOP);
-          call_fun_ins->pdata->func_call_pdata.name = strdup(a->idtype);
-
-          // oprand the array
-          char temp_str[15];
-          char text[10];
-          sprintf(text, "%d", temp_var_seed);
-          ++temp_var_seed;
-          strcpy(temp_str, "\%temp");
-          strcat(temp_str, text);
 
           call_fun_ins->name = strdup(temp_str);
-          call_fun_ins->VTy->TID =
-              func_label->pdata->symtab_func_pdata.return_type;
 
           ListPushBack(ins_list, (void *)call_fun_ins);
 
@@ -691,34 +695,46 @@ Value *post_eval(ast *a, Value *left, Value *right) {
       } else {
         // init the array
         if (a->r && !strcmp(a->r->name, "LB")) {
-          total_array_member *= right->pdata->var_pdata.iVal;
-          // printf("total array member multiple %d\n",
-          //        right->pdata->var_pdata.iVal);
-          ListPushBack(array_list,
-                       (void *)(intptr_t)(right->pdata->var_pdata.iVal));
+          if (right != NULL) {
+            total_array_member *= right->pdata->var_pdata.iVal;
+            // printf("total array member multiple %d\n",
+            //        right->pdata->var_pdata.iVal);
+            ListPushBack(array_list,
+                         (void *)(intptr_t)(right->pdata->var_pdata.iVal));
+          } else {
+            ListPushBack(array_list, (void *)(intptr_t)(1));
+          }
         } else if (a->r && !strcmp(a->r->name, "ASSIGNOP")) {
         } else {
           // printf("%s have %d members\n", left->name, total_array_member);
+          void *element;
+          ListGetFront(array_list, &element);
+          left->pdata->array_pdata.step_long =
+              total_array_member / (intptr_t)element;
+          ListPopFront(array_list);
+          element = (void *)(intptr_t)1;
+          ListPushBack(array_list, element);
           left->pdata->array_pdata.list_para = array_list;
           left->pdata->array_pdata.total_member = total_array_member;
-          left->pdata->array_pdata.array_value =
-              malloc(sizeof(Value) * total_array_member);
-          for (int ii = 0; ii < total_array_member; ii++) {
-            // 在内存中为变量分配空间
-            Value *cur_var = (Value *)malloc(sizeof(Value));
-            value_init(cur_var);
-            // 添加变量类型
-            cur_var->VTy->TID = (int)nowVarDecType;
+          left->pdata->array_pdata.array_type = (int)nowVarDecType;
+          // left->pdata->array_pdata.array_value =
+          //     malloc(sizeof(Value) * total_array_member);
+          // for (int ii = 0; ii < total_array_member; ii++) {
+          //   // 在内存中为变量分配空间
+          //   Value *cur_var = (Value *)malloc(sizeof(Value));
+          //   value_init(cur_var);
+          //   // 添加变量类型
+          //   cur_var->VTy->TID = (int)nowVarDecType;
 
-            // 创建指针
-            Value *cur_ins = &(left->pdata->array_pdata.array_value[ii]);
-            value_init(cur_ins);
-            cur_ins->name = strdup("array_memeber");
-            // 添加变量类型
-            cur_ins->VTy->TID = PointerTyID;
-            // 设定allocate语句的指针所指向的value*
-            cur_ins->pdata->allocate_pdata.point_value = cur_var;
-          }
+          //   // 创建指针
+          //   Value *cur_ins = &(left->pdata->array_pdata.array_value[ii]);
+          //   value_init(cur_ins);
+          //   cur_ins->name = strdup("array_memeber");
+          //   // 添加变量类型
+          //   cur_ins->VTy->TID = PointerTyID;
+          //   // 设定allocate语句的指针所指向的value*
+          //   cur_ins->pdata->allocate_pdata.point_value = cur_var;
+          // }
           total_array_member = 1;
           array_list = NULL;
         }
@@ -759,24 +775,26 @@ Value *post_eval(ast *a, Value *left, Value *right) {
         // 将数组的信息拷贝一份
         cur_ins->name = strdup(temp_str);
         cur_ins->VTy->TID = ArrayTyID;
-        cur_ins->pdata->array_pdata.array_value =
-            left->pdata->array_pdata.array_value;
+        cur_ins->pdata->array_pdata.array_type =
+            left->pdata->array_pdata.array_type;
+        // cur_ins->pdata->array_pdata.array_value =
+        //     left->pdata->array_pdata.array_value;
         cur_ins->pdata->array_pdata.list_para = ListInit();
         ListSetClean(cur_ins->pdata->array_pdata.list_para, CleanObject);
         list_copy(cur_ins->pdata->array_pdata.list_para,
                   left->pdata->array_pdata.list_para);
         cur_ins->pdata->array_pdata.total_member =
-            left->pdata->array_pdata.total_member;
+            left->pdata->array_pdata.step_long;
         void *element;
         ListGetFront(cur_ins->pdata->array_pdata.list_para, &element);
         ListPopFront(cur_ins->pdata->array_pdata.list_para);
-        cur_ins->pdata->array_pdata.total_member /= (int)(element);
-        left->pdata->array_pdata.step_long =
-            cur_ins->pdata->array_pdata.total_member;
-        char para_buffer[50];
+        cur_ins->pdata->array_pdata.step_long =
+            cur_ins->pdata->array_pdata.total_member / (int)element;
+        ListPushBack(ins_list, cur_ins);
+
+        char para_buffer[100];
         memset(para_buffer, 0, sizeof(para_buffer));
         ListFirst(left->pdata->array_pdata.list_para, false);
-
         while (ListNext(left->pdata->array_pdata.list_para, &element) != NULL) {
           char text[10];
           sprintf(text, "[%d x ", (int)element);
@@ -791,7 +809,7 @@ Value *post_eval(ast *a, Value *left, Value *right) {
             "%s = getelementptr inbounds %s, %s"
             " * %s, i32 0, i32 %s, !dbg !24\n",
             cur_ins->name, para_buffer, para_buffer, left->name, right->name);
-        ListPushBack(ins_list, cur_ins);
+
         if (ListSize(cur_ins->pdata->array_pdata.list_para) == 0 &&
             (pre_astnode->r ? strcmp(pre_astnode->r->name, "ASSIGNOP")
                             : true)) {
@@ -808,9 +826,7 @@ Value *post_eval(ast *a, Value *left, Value *right) {
           Value *load_ins =
               (Value *)ins_new_single_operator_v2(LoadOP, cur_ins);
           load_ins->name = strdup(temp_str);
-          // 将内容拷贝
-          value_copy(load_ins, cur_ins->pdata->array_pdata.array_value[0]
-                                   .pdata->allocate_pdata.point_value);
+          load_ins->VTy->TID = left->pdata->array_pdata.array_type;
 
           ListPushBack(ins_list, (void *)load_ins);
 

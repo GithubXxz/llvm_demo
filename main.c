@@ -34,17 +34,41 @@ int main() {
 
   printf("开始遍历\n");
 
+  char *multidimensional_arrays =
+      "int main() {"
+      "  int b = 10;"
+      "  int c = 233,arr[10][20][30];"
+      "  arr[3][5][b] = 100;"
+      "  int d = arr[3][5][b];"
+      "  return 0;"
+      "}";
+
   char *func_call =
       "int add(int a, int b) {"
-      "a = 10;"
+      "a = 19;"
       "int c = a + b;"
       "return c;"
       "}"
-      "void main() {"
+      "int main() {"
       "int a = 10;"
       "int b = 20;"
-      "int c = add(add(a,b), b);"
+      "int c = add(a, b);"
       "return c;"
+      "}";
+
+  char *arr_func_call =
+      "int add_arr(int arr[][20]) {"
+      "int a = arr[1][2];"
+      "arr[3][4] = 10;"
+      "int b = arr[3][4];"
+      "return a + b;"
+      "}"
+      "int main() {"
+      "int arr[10][20];"
+      "arr[1][2] = 10;"
+      "arr[3][4] = 20;"
+      "int res1 = add_arr(arr);"
+      "return res1;"
       "}";
 
   if (freopen("printf_ast.txt", "w", stdout) == NULL) {
@@ -52,7 +76,7 @@ int main() {
     exit(-1);
   }
 
-  parser(func_call);
+  parser(arr_func_call);
 
   // 重定向输出回终端
   if (freopen(tty_path, "w", stdout) == NULL) {

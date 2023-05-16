@@ -93,6 +93,7 @@ union _PData {
   } param_init_pdata;
 
   struct {
+    TypeID array_type;
     // 指针
     Value *array_value;
     // 链表 各层数组的元素个数
