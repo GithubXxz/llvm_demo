@@ -68,8 +68,8 @@ ExtDef:Specifire ExtDecList SEMI    {$$=newast("ExtDef",2,$1,$2);}
 	;
 
 //全局变量名
-ExtDecList:VarDec {$$=newast("ExtDecList",1,$1);}
-	|VarDec COMMA ExtDecList {$$=newast("ExtDecList",2,$1,$3);}
+ExtDecList:Dec {$$=newast("ExtDecList",1,$1);}
+	|Dec COMMA ExtDecList {$$=newast("ExtDecList",2,$1,$3);}
 	;
 
 

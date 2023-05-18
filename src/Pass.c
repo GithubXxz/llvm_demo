@@ -67,6 +67,8 @@ extern HashSet *bblock_pass_hashset;
 
 extern HashMap *bblock_to_dom_graph_hashmap;
 
+extern List *global_var_list;
+
 static Function *cur_func = NULL;
 
 static ALGraph *graph_for_dom_tree = NULL;
@@ -467,7 +469,8 @@ void insert_phi_func_pass(Function *self) {
 
   // &&!strcmp(((Value *)bblock_ins)->name, "\%point1")
   while (ListNext(entry_bblock->inst_list, &bblock_ins)) {
-    if (((Instruction *)bblock_ins)->opcode == AllocateOP) {
+    if (((Instruction *)bblock_ins)->opcode == AllocateOP &&
+        ((Value *)bblock_ins)->VTy->TID != ArrayTyID) {
       // 也就是迭代支配边界集合
       HashSet *phi_insert_bblock = NULL;
       hashset_init(&(phi_insert_bblock));
@@ -482,7 +485,6 @@ void insert_phi_func_pass(Function *self) {
         if (graph_for_dom_tree->node_set[i]->is_visited) {
           graph_for_dom_tree->node_set[i]->is_visited = false;
           phi_insert_bblock =
-
               HashSetUnion(phi_insert_bblock,
                            graph_for_dom_tree->node_set[i]->dom_frontier_set);
         }
@@ -587,44 +589,36 @@ void rename_pass_help_new(HashMap *rename_var_stack_hashmap,
   void *element;
   // 遍历当前bblock的instruction找出赋值语句
   while (ListNext(cur_bblock->bblock_node->bblock_head->inst_list, &element)) {
+    Value *cur_handle = user_get_operand_use(element, 0)->Val;
     // 如果是赋值语句则将操作数放在栈顶 用于后续的替换
-    if ((((Instruction *)element)->opcode == StoreOP ||
-         ((Instruction *)element)->opcode == InitArgOP) &&
-        user_get_operand_use(element, 0)->Val->VTy->TID != ArrayTyID) {
-      if (HashMapContain(
-              num_of_var_def,
-              user_get_operand_use(((User *)element), 0)->Val->name)) {
-        (*((int *)HashMapGet(
-            num_of_var_def,
-            user_get_operand_use(((User *)element), 0)->Val->name)))++;
+    if ((((Instruction *)element)->opcode == StoreOP) &&
+        cur_handle->VTy->TID != ArrayTyID && cur_handle->IsGlobalVar == 0) {
+      if (HashMapContain(num_of_var_def, cur_handle->name)) {
+        void *var_num = HashMapGet(num_of_var_def, cur_handle->name);
+        var_num = (intptr_t)var_num + 1;
+        HashMapPut(num_of_var_def, strdup(cur_handle->name), (void *)var_num);
       } else {
-        int *num_of_this_var = (int *)malloc(sizeof(int));
-        *num_of_this_var = 1;
-        HashMapPut(
-            num_of_var_def,
-            strdup(user_get_operand_use(((User *)element), 0)->Val->name),
-            num_of_this_var);
+        HashMapPut(num_of_var_def, strdup(cur_handle->name), (void *)1);
       }
-      puts(user_get_operand_use(((User *)element), 0)->Val->name);
-      puts(user_get_operand_use(((User *)element), 1)->Val->name);
-      StackPush(
-          HashMapGet(rename_var_stack_hashmap,
-                     user_get_operand_use(((User *)element), 0)->Val->name),
-          user_get_operand_use(((User *)element), 1)->Val);
+      StackPush(HashMapGet(rename_var_stack_hashmap, cur_handle->name),
+                user_get_operand_use(((User *)element), 1)->Val);
     } else if (((Instruction *)element)->opcode == PhiFuncOp) {
       if (HashMapContain(
               num_of_var_def,
               ((Value *)element)->pdata->phi_func_pdata.phi_pointer->name)) {
-        (*((int *)HashMapGet(
+        void *var_num = HashMapGet(
             num_of_var_def,
-            ((Value *)element)->pdata->phi_func_pdata.phi_pointer->name)))++;
-      } else {
-        int *num_of_this_var = (int *)malloc(sizeof(int));
-        *num_of_this_var = 1;
+            ((Value *)element)->pdata->phi_func_pdata.phi_pointer->name);
+        var_num = (intptr_t)var_num + 1;
         HashMapPut(
             num_of_var_def,
             strdup(((Value *)element)->pdata->phi_func_pdata.phi_pointer->name),
-            num_of_this_var);
+            (void *)var_num);
+      } else {
+        HashMapPut(
+            num_of_var_def,
+            strdup(((Value *)element)->pdata->phi_func_pdata.phi_pointer->name),
+            (void *)1);
       }
       StackPush(
           HashMapGet(
@@ -632,12 +626,11 @@ void rename_pass_help_new(HashMap *rename_var_stack_hashmap,
               ((Value *)element)->pdata->phi_func_pdata.phi_pointer->name),
           element);
     } else if (((Instruction *)element)->opcode == LoadOP &&
-               user_get_operand_use(element, 0)->Val->VTy->TID != ArrayTyID) {
+               cur_handle->VTy->TID != ArrayTyID &&
+               cur_handle->IsGlobalVar == 0) {
       void *stack_top_var;
-      StackTop(
-          HashMapGet(rename_var_stack_hashmap,
-                     user_get_operand_use(((User *)element), 0)->Val->name),
-          &stack_top_var);
+      StackTop(HashMapGet(rename_var_stack_hashmap, cur_handle->name),
+               &stack_top_var);
 
       // 使用栈顶Value替换使用当前instruction的value
       replace_use_other_by_self(stack_top_var, element);
@@ -688,7 +681,7 @@ void rename_pass_help_new(HashMap *rename_var_stack_hashmap,
 
   HashMapFirst(num_of_var_def);
   while ((ptr_pair = HashMapNext(num_of_var_def)) != NULL) {
-    for (int i = 0; i < *((int *)ptr_pair->value); i++) {
+    for (int i = 0; i < (intptr_t)(ptr_pair->value); i++) {
       StackPop((Stack *)HashMapGet(rename_var_stack_hashmap,
                                    ((char *)ptr_pair->key)));
     }
@@ -765,21 +758,16 @@ void delete_alloca_store_load_ins_pass(ALGraph *self) {
       ListGetAt(cur_handle, i, &element);
       switch (((Instruction *)element)->opcode) {
         case StoreOP:
-          if (user_get_operand_use(element, 0)->Val->VTy->TID != ArrayTyID) {
-            ListRemove(cur_handle, i);
-          } else {
-            i++;
-          }
-          break;
-        case InitArgOP:
-          if (user_get_operand_use(element, 0)->Val->VTy->TID != ArrayTyID) {
+          if (user_get_operand_use(element, 0)->Val->VTy->TID != ArrayTyID &&
+              user_get_operand_use(element, 0)->Val->IsGlobalVar == 0) {
             ListRemove(cur_handle, i);
           } else {
             i++;
           }
           break;
         case LoadOP:
-          if (user_get_operand_use(element, 0)->Val->VTy->TID != ArrayTyID) {
+          if (user_get_operand_use(element, 0)->Val->VTy->TID != ArrayTyID &&
+              user_get_operand_use(element, 0)->Val->IsGlobalVar == 0) {
             ListRemove(cur_handle, i);
           } else {
             i++;
@@ -1437,6 +1425,10 @@ void ins_toBBlock_pass(List *self) {
   // 迭代下标
 
   while (ListNext(self, &element)) {
+    while (((Instruction *)element)->opcode != FuncLabelOP) {
+      ListPushBack(global_var_list, element);
+      ListNext(self, &element);
+    }
     // 初始包含入口基本块和结束基本块
     int num_of_block = 2;
     //  进入一个函数

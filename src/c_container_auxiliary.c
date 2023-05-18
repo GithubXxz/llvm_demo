@@ -21,6 +21,8 @@ List* ins_list = NULL;
 
 List* func_list = NULL;
 
+List* global_var_list = NULL;
+
 // 用于生成cfg图通过label的名字查询对应的bblock
 HashMap* bblock_hashmap = NULL;
 
@@ -104,6 +106,10 @@ void AllInit() {
   // 初始化指令链表
   ins_list = ListInit();
   ListSetClean(ins_list, CleanObject);
+
+  // 初始化全局变量链条
+  global_var_list = ListInit();
+  ListSetClean(global_var_list, CleanObject);
 
   // 初始化函数链表
   func_list = ListInit();

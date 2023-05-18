@@ -13,6 +13,7 @@
 
 extern List *ins_list;
 extern List *func_list;
+extern List *global_var_list;
 
 SymbolTable *cur_symboltable = NULL;
 
@@ -34,49 +35,34 @@ int main() {
 
   printf("开始遍历\n");
 
-  char *multidimensional_arrays =
-      "int main() {"
-      "  int b = 10;"
-      "  int c = 233,arr[10][20][30];"
-      "  arr[3][5][b] = 100;"
-      "  int d = arr[3][5][b];"
-      "  return 0;"
-      "}";
-
-  char *func_call =
-      "int add(int a, int b) {"
-      "a = 19;"
-      "int c = a + b;"
-      "return c;"
+  char *mix_feature =
+      "int global_a = 10;"
+      "int global_b = 20;"
+      "int use_global(int a, int b, int arr[]) {"
+      "return 2 * global_a + a * global_b + b * arr[3];"
       "}"
       "int main() {"
-      "int a = 10;"
-      "int b = 20;"
-      "int c = add(a, b);"
-      "return c;"
-      "}";
-
-  char *arr_func_call =
-      "int add_arr(int arr[][20]) {"
-      "int a = arr[1][2];"
-      "arr[3][4] = 10;"
-      "int b = arr[3][4];"
-      "return a + b;"
-      "}"
-      "int main() {"
+      "int a = 111;"
+      "int b = 222;"
       "int arr[10][20];"
-      "arr[1][2] = 10;"
-      "arr[3][4] = 20;"
-      "int res1 = add_arr(arr);"
-      "return res1;"
+      "if (a == 111) {"
+      "arr[3][3] = 333;"
+      "b = 444;"
+      "global_a = 555;"
+      "} else {"
+      "arr[3][3] = 666;"
+      "global_a = 777;"
+      "a = 999;"
+      "}"
+      "return a + global_a + 2 * use_global(b, global_b, arr[3]);"
       "}";
 
-  if (freopen("printf_ast.txt", "w", stdout) == NULL) {
-    fprintf(stderr, "打开文件失败！");
-    exit(-1);
-  }
+  // if (freopen("printf_ast.txt", "w", stdout) == NULL) {
+  //   fprintf(stderr, "打开文件失败！");
+  //   exit(-1);
+  // }
 
-  parser(arr_func_call);
+  parser(mix_feature);
 
   // 重定向输出回终端
   if (freopen(tty_path, "w", stdout) == NULL) {
@@ -94,6 +80,8 @@ int main() {
   // delete_return_deadcode_pass(ins_list);
 
   ins_toBBlock_pass(ins_list);
+
+  print_ins_pass(global_var_list);
 
   ListFirst(func_list, false);
   void *element;

@@ -19,19 +19,63 @@ extern SymbolTable *cur_symboltable;
 void CleanObject(void *element);
 
 enum NowVarDecType { NowVoid, NowInt, NowFloat, NowStruct } nowVarDecType;
+enum NameSeed {
+  FUNC_LABEL_END,
+  TEMP_VAR,
+  FUNC_LABEL,
+  LABEL,
+  PARAM,
+  GLOBAL,
+  ARRAY,
+  POINT
+};
 
 char *NowVarDecStr[] = {"void", "int", "float", "struct"};
 
 static int temp_var_seed = 1;    // 用于标识变量的名字
 static int label_var_seed = 1;   // 用于标识label的名字
 static int label_func_seed = 1;  // 用于表示func_label的名字
-static int param_seed = 1;       // 用于表示函数参数的变量名
 static int point_seed = 1;       // 用于表示指针变量名 用于alloca
 static int array_seed = 1;       // 用于表示数组变量名 用于alloca
-static int num_of_param = 0;     // 用于标识函数参数的个数
+static int global_seed = 1;      // 用于表示全局变量
+static int param_seed = 0;       // 用于标识函数参数的个数
 static int total_array_member = 1;
 static List *array_list = NULL;
 static Value *cur_construction_func;
+static char *cur_handle_func = NULL;
+
+char *name_generate(enum NameSeed cur_handle) {
+  char temp_str[50];
+  switch (cur_handle) {
+    case TEMP_VAR:
+      sprintf(temp_str, "temp%d", temp_var_seed++);
+      break;
+    case FUNC_LABEL:
+      sprintf(temp_str, "func_label%d", label_func_seed++);
+      break;
+    case FUNC_LABEL_END:
+      sprintf(temp_str, "func_label_end%d", label_func_seed++);
+      break;
+    case LABEL:
+      sprintf(temp_str, "%slabel%d", cur_handle_func, label_var_seed++);
+      break;
+    case PARAM:
+      sprintf(temp_str, "param%d", param_seed++);
+      break;
+    case GLOBAL:
+      sprintf(temp_str, "global%d", global_seed++);
+      break;
+    case ARRAY:
+      sprintf(temp_str, "array%d", array_seed++);
+      break;
+    case POINT:
+      sprintf(temp_str, "point%d", point_seed++);
+      break;
+    default:
+      break;
+  }
+  return strdup(temp_str);
+}
 
 // 判断当前if是否含有else
 bool have_else = false;
@@ -137,6 +181,9 @@ void pre_eval(ast *a) {
       // 插入
       ListPushBack(ins_list, (void *)func_label_ins);
 
+      if (cur_handle_func != NULL) free(cur_handle_func);
+      cur_handle_func = strdup(a->l->idtype);
+
       printf("Func: %s\n", a->l->idtype);
 
       // 将函数的<name,label>插入函数表
@@ -145,7 +192,9 @@ void pre_eval(ast *a) {
       Value *entry_label_ins = (Value *)ins_new_no_operator_v2(LabelOP);
 
       // 添加变量的名字
-      entry_label_ins->name = strdup("entry");
+      char entry_label_name[50];
+      sprintf(entry_label_name, "%sentry", cur_handle_func);
+      entry_label_ins->name = strdup(entry_label_name);
       entry_label_ins->VTy->TID = LabelTyID;
 
       ListPushBack(ins_list, entry_label_ins);
@@ -181,19 +230,14 @@ void pre_eval(ast *a) {
     }
 
     // 全局变量的符号表
-    if (!strcmp(a->name, "ExtDecList") && StackSize(stack_symbol_table) == 0) {
+    if (!strcmp(a->name, "Program") && StackSize(stack_symbol_table) == 0) {
       cur_symboltable = (SymbolTable *)malloc(sizeof(SymbolTable));
       symbol_table_init(cur_symboltable);
     }
 
     if (a->r && !strcmp(a->r->name, "assistWHILE")) {
       // 创建while这条语句的label，用于返回循环头
-      char temp_str[30];
-      char text[10];
-      sprintf(text, "%d", label_var_seed);
-      ++label_var_seed;
-      strcpy(temp_str, "label");
-      strcat(temp_str, text);
+      char *temp_str = name_generate(LABEL);
 
       Value *while_head_label_ins = (Value *)ins_new_no_operator_v2(LabelOP);
       while_head_label_ins->name = strdup(temp_str);
@@ -204,7 +248,7 @@ void pre_eval(ast *a) {
       Value *goto_label_ins = (Value *)ins_new_no_operator_v2(GotoOP);
       strcpy(temp_str, "goto ");
       strcat(temp_str, while_head_label_ins->name);
-      goto_label_ins->name = strdup(temp_str);
+      goto_label_ins->name = temp_str;
       goto_label_ins->VTy->TID = GotoTyID;
       goto_label_ins->pdata->no_condition_goto.goto_location =
           while_head_label_ins;
@@ -228,15 +272,13 @@ void in_eval(ast *a, Value *left) {
       value_init(cur_var);
       // 添加变量类型
       cur_var->VTy->TID = (int)nowVarDecType;
-      char param_name[30];
-      sprintf(param_name, "param%d", num_of_param);
       // 添加变量的名字
-      cur_var->name = strdup(param_name);
+      cur_var->name = name_generate(PARAM);
       // 返回指针
       Value *store_ins =
-          (Value *)ins_new_binary_operator_v2(InitArgOP, left, cur_var);
+          (Value *)ins_new_binary_operator_v2(StoreOP, left, cur_var);
       store_ins->IsInitArgs = 1;
-      store_ins->pdata->param_init_pdata.the_param_index = num_of_param++;
+      store_ins->pdata->param_init_pdata.the_param_index = param_seed;
       printf("store %s %s, %s,align 4\n",
              NowVarDecStr[cur_var->VTy->TID < 4 ? cur_var->VTy->TID
                                                 : cur_var->VTy->TID - 4],
@@ -244,52 +286,42 @@ void in_eval(ast *a, Value *left) {
       ListPushBack(ins_list, store_ins);
       return;
     } else {
-      char param_name[30];
-      sprintf(param_name, "param%d", num_of_param);
       free(left->name);
       // 添加变量的名字
-      left->name = strdup(param_name);
+      left->name = name_generate(PARAM);
     }
   }
 
   if (!strcmp(a->name, "FunDec")) {
-    cur_construction_func->pdata->symtab_func_pdata.param_num = num_of_param;
+    cur_construction_func->pdata->symtab_func_pdata.param_num = param_seed;
     // 将参数的个数清零
-    num_of_param = 0;
+    param_seed = 0;
   }
 
   if (a->r && !strcmp(a->r->name, "assistIF")) {
     // 创建false条件下的label标签
-    char temp_str[15];
-    char text[10];
-    sprintf(text, "%d", label_var_seed);
-    ++label_var_seed;
-    strcpy(temp_str, "label");
-    strcat(temp_str, text);
+    char *temp_str = NULL;
+    temp_str = name_generate(LABEL);
 
     Value *else_label_ins = (Value *)ins_new_no_operator_v2(LabelOP);
-    else_label_ins->name = strdup(temp_str);
+    else_label_ins->name = temp_str;
     else_label_ins->VTy->TID = LabelTyID;
 
     // 将else-label入栈
     StackPush(stack_else_label, else_label_ins);
 
-    // 创建true条件下的label标签
-    sprintf(text, "%d", label_var_seed);
-    ++label_var_seed;
-    strcpy(temp_str, "label");
-    strcat(temp_str, text);
+    temp_str = name_generate(LABEL);
 
     Value *true_label_ins = (Value *)ins_new_no_operator_v2(LabelOP);
     // 添加变量的名字
-    true_label_ins->name = strdup(temp_str);
+    true_label_ins->name = temp_str;
     true_label_ins->VTy->TID = LabelTyID;
 
     // 创建跳转语句 left是跳转条件
     Value *goto_condition_ins =
         (Value *)ins_new_single_operator_v2(GotoWithConditionOP, left);
 
-    char temp_br_label_name[40];
+    char temp_br_label_name[80];
     strcpy(temp_br_label_name, "true:");
     strcat(temp_br_label_name, true_label_ins->name);
     strcat(temp_br_label_name, "  false:");
@@ -313,17 +345,10 @@ void in_eval(ast *a, Value *left) {
   }
 
   if (a->r && !strcmp(a->r->name, "assistELSE")) {
-    char temp_str[30];
-    char text[10];
-    sprintf(text, "%d", label_var_seed);
-    ++label_var_seed;
-    strcpy(temp_str, "label");
-    strcat(temp_str, text);
-
     Value *then_label_ins = (Value *)ins_new_no_operator_v2(LabelOP);
 
     // 添加变量的名字
-    then_label_ins->name = strdup(temp_str);
+    then_label_ins->name = name_generate(LABEL);
     then_label_ins->VTy->TID = LabelTyID;
 
     StackPush(stack_then_label, then_label_ins);
@@ -335,6 +360,7 @@ void in_eval(ast *a, Value *left) {
     //                                  strdup(temp_str), goto_else);
 
     Value *goto_else_ins = (Value *)ins_new_no_operator_v2(GotoOP);
+    char temp_str[30];
     strcpy(temp_str, "goto ");
     strcat(temp_str, then_label_ins->name);
     goto_else_ins->name = strdup(temp_str);
@@ -348,17 +374,10 @@ void in_eval(ast *a, Value *left) {
 
   // args_insert
   if (a->r && !strcmp(a->r->name, "assistArgs")) {
-    char temp_str[30];
-    char text[10];
-    sprintf(text, "%d", param_seed);
-    ++param_seed;
-    strcpy(temp_str, "param_convert");
-    strcat(temp_str, text);
-
     Value *func_param_ins = (Value *)ins_new_single_operator_v2(ParamOP, left);
 
     // 添加变量的名字 类型 和返回值
-    func_param_ins->name = strdup(temp_str);
+    func_param_ins->name = name_generate(PARAM);
     func_param_ins->VTy->TID = ParamTyID;
     // func_param_ins->pdata->param_pdata.param_value = left;
 
@@ -449,25 +468,27 @@ Value *post_eval(ast *a, Value *left, Value *right) {
       if (!strcmp(a->name, "ID")) {
         // allocate for array
         if (pre_astnode->r && !strcmp(pre_astnode->r->name, "LB")) {
-          // 给指针变量命名
-          char temp_str[15];
-          char text[10];
-          sprintf(text, "%d", array_seed);
-          ++array_seed;
-          strcpy(temp_str, "\%array");
-          strcat(temp_str, text);
-
+          char *array_name = NULL;
           // 创建指针
           Value *cur_ins = (Value *)ins_new_no_operator_v2(AllocateOP);
+
+          if (StackSize(stack_symbol_table) == 1) {
+            // 全局变量
+            array_name = name_generate(GLOBAL);
+            cur_ins->IsGlobalVar = 1;
+          } else {
+            array_name = name_generate(ARRAY);
+          }
+
           // 添加变量类型
           cur_ins->VTy->TID = ArrayTyID;
           // 添加指针的名字 映射进哈希表 放入symbol_tabel里面 用于索引
-          cur_ins->name = strdup(temp_str);
+          cur_ins->name = array_name;
 
           array_list = ListInit();
           ListSetClean(array_list, CleanObject);
 
-          printf("%s = alloca %s array,align 4\n", temp_str,
+          printf("%s = alloca %s array,align 4\n", array_name,
                  NowVarDecStr[nowVarDecType]);
 
           ListPushBack(ins_list, cur_ins);
@@ -478,6 +499,19 @@ Value *post_eval(ast *a, Value *left, Value *right) {
           // 返回指针
           return cur_ins;
         } else {
+          char *temp_var = NULL;
+          // 创建指针
+          Value *cur_ins = (Value *)ins_new_no_operator_v2(AllocateOP);
+
+          // 添加变量类型
+          if (StackSize(stack_symbol_table) == 1) {
+            puts("global var");
+            temp_var = name_generate(GLOBAL);
+            cur_ins->IsGlobalVar = 1;
+          } else {
+            temp_var = name_generate(TEMP_VAR);
+          }
+
           // 在内存中为变量分配空间
           Value *cur_var = (Value *)malloc(sizeof(Value));
           value_init(cur_var);
@@ -486,24 +520,13 @@ Value *post_eval(ast *a, Value *left, Value *right) {
           // 添加变量的名字
           cur_var->name = strdup(a->idtype);
 
-          // 给指针变量命名
-          char temp_str[15];
-          char text[10];
-          sprintf(text, "%d", point_seed);
-          ++point_seed;
-          strcpy(temp_str, "\%point");
-          strcat(temp_str, text);
-
-          // 创建指针
-          Value *cur_ins = (Value *)ins_new_no_operator_v2(AllocateOP);
-          // 添加变量类型
           cur_ins->VTy->TID = PointerTyID;
           // 添加指针的名字 映射进哈希表 放入symbol_tabel里面 用于索引
-          cur_ins->name = strdup(temp_str);
+          cur_ins->name = temp_var;
           // 设定allocate语句的指针所指向的value*
           cur_ins->pdata->allocate_pdata.point_value = cur_var;
 
-          printf("%s = alloca %s,align 4\n", temp_str,
+          printf("%s = alloca %s,align 4\n", temp_var,
                  NowVarDecStr[nowVarDecType]);
 
           ListPushBack(ins_list, cur_ins);
@@ -908,7 +931,7 @@ Value *post_eval(ast *a, Value *left, Value *right) {
     }
 
     if (!strcmp(a->name, "assistFuncCall")) {
-      // param_seed = 1;
+      //  = 1;
       return right;
     }
 
@@ -965,18 +988,14 @@ Value *post_eval(ast *a, Value *left, Value *right) {
       free(cur_symboltable);
       cur_symboltable = NULL;
       // 当前的符号表恢复到上一级的符号表
-      // StackTop(stack_symbol_table, (void **)&cur_symboltable);
+      StackTop(stack_symbol_table, (void **)&cur_symboltable);
 
-      char temp_str[20];
-      char text[10];
-      sprintf(text, "%d", label_func_seed - 1);
-      strcpy(temp_str, "func_label");
-      strcat(temp_str, text);
-      strcat(temp_str, " end");
+      char *func_label_end = NULL;
+      func_label_end = name_generate(FUNC_LABEL_END);
 
       Value *func_end_ins = (Value *)ins_new_no_operator_v2(FuncEndOP);
       // 添加变量的名字
-      func_end_ins->name = strdup(temp_str);
+      func_end_ins->name = func_label_end;
       func_end_ins->VTy->TID = FuncEndTyID;
       // // pdata不需要数据所以释放掉
       // free(func_end_ins->pdata);
@@ -984,7 +1003,7 @@ Value *post_eval(ast *a, Value *left, Value *right) {
       // 插入
       ListPushBack(ins_list, (void *)func_end_ins);
 
-      printf("%s\n", temp_str);
+      printf("%s\n", func_label_end);
     }
 
     if (!strcmp(a->name, "RETURN")) {

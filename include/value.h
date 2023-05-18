@@ -12,7 +12,7 @@
 struct _Symtab;
 struct _Use;
 
-#define NumUserOperandsBits 27
+#define NumUserOperandsBits 15
 
 typedef struct _Value Value;
 
@@ -36,6 +36,7 @@ struct _Value {
   unsigned HasName : 1;
   unsigned IsInitArgs : 1;      // is cur ins the func param init?
   unsigned HasHungOffUses : 1;  // 用于指示有多少个操作数
+  unsigned IsGlobalVar : 1;     //  is the pointer ponits to global var
 };
 
 union _PData {
