@@ -1441,6 +1441,24 @@ void ins_toBBlock_pass(List *self) {
       // 插入函数链表中
       ListPushBack(func_list, cur_func);
 
+      // 创建end_block和对应的end_label用于解决return语句唯一出口的问题
+      BasicBlock *end_bblock = (BasicBlock *)malloc(sizeof(BasicBlock));
+      bblock_init(end_bblock, cur_func);
+
+      // 创建end条件下的label标签
+      Value *end_label_ins = (Value *)ins_new_no_operator_v2(LabelOP);
+      // 添加变量的名字
+      char end_label_name[50];
+      sprintf(end_label_name, "%send_label", ((Value *)element)->name);
+      end_label_ins->name = strdup(end_label_name);
+      end_label_ins->VTy->TID = LabelTyID;
+
+      end_bblock->label = end_label_ins;
+      ListPushBack(end_bblock->inst_list, end_label_ins);
+
+      // 设置当前函数的结束基本块
+      cur_func->end_bblock = end_bblock;
+
       // 初始化entryLabel并且插入到函数的入口label
       ListNext(self, &element);
 
@@ -1452,24 +1470,6 @@ void ins_toBBlock_pass(List *self) {
       cur_func->entry_bblock = cur_bblock;
       ListPushBack(cur_bblock->inst_list, element);
 
-      // 创建end_block和对应的end_label用于解决return语句唯一出口的问题
-      BasicBlock *end_bblock = (BasicBlock *)malloc(sizeof(BasicBlock));
-      bblock_init(end_bblock, cur_func);
-
-      // 创建end条件下的label标签
-      Value *end_label_ins = (Value *)ins_new_no_operator_v2(LabelOP);
-      // 添加变量的名字
-      end_label_ins->name = strdup("end_label");
-      end_label_ins->VTy->TID = LabelTyID;
-
-      end_bblock->label = end_label_ins;
-      ListPushBack(end_bblock->inst_list, end_label_ins);
-
-      // 设置当前函数的结束基本块
-      cur_func->end_bblock = end_bblock;
-      // printf("successfully initialization functionblock\n");
-
-      // 插入instruction
       while (ListNext(self, &element)) {
         TAC_OP cur_ins_opcode = ((Instruction *)element)->opcode;
         switch (cur_ins_opcode) {

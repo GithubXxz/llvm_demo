@@ -1,4 +1,3 @@
-
 #ifndef FUNCTION_H
 #define FUNCTION_H
 #include "cds.h"
@@ -6,8 +5,6 @@
 #include "value.h"
 
 struct _BasicBlock;
-
-typedef struct _ALGraph ALGraph;  // 声明邻接表
 
 typedef struct _Function {
   // 指向label节点的value 等同于funcLabel节点里所包含的value*
@@ -21,7 +18,7 @@ typedef struct _Function {
   // 每个变量的活跃区间
   List* all_var_live_interval;
   // 函数对应的cfg图
-  ALGraph* self_cfg;
+  struct _ALGraph* self_cfg;
 } Function;
 
 void function_init(Function* this);

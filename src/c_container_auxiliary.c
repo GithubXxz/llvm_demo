@@ -14,6 +14,8 @@ Stack* stack_while_then_label = NULL;
 // while循环头(条件判断)
 Stack* stack_while_head_label = NULL;
 
+Stack* stack_param = NULL;
+
 // 哈希表的初始化 用于查找调用的函数名和对应的函数label
 HashMap* func_hashMap = NULL;
 
@@ -138,6 +140,9 @@ void AllInit() {
   // 初始化then的goto栈
   stack_while_then_label = StackInit();
   StackSetClean(stack_while_then_label, CleanObject);
+
+  stack_param = StackInit();
+  StackSetClean(stack_param, CleanObject);
 
   func_hashMap = HashMapInit();
   // 哈希表的初始化 用于查找调用的函数名和对应的函数label

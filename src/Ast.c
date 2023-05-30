@@ -11,6 +11,7 @@ extern Stack *stack_else_label;
 extern Stack *stack_then_label;
 extern Stack *stack_while_head_label;  // while循环头(条件判断)
 extern Stack *stack_while_then_label;  // while条件为false时所要跳转的label栈
+extern Stack *stack_param;
 extern ast *pre_astnode;
 extern List *ins_list;
 extern HashMap *func_hashMap;
@@ -381,8 +382,10 @@ void in_eval(ast *a, Value *left) {
     func_param_ins->VTy->TID = ParamTyID;
     // func_param_ins->pdata->param_pdata.param_value = left;
 
+    StackPush(stack_param, (void *)func_param_ins);
+
     // 插入
-    ListPushBack(ins_list, (void *)func_param_ins);
+    // ListPushBack(ins_list, (void *)func_param_ins);
 
     printf("%s %s insert\n", func_param_ins->name, left->name);
   }
@@ -509,7 +512,7 @@ Value *post_eval(ast *a, Value *left, Value *right) {
             temp_var = name_generate(GLOBAL);
             cur_ins->IsGlobalVar = 1;
           } else {
-            temp_var = name_generate(TEMP_VAR);
+            temp_var = name_generate(POINT);
           }
 
           // 在内存中为变量分配空间
@@ -658,13 +661,24 @@ Value *post_eval(ast *a, Value *left, Value *right) {
         Value *func_label = HashMapGet(func_hashMap, (void *)a->idtype);
 
         // oprand the array
-        char temp_str[25];
-        char text[10];
-        sprintf(text, "%d", temp_var_seed);
-        ++temp_var_seed;
-        strcpy(temp_str, "\%temp");
-        strcat(temp_str, text);
+        // char temp_str[25];
+        // char text[10];
+        // sprintf(text, "%d", temp_var_seed);
+        // ++temp_var_seed;
+        // strcpy(temp_str, "\%temp");
+        // strcat(temp_str, text);
+        char *temp_str = name_generate(TEMP_VAR);
         HashMapPut(func_hashMap, strdup(temp_str), func_label);
+
+        void *func_param_ins;
+        for (int i = 0; i < func_label->pdata->symtab_func_pdata.param_num;
+             i++) {
+          StackTop(stack_param, &func_param_ins);
+          StackPop(stack_param);
+
+          // 插入
+          ListPushBack(ins_list, (void *)func_param_ins);
+        }
 
         if (func_label->pdata->symtab_func_pdata.return_type == VoidTyID) {
           Value *call_fun_ins = (Value *)ins_new_no_operator_v2(CallOP);
