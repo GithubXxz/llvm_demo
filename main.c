@@ -1,4 +1,4 @@
-#include <stdarg.h>  //变长参数函数所需的头文件
+#include <stdarg.h> //变长参数函数所需的头文件
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -57,25 +57,39 @@ int main() {
       "return a + global_a + 2 * use_global(b, global_b, arr[3]);"
       "}";
 
-  // if (freopen("printf_ast.txt", "w", stdout) == NULL) {
-  //   fprintf(stderr, "打开文件失败！");
-  //   exit(-1);
-  // }
+  char *logical_or = "int logical_or() {"
+                     "  const int a = 233;"
+                     "  const int b = 323;"
+                     "  int res = 0;"
+                     "  if (a > 200 || b > 500) {"
+                     "    res = 10086;"
+                     "  }else{"
+                     "    res = 2333333;"
+                     "  }"
+                     "  return res;"
+                     "}";
 
+  if (freopen("printf_ast.txt", "w", stdout) == NULL) {
+    fprintf(stderr, "打开文件失败！");
+    exit(-1);
+  }
+
+#define PARSER
   parser(mix_feature);
 
+#ifdef PARSER
   // 重定向输出回终端
   if (freopen(tty_path, "w", stdout) == NULL) {
     fprintf(stderr, "打开文件失败！");
     exit(-1);
   }
 
-  print_ins_pass(ins_list);
-
   if (freopen("out.txt", "w", stdout) == NULL) {
     fprintf(stderr, "打开文件失败！");
     exit(-1);
   }
+
+  print_ins_pass(ins_list);
 
   // delete_return_deadcode_pass(ins_list);
 
@@ -89,9 +103,9 @@ int main() {
     puts(((Function *)element)->label->name);
     bblock_to_dom_graph_pass((Function *)element);
   }
+#endif
 
   free(tty_path);
   printf("All over!\n");
-
   return 0;
 }

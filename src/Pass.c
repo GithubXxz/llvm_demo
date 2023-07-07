@@ -1,11 +1,16 @@
 #include "Pass.h"
+#include "c_container_auxiliary.h"
+#include "container/hash_map.h"
 
-#include <stdarg.h>  //变长参数函数所需的头文件
+#include <stdarg.h> //变长参数函数所需的头文件
+#include <stdbool.h>
 #include <stdio.h>
+#include <string.h>
+#include <sys/_types/_uintptr_t.h>
 
 typedef struct _dom_tree {
   List *child;
-  HeadNode *bblock_node;  // 分管的basicblock
+  HeadNode *bblock_node; // 分管的basicblock
 } dom_tree;
 
 typedef struct _copy_pair {
@@ -23,6 +28,11 @@ typedef struct _var_live_interval {
   List *this_var_discrete_live_interval;
   live_interval *this_var_total_live_interval;
 } var_live_interval;
+
+typedef struct _node_pair {
+  char *key;
+  HeadNode *value;
+} node_pair;
 
 static const int REGISTER_NUM = 3;
 
@@ -75,12 +85,22 @@ static ALGraph *graph_for_dom_tree = NULL;
 
 static dom_tree *dom_tree_root = NULL;
 
-static int phi_var_seed = 1;   // 用于phi函数产生变量的名字
-static int temp_var_seed = 1;  // 用于标识变量的名字
+static int phi_var_seed = 1;  // 用于phi函数产生变量的名字
+static int temp_var_seed = 1; // 用于标识变量的名字
 
 // 通过bblock的名字获得bblock的指针
 BasicBlock *name_get_bblock(char *name) {
   return (BasicBlock *)HashMapGet(bblock_hashmap, name);
+}
+
+// 将other merge 到 self
+void hashmap_union(HashMap *self, HashMap *other) {
+  HashMapFirst(other);
+  node_pair *element = NULL;
+  while ((element = (node_pair *)HashMapNext(other)) != NULL) {
+    if (HashMapContain(self, element->key) == false)
+      HashMapPut(self, strdup(element->key), element->value);
+  }
 }
 
 // void dom_tree_pass(List *self) {
@@ -107,12 +127,14 @@ BasicBlock *name_get_bblock(char *name) {
 // }
 
 // 判断self是否为other的子集
-bool is_subset(HashSet *self, HashSet *other) {
-  // 求交集
-  HashSet *inter = HashSetIntersect(self, other);
-  bool is_self_subset_to_other = (HashSetSize(inter) == HashSetSize(self));
-  HashSetDeinit(inter);
-  return is_self_subset_to_other;
+bool is_subset(HashMap *self, HashMap *other) {
+  HashMapFirst(self);
+  node_pair *element = NULL;
+  while ((element = (node_pair *)HashMapNext(self)) != NULL) {
+    if (HashMapContain(other, element->key) == false)
+      return false;
+  }
+  return true;
 }
 
 // bblock关系图转化为CFG邻接表图形式
@@ -131,7 +153,9 @@ int bblock_to_dom_graph_dfs_pass(HeadNode *self, int n) {
           HashMapGet(bblock_to_dom_graph_hashmap,
                      self->bblock_head->true_bblock->label->name);
 
-      HashSetAdd(self->edge_list, true_situation_headnode);
+      HashMapPut(self->edge_list,
+                 strdup(true_situation_headnode->bblock_head->label->name),
+                 true_situation_headnode);
       ListPushBack(true_situation_headnode->pre_node_list, self);
     } else {
       HeadNode *true_situation_headnode = (HeadNode *)malloc(sizeof(HeadNode));
@@ -140,16 +164,18 @@ int bblock_to_dom_graph_dfs_pass(HeadNode *self, int n) {
 
       // 初始化哈希集 并且将true条件下跳转的的bblock加入当前表头的hash集中
       // 需要更改指针的指向所以需要传递指针的地址
-      hashset_init(&(true_situation_headnode->edge_list));
-      hashset_init(&(true_situation_headnode->dom_set));
-      hashset_init(&(true_situation_headnode->dom_frontier_set));
+      hashmap_init(&(true_situation_headnode->edge_list));
+      hashmap_init(&(true_situation_headnode->dom_set));
+      hashmap_init(&(true_situation_headnode->dom_frontier_set));
 
       // 初始化前驱链表
       true_situation_headnode->pre_node_list = ListInit();
       ListSetClean(true_situation_headnode->pre_node_list, CleanObject);
       ListPushBack(true_situation_headnode->pre_node_list, self);
 
-      HashSetAdd(self->edge_list, true_situation_headnode);
+      HashMapPut(self->edge_list,
+                 strdup(true_situation_headnode->bblock_head->label->name),
+                 true_situation_headnode);
       n = bblock_to_dom_graph_dfs_pass(true_situation_headnode, n);
     }
   }
@@ -161,21 +187,25 @@ int bblock_to_dom_graph_dfs_pass(HeadNode *self, int n) {
           HashMapGet(bblock_to_dom_graph_hashmap,
                      self->bblock_head->false_bblock->label->name);
 
-      HashSetAdd(self->edge_list, false_situation_headnode);
+      HashMapPut(self->edge_list,
+                 strdup(false_situation_headnode->bblock_head->label->name),
+                 false_situation_headnode);
       ListPushBack(false_situation_headnode->pre_node_list, self);
     } else {
       HeadNode *false_situation_headnode = (HeadNode *)malloc(sizeof(HeadNode));
       false_situation_headnode->bblock_head = self->bblock_head->false_bblock;
       false_situation_headnode->is_visited = false;
-      hashset_init(&(false_situation_headnode->edge_list));
-      hashset_init(&(false_situation_headnode->dom_set));
-      hashset_init(&(false_situation_headnode->dom_frontier_set));
+      hashmap_init(&(false_situation_headnode->edge_list));
+      hashmap_init(&(false_situation_headnode->dom_set));
+      hashmap_init(&(false_situation_headnode->dom_frontier_set));
       // 初始化前驱链表
       false_situation_headnode->pre_node_list = ListInit();
       ListSetClean(false_situation_headnode->pre_node_list, CleanObject);
       ListPushBack(false_situation_headnode->pre_node_list, self);
+      HashMapPut(self->edge_list,
+                 strdup(false_situation_headnode->bblock_head->label->name),
+                 false_situation_headnode);
 
-      HashSetAdd(self->edge_list, false_situation_headnode);
       n = bblock_to_dom_graph_dfs_pass(false_situation_headnode, n);
     }
   }
@@ -185,19 +215,20 @@ int bblock_to_dom_graph_dfs_pass(HeadNode *self, int n) {
 
 void dom_relation_pass_help(HeadNode *self) {
   self->is_visited = true;
-  void *element;
-  HashSetFirst(self->edge_list);
-  while ((element = HashSetNext(self->edge_list)) &&
-         !((HeadNode *)element)->is_visited) {
+  node_pair *element;
+  HashMapFirst(self->edge_list);
+  while ((element = (node_pair *)HashMapNext(self->edge_list)) &&
+         !(element->value)->is_visited) {
     // printf("cur node %s next node %s\n", self->bblock_head->label->name,
     //        ((HeadNode *)element)->bblock_head->label->name);
-    dom_relation_pass_help((HeadNode *)element);
+    dom_relation_pass_help(element->value);
   }
 }
 
 void dom_relation_pass() {
   int node_num = graph_for_dom_tree->node_num;
 
+#ifdef DEBUG
   //// 打印图中的每个节点的后继的名字和地址信息
   // for (int i = 0; i < node_num; i++) {
   //   printf("%s: ",
@@ -223,6 +254,7 @@ void dom_relation_pass() {
            graph_for_dom_tree->node_set[j]);
   }
   printf("\n");
+#endif
 
   for (int i = 1; i < node_num; i++) {
     // 删除该节点的入边和出边 计算出根节点的不可达节点便是该节点的支配节点
@@ -237,47 +269,38 @@ void dom_relation_pass() {
         // 自己需不需要支配自己 不需要就将自己的visited置为true
         continue;
       }
-      if (HashSetFind(graph_for_dom_tree->node_set[j]->edge_list,
-                      graph_for_dom_tree->node_set[i])) {
+      if (HashMapContain(
+              graph_for_dom_tree->node_set[j]->edge_list,
+              graph_for_dom_tree->node_set[i]->bblock_head->label->name)) {
         // 谁remove了谁就要添加回来
         delete_marked[j] = 1;
-        HashSetRemove(graph_for_dom_tree->node_set[j]->edge_list,
-                      graph_for_dom_tree->node_set[i]);
-        // //打印删除的边
-        // printf("%s|%8x,",
-        //        graph_for_dom_tree->node_set[j]->bblock_head->label->name,
-        //        graph_for_dom_tree->node_set[j]);
+        HashMapRemove(
+            graph_for_dom_tree->node_set[j]->edge_list,
+            graph_for_dom_tree->node_set[i]->bblock_head->label->name);
       }
     }
-
-    //// 打印删除的边的辅助信息
-    //  printf(" to %s|%8x\n",
-    //         graph_for_dom_tree->node_set[i]->bblock_head->label->name,
-    //         graph_for_dom_tree->node_set[i]);
 
     dom_relation_pass_help(graph_for_dom_tree->node_set[0]);
 
     // 将删除的边添加回来
     for (int j = 0; j < node_num; j++) {
       if (delete_marked[j] == 1) {
-        HashSetAdd(graph_for_dom_tree->node_set[j]->edge_list,
-                   graph_for_dom_tree->node_set[i]);
-        ////打印修复的边
-        // printf("fix %s to %s\n",
-        //        graph_for_dom_tree->node_set[j]->bblock_head->label->name,
-        //        graph_for_dom_tree->node_set[i]->bblock_head->label->name);
+        HashMapPut(
+            graph_for_dom_tree->node_set[j]->edge_list,
+            strdup(graph_for_dom_tree->node_set[i]->bblock_head->label->name),
+            graph_for_dom_tree->node_set[i]);
       }
     }
 
-    printf("node %s dom ",
-           graph_for_dom_tree->node_set[i]->bblock_head->label->name);
     // 把没有被访问的节点添加到当前节点的支配节点
     for (int j = 0; j < node_num; j++) {
       if (!graph_for_dom_tree->node_set[j]->is_visited) {
         // printf("%s\n",graph_for_dom_tree->node_set[j]->bblock_head->label->name);
         // 添加支配节点
-        HashSetAdd(graph_for_dom_tree->node_set[i]->dom_set,
-                   graph_for_dom_tree->node_set[j]);
+        HashMapPut(
+            graph_for_dom_tree->node_set[i]->dom_set,
+            strdup(graph_for_dom_tree->node_set[j]->bblock_head->label->name),
+            graph_for_dom_tree->node_set[j]->bblock_head);
         printf("%s,",
                graph_for_dom_tree->node_set[j]->bblock_head->label->name);
       } else {
@@ -313,11 +336,11 @@ void dom_relation_pass() {
       }
       if (is_subset(graph_for_dom_tree->node_set[i]->dom_set,
                     graph_for_dom_tree->node_set[j]->dom_set) &&
-          (HashSetSize(graph_for_dom_tree->node_set[j]->dom_set) <
+          (HashMapSize(graph_for_dom_tree->node_set[j]->dom_set) <
            cur_idom_nodeset_num)) {
         cur_subscript = j;
         cur_idom_nodeset_num =
-            HashSetSize(graph_for_dom_tree->node_set[j]->dom_set);
+            HashMapSize(graph_for_dom_tree->node_set[j]->dom_set);
       }
     }
 
@@ -379,8 +402,10 @@ void dom_relation_pass() {
           ListNext(graph_for_dom_tree->node_set[i]->pre_node_list, &runner)) {
         while (runner != graph_for_dom_tree->node_set[i]->idom_node) {
           // printf("%s,", runner->bblock_head->label->name);
-          HashSetAdd(((HeadNode *)(runner))->dom_frontier_set,
-                     graph_for_dom_tree->node_set[i]);
+          HashMapPut(
+              ((HeadNode *)(runner))->dom_frontier_set,
+              strdup(graph_for_dom_tree->node_set[i]->bblock_head->label->name),
+              graph_for_dom_tree->node_set[i]);
           runner = ((HeadNode *)(runner))->idom_node;
         }
         // printf("\n");
@@ -394,11 +419,11 @@ void dom_relation_pass() {
     printf("cur node %s's dom frontier is ",
            graph_for_dom_tree->node_set[i]->bblock_head->label->name);
 
-    HeadNode *element;
-    HashSetFirst(graph_for_dom_tree->node_set[i]->dom_frontier_set);
-    while ((element = HashSetNext(
+    node_pair *element = NULL;
+    HashMapNext(graph_for_dom_tree->node_set[i]->dom_frontier_set);
+    while ((element = (node_pair *)HashMapNext(
                 graph_for_dom_tree->node_set[i]->dom_frontier_set)) != NULL) {
-      printf("%s,", element->bblock_head->label->name);
+      printf("%s,", element->key);
     }
     printf("\n");
   }
@@ -472,8 +497,8 @@ void insert_phi_func_pass(Function *self) {
     if (((Instruction *)bblock_ins)->opcode == AllocateOP &&
         ((Value *)bblock_ins)->VTy->TID != ArrayTyID) {
       // 也就是迭代支配边界集合
-      HashSet *phi_insert_bblock = NULL;
-      hashset_init(&(phi_insert_bblock));
+      HashMap *phi_insert_bblock = NULL;
+      hashmap_init(&(phi_insert_bblock));
 
       for (int i = 1; i < num_of_block; i++) {
         find_bblock_store_ins_pass(graph_for_dom_tree->node_set[i],
@@ -484,58 +509,42 @@ void insert_phi_func_pass(Function *self) {
       for (int i = 1; i < num_of_block; i++) {
         if (graph_for_dom_tree->node_set[i]->is_visited) {
           graph_for_dom_tree->node_set[i]->is_visited = false;
-          phi_insert_bblock =
-              HashSetUnion(phi_insert_bblock,
-                           graph_for_dom_tree->node_set[i]->dom_frontier_set);
+          hashmap_union(phi_insert_bblock,
+                        graph_for_dom_tree->node_set[i]->dom_frontier_set);
         }
       }
 
       unsigned phi_insert_bblock_element_num = 0;
       // 寻找迭代支配边界
-      while (phi_insert_bblock_element_num != HashSetSize(phi_insert_bblock)) {
-        phi_insert_bblock_element_num = HashSetSize(phi_insert_bblock);
+      while (phi_insert_bblock_element_num != HashMapSize(phi_insert_bblock)) {
+        phi_insert_bblock_element_num = HashMapSize(phi_insert_bblock);
 
-        HashSet *cur_pass_add_phi_insert_bblock = NULL;
-        hashset_init(&(cur_pass_add_phi_insert_bblock));
+        HashMap *cur_pass_add_phi_insert_bblock = NULL;
+        hashmap_init(&(cur_pass_add_phi_insert_bblock));
 
-        void *element;
-        HashSetFirst(phi_insert_bblock);
+        node_pair *element;
+        HashMapFirst(phi_insert_bblock);
 
-        while ((element = HashSetNext(phi_insert_bblock)) != NULL) {
-          cur_pass_add_phi_insert_bblock =
-              HashSetUnion(cur_pass_add_phi_insert_bblock,
-                           ((HeadNode *)element)->dom_frontier_set);
+        while ((element = (node_pair *)HashMapNext(phi_insert_bblock)) !=
+                   NULL &&
+               element->value->is_visited == false) {
+          element->value->is_visited = true;
+          hashmap_union(cur_pass_add_phi_insert_bblock,
+                        element->value->dom_frontier_set);
         }
-        phi_insert_bblock =
-            HashSetUnion(phi_insert_bblock, cur_pass_add_phi_insert_bblock);
+        hashmap_union(phi_insert_bblock, cur_pass_add_phi_insert_bblock);
+      }
+
+      for (int i = 1; i < num_of_block; i++) {
+        graph_for_dom_tree->node_set[i]->is_visited = false;
       }
 
       // 根据 phi_insert_bblock 这个集合插入phi函数
       // 插入的是bblock_ins作为指针指向的地址空间
-      HeadNode *element;
-      HashSetFirst(phi_insert_bblock);
-      while ((element = HashSetNext(phi_insert_bblock)) != NULL &&
+      node_pair *element;
+      HashMapFirst(phi_insert_bblock);
+      while ((element = (node_pair *)HashMapNext(phi_insert_bblock)) != NULL &&
              HashSetFind(non_locals, bblock_ins)) {
-        //// 打印要插入phi函数的基本块的名字信息
-        // printf("%s\n", element->bblock_head->label->name);
-        // 在内存中为phi函数分配空间
-        // Value *cur_var = (Value *)malloc(sizeof(Value));
-        // value_init(cur_var);
-        // // 添加变量类型
-        // cur_var->VTy->TID = PhiFuncTyID;
-        // // 添加变量的名字
-        // cur_var->name = strdup("phi_func");
-
-        // // 初始化phi函数的hashmap
-        // cur_var->pdata->phi_func_pdata.phi_value = HashMapInit();
-
-        // HashMapSetHash(cur_var->pdata->phi_func_pdata.phi_value, HashKey);
-        // HashMapSetCompare(cur_var->pdata->phi_func_pdata.phi_value,
-        // CompareKey);
-        // HashMapSetCleanKey(cur_var->pdata->phi_func_pdata.phi_value,
-        //                    CleanHashMapKey);
-        // HashMapSetCleanValue(cur_var->pdata->phi_func_pdata.phi_value,
-        //                      CleanValue);
 
         // 给phi函数返回的 Value* 变量命名
         char temp_str[15];
@@ -557,7 +566,7 @@ void insert_phi_func_pass(Function *self) {
 
         // printf("%s = phi,align 4\n", temp_str);
 
-        ListInsert(element->bblock_head->inst_list, 1, cur_ins);
+        ListInsert(element->value->bblock_head->inst_list, 1, cur_ins);
       }
     }
   }
@@ -595,7 +604,7 @@ void rename_pass_help_new(HashMap *rename_var_stack_hashmap,
         cur_handle->VTy->TID != ArrayTyID && cur_handle->IsGlobalVar == 0) {
       if (HashMapContain(num_of_var_def, cur_handle->name)) {
         void *var_num = HashMapGet(num_of_var_def, cur_handle->name);
-        var_num = (intptr_t)var_num + 1;
+        var_num = (void *)((uintptr_t)var_num + 1);
         HashMapPut(num_of_var_def, strdup(cur_handle->name), (void *)var_num);
       } else {
         HashMapPut(num_of_var_def, strdup(cur_handle->name), (void *)1);
@@ -609,7 +618,7 @@ void rename_pass_help_new(HashMap *rename_var_stack_hashmap,
         void *var_num = HashMapGet(
             num_of_var_def,
             ((Value *)element)->pdata->phi_func_pdata.phi_pointer->name);
-        var_num = (intptr_t)var_num + 1;
+        var_num = (void *)((uintptr_t)var_num + 1);
         HashMapPut(
             num_of_var_def,
             strdup(((Value *)element)->pdata->phi_func_pdata.phi_pointer->name),
@@ -638,18 +647,18 @@ void rename_pass_help_new(HashMap *rename_var_stack_hashmap,
   }
 
   // 遍历邻接边集合 修改phi函数中的参数
-  void *neighbor_bblock = NULL;
-  HashSetFirst(cur_bblock->bblock_node->edge_list);
-  while ((neighbor_bblock = HashSetNext(cur_bblock->bblock_node->edge_list)) !=
-         NULL) {
+  node_pair *neighbor_bblock = NULL;
+  HashMapNext(cur_bblock->bblock_node->edge_list);
+  while ((neighbor_bblock = (node_pair *)HashMapNext(
+              cur_bblock->bblock_node->edge_list)) != NULL) {
     void *neighbor_bblock_ins = NULL;
-    ListFirst(((HeadNode *)neighbor_bblock)->bblock_head->inst_list, false);
+    ListFirst(neighbor_bblock->value->bblock_head->inst_list, false);
     // 向前走一步跳过label的instruciton
-    ListNext(((HeadNode *)neighbor_bblock)->bblock_head->inst_list,
+    ListNext(neighbor_bblock->value->bblock_head->inst_list,
              &neighbor_bblock_ins);
 
     // 三种情况同时满足则说明邻接bblock中需要修改含有该指针指向内存变量的phi函数
-    while (ListNext(((HeadNode *)neighbor_bblock)->bblock_head->inst_list,
+    while (ListNext(neighbor_bblock->value->bblock_head->inst_list,
                     &neighbor_bblock_ins)) {
       if (((Instruction *)neighbor_bblock_ins)->opcode == PhiFuncOp) {
         void *stack_top_var;
@@ -757,30 +766,30 @@ void delete_alloca_store_load_ins_pass(ALGraph *self) {
       // printf("in %s: %p\n", self->label->name, self->label);
       ListGetAt(cur_handle, i, &element);
       switch (((Instruction *)element)->opcode) {
-        case StoreOP:
-          if (user_get_operand_use(element, 0)->Val->VTy->TID != ArrayTyID &&
-              user_get_operand_use(element, 0)->Val->IsGlobalVar == 0) {
-            ListRemove(cur_handle, i);
-          } else {
-            i++;
-          }
-          break;
-        case LoadOP:
-          if (user_get_operand_use(element, 0)->Val->VTy->TID != ArrayTyID &&
-              user_get_operand_use(element, 0)->Val->IsGlobalVar == 0) {
-            ListRemove(cur_handle, i);
-          } else {
-            i++;
-          }
-          break;
-        case PhiFuncOp:
-          // memset(user_get_operand_use((User *)self, 1), 0, sizeof(Use));
-          // ((Instruction *)element)->user.num_oprands--;
+      case StoreOP:
+        if (user_get_operand_use(element, 0)->Val->VTy->TID != ArrayTyID &&
+            user_get_operand_use(element, 0)->Val->IsGlobalVar == 0) {
+          ListRemove(cur_handle, i);
+        } else {
           i++;
-          break;
-        default:
+        }
+        break;
+      case LoadOP:
+        if (user_get_operand_use(element, 0)->Val->VTy->TID != ArrayTyID &&
+            user_get_operand_use(element, 0)->Val->IsGlobalVar == 0) {
+          ListRemove(cur_handle, i);
+        } else {
           i++;
-          break;
+        }
+        break;
+      case PhiFuncOp:
+        // memset(user_get_operand_use((User *)self, 1), 0, sizeof(Use));
+        // ((Instruction *)element)->user.num_oprands--;
+        i++;
+        break;
+      default:
+        i++;
+        break;
       }
     }
   }
@@ -890,14 +899,14 @@ void insert_copies_help(HashMap *insert_copies_stack_hashmap,
   //        cur_bblock->bblock_node->bblock_head->label->name);
 
   // For all successors s of block
-  void *neighbor_bblock = NULL;
-  HashSetFirst(cur_bblock->bblock_node->edge_list);
-  while ((neighbor_bblock = HashSetNext(cur_bblock->bblock_node->edge_list)) !=
-         NULL) {
+  node_pair *neighbor_bblock = NULL;
+  HashMapNext(cur_bblock->bblock_node->edge_list);
+  while ((neighbor_bblock = (node_pair *)HashMapNext(
+              cur_bblock->bblock_node->edge_list)) != NULL) {
     void *neighbor_bblock_ins = NULL;
-    ListFirst(((HeadNode *)neighbor_bblock)->bblock_head->inst_list, false);
+    ListFirst(neighbor_bblock->value->bblock_head->inst_list, false);
 
-    while (ListNext(((HeadNode *)neighbor_bblock)->bblock_head->inst_list,
+    while (ListNext(neighbor_bblock->value->bblock_head->inst_list,
                     &neighbor_bblock_ins)) {
       if (((Instruction *)neighbor_bblock_ins)->opcode == PhiFuncOp &&
           HashMapContain(
@@ -1077,11 +1086,12 @@ void calculate_live_in_out(ALGraph *self) {
       cur_bblock->live_out = NULL;
       hashset_init_string(&(cur_bblock->live_out));
 
-      HashSetFirst((self->node_set)[i]->edge_list);
-      HeadNode *element;
-      while ((element = HashSetNext((self->node_set)[i]->edge_list)) != NULL) {
-        HashSet *union_set =
-            HashSetUnion(cur_bblock->live_out, element->bblock_head->live_in);
+      HashMapNext((self->node_set)[i]->edge_list);
+      node_pair *element;
+      while ((element = (node_pair *)HashMapNext(
+                  (self->node_set)[i]->edge_list)) != NULL) {
+        HashSet *union_set = HashSetUnion(cur_bblock->live_out,
+                                          element->value->bblock_head->live_in);
         HashSetDeinit(cur_bblock->live_out);
         cur_bblock->live_out = union_set;
       }
@@ -1102,7 +1112,8 @@ void calculate_live_in_out(ALGraph *self) {
       HashSetDeinit(intersert);
       HashSetDeinit(store_live_out);
     }
-    if (no_liveout_changed) break;
+    if (no_liveout_changed)
+      break;
   }
 
   /*
@@ -1158,8 +1169,9 @@ void calculate_live_in_out(ALGraph *self) {
 var_live_interval *is_list_contain_item(List *self, char *item) {
   ListFirst(self, false);
   var_live_interval *element;
-  while (ListNext(self, &element)) {
-    if (!strcmp(element->self, item)) return element;
+  while (ListNext(self, (void **)&element)) {
+    if (!strcmp(element->self, item))
+      return element;
   }
   return NULL;
 }
@@ -1170,7 +1182,8 @@ void calculate_live_interval(ALGraph *self_cfg, Function *self_func) {
   for (int i = 0; i < self_cfg->node_num; i++) {
     ListFirst((self_cfg->node_set)[i]->bblock_head->inst_list, false);
     Instruction *element;
-    while (ListNext((self_cfg->node_set)[i]->bblock_head->inst_list, &element))
+    while (ListNext((self_cfg->node_set)[i]->bblock_head->inst_list,
+                    (void **)&element))
       element->ins_id = ins_id_seed++;
   }
 
@@ -1191,7 +1204,7 @@ void calculate_live_interval(ALGraph *self_cfg, Function *self_func) {
         // 判断当前位置时候与取出的首活跃区间相邻来判断是新建还是延长
         live_interval *cur_var_front_live_interval = NULL;
         ListGetFront(cur_var_live_interval->this_var_discrete_live_interval,
-                     &cur_var_front_live_interval);
+                     (void **)&cur_var_front_live_interval);
         // 判断是否相邻
         if (((Instruction *)(self_cfg->node_set)[i + 1]->bblock_head->label)
                 ->ins_id == cur_var_front_live_interval->begin) {
@@ -1207,9 +1220,7 @@ void calculate_live_interval(ALGraph *self_cfg, Function *self_func) {
                   ->ins_id;
           add_live_interval->end =
               add_live_interval->begin +
-              ListSize((Instruction *)(self_cfg->node_set)[i]
-                           ->bblock_head->inst_list) -
-              1;
+              ListSize((self_cfg->node_set)[i]->bblock_head->inst_list) - 1;
           ListPushFront(cur_var_live_interval->this_var_discrete_live_interval,
                         add_live_interval);
         }
@@ -1228,9 +1239,7 @@ void calculate_live_interval(ALGraph *self_cfg, Function *self_func) {
                 ->ins_id;
         add_live_interval->end =
             add_live_interval->begin +
-            ListSize(((Instruction *)(self_cfg->node_set)[i]
-                          ->bblock_head->inst_list)) -
-            1;
+            ListSize(((self_cfg->node_set)[i]->bblock_head->inst_list)) - 1;
         ListPushFront(cur_var_live_interval->this_var_discrete_live_interval,
                       add_live_interval);
         ListPushBack(self_func->all_var_live_interval, cur_var_live_interval);
@@ -1240,7 +1249,7 @@ void calculate_live_interval(ALGraph *self_cfg, Function *self_func) {
     ListFirst((self_cfg->node_set)[i]->bblock_head->inst_list, true);
     Instruction *element;
     while (ListReverseNext((self_cfg->node_set)[i]->bblock_head->inst_list,
-                           &element)) {
+                           (void **)&element)) {
       if (element->opcode < NULL_USED) {
         if (((Instruction *)element)->opcode < RETURN_USED) {
           var_live_interval *cur_var_live_interval = NULL;
@@ -1250,7 +1259,7 @@ void calculate_live_interval(ALGraph *self_cfg, Function *self_func) {
             // 截断
             live_interval *cur_var_front_live_interval = NULL;
             ListGetFront(cur_var_live_interval->this_var_discrete_live_interval,
-                         &cur_var_front_live_interval);
+                         (void **)&cur_var_front_live_interval);
             cur_var_front_live_interval->begin = element->ins_id;
           }
         }
@@ -1259,17 +1268,17 @@ void calculate_live_interval(ALGraph *self_cfg, Function *self_func) {
           // 当前live_out取出的变量是否已经存在在链条中了
           var_live_interval *cur_var_live_interval = NULL;
           Value *cur_handle = user_get_operand_use((User *)element, j)->Val;
-          if ((cur_var_live_interval = is_list_contain_item(
-                   self_func->all_var_live_interval, cur_handle->name)) !=
-              NULL) {
+          if ((cur_var_live_interval =
+                   is_list_contain_item(self_func->all_var_live_interval,
+                                        cur_handle->name)) != NULL) {
             // 存在的情况 先取出
             // 判断当前位置时候与取出的首活跃区间相邻来判断是新建还是延长
             live_interval *cur_var_front_live_interval = NULL;
             ListGetFront(cur_var_live_interval->this_var_discrete_live_interval,
-                         &cur_var_front_live_interval);
+                         (void **)&cur_var_front_live_interval);
             // 判断是否相邻
             if (element->ins_id <
-                cur_var_front_live_interval->begin) {  // 不相邻的情况 新建
+                cur_var_front_live_interval->begin) { // 不相邻的情况 新建
               live_interval *add_live_interval =
                   (live_interval *)malloc(sizeof(live_interval));
               add_live_interval->begin =
@@ -1309,24 +1318,26 @@ void calculate_live_interval(ALGraph *self_cfg, Function *self_func) {
 
   var_live_interval *element;
   ListFirst(self_func->all_var_live_interval, false);
-  while (ListNext(self_func->all_var_live_interval, &element)) {
+  while (ListNext(self_func->all_var_live_interval, (void **)&element)) {
     live_interval *total_live_interval = NULL;
     ListGetFront(element->this_var_discrete_live_interval,
-                 &total_live_interval);
+                 (void **)&total_live_interval);
     element->this_var_total_live_interval->begin = total_live_interval->begin;
-    ListGetBack(element->this_var_discrete_live_interval, &total_live_interval);
+    ListGetBack(element->this_var_discrete_live_interval,
+                (void **)&total_live_interval);
     element->this_var_total_live_interval->end = total_live_interval->end;
   }
 
+  // sort the list
   int num_of_var_live_interval = ListSize(self_func->all_var_live_interval);
   for (int i = 0; i < num_of_var_live_interval; i++) {
     var_live_interval *cur_index_var_live_interval = NULL;
     ListGetAt(self_func->all_var_live_interval, i,
-              &cur_index_var_live_interval);
+              (void **)&cur_index_var_live_interval);
     for (int j = i + 1; j < num_of_var_live_interval; j++) {
       var_live_interval *cur_iter_var_live_interval = NULL;
       ListGetAt(self_func->all_var_live_interval, j,
-                &cur_iter_var_live_interval);
+                (void **)&cur_iter_var_live_interval);
       if (cur_index_var_live_interval->this_var_total_live_interval->begin >=
           cur_iter_var_live_interval->this_var_total_live_interval->begin) {
         ListSetAt(self_func->all_var_live_interval, i,
@@ -1337,17 +1348,9 @@ void calculate_live_interval(ALGraph *self_cfg, Function *self_func) {
       }
     }
   }
-
-  ListFirst(self_func->all_var_live_interval, false);
-  while (ListNext(self_func->all_var_live_interval, &element)) {
-    printf("\tval:%s \tbegin:%d \tend:%d \n", element->self,
-           element->this_var_total_live_interval->begin,
-           element->this_var_total_live_interval->end);
-  }
 }
 
-// 生成支配树的pass和插入phi节点的pass和重命名函数的pass
-
+// delete phi func
 void remove_bblock_phi_func_pass(ALGraph *self_cfg) {
   for (int i = 0; i < self_cfg->node_num; i++) {
     int iter_num = 0;
@@ -1355,8 +1358,8 @@ void remove_bblock_phi_func_pass(ALGraph *self_cfg) {
 
     ListFirst((self_cfg->node_set)[i]->bblock_head->inst_list, false);
     ListSetClean((self_cfg->node_set)[i]->bblock_head->inst_list, CleanObject);
-    while (
-        ListNext((self_cfg->node_set)[i]->bblock_head->inst_list, &element)) {
+    while (ListNext((self_cfg->node_set)[i]->bblock_head->inst_list,
+                    (void **)&element)) {
       if (((Instruction *)element)->opcode == PhiFuncOp) {
         ListRemove((self_cfg->node_set)[i]->bblock_head->inst_list, iter_num);
         continue;
@@ -1433,6 +1436,9 @@ void ins_toBBlock_pass(List *self) {
     int num_of_block = 2;
     //  进入一个函数
     if (((Instruction *)element)->opcode == FuncLabelOP) {
+      HashMapDeinit(bblock_hashmap);
+      hashmap_init(&bblock_hashmap);
+
       // 初始化函数 将函数里的label等同于Funclabel中的value*
       cur_func = (Function *)malloc(sizeof(Function));
       function_init(cur_func);
@@ -1473,145 +1479,141 @@ void ins_toBBlock_pass(List *self) {
       while (ListNext(self, &element)) {
         TAC_OP cur_ins_opcode = ((Instruction *)element)->opcode;
         switch (cur_ins_opcode) {
-          // TODO 修改代码逻辑 使用标志flag替换hashset
-          // 先遍历一次建立所有基本块应该是更优而且易理解的算法
-          case GotoWithConditionOP:
-            // printf("%s label %s ins is printed\n",
-            // cur_bblock->label->name,
-            //        op_string[((Instruction *)element)->opcode]);
-            ListPushBack(cur_bblock->inst_list, element);
-            if (!HashMapContain(
-                    bblock_hashmap,
-                    ((Value *)element)
-                        ->pdata->condition_goto.true_goto_location->name)) {
-              // 初始化要跳转的一个基本块
-              BasicBlock *true_condition_block =
-                  (BasicBlock *)malloc(sizeof(BasicBlock));
-              bblock_init(true_condition_block, cur_func);
-              ListPushBack(true_condition_block->father_bblock_list,
-                           cur_bblock);
-              true_condition_block->label =
-                  ((Value *)element)->pdata->condition_goto.true_goto_location;
-              HashMapPut(bblock_hashmap,
-                         strdup(true_condition_block->label->name),
-                         true_condition_block);
-              cur_bblock->true_bblock = true_condition_block;
-            } else {
-              cur_bblock->true_bblock = HashMapGet(
+        // TODO 修改代码逻辑 使用标志flag替换hashset
+        // 先遍历一次建立所有基本块应该是更优而且易理解的算法
+        case GotoWithConditionOP:
+          // printf("%s label %s ins is printed\n",
+          // cur_bblock->label->name,
+          //        op_string[((Instruction *)element)->opcode]);
+          ListPushBack(cur_bblock->inst_list, element);
+          if (!HashMapContain(
                   bblock_hashmap,
                   ((Value *)element)
-                      ->pdata->condition_goto.true_goto_location->name);
-              ListPushBack(cur_bblock->true_bblock->father_bblock_list,
-                           cur_bblock);
-            }
-            if (!HashMapContain(
-                    bblock_hashmap,
-                    ((Value *)element)
-                        ->pdata->condition_goto.false_goto_location->name)) {
-              // 初始化要跳转的一个基本块
-              BasicBlock *false_condition_block =
-                  (BasicBlock *)malloc(sizeof(BasicBlock));
-              bblock_init(false_condition_block, cur_func);
-              ListPushBack(false_condition_block->father_bblock_list,
-                           cur_bblock);
-              false_condition_block->label =
-                  ((Value *)element)->pdata->condition_goto.false_goto_location;
-              HashMapPut(bblock_hashmap,
-                         strdup(false_condition_block->label->name),
-                         false_condition_block);
-              cur_bblock->false_bblock = false_condition_block;
-            } else {
-              cur_bblock->false_bblock = HashMapGet(
+                      ->pdata->condition_goto.true_goto_location->name)) {
+            // 初始化要跳转的一个基本块
+            BasicBlock *true_condition_block =
+                (BasicBlock *)malloc(sizeof(BasicBlock));
+            bblock_init(true_condition_block, cur_func);
+            ListPushBack(true_condition_block->father_bblock_list, cur_bblock);
+            true_condition_block->label =
+                ((Value *)element)->pdata->condition_goto.true_goto_location;
+            HashMapPut(bblock_hashmap,
+                       strdup(true_condition_block->label->name),
+                       true_condition_block);
+            cur_bblock->true_bblock = true_condition_block;
+          } else {
+            cur_bblock->true_bblock = HashMapGet(
+                bblock_hashmap,
+                ((Value *)element)
+                    ->pdata->condition_goto.true_goto_location->name);
+            ListPushBack(cur_bblock->true_bblock->father_bblock_list,
+                         cur_bblock);
+          }
+          if (!HashMapContain(
                   bblock_hashmap,
                   ((Value *)element)
-                      ->pdata->condition_goto.false_goto_location->name);
-              ListPushBack(cur_bblock->false_bblock->father_bblock_list,
-                           cur_bblock);
-            }
-            break;
+                      ->pdata->condition_goto.false_goto_location->name)) {
+            // 初始化要跳转的一个基本块
+            BasicBlock *false_condition_block =
+                (BasicBlock *)malloc(sizeof(BasicBlock));
+            bblock_init(false_condition_block, cur_func);
+            ListPushBack(false_condition_block->father_bblock_list, cur_bblock);
+            false_condition_block->label =
+                ((Value *)element)->pdata->condition_goto.false_goto_location;
+            HashMapPut(bblock_hashmap,
+                       strdup(false_condition_block->label->name),
+                       false_condition_block);
+            cur_bblock->false_bblock = false_condition_block;
+          } else {
+            cur_bblock->false_bblock = HashMapGet(
+                bblock_hashmap,
+                ((Value *)element)
+                    ->pdata->condition_goto.false_goto_location->name);
+            ListPushBack(cur_bblock->false_bblock->father_bblock_list,
+                         cur_bblock);
+          }
+          break;
 
-          case GotoOP:
-            // printf("%s label %s ins is printed\n",
-            // cur_bblock->label->name,
-            //        op_string[((Instruction *)element)->opcode]);
-            // 添加跳转语句在链条尾
-            ListPushBack(cur_bblock->inst_list, element);
-            if (!HashMapContain(
-                    bblock_hashmap,
-                    ((Value *)element)
-                        ->pdata->no_condition_goto.goto_location->name)) {
-              // 初始化要跳转的一个基本块
-              BasicBlock *true_condition_block =
-                  (BasicBlock *)malloc(sizeof(BasicBlock));
-              bblock_init(true_condition_block, cur_func);
-              ListPushBack(true_condition_block->father_bblock_list,
-                           cur_bblock);
-              true_condition_block->label =
-                  ((Value *)element)->pdata->no_condition_goto.goto_location;
-              HashMapPut(bblock_hashmap,
-                         strdup(true_condition_block->label->name),
-                         true_condition_block);
-              cur_bblock->true_bblock = true_condition_block;
-            } else {
-              cur_bblock->true_bblock = HashMapGet(
+        case GotoOP:
+          // printf("%s label %s ins is printed\n",
+          // cur_bblock->label->name,
+          //        op_string[((Instruction *)element)->opcode]);
+          // 添加跳转语句在链条尾
+          ListPushBack(cur_bblock->inst_list, element);
+          if (!HashMapContain(
                   bblock_hashmap,
                   ((Value *)element)
-                      ->pdata->no_condition_goto.goto_location->name);
-              ListPushBack(cur_bblock->true_bblock->father_bblock_list,
-                           cur_bblock);
-            }
-            break;
+                      ->pdata->no_condition_goto.goto_location->name)) {
+            // 初始化要跳转的一个基本块
+            BasicBlock *true_condition_block =
+                (BasicBlock *)malloc(sizeof(BasicBlock));
+            bblock_init(true_condition_block, cur_func);
+            ListPushBack(true_condition_block->father_bblock_list, cur_bblock);
+            true_condition_block->label =
+                ((Value *)element)->pdata->no_condition_goto.goto_location;
+            HashMapPut(bblock_hashmap,
+                       strdup(true_condition_block->label->name),
+                       true_condition_block);
+            cur_bblock->true_bblock = true_condition_block;
+          } else {
+            cur_bblock->true_bblock =
+                HashMapGet(bblock_hashmap,
+                           ((Value *)element)
+                               ->pdata->no_condition_goto.goto_location->name);
+            ListPushBack(cur_bblock->true_bblock->father_bblock_list,
+                         cur_bblock);
+          }
+          break;
 
-          case LabelOP:
-            num_of_block++;
-            // printf(" %s ins is printed\n",
-            //        op_string[((Instruction *)element)->opcode]);
-            if (pre_op != GotoOP && pre_op != ReturnOP &&
-                pre_op != GotoWithConditionOP) {
-              // printf("%s is cur label %s is next label \n",
-              //        cur_bblock->label->name, ((User
-              //        *)element)->res->name);
-              cur_bblock->true_bblock =
-                  name_get_bblock(((Value *)element)->name);
-              ListPushBack(
-                  name_get_bblock(((Value *)element)->name)->father_bblock_list,
-                  cur_bblock);
-            }
-            cur_bblock = name_get_bblock(((Value *)element)->name);
+        case LabelOP:
+          num_of_block++;
+          // printf(" %s ins is printed\n",
+          //        op_string[((Instruction *)element)->opcode]);
+          if (pre_op != GotoOP && pre_op != ReturnOP &&
+              pre_op != GotoWithConditionOP) {
+            // printf("%s is cur label %s is next label \n",
+            //        cur_bblock->label->name, ((User
+            //        *)element)->res->name);
+            cur_bblock->true_bblock = name_get_bblock(((Value *)element)->name);
+            ListPushBack(
+                name_get_bblock(((Value *)element)->name)->father_bblock_list,
+                cur_bblock);
+          }
+          cur_bblock = name_get_bblock(((Value *)element)->name);
 
-            ListPushBack(cur_bblock->inst_list, element);
-            break;
+          ListPushBack(cur_bblock->inst_list, element);
+          break;
 
-          case FuncEndOP:
-            if (pre_op != ReturnOP) {
-              char temp_str[30];
-              strcpy(temp_str, "goto ");
-              strcat(temp_str, end_bblock->label->name);
-              Value *goto_end_bblock_ins =
-                  (Value *)ins_new_no_operator_v2(GotoOP);
-              goto_end_bblock_ins->name = strdup(temp_str);
-              goto_end_bblock_ins->VTy->TID = GotoTyID;
-              goto_end_bblock_ins->pdata->no_condition_goto.goto_location =
-                  end_bblock->label;
-              cur_bblock->true_bblock = end_bblock;
-              ListPushBack(cur_bblock->inst_list, goto_end_bblock_ins);
-            }
-            ListPushBack(end_bblock->inst_list, element);
-            break;
-
-          case ReturnOP:
+        case FuncEndOP:
+          if (pre_op != ReturnOP) {
+            char temp_str[30];
+            strcpy(temp_str, "goto ");
+            strcat(temp_str, end_bblock->label->name);
+            Value *goto_end_bblock_ins =
+                (Value *)ins_new_no_operator_v2(GotoOP);
+            goto_end_bblock_ins->name = strdup(temp_str);
+            goto_end_bblock_ins->VTy->TID = GotoTyID;
+            goto_end_bblock_ins->pdata->no_condition_goto.goto_location =
+                end_bblock->label;
             cur_bblock->true_bblock = end_bblock;
-            ListPushBack(cur_bblock->inst_list, element);
-            break;
-          case AllocateOP:
-            ListInsert(cur_func->entry_bblock->inst_list, 1, element);
-            break;
-          default:
-            // printf("%s label %s ins push back\n",
-            // cur_bblock->label->name,
-            //        op_string[((Instruction *)element)->opcode]);
-            ListPushBack(cur_bblock->inst_list, element);
-            break;
+            ListPushBack(cur_bblock->inst_list, goto_end_bblock_ins);
+          }
+          ListPushBack(end_bblock->inst_list, element);
+          break;
+
+        case ReturnOP:
+          cur_bblock->true_bblock = end_bblock;
+          ListPushBack(cur_bblock->inst_list, element);
+          break;
+        case AllocateOP:
+          ListInsert(cur_func->entry_bblock->inst_list, 1, element);
+          break;
+        default:
+          // printf("%s label %s ins push back\n",
+          // cur_bblock->label->name,
+          //        op_string[((Instruction *)element)->opcode]);
+          ListPushBack(cur_bblock->inst_list, element);
+          break;
         }
 
         pre_op = ((Instruction *)element)->opcode;
@@ -1640,52 +1642,50 @@ void delete_return_deadcode_pass(List *self) {
   while (i != ListSize(self)) {
     ListGetAt(self, i, &element);
     switch (((Instruction *)element)->opcode) {
-      case GotoOP:
-        HashSetAdd(reach_label,
-                   ((Value *)element)->pdata->no_condition_goto.goto_location);
-        i++;
+    case GotoOP:
+      HashSetAdd(reach_label,
+                 ((Value *)element)->pdata->no_condition_goto.goto_location);
+      i++;
+      while (ListGetAt(self, i, &element) &&
+             (((Instruction *)element)->opcode == GotoOP ||
+              ((Instruction *)element)->opcode == GotoWithConditionOP)) {
+        ListRemove(self, i);
+      }
+      break;
+    case GotoWithConditionOP:
+      HashSetAdd(reach_label,
+                 ((Value *)element)->pdata->condition_goto.true_goto_location);
+      HashSetAdd(reach_label,
+                 ((Value *)element)->pdata->condition_goto.false_goto_location);
+      i++;
+      while (ListGetAt(self, i, &element) &&
+             (((Instruction *)element)->opcode == GotoOP ||
+              ((Instruction *)element)->opcode == GotoWithConditionOP)) {
+        ListRemove(self, i);
+      }
+      break;
+    case ReturnOP:
+      i++;
+      while (ListGetAt(self, i, &element) &&
+             (((Instruction *)element)->opcode != LabelOP &&
+              ((Instruction *)element)->opcode != FuncEndOP)) {
+        ListRemove(self, i);
+      }
+      break;
+    case LabelOP:
+      while (!HashSetFind(reach_label, (Value *)element) &&
+             strcmp(((Value *)element)->name, "entry")) {
+        ListRemove(self, i);
         while (ListGetAt(self, i, &element) &&
-               (((Instruction *)element)->opcode == GotoOP ||
-                ((Instruction *)element)->opcode == GotoWithConditionOP)) {
+               (((Instruction *)element)->opcode != LabelOP)) {
           ListRemove(self, i);
         }
-        break;
-      case GotoWithConditionOP:
-        HashSetAdd(
-            reach_label,
-            ((Value *)element)->pdata->condition_goto.true_goto_location);
-        HashSetAdd(
-            reach_label,
-            ((Value *)element)->pdata->condition_goto.false_goto_location);
-        i++;
-        while (ListGetAt(self, i, &element) &&
-               (((Instruction *)element)->opcode == GotoOP ||
-                ((Instruction *)element)->opcode == GotoWithConditionOP)) {
-          ListRemove(self, i);
-        }
-        break;
-      case ReturnOP:
-        i++;
-        while (ListGetAt(self, i, &element) &&
-               (((Instruction *)element)->opcode != LabelOP &&
-                ((Instruction *)element)->opcode != FuncEndOP)) {
-          ListRemove(self, i);
-        }
-        break;
-      case LabelOP:
-        while (!HashSetFind(reach_label, (Value *)element) &&
-               strcmp(((Value *)element)->name, "entry")) {
-          ListRemove(self, i);
-          while (ListGetAt(self, i, &element) &&
-                 (((Instruction *)element)->opcode != LabelOP)) {
-            ListRemove(self, i);
-          }
-        }
-        i++;
-        break;
-      default:
-        i++;
-        break;
+      }
+      i++;
+      break;
+    default:
+      i++;
+      break;
     }
   }
   ListSetClean(self, CleanObject);
@@ -1693,6 +1693,14 @@ void delete_return_deadcode_pass(List *self) {
 
 void line_scan_register_allocation(ALGraph *self_cfg, Function *self_func,
                                    HashMap *var_location) {
+  // var_live_interval *element;
+  // ListFirst(self_func->all_var_live_interval, false);
+  // while (ListNext(self_func->all_var_live_interval, &element)) {
+  //   printf("\tval:%s \tbegin:%d \tend:%d \n", element->self,
+  //          element->this_var_total_live_interval->begin,
+  //          element->this_var_total_live_interval->end);
+  // }
+
   List *active = ListInit();
   ListSetClean(active, CleanObject);
   // 0代表空闲 1代表被占用
@@ -1704,32 +1712,43 @@ void line_scan_register_allocation(ALGraph *self_cfg, Function *self_func,
   var_live_interval *cur_handle = NULL;
   ListFirst(self_func->all_var_live_interval, false);
 
-  ListNext(self_func->all_var_live_interval, &cur_handle);
-  if (cur_handle == NULL) return;
+  ListNext(self_func->all_var_live_interval, (void **)&cur_handle);
+  printf("\tval:%s \tbegin:%d \tend:%d \n", cur_handle->self,
+         cur_handle->this_var_total_live_interval->begin,
+         cur_handle->this_var_total_live_interval->end);
+  if (cur_handle == NULL)
+    return;
   LOCATION *cur_add_var_location = (LOCATION *)malloc(sizeof(LOCATION));
-  *cur_add_var_location = 1;
+  *cur_add_var_location = R1;
   register_situation[1] = true;
   HashMapPut(var_location, strdup(cur_handle->self), cur_add_var_location);
+  // printf("hashmap put %s\n", cur_handle->self);
   ListPushBack(active, cur_handle);
 
-  while (ListNext(self_func->all_var_live_interval, &cur_handle)) {
+  while (ListNext(self_func->all_var_live_interval, (void **)&cur_handle)) {
+    printf("\tval:%s \tbegin:%d \tend:%d \n", cur_handle->self,
+           cur_handle->this_var_total_live_interval->begin,
+           cur_handle->this_var_total_live_interval->end);
     // Expire OLD Intervals
     var_live_interval *iter_active = NULL;
     while (ListSize(active) != 0) {
-      ListGetFront(active, &iter_active);
+      ListGetFront(active, (void **)&iter_active);
       if (iter_active->this_var_total_live_interval->end >=
           cur_handle->this_var_total_live_interval->begin)
         break;
+      // release the register
       LOCATION *cur_var_location =
           (LOCATION *)HashMapGet(var_location, iter_active->self);
       register_situation[*cur_var_location] = false;
+      // printf("%s is clean 111111111111111\n",
+      //        location_string[*cur_var_location]);
       ListPopFront(active);
     }
     iter_active = NULL;
 
     if (ListSize(active) == REGISTER_NUM) {
       var_live_interval *active_tail_live_interval = NULL;
-      ListGetBack(active, &active_tail_live_interval);
+      ListGetBack(active, (void **)&active_tail_live_interval);
       if (active_tail_live_interval->this_var_total_live_interval->end >
           cur_handle->this_var_total_live_interval->end) {
         LOCATION *cur_spill_var_location = (LOCATION *)HashMapGet(
@@ -1739,10 +1758,11 @@ void line_scan_register_allocation(ALGraph *self_cfg, Function *self_func,
         *cur_spill_var_location = MEMORY;
         HashMapPut(var_location, strdup(cur_handle->self),
                    cur_add_var_location);
+        // printf("hashmap put %s\n", cur_handle->self);
         ListPopBack(active);
         for (int i = 0; i < ListSize(active); i++) {
           var_live_interval *iter_active_live_interval = NULL;
-          ListGetAt(active, i, &iter_active_live_interval);
+          ListGetAt(active, i, (void **)&iter_active_live_interval);
           if (cur_handle->this_var_total_live_interval->end <
               iter_active_live_interval->this_var_total_live_interval->end) {
             ListInsert(active, i, cur_handle);
@@ -1754,32 +1774,43 @@ void line_scan_register_allocation(ALGraph *self_cfg, Function *self_func,
         *cur_add_var_location = MEMORY;
         HashMapPut(var_location, strdup(cur_handle->self),
                    cur_add_var_location);
+        // printf("hashmap put %s\n", cur_handle->self);
       }
+      // printf("gggggggggggggggg\n");
     } else {
+      bool found = false;
       for (int i = 1; i <= REGISTER_NUM; i++) {
         if (!register_situation[i]) {
           LOCATION *cur_add_var_location = (LOCATION *)malloc(sizeof(LOCATION));
           *cur_add_var_location = i;
           HashMapPut(var_location, strdup(cur_handle->self),
                      cur_add_var_location);
+          // printf("hashmap put %s\n", cur_handle->self);
           int j = 0;
           for (; j < ListSize(active); j++) {
             var_live_interval *iter_active_live_interval = NULL;
-            ListGetAt(active, j, &iter_active_live_interval);
+            ListGetAt(active, j, (void **)&iter_active_live_interval);
             if (cur_handle->this_var_total_live_interval->end <
                 iter_active_live_interval->this_var_total_live_interval->end) {
               ListInsert(active, j, cur_handle);
               break;
             }
           }
-          if (j == ListSize(active)) ListPushBack(active, cur_handle);
+          if (j == ListSize(active))
+            ListPushBack(active, cur_handle);
 
           register_situation[i] = true;
+          found = true;
           break;
         }
       }
+      // if (found)
+      //   printf("found 1111111111111111111\n");
+      // else
+      //   printf("Not found\n");
     }
   }
+  printf("\n");
 }
 
 void register_replace(ALGraph *self_cfg, Function *self_func,
@@ -1846,9 +1877,9 @@ void bblock_to_dom_graph_pass(Function *self) {
   HeadNode *init_headnode = (HeadNode *)malloc(sizeof(HeadNode));
   init_headnode->bblock_head = self->entry_bblock;
   init_headnode->is_visited = false;
-  hashset_init(&(init_headnode->edge_list));
-  hashset_init(&(init_headnode->dom_set));
-  hashset_init(&(init_headnode->dom_frontier_set));
+  hashmap_init(&(init_headnode->edge_list));
+  hashmap_init(&(init_headnode->dom_set));
+  hashmap_init(&(init_headnode->dom_frontier_set));
   init_headnode->pre_node_list = NULL;
 
   bblock_to_dom_graph_dfs_pass(init_headnode, 0);
@@ -1857,13 +1888,13 @@ void bblock_to_dom_graph_pass(Function *self) {
 
   // 打印邻接边
   for (int i = 0; i < num_of_block; i++) {
-    HashSetFirst(graph_for_dom_tree->node_set[i]->edge_list);
-    void *element;
+    HashMapFirst(graph_for_dom_tree->node_set[i]->edge_list);
+    node_pair *element;
     printf("%s edge is ",
            graph_for_dom_tree->node_set[i]->bblock_head->label->name);
-    while ((element = HashSetNext(
+    while ((element = (node_pair *)HashMapNext(
                 graph_for_dom_tree->node_set[i]->edge_list)) != NULL) {
-      printf("%s ", ((HeadNode *)element)->bblock_head->label->name);
+      printf("%s ", element->value->bblock_head->label->name);
     }
     printf("\n");
   }
@@ -1909,6 +1940,8 @@ void bblock_to_dom_graph_pass(Function *self) {
 
   replace_phi_nodes(dom_tree_root);
 
+  remove_bblock_phi_func_pass(graph_for_dom_tree);
+  // puts("over once");
   remove_bblock_phi_func_pass(graph_for_dom_tree);
 
   printf("\n\n\n");

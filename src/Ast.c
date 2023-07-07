@@ -1,6 +1,8 @@
 #include "Ast.h"
+#include "type.h"
 
-#include <stdarg.h>  //变长参数函数所需的头文件
+#include <stdarg.h> //变长参数函数所需的头文件
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -9,8 +11,8 @@ extern Stack *stack_ast_pre;
 extern Stack *stack_symbol_table;
 extern Stack *stack_else_label;
 extern Stack *stack_then_label;
-extern Stack *stack_while_head_label;  // while循环头(条件判断)
-extern Stack *stack_while_then_label;  // while条件为false时所要跳转的label栈
+extern Stack *stack_while_head_label; // while循环头(条件判断)
+extern Stack *stack_while_then_label; // while条件为false时所要跳转的label栈
 extern Stack *stack_param;
 extern ast *pre_astnode;
 extern List *ins_list;
@@ -20,12 +22,16 @@ extern SymbolTable *cur_symboltable;
 void CleanObject(void *element);
 
 enum NowVarDecType { NowVoid, NowInt, NowFloat, NowStruct } nowVarDecType;
+
+bool NowConst = false;
+
 enum NameSeed {
   FUNC_LABEL_END,
   TEMP_VAR,
   FUNC_LABEL,
   LABEL,
   PARAM,
+  PARAM_CONVERT,
   GLOBAL,
   ARRAY,
   POINT
@@ -33,13 +39,13 @@ enum NameSeed {
 
 char *NowVarDecStr[] = {"void", "int", "float", "struct"};
 
-static int temp_var_seed = 1;    // 用于标识变量的名字
-static int label_var_seed = 1;   // 用于标识label的名字
-static int label_func_seed = 1;  // 用于表示func_label的名字
-static int point_seed = 1;       // 用于表示指针变量名 用于alloca
-static int array_seed = 1;       // 用于表示数组变量名 用于alloca
-static int global_seed = 1;      // 用于表示全局变量
-static int param_seed = 0;       // 用于标识函数参数的个数
+static int temp_var_seed = 1;   // 用于标识变量的名字
+static int label_var_seed = 1;  // 用于标识label的名字
+static int label_func_seed = 1; // 用于表示func_label的名字
+static int point_seed = 1;      // 用于表示指针变量名 用于alloca
+static int array_seed = 1;      // 用于表示数组变量名 用于alloca
+static int global_seed = 1;     // 用于表示全局变量
+static int param_seed = 0;      // 用于标识函数参数的个数
 static int total_array_member = 1;
 static List *array_list = NULL;
 static Value *cur_construction_func;
@@ -48,32 +54,35 @@ static char *cur_handle_func = NULL;
 char *name_generate(enum NameSeed cur_handle) {
   char temp_str[50];
   switch (cur_handle) {
-    case TEMP_VAR:
-      sprintf(temp_str, "temp%d", temp_var_seed++);
-      break;
-    case FUNC_LABEL:
-      sprintf(temp_str, "func_label%d", label_func_seed++);
-      break;
-    case FUNC_LABEL_END:
-      sprintf(temp_str, "func_label_end%d", label_func_seed++);
-      break;
-    case LABEL:
-      sprintf(temp_str, "%slabel%d", cur_handle_func, label_var_seed++);
-      break;
-    case PARAM:
-      sprintf(temp_str, "param%d", param_seed++);
-      break;
-    case GLOBAL:
-      sprintf(temp_str, "global%d", global_seed++);
-      break;
-    case ARRAY:
-      sprintf(temp_str, "array%d", array_seed++);
-      break;
-    case POINT:
-      sprintf(temp_str, "point%d", point_seed++);
-      break;
-    default:
-      break;
+  case TEMP_VAR:
+    sprintf(temp_str, "temp%d", temp_var_seed++);
+    break;
+  case FUNC_LABEL:
+    sprintf(temp_str, "func_label%d", label_func_seed++);
+    break;
+  case FUNC_LABEL_END:
+    sprintf(temp_str, "func_label_end%d", label_func_seed++);
+    break;
+  case LABEL:
+    sprintf(temp_str, "%slabel%d", cur_handle_func, label_var_seed++);
+    break;
+  case PARAM:
+    sprintf(temp_str, "param%d", param_seed++);
+    break;
+  case PARAM_CONVERT:
+    sprintf(temp_str, "param%d", --param_seed);
+    break;
+  case GLOBAL:
+    sprintf(temp_str, "global%d", global_seed++);
+    break;
+  case ARRAY:
+    sprintf(temp_str, "array%d", array_seed++);
+    break;
+  case POINT:
+    sprintf(temp_str, "point%d", point_seed++);
+    break;
+  default:
+    break;
   }
   return strdup(temp_str);
 }
@@ -81,43 +90,43 @@ char *name_generate(enum NameSeed cur_handle) {
 // 判断当前if是否含有else
 bool have_else = false;
 
-ast *newast(char *name, int num, ...)  // 抽象语法树建立
+ast *newast(char *name, int num, ...) // 抽象语法树建立
 {
-  va_list valist;                       // 定义变长参数列表
-  ast *a = (ast *)malloc(sizeof(ast));  // 新生成的父节点
+  va_list valist;                      // 定义变长参数列表
+  ast *a = (ast *)malloc(sizeof(ast)); // 新生成的父节点
   a->l = NULL;
   a->r = NULL;
-  ast *temp;  // 修改为局部指针而不分配所指向的内存空间
+  ast *temp; // 修改为局部指针而不分配所指向的内存空间
   if (!a) {
     yyerror("out of space");
     exit(0);
   }
-  a->name = name;         // 语法单元名字
-  va_start(valist, num);  // 初始化变长参数为num后的参数
+  a->name = name;        // 语法单元名字
+  va_start(valist, num); // 初始化变长参数为num后的参数
 
-  if (num > 0)  // num>0为非终结符：变长参数均为语法树结点，孩子兄弟表示法
+  if (num > 0) // num>0为非终结符：变长参数均为语法树结点，孩子兄弟表示法
   {
     temp = va_arg(valist,
-                  ast *);  // 取变长参数列表中的第一个结点设为a的左孩子
+                  ast *); // 取变长参数列表中的第一个结点设为a的左孩子
     a->l = temp;
-    a->line = temp->line;  // 父节点a的行号等于左孩子的行号
+    a->line = temp->line; // 父节点a的行号等于左孩子的行号
 
-    if (num >= 2)  // 可以规约到a的语法单元>=2
+    if (num >= 2) // 可以规约到a的语法单元>=2
     {
       for (int i = 0; i < num - 1;
-           ++i)  // 取变长参数列表中的剩余结点，依次设置成兄弟结点
+           ++i) // 取变长参数列表中的剩余结点，依次设置成兄弟结点
       {
         temp->r = va_arg(valist, ast *);
         temp = temp->r;
       }
       temp->r = NULL;
     }
-  } else  // num==0为终结符或产生空的语法单元：第1个变长参数表示行号，产生空的语法单元行号为-1。
+  } else // num==0为终结符或产生空的语法单元：第1个变长参数表示行号，产生空的语法单元行号为-1。
   {
-    int t = va_arg(valist, int);  // 取第1个变长参数
+    int t = va_arg(valist, int); // 取第1个变长参数
     a->line = t;
     if ((!strcmp(a->name, "ID")) ||
-        (!strcmp(a->name, "TYPE")))  //"ID,TYPE,INTEGER，借助union保存yytext的值
+        (!strcmp(a->name, "TYPE"))) //"ID,TYPE,INTEGER，借助union保存yytext的值
     {
       char *t;
       t = (char *)malloc(sizeof(char *) * 40);
@@ -126,7 +135,7 @@ ast *newast(char *name, int num, ...)  // 抽象语法树建立
     } else if (!strcmp(a->name, "INTEGER")) {
       a->intgr = atoi(yytext);
     } else if (!strcmp(a->name, "FLOAT")) {
-      a->flt = atoi(yytext);
+      a->flt = atof(yytext);
     } else {
     }
   }
@@ -136,11 +145,11 @@ ast *newast(char *name, int num, ...)  // 抽象语法树建立
 void eval_print(ast *a, int level) {
   // 打印该节点
   if (a != NULL) {
-    for (int i = 0; i < level; ++i)  // 孩子结点相对父节点缩进2个空格
+    for (int i = 0; i < level; ++i) // 孩子结点相对父节点缩进2个空格
       printf("  ");
-    if (a->line != -1) {  // 产生空的语法单元不需要打印信息
+    if (a->line != -1) { // 产生空的语法单元不需要打印信息
       printf("%s ",
-             a->name);  // 打印语法单元名字，ID/TYPE/INTEGER要打印yytext的值
+             a->name); // 打印语法单元名字，ID/TYPE/INTEGER要打印yytext的值
       if ((!strcmp(a->name, "ID")) || (!strcmp(a->name, "TYPE")))
         printf(":%s ", a->idtype);
       else if (!strcmp(a->name, "INTEGER"))
@@ -149,7 +158,7 @@ void eval_print(ast *a, int level) {
         printf("(%d)", a->line);
     } else {
       printf("%s ",
-             a->name);  // 打印语法单元名字，ID/TYPE/INTEGER要打印yytext的值
+             a->name); // 打印语法单元名字，ID/TYPE/INTEGER要打印yytext的值
     }
 
     // if (!strcmp(a->name, "SEMI")) {
@@ -160,8 +169,8 @@ void eval_print(ast *a, int level) {
     // }
     printf("\n");
 
-    eval_print(a->l, level + 1);  // 遍历左子树
-    eval_print(a->r, level);      // 遍历右子树
+    eval_print(a->l, level + 1); // 遍历左子树
+    eval_print(a->r, level);     // 遍历右子树
   }
 }
 
@@ -182,7 +191,8 @@ void pre_eval(ast *a) {
       // 插入
       ListPushBack(ins_list, (void *)func_label_ins);
 
-      if (cur_handle_func != NULL) free(cur_handle_func);
+      if (cur_handle_func != NULL)
+        free(cur_handle_func);
       cur_handle_func = strdup(a->l->idtype);
 
       printf("Func: %s\n", a->l->idtype);
@@ -378,7 +388,6 @@ void in_eval(ast *a, Value *left) {
     Value *func_param_ins = (Value *)ins_new_single_operator_v2(ParamOP, left);
 
     // 添加变量的名字 类型 和返回值
-    func_param_ins->name = name_generate(PARAM);
     func_param_ins->VTy->TID = ParamTyID;
     // func_param_ins->pdata->param_pdata.param_value = left;
 
@@ -391,36 +400,23 @@ void in_eval(ast *a, Value *left) {
   }
 
   if (a->r && !strcmp(a->r->name, "assistWHILE")) {
-    char temp_str[30];
-    char text[10];
-    // 创建false条件下的label标签
-    sprintf(text, "%d", label_var_seed);
-    ++label_var_seed;
-    strcpy(temp_str, "label");
-    strcat(temp_str, text);
 
     Value *while_false_label_ins = (Value *)ins_new_no_operator_v2(LabelOP);
-    while_false_label_ins->name = strdup(temp_str);
+    while_false_label_ins->name = name_generate(LABEL);
     while_false_label_ins->VTy->TID = LabelTyID;
     // 将 while_then_label入栈
     StackPush(stack_while_then_label, while_false_label_ins);
 
-    // 创建true条件下的label标签
-    sprintf(text, "%d", label_var_seed);
-    ++label_var_seed;
-    strcpy(temp_str, "label");
-    strcat(temp_str, text);
-
     Value *while_true_label_ins = (Value *)ins_new_no_operator_v2(LabelOP);
     // 添加变量的名字
-    while_true_label_ins->name = strdup(temp_str);
+    while_true_label_ins->name = name_generate(LABEL);
     while_true_label_ins->VTy->TID = LabelTyID;
 
     // 创建跳转语句
     Value *goto_condition_ins =
         (Value *)ins_new_single_operator_v2(GotoWithConditionOP, left);
 
-    char temp_br_label_name[40];
+    char temp_br_label_name[80];
     strcpy(temp_br_label_name, "true:");
     strcat(temp_br_label_name, while_true_label_ins->name);
     strcat(temp_br_label_name, "  false:");
@@ -440,7 +436,7 @@ void in_eval(ast *a, Value *left) {
 
     ListPushBack(ins_list, while_true_label_ins);
 
-    printf("%s\n", temp_str);
+    printf("%s\n", while_true_label_ins->name);
   }
 }
 
@@ -459,6 +455,8 @@ Value *post_eval(ast *a, Value *left, Value *right) {
         else if (!strcmp(a->idtype, NowVarDecStr[3]))
           nowVarDecType = NowStruct;
       }
+      if (a->r && !strcmp(a->r->name, "CONST"))
+        NowConst = true;
     }
 
     if (!strcmp(a->name, "Specifire")) {
@@ -481,6 +479,11 @@ Value *post_eval(ast *a, Value *left, Value *right) {
             cur_ins->IsGlobalVar = 1;
           } else {
             array_name = name_generate(ARRAY);
+          }
+
+          if (NowConst) {
+            cur_ins->IsConst = 1;
+            NowConst = false;
           }
 
           // 添加变量类型
@@ -523,6 +526,12 @@ Value *post_eval(ast *a, Value *left, Value *right) {
           // 添加变量的名字
           cur_var->name = strdup(a->idtype);
 
+          if (NowConst) {
+            cur_var->IsConst = 1;
+            cur_ins->IsConst = 1;
+            NowConst = false;
+          }
+
           cur_ins->VTy->TID = PointerTyID;
           // 添加指针的名字 映射进哈希表 放入symbol_tabel里面 用于索引
           cur_ins->name = temp_var;
@@ -540,10 +549,10 @@ Value *post_eval(ast *a, Value *left, Value *right) {
           // 返回指针
           return cur_ins;
         }
-      } else if  // 变量声明的时候同时初始化
+      } else if // 变量声明的时候同时初始化
           (!strcmp(a->name, "ASSIGNOP")) {
         return right;
-      } else if  // 变量声明的时候同时初始化
+      } else if // 变量声明的时候同时初始化
           (!strcmp(a->name, "LB")) {
         return right;
       }
@@ -571,26 +580,53 @@ Value *post_eval(ast *a, Value *left, Value *right) {
         };
         if (load_var_pointer->VTy->TID == ArrayTyID) {
           return load_var_pointer;
-        } else {
-          // 给引用变量命名
-          char temp_str[15];
-          char text[10];
-          sprintf(text, "%d", temp_var_seed);
-          ++temp_var_seed;
-          strcpy(temp_str, "\%temp");
-          strcat(temp_str, text);
+        } else if (load_var_pointer->pdata->allocate_pdata.point_value
+                       ->IsConst) {
+          if (load_var_pointer->pdata->allocate_pdata.point_value->VTy->TID ==
+              IntegerTyID) {
+            Value *cur = (Value *)malloc(sizeof(Value));
+            value_init(cur);
+            cur->VTy->TID = ImmediateIntTyID;
+            char text[10];
+            sprintf(text, "%d",
+                    load_var_pointer->pdata->allocate_pdata.point_value->pdata
+                        ->var_pdata.iVal);
+            // 添加变量的名字
+            cur->name = strdup(text);
+            // 为padata里的整数字面量常量赋值
+            cur->pdata->var_pdata.iVal =
+                load_var_pointer->pdata->allocate_pdata.point_value->pdata
+                    ->var_pdata.iVal;
+            return cur;
+          } else {
+            Value *cur = (Value *)malloc(sizeof(Value));
+            value_init(cur);
+            cur->VTy->TID = ImmediateFloatTyID;
+            char text[32];
+            sprintf(text, "%f",
+                    load_var_pointer->pdata->allocate_pdata.point_value->pdata
+                        ->var_pdata.fVal);
+            // 添加变量的名字
+            cur->name = strdup(text);
+            // 为padata里的整数字面量常量赋值
+            cur->pdata->var_pdata.fVal =
+                load_var_pointer->pdata->allocate_pdata.point_value->pdata
+                    ->var_pdata.fVal;
+            return cur;
+          }
 
-          // 内容与指针所指向的pdata完全一样 名字不一样 占用的内存地址也不一样
+        } else {
+          // load instruction
           Value *load_ins =
               (Value *)ins_new_single_operator_v2(LoadOP, load_var_pointer);
-          load_ins->name = strdup(temp_str);
+          load_ins->name = name_generate(TEMP_VAR);
           // 将内容拷贝
           value_copy(load_ins,
                      load_var_pointer->pdata->allocate_pdata.point_value);
 
           ListPushBack(ins_list, (void *)load_ins);
 
-          printf("%s = load %s, %s,align 4\n", temp_str,
+          printf("%s = load %s, %s,align 4\n", load_ins->name,
                  NowVarDecStr[load_ins->VTy->TID < 4 ? load_ins->VTy->TID
                                                      : load_ins->VTy->TID - 4],
                  load_var_pointer->name);
@@ -630,7 +666,7 @@ Value *post_eval(ast *a, Value *left, Value *right) {
         Value *cur = (Value *)malloc(sizeof(Value));
         value_init(cur);
         cur->VTy->TID = ImmediateFloatTyID;
-        char text[10];
+        char text[30];
         sprintf(text, "%f", a->flt);
         // 添加变量的名字
         cur->name = strdup(text);
@@ -671,10 +707,13 @@ Value *post_eval(ast *a, Value *left, Value *right) {
         HashMapPut(func_hashMap, strdup(temp_str), func_label);
 
         void *func_param_ins;
+        param_seed = func_label->pdata->symtab_func_pdata.param_num;
+
         for (int i = 0; i < func_label->pdata->symtab_func_pdata.param_num;
              i++) {
           StackTop(stack_param, &func_param_ins);
           StackPop(stack_param);
+          ((Value *)func_param_ins)->name = name_generate(PARAM_CONVERT);
 
           // 插入
           ListPushBack(ins_list, (void *)func_param_ins);
@@ -721,6 +760,15 @@ Value *post_eval(ast *a, Value *left, Value *right) {
             // 把right存给left left是赋值号左边操作数的地址
             Value *store_ins =
                 (Value *)ins_new_binary_operator_v2(StoreOP, left, right);
+            if (left->pdata->allocate_pdata.point_value->IsConst) {
+              if (left->pdata->allocate_pdata.point_value->VTy->TID ==
+                  IntegerTyID)
+                left->pdata->allocate_pdata.point_value->pdata->var_pdata.iVal =
+                    right->pdata->var_pdata.iVal;
+              else
+                left->pdata->allocate_pdata.point_value->pdata->var_pdata.fVal =
+                    right->pdata->var_pdata.fVal;
+            }
             ListPushBack(ins_list, (void *)store_ins);
             printf("store %s %s, %s,align 4\n",
                    NowVarDecStr[right->VTy->TID < 4 ? right->VTy->TID
@@ -749,7 +797,7 @@ Value *post_eval(ast *a, Value *left, Value *right) {
           left->pdata->array_pdata.step_long =
               total_array_member / (intptr_t)element;
           ListPopFront(array_list);
-          element = (void *)(intptr_t)1;
+          element = (void *)(uintptr_t)1;
           ListPushBack(array_list, element);
           left->pdata->array_pdata.list_para = array_list;
           left->pdata->array_pdata.total_member = total_array_member;
@@ -826,15 +874,15 @@ Value *post_eval(ast *a, Value *left, Value *right) {
         ListGetFront(cur_ins->pdata->array_pdata.list_para, &element);
         ListPopFront(cur_ins->pdata->array_pdata.list_para);
         cur_ins->pdata->array_pdata.step_long =
-            cur_ins->pdata->array_pdata.total_member / (int)element;
+            cur_ins->pdata->array_pdata.total_member / (intptr_t)element;
         ListPushBack(ins_list, cur_ins);
 
         char para_buffer[100];
         memset(para_buffer, 0, sizeof(para_buffer));
         ListFirst(left->pdata->array_pdata.list_para, false);
-        while (ListNext(left->pdata->array_pdata.list_para, &element) != NULL) {
+        while (ListNext(left->pdata->array_pdata.list_para, &element)) {
           char text[10];
-          sprintf(text, "[%d x ", (int)element);
+          sprintf(text, "[%lu x ", (uintptr_t)element);
           strcat(para_buffer, text);
         }
         strcat(para_buffer, "i32");
@@ -842,10 +890,10 @@ Value *post_eval(ast *a, Value *left, Value *right) {
              ii++) {
           strcat(para_buffer, "]");
         }
-        printf(
-            "%s = getelementptr inbounds %s, %s"
-            " * %s, i32 0, i32 %s, !dbg !24\n",
-            cur_ins->name, para_buffer, para_buffer, left->name, right->name);
+        printf("%s = getelementptr inbounds %s, %s"
+               " * %s, i32 0, i32 %s, !dbg !24\n",
+               cur_ins->name, para_buffer, para_buffer, left->name,
+               right->name);
 
         if (ListSize(cur_ins->pdata->array_pdata.list_para) == 0 &&
             (pre_astnode->r ? strcmp(pre_astnode->r->name, "ASSIGNOP")
@@ -876,12 +924,6 @@ Value *post_eval(ast *a, Value *left, Value *right) {
         }
         return cur_ins;
       } else {
-        char temp_str[15];
-        char text[10];
-        sprintf(text, "%d", temp_var_seed);
-        ++temp_var_seed;
-        strcpy(temp_str, "\%temp");
-        strcat(temp_str, text);
 
         // 放入符号表
         // HashMapPut(cur_symboltable->symbol_map, strdup(temp_str), cur);
@@ -890,7 +932,7 @@ Value *post_eval(ast *a, Value *left, Value *right) {
         Value *cur_ins =
             (Value *)ins_new_binary_operator_v2(DefaultOP, left, right);
         // 添加变量的名字
-        cur_ins->name = strdup(temp_str);
+        cur_ins->name = name_generate(TEMP_VAR);
         cur_ins->VTy->TID = ins_res_type(left, right);
 
         char *oprand_type =
@@ -1135,11 +1177,11 @@ Value *eval(ast *a) {
     pre_eval(a);
     // 将当前的ast节点如栈
     StackPush(stack_ast_pre, a);
-    Value *left = eval(a->l);  // 遍历左子树
+    Value *left = eval(a->l); // 遍历左子树
     // 中序遍历
     in_eval(a, left);
 
-    Value *right = eval(a->r);  // 遍历右子树
+    Value *right = eval(a->r); // 遍历右子树
 
     // 将当前的ast节点出栈
     StackPop(stack_ast_pre);
@@ -1153,11 +1195,11 @@ Value *eval(ast *a) {
   return NULL;
 }
 
-void yyerror(char *s, ...)  // 变长参数错误处理函数
+void yyerror(char *s, ...) // 变长参数错误处理函数
 {
   va_list ap;
   va_start(ap, s);
-  fprintf(stderr, "%d:error:", yylineno);  // 错误行号
+  fprintf(stderr, "%d:error:", yylineno); // 错误行号
   vfprintf(stderr, s, ap);
   fprintf(stderr, "\n");
 }

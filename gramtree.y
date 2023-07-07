@@ -18,7 +18,7 @@ double d;
 
 /*declare tokens*/
 %token  <a> INTEGER FLOAT
-%token <a> TYPE STRUCT RETURN IF ELSE WHILE ID SPACE SEMI COMMA ASSIGNOP BREAK CONTINUE
+%token <a> TYPE CONST STRUCT RETURN IF ELSE WHILE ID SPACE SEMI COMMA ASSIGNOP BREAK CONTINUE
 %token <a> GREAT GREATEQUAL LESS LESSEQUAL NOTEQUAL EQUAL 
 %token <a> PLUS MINUS STAR DIV AND OR DOT NOT LP RP LB RB LC RC AERROR
 %token <a> EOL
@@ -80,6 +80,7 @@ ExtDecList:Dec {$$=newast("ExtDecList",1,$1);}
 /*Specifire*/
 Specifire:TYPE {$$=newast("Specifire",1,$1);}
 	|StructSpecifire {$$=newast("Specifire",1,$1);}
+    |CONST TYPE {$$=newast("Specifire",2,$2,$1);}
 	;
 
 /*结构体格式: struct myStruct

@@ -27,27 +27,28 @@ struct _Value {
 
   char *name;
 
-  unsigned char HasValueHandle : 1;  // Has a ValueHandle pointing to this?
+  unsigned char HasValueHandle : 1; // Has a ValueHandle pointing to this?
 
-  unsigned NumUserOperands : NumUserOperandsBits;  // 用于指示被多少个user调用
+  unsigned NumUserOperands : NumUserOperandsBits; // 用于指示被多少个user调用
 
   // Use the same type as the bitfield above so that MSVC will pack them.
   unsigned IsUsedByMD : 1;
   unsigned HasName : 1;
-  unsigned IsInitArgs : 1;      // is cur ins the func param init?
-  unsigned HasHungOffUses : 1;  // 用于指示有多少个操作数
-  unsigned IsGlobalVar : 1;     //  is the pointer ponits to global var
+  unsigned IsInitArgs : 1;     // is cur ins the func param init?
+  unsigned HasHungOffUses : 1; // 用于指示有多少个操作数
+  unsigned IsGlobalVar : 1;    //  is the pointer ponits to global var
+  unsigned IsConst : 1;        //  is the pointer ponits to global var
 };
 
 union _PData {
   // 跳转的目的地 跳转的条件放在use里
   struct {
-    Value *goto_location;  // 无条件跳转位置
+    Value *goto_location; // 无条件跳转位置
   } no_condition_goto;
 
   struct {
-    Value *true_goto_location;   // 条件为真跳转位置
-    Value *false_goto_location;  // 条件为假跳转位置
+    Value *true_goto_location;  // 条件为真跳转位置
+    Value *false_goto_location; // 条件为假跳转位置
   } condition_goto;
 
   // 常数字面量
@@ -59,9 +60,9 @@ union _PData {
   } var_pdata;
 
   struct {
-    TypeID return_type;  // 返回类型
+    TypeID return_type; // 返回类型
     // Type param_type_lists[10];  // 参数的类型数组
-    int param_num;  // 传入参数的个数
+    int param_num; // 传入参数的个数
 
   } symtab_func_pdata;
   struct {
@@ -69,11 +70,11 @@ union _PData {
   } func_call_pdata;
 
   struct {
-    Value *param_value;  // 函数参数
+    Value *param_value; // 函数参数
   } param_pdata;
 
   struct {
-    Value *point_value;  // 分配内存的变量
+    Value *point_value; // 分配内存的变量
   } allocate_pdata;
 
   struct {

@@ -151,12 +151,7 @@ void AllInit() {
   HashMapSetCleanKey(func_hashMap, CleanHashMapKey);
   HashMapSetCleanValue(func_hashMap, CleanValue);
 
-  bblock_hashmap = HashMapInit();
-  // 用于遍历生成cfg图结构时候查找bblock
-  HashMapSetHash(bblock_hashmap, HashKey);
-  HashMapSetCompare(bblock_hashmap, CompareKey);
-  HashMapSetCleanKey(bblock_hashmap, CleanHashMapKey);
-  HashMapSetCleanValue(bblock_hashmap, CleanValue);
+  hashmap_init(&bblock_hashmap);
 
   bblock_to_dom_graph_hashmap = HashMapInit();
   // 用于遍历生成cfg图结构时候查找bblock

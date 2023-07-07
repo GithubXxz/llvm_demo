@@ -9,25 +9,25 @@
 typedef struct _HeadNode {
   BasicBlock *bblock_head;
   // 邻接的边集
-  HashSet *edge_list;
+  HashMap *edge_list;
   // 他支配的节点集
-  HashSet *dom_set;
+  HashMap *dom_set;
   // 他的支配边界集合
-  HashSet *dom_frontier_set;
+  HashMap *dom_frontier_set;
   // 立即支配他的节点
   struct _HeadNode *idom_node;
   // 他的前驱节点链表
   List *pre_node_list;
   // 是否被访问过
   bool is_visited;
-} HeadNode;  // 定义头结点
+} HeadNode; // 定义头结点
 
 // 邻接表表示法的图
 typedef struct _ALGraph {
   HeadNode **node_set;
   // 顶点数目和边的数目
   int node_num, edge_num;
-} ALGraph;  // 定义邻接表
+} ALGraph; // 定义邻接表
 
 void print_ins_pass(List *self);
 void ins_toBBlock_pass(List *self);
