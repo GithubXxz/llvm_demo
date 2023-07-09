@@ -42,7 +42,8 @@ char *op_string[] = {
     "MulOP",       "DivOP",       "EqualOP",         "NotEqualOP",
     "GreatThanOP", "LessThanOP",  "GreatEqualOP",    "LessEqualOP",
     "AssignOP",    "PhiAssignOp", "GetelementptrOP", "CallWithReturnValueOP",
-    "LoadOP",      "NegativeOP",  "PositiveOP",
+    "LoadOP",      "NegativeOP",  "PositiveOP",      "LogicOrOP",
+    "LogicAndOP",
 
     "ReturnOP",    "AllocateOP",  "StoreOP",         "GotoWithConditionOP",
     "ParamOP",

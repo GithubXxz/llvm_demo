@@ -25,6 +25,8 @@ typedef enum _TAC_OP {
   LoadOP,
   NegativeOP,
   PositiveOP,
+  LogicOrOP,
+  LogicAndOP,
 
   ReturnOP,
   AllocateOP,

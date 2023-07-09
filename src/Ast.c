@@ -697,6 +697,7 @@ Value *post_eval(ast *a, Value *left, Value *right) {
                !strcmp(a->name, "EQUAL") || !strcmp(a->name, "NOTEQUAL") ||
                !strcmp(a->name, "GREAT") || !strcmp(a->name, "GREATEQUAL") ||
                !strcmp(a->name, "LESSEQUAL") || !strcmp(a->name, "LESS") ||
+               !strcmp(a->name, "AND") || !strcmp(a->name, "OR") ||
                !strcmp(a->name, "LB")) {
         // 返回当前节点的右节点
         return right;
@@ -1016,6 +1017,14 @@ Value *post_eval(ast *a, Value *left, Value *right) {
         } else if (!strcmp(a->r->name, "MOD")) {
           ((Instruction *)cur_ins)->opcode = ModOP;
           printf("%s = icmp %% %s %s, %s\n", cur_ins->name, oprand_type,
+                 left->name, right->name);
+        } else if (!strcmp(a->r->name, "AND")) {
+          ((Instruction *)cur_ins)->opcode = LogicAndOP;
+          printf("%s = icmp && %s %s, %s\n", cur_ins->name, oprand_type,
+                 left->name, right->name);
+        } else if (!strcmp(a->r->name, "OR")) {
+          ((Instruction *)cur_ins)->opcode = LogicOrOP;
+          printf("%s = icmp || %s %s, %s\n", cur_ins->name, oprand_type,
                  left->name, right->name);
         }
 
