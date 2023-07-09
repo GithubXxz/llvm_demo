@@ -141,7 +141,7 @@ int main(int argc, char **argv) {
   if (argc == 2) {
     choose_case = read_code_from_file(argv[1]);
   } else {
-    choose_case = read_code_from_file(test_cases[25]);
+    choose_case = read_code_from_file(test_cases[21]);
   }
   if (choose_case == NULL)
     return 1;
@@ -153,11 +153,11 @@ int main(int argc, char **argv) {
 
 #ifdef PARSER
   freopen(tty_path, "w", stdout);
-  // freopen("./output/out.txt", "w", stdout);
+  freopen("./output/out.txt", "w", stdout);
 
   print_ins_pass(ins_list);
 
-  // delete_return_deadcode_pass(ins_list);
+  delete_return_deadcode_pass(ins_list);
 
   ins_toBBlock_pass(ins_list);
 

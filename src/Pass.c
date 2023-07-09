@@ -632,7 +632,7 @@ void rename_pass_help_new(HashMap *rename_var_stack_hashmap,
 
   // 遍历邻接边集合 修改phi函数中的参数
   node_pair *neighbor_bblock = NULL;
-  HashMapNext(cur_bblock->bblock_node->edge_list);
+  HashMapFirst(cur_bblock->bblock_node->edge_list);
   while ((neighbor_bblock = (node_pair *)HashMapNext(
               cur_bblock->bblock_node->edge_list)) != NULL) {
     void *neighbor_bblock_ins = NULL;
@@ -867,10 +867,10 @@ void insert_copies_help(HashMap *insert_copies_stack_hashmap,
                         HashMap *num_of_var_def, dom_tree *cur_bblock) {
   // Pass One:Initialize the data structures
   HashSet *copy_set = NULL;
-  hashset_init(&(copy_set));
+  hashset_init(&copy_set);
 
   HashSet *worklist = NULL;
-  hashset_init(&(worklist));
+  hashset_init(&worklist);
 
   // 伪代码中的map
   HashMap *var_replace_hashmap = NULL;
@@ -884,7 +884,7 @@ void insert_copies_help(HashMap *insert_copies_stack_hashmap,
 
   // For all successors s of block
   node_pair *neighbor_bblock = NULL;
-  HashMapNext(cur_bblock->bblock_node->edge_list);
+  HashMapFirst(cur_bblock->bblock_node->edge_list);
   while ((neighbor_bblock = (node_pair *)HashMapNext(
               cur_bblock->bblock_node->edge_list)) != NULL) {
     void *neighbor_bblock_ins = NULL;
@@ -1626,28 +1626,30 @@ void delete_return_deadcode_pass(List *self) {
   while (i != ListSize(self)) {
     ListGetAt(self, i, &element);
     switch (((Instruction *)element)->opcode) {
-    case GotoOP:
-      HashSetAdd(reach_label,
-                 ((Value *)element)->pdata->no_condition_goto.goto_location);
-      i++;
-      while (ListGetAt(self, i, &element) &&
-             (((Instruction *)element)->opcode == GotoOP ||
-              ((Instruction *)element)->opcode == GotoWithConditionOP)) {
-        ListRemove(self, i);
-      }
-      break;
-    case GotoWithConditionOP:
-      HashSetAdd(reach_label,
-                 ((Value *)element)->pdata->condition_goto.true_goto_location);
-      HashSetAdd(reach_label,
-                 ((Value *)element)->pdata->condition_goto.false_goto_location);
-      i++;
-      while (ListGetAt(self, i, &element) &&
-             (((Instruction *)element)->opcode == GotoOP ||
-              ((Instruction *)element)->opcode == GotoWithConditionOP)) {
-        ListRemove(self, i);
-      }
-      break;
+    // case GotoOP:
+    //   HashSetAdd(reach_label,
+    //              ((Value *)element)->pdata->no_condition_goto.goto_location);
+    //   i++;
+    //   while (ListGetAt(self, i, &element) &&
+    //          (((Instruction *)element)->opcode == GotoOP ||
+    //           ((Instruction *)element)->opcode == GotoWithConditionOP)) {
+    //     ListRemove(self, i);
+    //   }
+    //   break;
+    // case GotoWithConditionOP:
+    //   HashSetAdd(reach_label,
+    //              ((Value
+    //              *)element)->pdata->condition_goto.true_goto_location);
+    //   HashSetAdd(reach_label,
+    //              ((Value
+    //              *)element)->pdata->condition_goto.false_goto_location);
+    //   i++;
+    //   while (ListGetAt(self, i, &element) &&
+    //          (((Instruction *)element)->opcode == GotoOP ||
+    //           ((Instruction *)element)->opcode == GotoWithConditionOP)) {
+    //     ListRemove(self, i);
+    //   }
+    //   break;
     case ReturnOP:
       i++;
       while (ListGetAt(self, i, &element) &&
@@ -1656,17 +1658,17 @@ void delete_return_deadcode_pass(List *self) {
         ListRemove(self, i);
       }
       break;
-    case LabelOP:
-      while (!HashSetFind(reach_label, (Value *)element) &&
-             strcmp(((Value *)element)->name, "entry")) {
-        ListRemove(self, i);
-        while (ListGetAt(self, i, &element) &&
-               (((Instruction *)element)->opcode != LabelOP)) {
-          ListRemove(self, i);
-        }
-      }
-      i++;
-      break;
+    // case LabelOP:
+    //   while (!HashSetFind(reach_label, (Value *)element) &&
+    //          strcmp(((Value *)element)->name, "entry")) {
+    //     ListRemove(self, i);
+    //     while (ListGetAt(self, i, &element) &&
+    //            (((Instruction *)element)->opcode != LabelOP)) {
+    //       ListRemove(self, i);
+    //     }
+    //   }
+    //   i++;
+    //   break;
     default:
       i++;
       break;
