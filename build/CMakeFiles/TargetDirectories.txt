@@ -1,0 +1,3 @@
+/home/ryuk/project/llvm_demo/llvm_demo/build/CMakeFiles/llvm_demo.dir
+/home/ryuk/project/llvm_demo/llvm_demo/build/CMakeFiles/edit_cache.dir
+/home/ryuk/project/llvm_demo/llvm_demo/build/CMakeFiles/rebuild_cache.dir

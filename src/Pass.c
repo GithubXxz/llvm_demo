@@ -6,7 +6,6 @@
 #include <stdbool.h>
 #include <stdio.h>
 #include <string.h>
-#include <sys/_types/_uintptr_t.h>
 
 typedef struct _dom_tree {
   List *child;
@@ -38,34 +37,18 @@ static const int REGISTER_NUM = 3;
 
 typedef enum _LOCATION { R1 = 1, R2, R3, MEMORY } LOCATION;
 
-char *op_string[] = {"DefaultOP",
-                     "AddOP",
-                     "SubOP",
-                     "MulOP",
-                     "DivOP",
-                     "EqualOP",
-                     "NotEqualOP",
-                     "GreatThanOP",
-                     "LessThanOP",
-                     "GreatEqualOP",
-                     "LessEqualOP",
-                     "AssignOP",
-                     "PhiAssignOp",
-                     "GetelementptrOP",
-                     "CallWithReturnValueOP",
-                     "LoadOP",
-                     "ReturnOP",
-                     "AllocateOP",
-                     "StoreOP",
-                     "GotoWithConditionOP",
-                     "ParamOP",
-                     "GotoOP",
-                     "CallOP",
-                     "LabelOP",
-                     "FuncLabelOP",
-                     "FuncEndOP",
-                     "PhiFuncOp",
-                     "InitArgO"};
+char *op_string[] = {
+    "DefaultOP",   "AddOP",       "SubOP",           "ModOP",
+    "MulOP",       "DivOP",       "EqualOP",         "NotEqualOP",
+    "GreatThanOP", "LessThanOP",  "GreatEqualOP",    "LessEqualOP",
+    "AssignOP",    "PhiAssignOp", "GetelementptrOP", "CallWithReturnValueOP",
+    "LoadOP",      "NegativeOP",  "PositiveOP",
+
+    "ReturnOP",    "AllocateOP",  "StoreOP",         "GotoWithConditionOP",
+    "ParamOP",
+
+    "GotoOP",      "CallOP",      "LabelOP",         "FuncLabelOP",
+    "FuncEndOP",   "PhiFuncOp",   "InitArgO"};
 
 static char *location_string[] = {"null", "R1", "R2", "R3", "M"};
 
@@ -1713,11 +1696,11 @@ void line_scan_register_allocation(ALGraph *self_cfg, Function *self_func,
   ListFirst(self_func->all_var_live_interval, false);
 
   ListNext(self_func->all_var_live_interval, (void **)&cur_handle);
+  if (cur_handle == NULL)
+    return;
   printf("\tval:%s \tbegin:%d \tend:%d \n", cur_handle->self,
          cur_handle->this_var_total_live_interval->begin,
          cur_handle->this_var_total_live_interval->end);
-  if (cur_handle == NULL)
-    return;
   LOCATION *cur_add_var_location = (LOCATION *)malloc(sizeof(LOCATION));
   *cur_add_var_location = R1;
   register_situation[1] = true;

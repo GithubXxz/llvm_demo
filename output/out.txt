@@ -1,0 +1,43 @@
+         	     0:          FuncLabelOP 	                 ifElseIf 	      null
+         	     0:              LabelOP 	            ifElseIfentry 	      null
+         	     0:           AllocateOP 	                   point1 	      null
+         	     0:              StoreOP 	                   (null) 	    point1,          5
+         	     0:           AllocateOP 	                   point2 	      null
+         	     0:              StoreOP 	                   (null) 	    point2,         10
+         	     0:               LoadOP 	                    temp1 	    point1
+         	     0:              EqualOP 	                    temp2 	     temp1,          6
+         	     0:  GotoWithConditionOP 	true:ifElseIflabel2  false:ifElseIflabel1 	     temp2
+         	     0:              LabelOP 	           ifElseIflabel2 	      null
+         	     0:               LoadOP 	                    temp3 	    point1
+         	     0:             ReturnOP 	                   return 	     temp3
+         	     0:               GotoOP 	      goto ifElseIflabel3 	      null
+         	     0:              LabelOP 	           ifElseIflabel1 	      null
+         	     0:               LoadOP 	                    temp4 	    point2
+         	     0:              EqualOP 	                    temp5 	     temp4,         10
+         	     0:  GotoWithConditionOP 	true:ifElseIflabel5  false:ifElseIflabel4 	     temp5
+         	     0:              LabelOP 	           ifElseIflabel5 	      null
+         	     0:              StoreOP 	                   (null) 	    point1,         25
+         	     0:               GotoOP 	      goto ifElseIflabel6 	      null
+         	     0:              LabelOP 	           ifElseIflabel4 	      null
+         	     0:               LoadOP 	                    temp6 	    point2
+         	     0:              EqualOP 	                    temp7 	     temp6,         10
+         	     0:  GotoWithConditionOP 	true:ifElseIflabel8  false:ifElseIflabel7 	     temp7
+         	     0:              LabelOP 	           ifElseIflabel8 	      null
+         	     0:               LoadOP 	                    temp8 	    point1
+         	     0:                AddOP 	                    temp9 	     temp8,         15
+         	     0:              StoreOP 	                   (null) 	    point1,      temp9
+         	     0:               GotoOP 	      goto ifElseIflabel9 	      null
+         	     0:              LabelOP 	           ifElseIflabel7 	      null
+         	     0:               LoadOP 	                   temp10 	    point1
+         	     0:                AddOP 	                   temp11 	    temp10,        100
+         	     0:              StoreOP 	                   (null) 	    point1,     temp11
+         	     0:               GotoOP 	      goto ifElseIflabel9 	      null
+         	     96:              LabelOP 	           ifElseIflabel9 	      null
+         	     0:               GotoOP 	      goto ifElseIflabel6 	      null
+         	     0:              LabelOP 	           ifElseIflabel6 	      null
+         	     0:               GotoOP 	      goto ifElseIflabel3 	      null
+         	     0:              LabelOP 	           ifElseIflabel3 	      null
+         	     0:               LoadOP 	                   temp12 	    point1
+         	     0:             ReturnOP 	                   return 	    temp12
+         	     0:            FuncEndOP 	          func_label_end1 	      null
+All over!

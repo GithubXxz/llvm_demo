@@ -1,14 +1,15 @@
-/*
-*Name:gramtree.l
+/**Name:gramtree.l
 *Function:词法分析模块，对每个终结符建立一个叶子结点，返回记号，供bison语法分析使用
 */
 
+%x COMMENT
 
 %{
 #include "stdio.h"
 #include "stdlib.h"
 #include "Ast.h"
 #include "gramtree.tab.h"
+#include "math.h"
 int yyparse(void);
 %}
 
@@ -17,7 +18,9 @@ int yyparse(void);
 *会自动在gramtree.tab.h中分配编号 line:41
 */
 
+
 %option yylineno
+line_commet (\/\/.*\n)
 TYPE int|float|void
 CONST const
 STRUCT struct
@@ -29,8 +32,14 @@ BREAK break
 CONTINUE continue
 PLUS \+
 MINUS \-
-INTEGER [1-9]+[0-9]*|0
-FLOAT   [0-9]+\.[0-9]*
+
+INTEGER [+-]?[1-9]+[0-9]*|0
+FLOAT   [+-]?[0-9]+\.[0-9]*
+OCT_INT [+-]?0[0-7]+
+HEX_INT [+-]?0[xX][0-9a-fA-F]+
+SCI_INT [+-]?[0-9]+[eE][+-]?[0-9]+
+SCI_FLOAT [+-]?[0-9]*\.[0-9]+([eE][+-]?[0-9]+)?
+
 ID [a-z_A-Z][a-zA-Z_0-9]*
 SPACE [ \t\r]*
 EOL \n
@@ -45,6 +54,7 @@ NOTEQUAL !=
 EQUAL ==
 STAR \*
 DIV \/
+MOD \%
 AND &&
 OR \|\|
 DOT \.
@@ -59,8 +69,12 @@ AERROR .
 
 %%
 
+{line_commet}
+"/*"             {BEGIN COMMENT;}
+<COMMENT>"*/"    {BEGIN INITIAL;}
+<COMMENT>.       {}
 "int"            {yylval.a=newast("TYPE",0,yylineno);return TYPE;}
-"float"           {yylval.a=newast("TYPE",0,yylineno);return TYPE;}
+"float"          {yylval.a=newast("TYPE",0,yylineno);return TYPE;}
 "void"           {yylval.a=newast("TYPE",0,yylineno);return TYPE;}
 "struct"         {yylval.a=newast("STRUCT",0,yylineno);return STRUCT;}
 "const"          {yylval.a=newast("CONST",0,yylineno);return CONST;}
@@ -72,8 +86,14 @@ AERROR .
 {CONTINUE}       {yylval.a=newast("CONTINUE",0,yylineno); return CONTINUE;}
 {PLUS}           {yylval.a=newast("PLUS",0,yylineno); return PLUS;}
 {MINUS}          {yylval.a=newast("MINUS",0,yylineno); return MINUS;}
+
 {INTEGER}        {yylval.a=newast("INTEGER",0,yylineno); return INTEGER;}
 {FLOAT}          {yylval.a=newast("FLOAT",0,yylineno); return FLOAT;}
+{OCT_INT}        {yylval.a=newast("OCT_INT",0,yylineno); return INTEGER;}
+{HEX_INT}        {yylval.a=newast("HEX_INT",0,yylineno); return INTEGER;}
+{SCI_INT}        {yylval.a=newast("SCI_INT",0,yylineno); return INTEGER;}
+{SCI_FLOAT}      {yylval.a=newast("SCI_FLOAT",0,yylineno); return FLOAT;}
+
 {ID}             {yylval.a=newast("ID",0,yylineno); return ID;}
 {SPACE}          {}
 {EOL}            {}
@@ -88,6 +108,7 @@ AERROR .
 {EQUAL}          {yylval.a=newast("EQUAL",0,yylineno); return EQUAL;}
 {STAR}           {yylval.a=newast("STAR",0,yylineno); return STAR;}
 {DIV}            {yylval.a=newast("DIV",0,yylineno); return DIV;}
+{MOD}            {yylval.a=newast("MOD",0,yylineno); return MOD;}
 {AND}            {yylval.a=newast("AND",0,yylineno); return AND;}
 {OR}             {yylval.a=newast("OR",0,yylineno); return OR;}
 {DOT}            {yylval.a=newast("DOT",0,yylineno); return DOT;}

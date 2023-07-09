@@ -1,6 +1,7 @@
 #include "Ast.h"
 #include "type.h"
 
+#include <math.h>
 #include <stdarg.h> //变长参数函数所需的头文件
 #include <stdbool.h>
 #include <stdio.h>
@@ -136,6 +137,18 @@ ast *newast(char *name, int num, ...) // 抽象语法树建立
       a->intgr = atoi(yytext);
     } else if (!strcmp(a->name, "FLOAT")) {
       a->flt = atof(yytext);
+    } else if (!strcmp(a->name, "OCT_INT")) {
+      a->name = "INTEGER";
+      a->intgr = strtol(yytext, NULL, 8);
+    } else if (!strcmp(a->name, "HEX_INT")) {
+      a->name = "INTEGER";
+      a->intgr = strtol(yytext, NULL, 16);
+    } else if (!strcmp(a->name, "SCI_INT")) {
+      a->name = "INTEGER";
+      a->intgr = (int)strtod(yytext, NULL);
+    } else if (!strcmp(a->name, "SCI_FLOAT")) {
+      a->name = "FLOAT";
+      a->flt = strtof(yytext, NULL);
     } else {
     }
   }
@@ -270,6 +283,33 @@ void pre_eval(ast *a) {
       // 插入while循环头的label
       ListPushBack(ins_list, while_head_label_ins);
     }
+    if (!strcmp(a->name, "assistELSE")) {
+      Value *then_label_ins = (Value *)ins_new_no_operator_v2(LabelOP);
+
+      // 添加变量的名字
+      then_label_ins->name = name_generate(LABEL);
+      then_label_ins->VTy->TID = LabelTyID;
+
+      StackPush(stack_then_label, then_label_ins);
+
+      // printf("new instruction destination %s and push to the then_stack\n",
+      //        then_label->name);
+
+      // cur_symboltable->symbol_map->put(cur_symboltable->symbol_map,
+      //                                  strdup(temp_str), goto_else);
+
+      Value *goto_else_ins = (Value *)ins_new_no_operator_v2(GotoOP);
+      char temp_str[50];
+      strcpy(temp_str, "goto ");
+      strcat(temp_str, then_label_ins->name);
+      goto_else_ins->name = strdup(temp_str);
+      goto_else_ins->VTy->TID = GotoTyID;
+      goto_else_ins->pdata->no_condition_goto.goto_location = then_label_ins;
+
+      ListPushBack(ins_list, (void *)goto_else_ins);
+
+      printf("br %s \n", then_label_ins->name);
+    }
   }
 }
 
@@ -355,34 +395,6 @@ void in_eval(ast *a, Value *left) {
     printf("%s\n", temp_str);
   }
 
-  if (a->r && !strcmp(a->r->name, "assistELSE")) {
-    Value *then_label_ins = (Value *)ins_new_no_operator_v2(LabelOP);
-
-    // 添加变量的名字
-    then_label_ins->name = name_generate(LABEL);
-    then_label_ins->VTy->TID = LabelTyID;
-
-    StackPush(stack_then_label, then_label_ins);
-
-    // printf("new instruction destination %s and push to the then_stack\n",
-    //        then_label->name);
-
-    // cur_symboltable->symbol_map->put(cur_symboltable->symbol_map,
-    //                                  strdup(temp_str), goto_else);
-
-    Value *goto_else_ins = (Value *)ins_new_no_operator_v2(GotoOP);
-    char temp_str[30];
-    strcpy(temp_str, "goto ");
-    strcat(temp_str, then_label_ins->name);
-    goto_else_ins->name = strdup(temp_str);
-    goto_else_ins->VTy->TID = GotoTyID;
-    goto_else_ins->pdata->no_condition_goto.goto_location = then_label_ins;
-
-    ListPushBack(ins_list, (void *)goto_else_ins);
-
-    printf("br %s \n", then_label_ins->name);
-  }
-
   // args_insert
   if (a->r && !strcmp(a->r->name, "assistArgs")) {
     Value *func_param_ins = (Value *)ins_new_single_operator_v2(ParamOP, left);
@@ -459,6 +471,12 @@ Value *post_eval(ast *a, Value *left, Value *right) {
         NowConst = true;
     }
 
+    if (!strcmp(a->name, "Dec")) {
+      if (a->r == NULL)
+        NowConst = false;
+      return NULL;
+    }
+
     if (!strcmp(a->name, "Specifire")) {
       return right;
     }
@@ -483,7 +501,6 @@ Value *post_eval(ast *a, Value *left, Value *right) {
 
           if (NowConst) {
             cur_ins->IsConst = 1;
-            NowConst = false;
           }
 
           // 添加变量类型
@@ -529,7 +546,6 @@ Value *post_eval(ast *a, Value *left, Value *right) {
           if (NowConst) {
             cur_var->IsConst = 1;
             cur_ins->IsConst = 1;
-            NowConst = false;
           }
 
           cur_ins->VTy->TID = PointerTyID;
@@ -655,7 +671,7 @@ Value *post_eval(ast *a, Value *left, Value *right) {
         Value *cur = (Value *)malloc(sizeof(Value));
         value_init(cur);
         cur->VTy->TID = ImmediateIntTyID;
-        char text[10];
+        char text[20];
         sprintf(text, "%d", a->intgr);
         // 添加变量的名字
         cur->name = strdup(text);
@@ -666,7 +682,7 @@ Value *post_eval(ast *a, Value *left, Value *right) {
         Value *cur = (Value *)malloc(sizeof(Value));
         value_init(cur);
         cur->VTy->TID = ImmediateFloatTyID;
-        char text[30];
+        char text[50];
         sprintf(text, "%f", a->flt);
         // 添加变量的名字
         cur->name = strdup(text);
@@ -677,9 +693,9 @@ Value *post_eval(ast *a, Value *left, Value *right) {
       // 加减乘除的情况
       else if (!strcmp(a->name, "MINUS") || !strcmp(a->name, "PLUS") ||
                !strcmp(a->name, "STAR") || !strcmp(a->name, "DIV") ||
-               !strcmp(a->name, "ASSIGNOP") || !strcmp(a->name, "EQUAL") ||
-               !strcmp(a->name, "NOTEQUAL") || !strcmp(a->name, "GREAT") ||
-               !strcmp(a->name, "GREATEQUAL") ||
+               !strcmp(a->name, "MOD") || !strcmp(a->name, "ASSIGNOP") ||
+               !strcmp(a->name, "EQUAL") || !strcmp(a->name, "NOTEQUAL") ||
+               !strcmp(a->name, "GREAT") || !strcmp(a->name, "GREATEQUAL") ||
                !strcmp(a->name, "LESSEQUAL") || !strcmp(a->name, "LESS") ||
                !strcmp(a->name, "LB")) {
         // 返回当前节点的右节点
@@ -834,6 +850,24 @@ Value *post_eval(ast *a, Value *left, Value *right) {
         var_name = left->name;
       }
 
+      if (a->l) {
+        Value *work_ins = NULL;
+        bool flag = false;
+        if (!strcmp(a->l->name, "PLUS")) {
+          // flag = true;
+          // work_ins = (Value *)ins_new_single_operator_v2(PositiveOP, left);
+        } else if (!strcmp(a->l->name, "MINUS")) {
+          flag = true;
+          work_ins = (Value *)ins_new_single_operator_v2(NegativeOP, left);
+        }
+        if (flag) {
+          work_ins->name = name_generate(TEMP_VAR);
+          work_ins->VTy->TID = left->VTy->TID;
+          ListPushBack(ins_list, work_ins);
+          left = work_ins;
+        }
+      }
+
       if (right == NULL) {
         return left;
       } else if (!strcmp(a->r->name, "ASSIGNOP")) {
@@ -979,11 +1013,15 @@ Value *post_eval(ast *a, Value *left, Value *right) {
           ((Instruction *)cur_ins)->opcode = LessEqualOP;
           printf("%s = icmp <= %s %s, %s\n", cur_ins->name, oprand_type,
                  left->name, right->name);
+        } else if (!strcmp(a->r->name, "MOD")) {
+          ((Instruction *)cur_ins)->opcode = ModOP;
+          printf("%s = icmp %% %s %s, %s\n", cur_ins->name, oprand_type,
+                 left->name, right->name);
         }
+
         ListPushBack(ins_list, (void *)cur_ins);
         return cur_ins;
       }
-      return left;
     }
 
     if (!strcmp(a->name, "assistFuncCall")) {

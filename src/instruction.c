@@ -150,9 +150,10 @@ TypeID ins_res_type_v2(Value *left, Value *right) {
 void free_common_ins_v2(Instruction *self) {
   if (self->opcode == AddOP || self->opcode == SubOP || self->opcode == MulOP ||
       self->opcode == DivOP || self->opcode == EqualOP ||
-      self->opcode == GreatThanOP || self->opcode == LessThanOP ||
-      self->opcode == ParamOP || self->opcode == NotEqualOP ||
-      self->opcode == GreatEqualOP || self->opcode == LessEqualOP) {
+      self->opcode == ModOP || self->opcode == GreatThanOP ||
+      self->opcode == LessThanOP || self->opcode == ParamOP ||
+      self->opcode == NotEqualOP || self->opcode == GreatEqualOP ||
+      self->opcode == LessEqualOP) {
     // 释放连接这条instruction的use链
     for (int i = 0; i < self->user.num_oprands; i++) {
       use_remove_from_list(user_get_operand_use((User *)self, i));

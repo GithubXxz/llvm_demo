@@ -17,10 +17,10 @@ double d;
 }
 
 /*declare tokens*/
-%token  <a> INTEGER FLOAT
+%token <a> INTEGER FLOAT 
 %token <a> TYPE CONST STRUCT RETURN IF ELSE WHILE ID SPACE SEMI COMMA ASSIGNOP BREAK CONTINUE
 %token <a> GREAT GREATEQUAL LESS LESSEQUAL NOTEQUAL EQUAL 
-%token <a> PLUS MINUS STAR DIV AND OR DOT NOT LP RP LB RB LC RC AERROR
+%token <a> PLUS MINUS STAR DIV MOD AND OR DOT NOT LP RP LB RB LC RC AERROR
 %token <a> EOL
 %type  <a> Program ExtDefList ExtDef ExtDecList Specifire StructSpecifire TACList TAC InitList
 OptTag  Tag VarDec  FunDec VarList ParamDec Compst StmtList Stmt DefList Def DecList Dec Exp Args 
@@ -32,7 +32,7 @@ OptTag  Tag VarDec  FunDec VarList ParamDec Compst StmtList Stmt DefList Def Dec
 %left AND 
 %left GREAT GREATEQUAL LESS LESSEQUAL NOTEQUAL EQUAL
 %left PLUS MINUS
-%left STAR DIV
+%left STAR DIV MOD
 %right NOT
 %left LP RP LB RB DOT
 %%
@@ -164,13 +164,14 @@ StmtList:Stmt StmtList{$$=newast("StmtList",2,$1,$2);}
 //5.if(表达式)语句::=>{基本块} else语句=>{基本块}
 //6.while(表达式)语句::=>{基本块}
 Stmt:Exp SEMI {$$=newast("Stmt",1,$1);}
+    |SEMI
     |Compst {$$=newast("Stmt",1,$1);}
-	|RETURN Exp SEMI {$$=newast("Stmt",2,$1,$2);}
+	  |RETURN Exp SEMI {$$=newast("Stmt",2,$1,$2);}
     |BREAK SEMI{$$=newast("Stmt",1,$1);}
     |CONTINUE SEMI{$$=newast("Stmt",1,$1);}
-	|IF LP Exp RP Stmt {$$=newast("Stmt",5,$1,$3,newast("assistIF",0,-1),$5,newast("assistELSE",0,-1));}
-	|IF LP Exp RP Stmt ELSE Stmt {$$=newast("Stmt",7,$1,$3,newast("assistIF",0,-1),$5,newast("assistELSE",0,-1),$6,$7);}
-	|WHILE LP Exp RP Stmt {$$=newast("Stmt",4,$1,$3,newast("assistWHILE",0,-1),$5);}
+    |IF LP Exp RP Stmt {$$=newast("Stmt",5,$1,$3,newast("assistIF",0,-1),$5,newast("assistELSE",0,-1));}
+    |IF LP Exp RP Stmt ELSE Stmt {$$=newast("Stmt",7,$1,$3,newast("assistIF",0,-1),$5,newast("assistELSE",0,-1),$6,$7);}
+    |WHILE LP Exp RP Stmt {$$=newast("Stmt",4,$1,$3,newast("assistWHILE",0,-1),$5);}
 	;
 
 
@@ -193,7 +194,7 @@ DecList:Dec COMMA DecList {$$=newast("DecList",2,$1,$3);}
 // a =10; a=b+c;
 Dec:VarDec {$$=newast("Dec",1,$1);}
 	|VarDec ASSIGNOP Exp {$$=newast("Dec",3,$1,$2,$3);}
-	|VarDec ASSIGNOP InitList {$$=newast("Dec",3,$1,$2,$3);}
+	|VarDec ASSIGNOP LC InitList RC{$$=newast("Dec",3,$1,$2,$4);}
 	;
 
 InitList:InitList COMMA InitList {$$=newast("InitList",3,$1,$2,$3);}
@@ -214,8 +215,10 @@ Exp:Exp ASSIGNOP Exp{$$=newast("Exp",3,$1,$2,$3);} // Exp = Exp
         |Exp MINUS Exp{$$=newast("Exp",3,$1,$2,$3);} // Exp - Exp
         |Exp STAR Exp{$$=newast("Exp",3,$1,$2,$3);} // Exp * Exp
         |Exp DIV Exp{$$=newast("Exp",3,$1,$2,$3);} // Exp / Exp
+        |Exp MOD Exp{$$=newast("Exp",3,$1,$2,$3);} // Exp % Exp
         |LP Exp RP{$$=newast("Exp",1,$2);}  // (Exp)
-        |MINUS Exp {$$=newast("Exp",2,$1,$2);} // -Exp
+        |MINUS Exp %prec MINUS{$$=newast("Exp",2,$1,$2);} // -Exp
+        |PLUS Exp %prec PLUS{$$=newast("Exp",2,$1,$2);} // +Exp
         |NOT Exp {$$=newast("Exp",2,$1,$2);} // !Exp
         |ID LP Args RP {$$=newast("Exp",3,newast("assistFuncCall",0,-1),$1,$3);}//带有参数的函数调用
         |ID LP RP {$$=newast("Exp",2,newast("assistFuncCall",0,-1),$1);}//没有参数的函数调用
