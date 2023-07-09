@@ -135,12 +135,13 @@ int main(int argc, char **argv) {
 
   AllInit();
 
+
   printf("%%begin the pass\n");
   char *choose_case = NULL;
   if (argc == 2) {
     choose_case = read_code_from_file(argv[1]);
   } else {
-    choose_case = read_code_from_file(test_cases[21]);
+    choose_case = read_code_from_file(test_cases[25]);
   }
   if (choose_case == NULL)
     return 1;
