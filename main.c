@@ -131,6 +131,7 @@ char *test_cases[] = {"./test_cases/00_main.c",
                       "./test_cases/99_matrix_tran.c"};
 
 int main(int argc, char **argv) {
+  printf("hello world\n");
   tty_path = ttyname(STDIN_FILENO);
 
   AllInit();
