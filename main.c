@@ -132,17 +132,16 @@ char *test_cases[] = {"./test_cases/00_main.c",
 
 int main(int argc, char **argv) {
   printf("hello world\n");
-  tty_path = ttyname(STDIN_FILENO);
+  tty_path = ttyname(STDOUT_FILENO);
 
   AllInit();
-
 
   printf("%%begin the pass\n");
   char *choose_case = NULL;
   if (argc == 2) {
     choose_case = read_code_from_file(argv[1]);
   } else {
-    choose_case = read_code_from_file(test_cases[21]);
+    choose_case = read_code_from_file(test_cases[53]);
   }
   if (choose_case == NULL)
     return 1;
@@ -152,14 +151,16 @@ int main(int argc, char **argv) {
 #define PARSER
   parser(choose_case);
 
-#ifdef PARSER
   freopen(tty_path, "w", stdout);
   freopen("./output/out.txt", "w", stdout);
 
-  print_ins_pass(ins_list);
+  // print_ins_pass(ins_list);
 
   delete_return_deadcode_pass(ins_list);
 
+  print_ins_pass(ins_list);
+
+#ifdef PARSER
   ins_toBBlock_pass(ins_list);
 
   print_ins_pass(global_var_list);

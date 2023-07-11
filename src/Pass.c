@@ -6,6 +6,7 @@
 #include <stdbool.h>
 #include <stdio.h>
 #include <string.h>
+#include <unistd.h>
 
 typedef struct _dom_tree {
   List *child;
@@ -42,8 +43,8 @@ char *op_string[] = {
     "MulOP",       "DivOP",       "EqualOP",         "NotEqualOP",
     "GreatThanOP", "LessThanOP",  "GreatEqualOP",    "LessEqualOP",
     "AssignOP",    "PhiAssignOp", "GetelementptrOP", "CallWithReturnValueOP",
-    "LoadOP",      "NegativeOP",  "PositiveOP",      "LogicOrOP",
-    "LogicAndOP",
+    "LoadOP",      "NegativeOP",  "PositiveOP",      "NotOP",
+    "LogicOrOP",   "LogicAndOP",
 
     "ReturnOP",    "AllocateOP",  "StoreOP",         "GotoWithConditionOP",
     "ParamOP",
@@ -62,6 +63,8 @@ extern HashSet *bblock_pass_hashset;
 extern HashMap *bblock_to_dom_graph_hashmap;
 
 extern List *global_var_list;
+
+extern char *tty_path;
 
 static Function *cur_func = NULL;
 
@@ -404,7 +407,7 @@ void dom_relation_pass() {
            graph_for_dom_tree->node_set[i]->bblock_head->label->name);
 
     node_pair *element = NULL;
-    HashMapNext(graph_for_dom_tree->node_set[i]->dom_frontier_set);
+    HashMapFirst(graph_for_dom_tree->node_set[i]->dom_frontier_set);
     while ((element = (node_pair *)HashMapNext(
                 graph_for_dom_tree->node_set[i]->dom_frontier_set)) != NULL) {
       printf("%s,", element->key);
@@ -546,6 +549,7 @@ void insert_phi_func_pass(Function *self) {
         // 添加变量的名字
         cur_ins->name = strdup(temp_str);
         cur_ins->pdata->phi_func_pdata.phi_pointer = (Value *)bblock_ins;
+        printf("insert ptr %s phi_func\n", ((Value *)bblock_ins)->name);
         hashmap_init(&(cur_ins->pdata->phi_func_pdata.phi_value));
 
         // printf("%s = phi,align 4\n", temp_str);
@@ -622,11 +626,13 @@ void rename_pass_help_new(HashMap *rename_var_stack_hashmap,
                cur_handle->VTy->TID != ArrayTyID &&
                cur_handle->IsGlobalVar == 0) {
       void *stack_top_var;
-      StackTop(HashMapGet(rename_var_stack_hashmap, cur_handle->name),
-               &stack_top_var);
-
-      // 使用栈顶Value替换使用当前instruction的value
-      replace_use_other_by_self(stack_top_var, element);
+      if (StackSize(HashMapGet(rename_var_stack_hashmap, cur_handle->name)) !=
+          0) {
+        StackTop(HashMapGet(rename_var_stack_hashmap, cur_handle->name),
+                 &stack_top_var);
+        // 使用栈顶Value替换使用当前instruction的value
+        replace_use_other_by_self(stack_top_var, element);
+      }
     }
   }
 
@@ -645,19 +651,35 @@ void rename_pass_help_new(HashMap *rename_var_stack_hashmap,
     while (ListNext(neighbor_bblock->value->bblock_head->inst_list,
                     &neighbor_bblock_ins)) {
       if (((Instruction *)neighbor_bblock_ins)->opcode == PhiFuncOp) {
-        void *stack_top_var;
-        StackTop(HashMapGet(rename_var_stack_hashmap,
-                            ((Value *)neighbor_bblock_ins)
-                                ->pdata->phi_func_pdata.phi_pointer->name),
-                 &stack_top_var);
-        // printf("%p:phinode %s add %s from bblock %s\n", neighbor_bblock_ins,
-        //        ((Value *)neighbor_bblock_ins)->name,
-        //        ((Value *)stack_top_var)->name,
-        //        cur_bblock->bblock_node->bblock_head->label->name);
-        HashMapPut(
-            ((Value *)neighbor_bblock_ins)->pdata->phi_func_pdata.phi_value,
-            strdup(cur_bblock->bblock_node->bblock_head->label->name),
-            stack_top_var);
+        if (StackSize(HashMapGet(
+                rename_var_stack_hashmap,
+                ((Value *)neighbor_bblock_ins)
+                    ->pdata->phi_func_pdata.phi_pointer->name)) != 0) {
+          void *stack_top_var;
+          StackTop(HashMapGet(rename_var_stack_hashmap,
+                              ((Value *)neighbor_bblock_ins)
+                                  ->pdata->phi_func_pdata.phi_pointer->name),
+                   &stack_top_var);
+          // printf("%p:phinode %s add %s from bblock %s\n",
+          // neighbor_bblock_ins,
+          //        ((Value *)neighbor_bblock_ins)->name,
+          //        ((Value *)stack_top_var)->name,
+          //        cur_bblock->bblock_node->bblock_head->label->name);
+          HashMapPut(
+              ((Value *)neighbor_bblock_ins)->pdata->phi_func_pdata.phi_value,
+              strdup(cur_bblock->bblock_node->bblock_head->label->name),
+              stack_top_var);
+        } else {
+          Value *cur = (Value *)malloc(sizeof(Value));
+          value_init(cur);
+          cur->VTy->TID = ImmediateIntTyID;
+          cur->name = strdup("undefined");
+          // 为padata里的整数字面量常量赋值
+          cur->pdata->var_pdata.iVal = 0;
+          HashMapPut(
+              ((Value *)neighbor_bblock_ins)->pdata->phi_func_pdata.phi_value,
+              strdup(cur_bblock->bblock_node->bblock_head->label->name), cur);
+        }
       }
     }
   }
@@ -711,13 +733,12 @@ void rename_pass(Function *self) {
 
   rename_pass_help_new(var_stack_hashmap, dom_tree_root);
 
+  Pair *ptr_pair;
+  while ((ptr_pair = HashMapNext(var_stack_hashmap)) != NULL) {
+    printf("size is %d\n", StackSize((Stack *)ptr_pair->value));
+    StackDeinit(ptr_pair->value);
+  }
   HashMapDeinit(var_stack_hashmap);
-  // Pair *ptr_pair;
-
-  // while ((ptr_pair = HashMapNext(var_stack_hashmap)) != NULL) {
-  //   printf("size is %d\n", StackSize((Stack *)ptr_pair->value));
-  // }
-  // printf("\n");
 
   // while (ListNext(entry_bblock->inst_list, &bblock_ins)) {
   //   memory_iter++;
@@ -1626,49 +1647,54 @@ void delete_return_deadcode_pass(List *self) {
   while (i != ListSize(self)) {
     ListGetAt(self, i, &element);
     switch (((Instruction *)element)->opcode) {
-    // case GotoOP:
-    //   HashSetAdd(reach_label,
-    //              ((Value *)element)->pdata->no_condition_goto.goto_location);
-    //   i++;
-    //   while (ListGetAt(self, i, &element) &&
-    //          (((Instruction *)element)->opcode == GotoOP ||
-    //           ((Instruction *)element)->opcode == GotoWithConditionOP)) {
-    //     ListRemove(self, i);
-    //   }
-    //   break;
-    // case GotoWithConditionOP:
-    //   HashSetAdd(reach_label,
-    //              ((Value
-    //              *)element)->pdata->condition_goto.true_goto_location);
-    //   HashSetAdd(reach_label,
-    //              ((Value
-    //              *)element)->pdata->condition_goto.false_goto_location);
-    //   i++;
-    //   while (ListGetAt(self, i, &element) &&
-    //          (((Instruction *)element)->opcode == GotoOP ||
-    //           ((Instruction *)element)->opcode == GotoWithConditionOP)) {
-    //     ListRemove(self, i);
-    //   }
-    //   break;
-    case ReturnOP:
+    case GotoOP:
+      HashSetAdd(reach_label,
+                 ((Value *)element)->pdata->no_condition_goto.goto_location);
       i++;
-      while (ListGetAt(self, i, &element) &&
-             (((Instruction *)element)->opcode != LabelOP &&
+      while (i < ListSize(self) && ListGetAt(self, i, &element) &&
+             (((Instruction *)element)->opcode != FuncLabelOP &&
+              ((Instruction *)element)->opcode != LabelOP &&
               ((Instruction *)element)->opcode != FuncEndOP)) {
         ListRemove(self, i);
       }
       break;
-    // case LabelOP:
-    //   while (!HashSetFind(reach_label, (Value *)element) &&
-    //          strcmp(((Value *)element)->name, "entry")) {
-    //     ListRemove(self, i);
-    //     while (ListGetAt(self, i, &element) &&
-    //            (((Instruction *)element)->opcode != LabelOP)) {
-    //       ListRemove(self, i);
-    //     }
-    //   }
-    //   i++;
-    //   break;
+    case GotoWithConditionOP:
+      HashSetAdd(reach_label,
+                 ((Value *)element)->pdata->condition_goto.true_goto_location);
+      HashSetAdd(reach_label,
+                 ((Value *)element)->pdata->condition_goto.false_goto_location);
+      i++;
+      while (i < ListSize(self) && ListGetAt(self, i, &element) &&
+             (((Instruction *)element)->opcode != FuncLabelOP &&
+              ((Instruction *)element)->opcode != LabelOP &&
+              ((Instruction *)element)->opcode != FuncEndOP)) {
+        ListRemove(self, i);
+      }
+      break;
+    case ReturnOP:
+      i++;
+      while (i < ListSize(self) && ListGetAt(self, i, &element) &&
+             (((Instruction *)element)->opcode != FuncLabelOP &&
+              ((Instruction *)element)->opcode != LabelOP &&
+              ((Instruction *)element)->opcode != FuncEndOP)) {
+        // printf("remove %s\n", ((Value *)element)->name);
+        ListRemove(self, i);
+      }
+      break;
+    case LabelOP:
+      if (!HashSetFind(reach_label, (Value *)element) &&
+          !strstr(((Value *)element)->name, "entry")) {
+        ListRemove(self, i);
+        while (i < ListSize(self) && ListGetAt(self, i, &element) &&
+               (((Instruction *)element)->opcode != FuncLabelOP &&
+                ((Instruction *)element)->opcode != LabelOP &&
+                ((Instruction *)element)->opcode != FuncEndOP)) {
+          // printf("remove %s\n", ((Value *)element)->name);
+          ListRemove(self, i);
+        }
+      }
+      i++;
+      break;
     default:
       i++;
       break;
@@ -1924,7 +1950,12 @@ void bblock_to_dom_graph_pass(Function *self) {
 
   printf_cur_func_ins(self);
 
+  fflush(stdout);
+  freopen(tty_path, "w", stdout);
+
+  puts("replace phi node begin\n");
   replace_phi_nodes(dom_tree_root);
+  puts("replace phi node over\n");
 
   remove_bblock_phi_func_pass(graph_for_dom_tree);
   // puts("over once");

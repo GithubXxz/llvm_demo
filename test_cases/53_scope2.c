@@ -1,9 +1,9 @@
-int k;
+int m;
 
 int main() {
-  k = 3389;
-  if (k < 10000) {
-    k = k + 1;
+  m = 389;
+  if (m < 10000) {
+    m = m + 1;
     int k = 112;
     while (k > 10) {
       k = k - 88;
@@ -22,5 +22,5 @@ int main() {
     }
     putint(k);
   }
-  return k;
+  return m;
 }

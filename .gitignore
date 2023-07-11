@@ -1,6 +1,6 @@
-.vscode
-build
-.cache
-bin
+.vscode/
+build/
+.cache/
+bin/
 llvm_demo
 

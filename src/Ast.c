@@ -698,7 +698,7 @@ Value *post_eval(ast *a, Value *left, Value *right) {
                !strcmp(a->name, "GREAT") || !strcmp(a->name, "GREATEQUAL") ||
                !strcmp(a->name, "LESSEQUAL") || !strcmp(a->name, "LESS") ||
                !strcmp(a->name, "AND") || !strcmp(a->name, "OR") ||
-               !strcmp(a->name, "LB")) {
+               !strcmp(a->name, "NOT") || !strcmp(a->name, "LB")) {
         // 返回当前节点的右节点
         return right;
       } else if (!strcmp(a->name, "Stmt")) {
@@ -860,6 +860,9 @@ Value *post_eval(ast *a, Value *left, Value *right) {
         } else if (!strcmp(a->l->name, "MINUS")) {
           flag = true;
           work_ins = (Value *)ins_new_single_operator_v2(NegativeOP, left);
+        } else if (!strcmp(a->l->name, "NOT")) {
+          flag = true;
+          work_ins = (Value *)ins_new_single_operator_v2(NotOP, left);
         }
         if (flag) {
           work_ins->name = name_generate(TEMP_VAR);

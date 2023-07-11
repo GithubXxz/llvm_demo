@@ -134,7 +134,8 @@ void system_func_init() {
     func_label_ins->pdata->symtab_func_pdata.param_num = sysy[i].param_num;
 
     // 将函数的<name,label>插入函数表
-    HashMapPut(func_hashMap, strdup(sysy[i].func_name), func_label_ins);
+    char *sys_func_name = strdup(sysy[i].func_name);
+    HashMapPut(func_hashMap, sys_func_name, func_label_ins);
   }
 }
 
