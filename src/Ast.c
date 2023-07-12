@@ -858,11 +858,43 @@ Value *post_eval(ast *a, Value *left, Value *right) {
           // flag = true;
           // work_ins = (Value *)ins_new_single_operator_v2(PositiveOP, left);
         } else if (!strcmp(a->l->name, "MINUS")) {
-          flag = true;
-          work_ins = (Value *)ins_new_single_operator_v2(NegativeOP, left);
+          if (left->VTy->TID == ImmediateIntTyID ||
+              left->VTy->TID == ImmediateFloatTyID) {
+            char buffer[50];
+            if (left->name[0] == '-') {
+              sprintf(buffer, "%s", left->name + 1);
+            } else {
+              sprintf(buffer, "-%s", left->name);
+            }
+            if (left->VTy->TID == ImmediateIntTyID)
+              left->pdata->var_pdata.iVal = -left->pdata->var_pdata.iVal;
+            else
+              left->pdata->var_pdata.fVal = -left->pdata->var_pdata.fVal;
+            free(left->name);
+            left->name = strdup(buffer);
+          } else {
+            flag = true;
+            work_ins = (Value *)ins_new_single_operator_v2(NegativeOP, left);
+          }
         } else if (!strcmp(a->l->name, "NOT")) {
-          flag = true;
-          work_ins = (Value *)ins_new_single_operator_v2(NotOP, left);
+          if (left->VTy->TID == ImmediateIntTyID ||
+              left->VTy->TID == ImmediateFloatTyID) {
+            char buffer[50];
+            if (left->VTy->TID == ImmediateIntTyID) {
+              sprintf(buffer, "%d",
+                      left->pdata->var_pdata.iVal =
+                          (left->pdata->var_pdata.iVal == 0 ? 1 : 0));
+            } else {
+              sprintf(buffer, "%f",
+                      left->pdata->var_pdata.fVal =
+                          (left->pdata->var_pdata.fVal == 0.0f ? 1.0f : 0.0f));
+            }
+            free(left->name);
+            left->name = strdup(buffer);
+          } else {
+            flag = true;
+            work_ins = (Value *)ins_new_single_operator_v2(NotOP, left);
+          }
         }
         if (flag) {
           work_ins->name = name_generate(TEMP_VAR);

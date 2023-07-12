@@ -141,7 +141,7 @@ int main(int argc, char **argv) {
   if (argc == 2) {
     choose_case = read_code_from_file(argv[1]);
   } else {
-    choose_case = read_code_from_file(test_cases[53]);
+    choose_case = read_code_from_file(test_cases[11]);
   }
   if (choose_case == NULL)
     return 1;

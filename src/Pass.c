@@ -1052,7 +1052,7 @@ void calculate_live_use_def_by_graph(ALGraph *self) {
     ListFirst((self->node_set)[i]->bblock_head->inst_list, false);
     void *element;
     while (ListNext((self->node_set)[i]->bblock_head->inst_list, &element)) {
-      if (((Instruction *)element)->opcode <= 18) {
+      if (((Instruction *)element)->opcode <= NULL_USED) {
         for (int j = 0; j < ((User *)element)->num_oprands; j++) {
           if (!HashSetFind(
                   (self->node_set)[i]->bblock_head->live_def,
@@ -1091,7 +1091,7 @@ void calculate_live_in_out(ALGraph *self) {
       cur_bblock->live_out = NULL;
       hashset_init_string(&(cur_bblock->live_out));
 
-      HashMapNext((self->node_set)[i]->edge_list);
+      HashMapFirst((self->node_set)[i]->edge_list);
       node_pair *element;
       while ((element = (node_pair *)HashMapNext(
                   (self->node_set)[i]->edge_list)) != NULL) {
@@ -1257,6 +1257,7 @@ void calculate_live_interval(ALGraph *self_cfg, Function *self_func) {
                            (void **)&element)) {
       if (element->opcode < NULL_USED) {
         if (((Instruction *)element)->opcode < RETURN_USED) {
+          printf("var name is %s\n", ((Value *)element)->name);
           var_live_interval *cur_var_live_interval = NULL;
           cur_var_live_interval = is_list_contain_item(
               self_func->all_var_live_interval, ((Value *)element)->name);
@@ -1705,13 +1706,13 @@ void delete_return_deadcode_pass(List *self) {
 
 void line_scan_register_allocation(ALGraph *self_cfg, Function *self_func,
                                    HashMap *var_location) {
-  // var_live_interval *element;
-  // ListFirst(self_func->all_var_live_interval, false);
-  // while (ListNext(self_func->all_var_live_interval, &element)) {
-  //   printf("\tval:%s \tbegin:%d \tend:%d \n", element->self,
-  //          element->this_var_total_live_interval->begin,
-  //          element->this_var_total_live_interval->end);
-  // }
+  var_live_interval *element;
+  ListFirst(self_func->all_var_live_interval, false);
+  while (ListNext(self_func->all_var_live_interval, (void **)&element)) {
+    printf("\tval:%s \tbegin:%d \tend:%d \n", element->self,
+           element->this_var_total_live_interval->begin,
+           element->this_var_total_live_interval->end);
+  }
 
   List *active = ListInit();
   ListSetClean(active, CleanObject);
@@ -1727,9 +1728,6 @@ void line_scan_register_allocation(ALGraph *self_cfg, Function *self_func,
   ListNext(self_func->all_var_live_interval, (void **)&cur_handle);
   if (cur_handle == NULL)
     return;
-  printf("\tval:%s \tbegin:%d \tend:%d \n", cur_handle->self,
-         cur_handle->this_var_total_live_interval->begin,
-         cur_handle->this_var_total_live_interval->end);
   LOCATION *cur_add_var_location = (LOCATION *)malloc(sizeof(LOCATION));
   *cur_add_var_location = R1;
   register_situation[1] = true;
@@ -1738,9 +1736,6 @@ void line_scan_register_allocation(ALGraph *self_cfg, Function *self_func,
   ListPushBack(active, cur_handle);
 
   while (ListNext(self_func->all_var_live_interval, (void **)&cur_handle)) {
-    printf("\tval:%s \tbegin:%d \tend:%d \n", cur_handle->self,
-           cur_handle->this_var_total_live_interval->begin,
-           cur_handle->this_var_total_live_interval->end);
     // Expire OLD Intervals
     var_live_interval *iter_active = NULL;
     while (ListSize(active) != 0) {
@@ -1950,8 +1945,8 @@ void bblock_to_dom_graph_pass(Function *self) {
 
   printf_cur_func_ins(self);
 
-  fflush(stdout);
-  freopen(tty_path, "w", stdout);
+  // fflush(stdout);
+  // freopen(tty_path, "w", stdout);
 
   puts("replace phi node begin\n");
   replace_phi_nodes(dom_tree_root);
