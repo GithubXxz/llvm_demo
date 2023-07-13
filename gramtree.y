@@ -217,8 +217,8 @@ Exp:Exp ASSIGNOP Exp{$$=newast("Exp",3,$1,$2,$3);} // Exp = Exp
         |Exp DIV Exp{$$=newast("Exp",3,$1,$2,$3);} // Exp / Exp
         |Exp MOD Exp{$$=newast("Exp",3,$1,$2,$3);} // Exp % Exp
         |LP Exp RP{$$=newast("Exp",1,$2);}  // (Exp)
-        |MINUS Exp %prec MINUS{$$=newast("Exp",2,$1,$2);} // -Exp
-        |PLUS Exp %prec PLUS{$$=newast("Exp",2,$1,$2);} // +Exp
+        |MINUS Exp {$$=newast("Exp",2,$1,$2);} // -Exp
+        |PLUS Exp {$$=newast("Exp",2,$1,$2);} // +Exp
         |NOT Exp {$$=newast("Exp",2,$1,$2);} // !Exp
         |ID LP Args RP {$$=newast("Exp",3,newast("assistFuncCall",0,-1),$1,$3);}//带有参数的函数调用
         |ID LP RP {$$=newast("Exp",2,newast("assistFuncCall",0,-1),$1);}//没有参数的函数调用

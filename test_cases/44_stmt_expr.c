@@ -1,13 +1,13 @@
-int k;
+int m;
 const int n = 10;
 int main () {
 	int i = 0;
-	k = 1;
+	m = 1;
 	while (i <= n - 1) {
 		i = i + 1;
-		k + 1;
-		k = k + k;
+		m + 1;
+		m = m + m;
 	}
-	putint(k);
-	return k;
+	putint(m);
+	return m;
 }

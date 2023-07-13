@@ -4,7 +4,7 @@ Program (2)
       Specifire (2)
         TYPE :int 
       FunDec (2)
-        ID :ifElseIf 
+        ID :main 
         LP (2)
         RP (2)
       Compst (2)
@@ -19,6 +19,10 @@ Program (2)
                   Dec (3)
                     VarDec (3)
                       ID :a 
+                  DecList (3)
+                    Dec (3)
+                      VarDec (3)
+                        ID :b 
               DefList 
             StmtList (4)
               Stmt (4)
@@ -27,214 +31,37 @@ Program (2)
                     ID :a 
                   ASSIGNOP (4)
                   Exp (4)
-                    INTEGER :5 
-              StmtList 
-          TACList (5)
-            TAC (5)
-              DefList (5)
-                Def (5)
-                  Specifire (5)
-                    TYPE :int 
-                  DecList (5)
-                    Dec (5)
-                      VarDec (5)
-                        ID :b 
-                DefList 
-              StmtList (6)
-                Stmt (6)
-                  Exp (6)
-                    Exp (6)
+                    INTEGER :10 
+              StmtList (5)
+                Stmt (5)
+                  Exp (5)
+                    Exp (5)
                       ID :b 
-                    ASSIGNOP (6)
+                    ASSIGNOP (5)
+                    Exp (5)
+                      MINUS (5)
+                      Exp (5)
+                        INTEGER :1 
+                StmtList (6)
+                  Stmt (6)
+                    RETURN (6)
                     Exp (6)
-                      INTEGER :10 
-                StmtList (7)
-                  Stmt (7)
-                    IF (7)
-                    Exp (7)
-                      Exp (7)
-                        Exp (7)
-                          ID :a 
-                        EQUAL (7)
-                        Exp (7)
-                          INTEGER :6 
-                      OR (7)
-                      Exp (7)
-                        Exp (7)
-                          ID :b 
-                        EQUAL (7)
-                        Exp (7)
-                          INTEGER :11 
-                    assistIF 
-                    Stmt (7)
-                      Compst (7)
-                        LC (7)
-                        TACList 
-                          TAC 
-                            DefList 
-                            StmtList (8)
-                              Stmt (8)
-                                RETURN (8)
-                                Exp (8)
-                                  ID :a 
-                              StmtList 
-                          TACList 
-                        RC (9)
-                    assistELSE 
-                    ELSE (9)
-                    Stmt (9)
-                      Compst (9)
-                        LC (9)
-                        TACList 
-                          TAC 
-                            DefList 
-                            StmtList (10)
-                              Stmt (10)
-                                IF (10)
-                                Exp (10)
-                                  Exp (10)
-                                    Exp (10)
-                                      ID :b 
-                                    EQUAL (10)
-                                    Exp (10)
-                                      INTEGER :10 
-                                  AND (10)
-                                  Exp (10)
-                                    Exp (10)
-                                      ID :a 
-                                    EQUAL (10)
-                                    Exp (10)
-                                      INTEGER :1 
-                                assistIF 
-                                Stmt (11)
-                                  Exp (11)
-                                    Exp (11)
-                                      ID :a 
-                                    ASSIGNOP (11)
-                                    Exp (11)
-                                      INTEGER :25 
-                                assistELSE 
-                                ELSE (12)
-                                Stmt (12)
-                                  IF (12)
-                                  Exp (12)
-                                    Exp (12)
-                                      Exp (12)
-                                        ID :b 
-                                      EQUAL (12)
-                                      Exp (12)
-                                        INTEGER :10 
-                                    AND (12)
-                                    Exp (12)
-                                      Exp (12)
-                                        ID :a 
-                                      EQUAL (12)
-                                      Exp (12)
-                                        INTEGER :-5 
-                                  assistIF 
-                                  Stmt (13)
-                                    Exp (13)
-                                      Exp (13)
-                                        ID :a 
-                                      ASSIGNOP (13)
-                                      Exp (13)
-                                        Exp (13)
-                                          ID :a 
-                                        PLUS (13)
-                                        Exp (13)
-                                          INTEGER :15 
-                                  assistELSE 
-                                  ELSE (14)
-                                  Stmt (15)
-                                    Exp (15)
-                                      Exp (15)
-                                        ID :a 
-                                      ASSIGNOP (15)
-                                      Exp (15)
-                                        MINUS (15)
-                                        Exp (15)
-                                          PLUS (15)
-                                          Exp (15)
-                                            ID :a 
-                              StmtList 
-                          TACList 
-                        RC (16)
-                  StmtList (18)
-                    Stmt (18)
-                      RETURN (18)
-                      Exp (18)
+                      Exp (6)
                         ID :a 
-                    StmtList 
-            TACList 
-        RC (19)
-    ExtDefList (21)
-      ExtDef (21)
-        Specifire (21)
-          TYPE :int 
-        FunDec (21)
-          ID :main 
-          LP (21)
-          RP (21)
-        Compst (21)
-          LC (21)
+                      MINUS (6)
+                      Exp (6)
+                        ID :b 
+                  StmtList 
           TACList 
-            TAC 
-              DefList 
-              StmtList (23)
-                Stmt (23)
-                  RETURN (23)
-                  Exp (23)
-                    INTEGER :0 
-                StmtList 
-            TACList 
-          RC (24)
-      ExtDefList 
-Func: ifElseIf
+        RC (7)
+    ExtDefList 
+Func: main
 point1 = alloca int,align 4
-store int 5, point1,align 4
 point2 = alloca int,align 4
-store int 10, point2,align 4
+store int 10, point1,align 4
+store int -1, point2,align 4
 temp1 = load int, point1,align 4
-temp2 = icmp eq int temp1, 6
-temp3 = load int, point2,align 4
-temp4 = icmp eq int temp3, 11
-temp5 = icmp || int temp2, temp4
-br temp5, true: ifElseIflabel2  false : ifElseIflabel1 
-ifElseIflabel2
-temp6 = load int, point1,align 4
-return
-br ifElseIflabel3 
-ifElseIflabel1
-temp7 = load int, point2,align 4
-temp8 = icmp eq int temp7, 10
-temp9 = load int, point1,align 4
-temp10 = icmp eq int temp9, 1
-temp11 = icmp && int temp8, temp10
-br temp11, true: ifElseIflabel5  false : ifElseIflabel4 
-ifElseIflabel5
-store int 25, point1,align 4
-br ifElseIflabel6 
-ifElseIflabel4
-temp12 = load int, point2,align 4
-temp13 = icmp eq int temp12, 10
-temp14 = load int, point1,align 4
-temp15 = icmp eq int temp14, -5
-temp16 = icmp && int temp13, temp15
-br temp16, true: ifElseIflabel8  false : ifElseIflabel7 
-ifElseIflabel8
-temp17 = load int, point1,align 4
-temp18 = add nsw int temp17, 15
-store int temp18, point1,align 4
-br ifElseIflabel9 
-ifElseIflabel7
-temp19 = load int, point1,align 4
-store int temp20, point1,align 4
-ifElseIflabel9
-ifElseIflabel6
-ifElseIflabel3
-temp21 = load int, point1,align 4
+temp2 = load int, point2,align 4
+temp3 = sub nsw int temp1, temp2
 return
 func_label_end1
-Func: main
-return
-func_label_end2

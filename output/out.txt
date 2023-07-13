@@ -1,438 +1,15 @@
-         	     0:          FuncLabelOP 	                 ifElseIf 	      null
-         	     0:              LabelOP 	            ifElseIfentry 	      null
-         	     0:           AllocateOP 	                   point1 	      null
-         	     0:              StoreOP 	                   (null) 	    point1,          5
-         	     0:           AllocateOP 	                   point2 	      null
-         	     0:              StoreOP 	                   (null) 	    point2,         10
-         	     0:               LoadOP 	                    temp1 	    point1
-         	     0:              EqualOP 	                    temp2 	     temp1,          6
-         	     0:               LoadOP 	                    temp3 	    point2
-         	     0:              EqualOP 	                    temp4 	     temp3,         11
-         	     0:            LogicOrOP 	                    temp5 	     temp2,      temp4
-         	     0:  GotoWithConditionOP 	true:ifElseIflabel2  false:ifElseIflabel1 	     temp5
-         	     0:              LabelOP 	           ifElseIflabel2 	      null
-         	     0:               LoadOP 	                    temp6 	    point1
-         	     0:             ReturnOP 	                   return 	     temp6
-         	     0:               GotoOP 	      goto ifElseIflabel3 	      null
-         	     0:              LabelOP 	           ifElseIflabel1 	      null
-         	     0:               LoadOP 	                    temp7 	    point2
-         	     0:              EqualOP 	                    temp8 	     temp7,         10
-         	     0:               LoadOP 	                    temp9 	    point1
-         	     0:              EqualOP 	                   temp10 	     temp9,          1
-         	     0:           LogicAndOP 	                   temp11 	     temp8,     temp10
-         	     0:  GotoWithConditionOP 	true:ifElseIflabel5  false:ifElseIflabel4 	    temp11
-         	     0:              LabelOP 	           ifElseIflabel5 	      null
-         	     0:              StoreOP 	                   (null) 	    point1,         25
-         	     0:               GotoOP 	      goto ifElseIflabel6 	      null
-         	     0:              LabelOP 	           ifElseIflabel4 	      null
-         	     0:               LoadOP 	                   temp12 	    point2
-         	     0:              EqualOP 	                   temp13 	    temp12,         10
-         	     0:               LoadOP 	                   temp14 	    point1
-         	     0:              EqualOP 	                   temp15 	    temp14,         -5
-         	     0:           LogicAndOP 	                   temp16 	    temp13,     temp15
-         	     0:  GotoWithConditionOP 	true:ifElseIflabel8  false:ifElseIflabel7 	    temp16
-         	     0:              LabelOP 	           ifElseIflabel8 	      null
-         	     0:               LoadOP 	                   temp17 	    point1
-         	     0:                AddOP 	                   temp18 	    temp17,         15
-         	     0:              StoreOP 	                   (null) 	    point1,     temp18
-         	     0:               GotoOP 	      goto ifElseIflabel9 	      null
-         	     0:              LabelOP 	           ifElseIflabel7 	      null
-         	     0:               LoadOP 	                   temp19 	    point1
-         	     0:           NegativeOP 	                   temp20 	    temp19
-         	     0:              StoreOP 	                   (null) 	    point1,     temp20
-         	     0:               GotoOP 	      goto ifElseIflabel9 	      null
-         	     0:              LabelOP 	           ifElseIflabel9 	      null
-         	     0:               GotoOP 	      goto ifElseIflabel6 	      null
-         	     0:              LabelOP 	           ifElseIflabel6 	      null
-         	     0:               GotoOP 	      goto ifElseIflabel3 	      null
-         	     0:              LabelOP 	           ifElseIflabel3 	      null
-         	     0:               LoadOP 	                   temp21 	    point1
-         	     0:             ReturnOP 	                   return 	    temp21
-         	     0:            FuncEndOP 	          func_label_end1 	      null
          	     0:          FuncLabelOP 	                     main 	      null
          	     0:              LabelOP 	                mainentry 	      null
-         	     0:             ReturnOP 	                   return 	         0
-         	     0:            FuncEndOP 	          func_label_end2 	      null
-ifElseIf
-ifElseIfentry edge is ifElseIflabel1 ifElseIflabel2 
-ifElseIflabel2 edge is ifElseIfend_label 
-ifElseIfend_label edge is 
-ifElseIflabel1 edge is ifElseIflabel4 ifElseIflabel5 
-ifElseIflabel5 edge is ifElseIflabel6 
-ifElseIflabel6 edge is ifElseIflabel3 
-ifElseIflabel3 edge is ifElseIfend_label 
-ifElseIflabel4 edge is ifElseIflabel7 ifElseIflabel8 
-ifElseIflabel8 edge is ifElseIflabel9 
-ifElseIflabel9 edge is ifElseIflabel6 
-ifElseIflabel7 edge is ifElseIflabel9 
-ifElseIflabel2,
-ifElseIfend_label,
-ifElseIflabel1,ifElseIflabel5,ifElseIflabel6,ifElseIflabel3,ifElseIflabel4,ifElseIflabel8,ifElseIflabel9,ifElseIflabel7,
-ifElseIflabel5,
-ifElseIflabel6,ifElseIflabel3,
-ifElseIflabel3,
-ifElseIflabel4,ifElseIflabel8,ifElseIflabel9,ifElseIflabel7,
-ifElseIflabel8,
-ifElseIflabel9,
-ifElseIflabel7,
-
-打印每个节点的立即支配节点
-idom(ifElseIflabel2) = ifElseIfentry
-idom(ifElseIfend_label) = ifElseIfentry
-idom(ifElseIflabel1) = ifElseIfentry
-idom(ifElseIflabel5) = ifElseIflabel1
-idom(ifElseIflabel6) = ifElseIflabel1
-idom(ifElseIflabel3) = ifElseIflabel6
-idom(ifElseIflabel4) = ifElseIflabel1
-idom(ifElseIflabel8) = ifElseIflabel4
-idom(ifElseIflabel9) = ifElseIflabel4
-idom(ifElseIflabel7) = ifElseIflabel4
-
-打印支配树中的层级关系
-ifElseIfentry: ifElseIflabel2,ifElseIfend_label,ifElseIflabel1,
-ifElseIflabel1: ifElseIflabel5,ifElseIflabel6,ifElseIflabel4,
-ifElseIflabel4: ifElseIflabel8,ifElseIflabel9,ifElseIflabel7,
-ifElseIflabel7: 
-ifElseIflabel9: 
-ifElseIflabel8: 
-ifElseIflabel6: ifElseIflabel3,
-ifElseIflabel3: 
-ifElseIflabel5: 
-ifElseIfend_label: 
-ifElseIflabel2: 
-
-打印每个基本块的支配边界节点
-cur node ifElseIflabel2's dom frontier is 
-cur node ifElseIfend_label's dom frontier is 
-cur node ifElseIflabel1's dom frontier is 
-cur node ifElseIflabel5's dom frontier is 
-cur node ifElseIflabel6's dom frontier is 
-cur node ifElseIflabel3's dom frontier is 
-cur node ifElseIflabel4's dom frontier is 
-cur node ifElseIflabel8's dom frontier is 
-cur node ifElseIflabel9's dom frontier is 
-cur node ifElseIflabel7's dom frontier is 
-
-	labelID	number:               opcode 	                     name 	       use
-	address:0x5640b7a7be80	ifElseIfentry:
-         	     0:              LabelOP 	            ifElseIfentry 	      null
-         	     0:           AllocateOP 	                   point2 	      null
          	     0:           AllocateOP 	                   point1 	      null
-         	     0:              StoreOP 	                   (null) 	    point1,          5
-         	     0:              StoreOP 	                   (null) 	    point2,         10
+         	     0:           AllocateOP 	                   point2 	      null
+         	     0:              StoreOP 	                   (null) 	    point1,         10
+         	     0:              StoreOP 	                   (null) 	    point2,         -1
          	     0:               LoadOP 	                    temp1 	    point1
-         	     0:              EqualOP 	                    temp2 	     temp1,          6
-         	     0:               LoadOP 	                    temp3 	    point2
-         	     0:              EqualOP 	                    temp4 	     temp3,         11
-         	     0:            LogicOrOP 	                    temp5 	     temp2,      temp4
-         	     0:  GotoWithConditionOP 	true:ifElseIflabel2  false:ifElseIflabel1 	     temp5
-
-	address:0x5640b7a7e800	ifElseIflabel2:
-         	     0:              LabelOP 	           ifElseIflabel2 	      null
-         	     0:               LoadOP 	                    temp6 	    point1
-         	     0:             ReturnOP 	                   return 	     temp6
-
-	address:0x5640b7a811b0	ifElseIfend_label:
-         	     0:              LabelOP 	        ifElseIfend_label 	      null
-         	     0:            PhiFuncOp 	                %phi_var1 	size: 0 
+         	     0:               LoadOP 	                    temp2 	    point2
+         	     0:                SubOP 	                    temp3 	     temp1,      temp2
+         	     0:             ReturnOP 	                   return 	     temp3
          	     0:            FuncEndOP 	          func_label_end1 	      null
-
-	address:0x5640b7a7e730	ifElseIflabel1:
-         	     0:              LabelOP 	           ifElseIflabel1 	      null
-         	     0:               LoadOP 	                    temp7 	    point2
-         	     0:              EqualOP 	                    temp8 	     temp7,         10
-         	     0:               LoadOP 	                    temp9 	    point1
-         	     0:              EqualOP 	                   temp10 	     temp9,          1
-         	     0:           LogicAndOP 	                   temp11 	     temp8,     temp10
-         	     0:  GotoWithConditionOP 	true:ifElseIflabel5  false:ifElseIflabel4 	    temp11
-
-	address:0x5640b7a7f6f0	ifElseIflabel5:
-         	     0:              LabelOP 	           ifElseIflabel5 	      null
-         	     0:              StoreOP 	                   (null) 	    point1,         25
-         	     0:               GotoOP 	      goto ifElseIflabel6 	      null
-
-	address:0x5640b7a7fac0	ifElseIflabel6:
-         	     0:              LabelOP 	           ifElseIflabel6 	      null
-         	     0:            PhiFuncOp 	                %phi_var2 	size: 0 
-         	     0:               GotoOP 	      goto ifElseIflabel3 	      null
-
-	address:0x5640b7a7eae0	ifElseIflabel3:
-         	     0:              LabelOP 	           ifElseIflabel3 	      null
-         	     0:               LoadOP 	                   temp21 	    point1
-         	     0:             ReturnOP 	                   return 	    temp21
-
-	address:0x5640b7a7f620	ifElseIflabel4:
-         	     0:              LabelOP 	           ifElseIflabel4 	      null
-         	     0:               LoadOP 	                   temp12 	    point2
-         	     0:              EqualOP 	                   temp13 	    temp12,         10
-         	     0:               LoadOP 	                   temp14 	    point1
-         	     0:              EqualOP 	                   temp15 	    temp14,         -5
-         	     0:           LogicAndOP 	                   temp16 	    temp13,     temp15
-         	     0:  GotoWithConditionOP 	true:ifElseIflabel8  false:ifElseIflabel7 	    temp16
-
-	address:0x5640b7a81f10	ifElseIflabel8:
-         	     0:              LabelOP 	           ifElseIflabel8 	      null
-         	     0:               LoadOP 	                   temp17 	    point1
-         	     0:                AddOP 	                   temp18 	    temp17,         15
-         	     0:              StoreOP 	                   (null) 	    point1,     temp18
-         	     0:               GotoOP 	      goto ifElseIflabel9 	      null
-
-	address:0x5640b7a82540	ifElseIflabel9:
-         	     0:              LabelOP 	           ifElseIflabel9 	      null
-         	     0:            PhiFuncOp 	                %phi_var3 	size: 0 
-         	     0:               GotoOP 	      goto ifElseIflabel6 	      null
-
-	address:0x5640b7a81e40	ifElseIflabel7:
-         	     0:              LabelOP 	           ifElseIflabel7 	      null
-         	     0:               LoadOP 	                   temp19 	    point1
-         	     0:           NegativeOP 	                   temp20 	    temp19
-         	     0:              StoreOP 	                   (null) 	    point1,     temp20
-         	     0:               GotoOP 	      goto ifElseIflabel9 	      null
-
-
-
-begin rename pass and delete alloca,store,load instruction!
-rename pass over
-delete alloca,store,load instruction over
-	labelID	number:               opcode 	                     name 	       use
-	address:0x5640b7a7be80	ifElseIfentry:
-         	     0:              LabelOP 	            ifElseIfentry 	      null
-         	     0:              EqualOP 	                    temp2 	         5,          6
-         	     0:              EqualOP 	                    temp4 	        10,         11
-         	     0:            LogicOrOP 	                    temp5 	     temp2,      temp4
-         	     0:  GotoWithConditionOP 	true:ifElseIflabel2  false:ifElseIflabel1 	     temp5
-
-	address:0x5640b7a7e800	ifElseIflabel2:
-         	     0:              LabelOP 	           ifElseIflabel2 	      null
-         	     0:             ReturnOP 	                   return 	         5
-
-	address:0x5640b7a811b0	ifElseIfend_label:
-         	     0:              LabelOP 	        ifElseIfend_label 	      null
-         	     0:            PhiFuncOp 	                %phi_var1 	size: 2 	bblock: ifElseIflabel2 value: 5, 	bblock: ifElseIflabel3 value: %phi_var2, 
-         	     0:            FuncEndOP 	          func_label_end1 	      null
-
-	address:0x5640b7a7e730	ifElseIflabel1:
-         	     0:              LabelOP 	           ifElseIflabel1 	      null
-         	     0:              EqualOP 	                    temp8 	        10,         10
-         	     0:              EqualOP 	                   temp10 	         5,          1
-         	     0:           LogicAndOP 	                   temp11 	     temp8,     temp10
-         	     0:  GotoWithConditionOP 	true:ifElseIflabel5  false:ifElseIflabel4 	    temp11
-
-	address:0x5640b7a7f6f0	ifElseIflabel5:
-         	     0:              LabelOP 	           ifElseIflabel5 	      null
-         	     0:               GotoOP 	      goto ifElseIflabel6 	      null
-
-	address:0x5640b7a7fac0	ifElseIflabel6:
-         	     0:              LabelOP 	           ifElseIflabel6 	      null
-         	     0:            PhiFuncOp 	                %phi_var2 	size: 2 	bblock: ifElseIflabel5 value: 25, 	bblock: ifElseIflabel9 value: %phi_var3, 
-         	     0:               GotoOP 	      goto ifElseIflabel3 	      null
-
-	address:0x5640b7a7eae0	ifElseIflabel3:
-         	     0:              LabelOP 	           ifElseIflabel3 	      null
-         	     0:             ReturnOP 	                   return 	 %phi_var2
-
-	address:0x5640b7a7f620	ifElseIflabel4:
-         	     0:              LabelOP 	           ifElseIflabel4 	      null
-         	     0:              EqualOP 	                   temp13 	        10,         10
-         	     0:              EqualOP 	                   temp15 	         5,         -5
-         	     0:           LogicAndOP 	                   temp16 	    temp13,     temp15
-         	     0:  GotoWithConditionOP 	true:ifElseIflabel8  false:ifElseIflabel7 	    temp16
-
-	address:0x5640b7a81f10	ifElseIflabel8:
-         	     0:              LabelOP 	           ifElseIflabel8 	      null
-         	     0:                AddOP 	                   temp18 	         5,         15
-         	     0:               GotoOP 	      goto ifElseIflabel9 	      null
-
-	address:0x5640b7a82540	ifElseIflabel9:
-         	     0:              LabelOP 	           ifElseIflabel9 	      null
-         	     0:            PhiFuncOp 	                %phi_var3 	size: 2 	bblock: ifElseIflabel7 value: temp20, 	bblock: ifElseIflabel8 value: temp18, 
-         	     0:               GotoOP 	      goto ifElseIflabel6 	      null
-
-	address:0x5640b7a81e40	ifElseIflabel7:
-         	     0:              LabelOP 	           ifElseIflabel7 	      null
-         	     0:           NegativeOP 	                   temp20 	         5
-         	     0:               GotoOP 	      goto ifElseIflabel9 	      null
-
-
-
-
-
-
-	labelID	number:               opcode 	                     name 	       use
-	address:0x5640b7a7be80	ifElseIfentry:
-         	     0:              LabelOP 	            ifElseIfentry 	      null
-         	     0:              EqualOP 	                    temp2 	         5,          6
-         	     0:              EqualOP 	                    temp4 	        10,         11
-         	     0:            LogicOrOP 	                    temp5 	     temp2,      temp4
-         	     0:  GotoWithConditionOP 	true:ifElseIflabel2  false:ifElseIflabel1 	     temp5
-
-	address:0x5640b7a7e800	ifElseIflabel2:
-         	     0:              LabelOP 	           ifElseIflabel2 	      null
-         	     0:             AssignOP 	                %phi_var1 	         5
-         	     0:             ReturnOP 	                   return 	         5
-
-	address:0x5640b7a811b0	ifElseIfend_label:
-         	     0:              LabelOP 	        ifElseIfend_label 	      null
-         	     0:            FuncEndOP 	          func_label_end1 	      null
-
-	address:0x5640b7a7e730	ifElseIflabel1:
-         	     0:              LabelOP 	           ifElseIflabel1 	      null
-         	     0:              EqualOP 	                    temp8 	        10,         10
-         	     0:              EqualOP 	                   temp10 	         5,          1
-         	     0:           LogicAndOP 	                   temp11 	     temp8,     temp10
-         	     0:  GotoWithConditionOP 	true:ifElseIflabel5  false:ifElseIflabel4 	    temp11
-
-	address:0x5640b7a7f6f0	ifElseIflabel5:
-         	     0:              LabelOP 	           ifElseIflabel5 	      null
-         	     0:             AssignOP 	                %phi_var2 	        25
-         	     0:               GotoOP 	      goto ifElseIflabel6 	      null
-
-	address:0x5640b7a7fac0	ifElseIflabel6:
-         	     0:              LabelOP 	           ifElseIflabel6 	      null
-         	     0:               GotoOP 	      goto ifElseIflabel3 	      null
-
-	address:0x5640b7a7eae0	ifElseIflabel3:
-         	     0:              LabelOP 	           ifElseIflabel3 	      null
-         	     0:             AssignOP 	                %phi_var1 	 %phi_var2
-         	     0:             ReturnOP 	                   return 	 %phi_var2
-
-	address:0x5640b7a7f620	ifElseIflabel4:
-         	     0:              LabelOP 	           ifElseIflabel4 	      null
-         	     0:              EqualOP 	                   temp13 	        10,         10
-         	     0:              EqualOP 	                   temp15 	         5,         -5
-         	     0:           LogicAndOP 	                   temp16 	    temp13,     temp15
-         	     0:  GotoWithConditionOP 	true:ifElseIflabel8  false:ifElseIflabel7 	    temp16
-
-	address:0x5640b7a81f10	ifElseIflabel8:
-         	     0:              LabelOP 	           ifElseIflabel8 	      null
-         	     0:                AddOP 	                   temp18 	         5,         15
-         	     0:             AssignOP 	                %phi_var3 	    temp18
-         	     0:               GotoOP 	      goto ifElseIflabel9 	      null
-
-	address:0x5640b7a82540	ifElseIflabel9:
-         	     0:              LabelOP 	           ifElseIflabel9 	      null
-         	     0:             AssignOP 	                %phi_var2 	 %phi_var3
-         	     0:               GotoOP 	      goto ifElseIflabel6 	      null
-
-	address:0x5640b7a81e40	ifElseIflabel7:
-         	     0:              LabelOP 	           ifElseIflabel7 	      null
-         	     0:           NegativeOP 	                   temp20 	         5
-         	     0:             AssignOP 	                %phi_var3 	    temp20
-         	     0:               GotoOP 	      goto ifElseIflabel9 	      null
-
-
-
-ifElseIfentry live def add temp2
-ifElseIfentry live def add temp4
-ifElseIflabel2 live def add %phi_var1
-ifElseIflabel1 live def add temp8
-ifElseIflabel1 live def add temp10
-ifElseIflabel5 live def add %phi_var2
-ifElseIflabel3 live use add %phi_var2
-ifElseIflabel3 live def add %phi_var1
-ifElseIflabel4 live def add temp13
-ifElseIflabel4 live def add temp15
-ifElseIflabel8 live def add temp18
-ifElseIflabel8 live def add %phi_var3
-ifElseIflabel9 live use add %phi_var3
-ifElseIflabel9 live def add %phi_var2
-ifElseIflabel7 live def add temp20
-ifElseIflabel7 live def add %phi_var3
-
-
-
-	labelID	number:               opcode 	                     name 	       use
-	address:0x5640b7a7be80	ifElseIfentry:
-         	     0:              LabelOP 	            ifElseIfentry 	      null
-         	     1:              EqualOP 	                    temp2 	         5,          6
-         	     2:              EqualOP 	                    temp4 	        10,         11
-         	     3:            LogicOrOP 	                    temp5 	     temp2,      temp4
-         	     4:  GotoWithConditionOP 	true:ifElseIflabel2  false:ifElseIflabel1 	     temp5
-
-	address:0x5640b7a7e800	ifElseIflabel2:
-         	     5:              LabelOP 	           ifElseIflabel2 	      null
-         	     6:             AssignOP 	                %phi_var1 	         5
-         	     7:             ReturnOP 	                   return 	         5
-
-	address:0x5640b7a811b0	ifElseIfend_label:
-         	     8:              LabelOP 	        ifElseIfend_label 	      null
-         	     9:            FuncEndOP 	          func_label_end1 	      null
-
-	address:0x5640b7a7e730	ifElseIflabel1:
-         	     10:              LabelOP 	           ifElseIflabel1 	      null
-         	     11:              EqualOP 	                    temp8 	        10,         10
-         	     12:              EqualOP 	                   temp10 	         5,          1
-         	     13:           LogicAndOP 	                   temp11 	     temp8,     temp10
-         	     14:  GotoWithConditionOP 	true:ifElseIflabel5  false:ifElseIflabel4 	    temp11
-
-	address:0x5640b7a7f6f0	ifElseIflabel5:
-         	     15:              LabelOP 	           ifElseIflabel5 	      null
-         	     16:             AssignOP 	                %phi_var2 	        25
-         	     17:               GotoOP 	      goto ifElseIflabel6 	      null
-
-	address:0x5640b7a7fac0	ifElseIflabel6:
-         	     18:              LabelOP 	           ifElseIflabel6 	      null
-         	     19:               GotoOP 	      goto ifElseIflabel3 	      null
-
-	address:0x5640b7a7eae0	ifElseIflabel3:
-         	     20:              LabelOP 	           ifElseIflabel3 	      null
-         	     21:             AssignOP 	                %phi_var1 	 %phi_var2
-         	     22:             ReturnOP 	                   return 	 %phi_var2
-
-	address:0x5640b7a7f620	ifElseIflabel4:
-         	     23:              LabelOP 	           ifElseIflabel4 	      null
-         	     24:              EqualOP 	                   temp13 	        10,         10
-         	     25:              EqualOP 	                   temp15 	         5,         -5
-         	     26:           LogicAndOP 	                   temp16 	    temp13,     temp15
-         	     27:  GotoWithConditionOP 	true:ifElseIflabel8  false:ifElseIflabel7 	    temp16
-
-	address:0x5640b7a81f10	ifElseIflabel8:
-         	     28:              LabelOP 	           ifElseIflabel8 	      null
-         	     29:                AddOP 	                   temp18 	         5,         15
-         	     30:             AssignOP 	                %phi_var3 	    temp18
-         	     31:               GotoOP 	      goto ifElseIflabel9 	      null
-
-	address:0x5640b7a82540	ifElseIflabel9:
-         	     32:              LabelOP 	           ifElseIflabel9 	      null
-         	     33:             AssignOP 	                %phi_var2 	 %phi_var3
-         	     34:               GotoOP 	      goto ifElseIflabel6 	      null
-
-	address:0x5640b7a81e40	ifElseIflabel7:
-         	     35:              LabelOP 	           ifElseIflabel7 	      null
-         	     36:           NegativeOP 	                   temp20 	         5
-         	     37:             AssignOP 	                %phi_var3 	    temp20
-         	     38:               GotoOP 	      goto ifElseIflabel9 	      null
-
-
-
-	val:temp2 	begin:1 	end:3 
-	val:temp4 	begin:2 	end:3 
-	val:temp5 	begin:3 	end:4 
-	val:temp8 	begin:11 	end:13 
-	val:temp10 	begin:12 	end:13 
-	val:temp11 	begin:13 	end:14 
-	val:%phi_var2 	begin:16 	end:22 
-	val:temp13 	begin:24 	end:26 
-	val:temp15 	begin:25 	end:26 
-	val:temp16 	begin:26 	end:27 
-	val:temp18 	begin:29 	end:30 
-	val:%phi_var3 	begin:30 	end:33 
-	val:temp20 	begin:36 	end:37 
-
-	var:%phi_var2	address:R1
- 	var:%phi_var3	address:R2
- 	var:temp10	address:R2
- 	var:temp11	address:R3
- 	var:temp13	address:R1
- 	var:temp15	address:R2
- 	var:temp16	address:R3
- 	var:temp18	address:R1
- 	var:temp20	address:R1
- 	var:temp2	address:R1
- 	var:temp4	address:R2
- 	var:temp5	address:R3
- 	var:temp8	address:R1
- main
+main
 mainentry edge is mainend_label 
 mainend_label edge is 
 mainend_label,
@@ -448,56 +25,77 @@ mainend_label:
 cur node mainend_label's dom frontier is 
 
 	labelID	number:               opcode 	                     name 	       use
-	address:0x5640b7a809e0	mainentry:
+	address:0x561ae1fd8f10	mainentry:
          	     0:              LabelOP 	                mainentry 	      null
-         	     0:             ReturnOP 	                   return 	         0
+         	     0:           AllocateOP 	                   point2 	      null
+         	     0:           AllocateOP 	                   point1 	      null
+         	     0:              StoreOP 	                   (null) 	    point1,         10
+         	     0:              StoreOP 	                   (null) 	    point2,         -1
+         	     0:               LoadOP 	                    temp1 	    point1
+         	     0:               LoadOP 	                    temp2 	    point2
+         	     0:                SubOP 	                    temp3 	     temp1,      temp2
+         	     0:             ReturnOP 	                   return 	     temp3
 
-	address:0x5640b7accb90	mainend_label:
+	address:0x561ae1fd7b20	mainend_label:
          	     0:              LabelOP 	            mainend_label 	      null
-         	     0:            FuncEndOP 	          func_label_end2 	      null
+         	     0:            FuncEndOP 	          func_label_end1 	      null
 
 
 
 begin rename pass and delete alloca,store,load instruction!
+size is 0
+size is 0
 rename pass over
 delete alloca,store,load instruction over
 	labelID	number:               opcode 	                     name 	       use
-	address:0x5640b7a809e0	mainentry:
+	address:0x561ae1fd8f10	mainentry:
          	     0:              LabelOP 	                mainentry 	      null
-         	     0:             ReturnOP 	                   return 	         0
+         	     0:                SubOP 	                    temp3 	        10,         -1
+         	     0:             ReturnOP 	                   return 	     temp3
 
-	address:0x5640b7accb90	mainend_label:
+	address:0x561ae1fd7b20	mainend_label:
          	     0:              LabelOP 	            mainend_label 	      null
-         	     0:            FuncEndOP 	          func_label_end2 	      null
+         	     0:            FuncEndOP 	          func_label_end1 	      null
 
 
+
+replace phi node begin
+
+replace phi node over
 
 
 
 
 	labelID	number:               opcode 	                     name 	       use
-	address:0x5640b7a809e0	mainentry:
+	address:0x561ae1fd8f10	mainentry:
          	     0:              LabelOP 	                mainentry 	      null
-         	     0:             ReturnOP 	                   return 	         0
+         	     0:                SubOP 	                    temp3 	        10,         -1
+         	     0:             ReturnOP 	                   return 	     temp3
 
-	address:0x5640b7accb90	mainend_label:
+	address:0x561ae1fd7b20	mainend_label:
          	     0:              LabelOP 	            mainend_label 	      null
-         	     0:            FuncEndOP 	          func_label_end2 	      null
+         	     0:            FuncEndOP 	          func_label_end1 	      null
 
 
 
+mainentry live def add temp3
 
 
 
 	labelID	number:               opcode 	                     name 	       use
-	address:0x5640b7a809e0	mainentry:
+	address:0x561ae1fd8f10	mainentry:
          	     0:              LabelOP 	                mainentry 	      null
-         	     1:             ReturnOP 	                   return 	         0
+         	     1:                SubOP 	                    temp3 	        10,         -1
+         	     2:             ReturnOP 	                   return 	     temp3
 
-	address:0x5640b7accb90	mainend_label:
-         	     2:              LabelOP 	            mainend_label 	      null
-         	     3:            FuncEndOP 	          func_label_end2 	      null
+	address:0x561ae1fd7b20	mainend_label:
+         	     3:              LabelOP 	            mainend_label 	      null
+         	     4:            FuncEndOP 	          func_label_end1 	      null
 
 
 
-All over!
+var name is temp3
+	val:temp3 	begin:1 	end:2 
+
+	var:temp3	address:R1
+ All over!

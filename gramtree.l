@@ -33,12 +33,12 @@ CONTINUE continue
 PLUS \+
 MINUS \-
 
-INTEGER [+-]?[1-9]+[0-9]*|0
-FLOAT   [+-]?[0-9]+\.[0-9]*
-OCT_INT [+-]?0[0-7]+
-HEX_INT [+-]?0[xX][0-9a-fA-F]+
-SCI_INT [+-]?[0-9]+[eE][+-]?[0-9]+
-SCI_FLOAT [+-]?[0-9]*\.[0-9]+([eE][+-]?[0-9]+)?
+INTEGER [1-9]+[0-9]*|0
+FLOAT   [0-9]+\.[0-9]*
+OCT_INT 0[0-7]+
+HEX_INT 0[xX][0-9a-fA-F]+
+SCI_INT [0-9]+[eE][+-]?[0-9]+
+SCI_FLOAT [0-9]*\.[0-9]+([eE][+-]?[0-9]+)?
 
 ID [a-z_A-Z][a-zA-Z_0-9]*
 SPACE [ \t\r]*
