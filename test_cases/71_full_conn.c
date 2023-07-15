@@ -23,28 +23,28 @@ int model(int a[][5])
     return 0;
 }
 
-int main()
-{
-    int N = getint();
-    int a[5][5];
-    while (N > 0) {
-        int i = 0;
-        while (i < 5) {
-            int j = 0;
-            while (j < 5) {
-                a[i][j] = getint();
-                j = j + 1;
-            }
-            i = i + 1;
-        }
-        if (model(a)) {
-            // cat
-            putch(99); putch(97); putch(116); putch(10);
-        } else {
-            // dog
-            putch(100); putch(111); putch(103); putch(10);
-        }
-        N = N - 1;
-    }
-    return 0;
-}
+// int main()
+// {
+//     int N = getint();
+//     int a[5][5];
+//     while (N > 0) {
+//         int i = 0;
+//         while (i < 5) {
+//             int j = 0;
+//             while (j < 5) {
+//                 a[i][j] = getint();
+//                 j = j + 1;
+//             }
+//             i = i + 1;
+//         }
+//         if (model(a)) {
+//             // cat
+//             putch(99); putch(97); putch(116); putch(10);
+//         } else {
+//             // dog
+//             putch(100); putch(111); putch(103); putch(10);
+//         }
+//         N = N - 1;
+//     }
+//     return 0;
+// }

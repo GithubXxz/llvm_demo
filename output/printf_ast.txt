@@ -2,66 +2,361 @@ Program (2)
   ExtDefList (2)
     ExtDef (2)
       Specifire (2)
-        TYPE :int 
+        TYPE :void 
       FunDec (2)
-        ID :main 
+        ID :move 
         LP (2)
+        VarList (2)
+          ParamDec (2)
+            Specifire (2)
+              TYPE :int 
+            VarDec (2)
+              ID :x 
+          VarList (2)
+            ParamDec (2)
+              Specifire (2)
+                TYPE :int 
+              VarDec (2)
+                ID :y 
         RP (2)
-      Compst (2)
-        LC (2)
-        TACList (3)
-          TAC (3)
-            DefList (3)
-              Def (3)
-                Specifire (3)
-                  TYPE :int 
-                DecList (3)
-                  Dec (3)
-                    VarDec (3)
-                      ID :a 
-                  DecList (3)
-                    Dec (3)
-                      VarDec (3)
-                        ID :b 
-              DefList 
-            StmtList (4)
-              Stmt (4)
-                Exp (4)
-                  Exp (4)
-                    ID :a 
-                  ASSIGNOP (4)
-                  Exp (4)
-                    INTEGER :10 
-              StmtList (5)
-                Stmt (5)
-                  Exp (5)
-                    Exp (5)
-                      ID :b 
-                    ASSIGNOP (5)
-                    Exp (5)
-                      MINUS (5)
-                      Exp (5)
-                        INTEGER :1 
-                StmtList (6)
-                  Stmt (6)
-                    RETURN (6)
-                    Exp (6)
-                      Exp (6)
-                        ID :a 
-                      MINUS (6)
-                      Exp (6)
-                        ID :b 
+      Compst (3)
+        LC (3)
+        TACList 
+          TAC 
+            DefList 
+            StmtList 
+              Stmt 
+                Exp 
+                  assistFuncCall 
+                  ID :putint 
+                  Args (4)
+                    Exp (4)
+                      ID :x 
+                    assistArgs 
+              StmtList 
+                Stmt 
+                  Exp 
+                    assistFuncCall 
+                    ID :putch 
+                    Args (4)
+                      Exp (4)
+                        INTEGER :32 
+                      assistArgs 
+                StmtList 
+                  Stmt 
+                    Exp 
+                      assistFuncCall 
+                      ID :putint 
+                      Args (4)
+                        Exp (4)
+                          ID :y 
+                        assistArgs 
                   StmtList 
+                    Stmt 
+                      Exp 
+                        assistFuncCall 
+                        ID :putch 
+                        Args (4)
+                          Exp (4)
+                            INTEGER :44 
+                          assistArgs 
+                    StmtList 
           TACList 
-        RC (7)
-    ExtDefList 
-Func: main
+        RC (5)
+    ExtDefList (7)
+      ExtDef (7)
+        Specifire (7)
+          TYPE :void 
+        FunDec (7)
+          ID :hanoi 
+          LP (7)
+          VarList (7)
+            ParamDec (7)
+              Specifire (7)
+                TYPE :int 
+              VarDec (7)
+                ID :n 
+            VarList (7)
+              ParamDec (7)
+                Specifire (7)
+                  TYPE :int 
+                VarDec (7)
+                  ID :one 
+              VarList (7)
+                ParamDec (7)
+                  Specifire (7)
+                    TYPE :int 
+                  VarDec (7)
+                    ID :two 
+                VarList (7)
+                  ParamDec (7)
+                    Specifire (7)
+                      TYPE :int 
+                    VarDec (7)
+                      ID :three 
+          RP (7)
+        Compst (8)
+          LC (8)
+          TACList 
+            TAC 
+              DefList 
+              StmtList (9)
+                Stmt (9)
+                  IF (9)
+                  Exp (9)
+                    Exp (9)
+                      ID :n 
+                    EQUAL (9)
+                    Exp (9)
+                      INTEGER :1 
+                  assistIF 
+                  Stmt 
+                    Exp 
+                      assistFuncCall 
+                      ID :move 
+                      Args (10)
+                        Exp (10)
+                          ID :one 
+                        assistArgs 
+                        Args (10)
+                          Exp (10)
+                            ID :three 
+                          assistArgs 
+                  assistELSE 
+                  ELSE (11)
+                  Stmt (11)
+                    Compst (11)
+                      LC (11)
+                      TACList 
+                        TAC 
+                          DefList 
+                          StmtList 
+                            Stmt 
+                              Exp 
+                                assistFuncCall 
+                                ID :hanoi 
+                                Args (12)
+                                  Exp (12)
+                                    Exp (12)
+                                      ID :n 
+                                    MINUS (12)
+                                    Exp (12)
+                                      INTEGER :1 
+                                  assistArgs 
+                                  Args (12)
+                                    Exp (12)
+                                      ID :one 
+                                    assistArgs 
+                                    Args (12)
+                                      Exp (12)
+                                        ID :three 
+                                      assistArgs 
+                                      Args (12)
+                                        Exp (12)
+                                          ID :two 
+                                        assistArgs 
+                            StmtList 
+                              Stmt 
+                                Exp 
+                                  assistFuncCall 
+                                  ID :move 
+                                  Args (13)
+                                    Exp (13)
+                                      ID :one 
+                                    assistArgs 
+                                    Args (13)
+                                      Exp (13)
+                                        ID :three 
+                                      assistArgs 
+                              StmtList 
+                                Stmt 
+                                  Exp 
+                                    assistFuncCall 
+                                    ID :hanoi 
+                                    Args (14)
+                                      Exp (14)
+                                        Exp (14)
+                                          ID :n 
+                                        MINUS (14)
+                                        Exp (14)
+                                          INTEGER :1 
+                                      assistArgs 
+                                      Args (14)
+                                        Exp (14)
+                                          ID :two 
+                                        assistArgs 
+                                        Args (14)
+                                          Exp (14)
+                                            ID :one 
+                                          assistArgs 
+                                          Args (14)
+                                            Exp (14)
+                                              ID :three 
+                                            assistArgs 
+                                StmtList 
+                        TACList 
+                      RC (15)
+                StmtList 
+            TACList 
+          RC (16)
+      ExtDefList (18)
+        ExtDef (18)
+          Specifire (18)
+            TYPE :int 
+          FunDec (18)
+            ID :main 
+            LP (18)
+            RP (18)
+          Compst (19)
+            LC (19)
+            TACList (20)
+              TAC (20)
+                DefList (20)
+                  Def (20)
+                    Specifire (20)
+                      TYPE :int 
+                    DecList (20)
+                      Dec (20)
+                        VarDec (20)
+                          ID :n 
+                        ASSIGNOP (20)
+                        Exp 
+                          assistFuncCall 
+                          ID :getint 
+                  DefList 
+                StmtList (21)
+                  Stmt (21)
+                    WHILE (21)
+                    Exp (21)
+                      Exp (21)
+                        ID :n 
+                      GREAT (21)
+                      Exp (21)
+                        INTEGER :0 
+                    assistWHILE 
+                    Stmt (21)
+                      Compst (21)
+                        LC (21)
+                        TACList 
+                          TAC 
+                            DefList 
+                            StmtList 
+                              Stmt 
+                                Exp 
+                                  assistFuncCall 
+                                  ID :hanoi 
+                                  Args 
+                                    Exp 
+                                      assistFuncCall 
+                                      ID :getint 
+                                    assistArgs 
+                                    Args (22)
+                                      Exp (22)
+                                        INTEGER :1 
+                                      assistArgs 
+                                      Args (22)
+                                        Exp (22)
+                                          INTEGER :2 
+                                        assistArgs 
+                                        Args (22)
+                                          Exp (22)
+                                            INTEGER :3 
+                                          assistArgs 
+                              StmtList 
+                                Stmt 
+                                  Exp 
+                                    assistFuncCall 
+                                    ID :putch 
+                                    Args (23)
+                                      Exp (23)
+                                        INTEGER :10 
+                                      assistArgs 
+                                StmtList (24)
+                                  Stmt (24)
+                                    Exp (24)
+                                      Exp (24)
+                                        ID :n 
+                                      ASSIGNOP (24)
+                                      Exp (24)
+                                        Exp (24)
+                                          ID :n 
+                                        MINUS (24)
+                                        Exp (24)
+                                          INTEGER :1 
+                                  StmtList 
+                          TACList 
+                        RC (25)
+                  StmtList (26)
+                    Stmt (26)
+                      RETURN (26)
+                      Exp (26)
+                        INTEGER :0 
+                    StmtList 
+              TACList 
+            RC (27)
+        ExtDefList 
+Func: move
 point1 = alloca int,align 4
+store int param0, point1,align 4
 point2 = alloca int,align 4
-store int 10, point1,align 4
-store int -1, point2,align 4
+store int param1, point2,align 4
 temp1 = load int, point1,align 4
-temp2 = load int, point2,align 4
-temp3 = sub nsw int temp1, temp2
-return
+(null) temp1 insert
+new instruction call func putint and goto putint without return value 
+(null) 32 insert
+new instruction call func putch and goto putch without return value 
+temp4 = load int, point2,align 4
+(null) temp4 insert
+new instruction call func putint and goto putint without return value 
+(null) 44 insert
+new instruction call func putch and goto putch without return value 
 func_label_end1
+Func: hanoi
+point3 = alloca int,align 4
+store int param0, point3,align 4
+point4 = alloca int,align 4
+store int param1, point4,align 4
+point5 = alloca int,align 4
+store int param2, point5,align 4
+point6 = alloca int,align 4
+store int param3, point6,align 4
+temp7 = load int, point5,align 4
+temp8 = icmp eq int temp7, 1
+br temp8, true: hanoilabel2  false : hanoilabel1 
+hanoilabel2
+temp9 = load int, point4,align 4
+(null) temp9 insert
+temp10 = load int, point6,align 4
+(null) temp10 insert
+new instruction call func move and goto move without return value 
+br hanoilabel3 
+hanoilabel1
+temp12 = load int, point5,align 4
+temp13 = sub nsw int temp12, 1
+(null) temp13 insert
+temp14 = load int, point4,align 4
+(null) temp14 insert
+temp15 = load int, point6,align 4
+(null) temp15 insert
+temp16 = load int, point5,align 4
+(null) temp16 insert
+new instruction call func hanoi and goto hanoi without return value 
+temp18 = load int, point4,align 4
+(null) temp18 insert
+temp19 = load int, point6,align 4
+(null) temp19 insert
+new instruction call func move and goto move without return value 
+temp21 = load int, point5,align 4
+temp22 = sub nsw int temp21, 1
+(null) temp22 insert
+temp23 = load int, point5,align 4
+(null) temp23 insert
+temp24 = load int, point4,align 4
+(null) temp24 insert
+temp25 = load int, point6,align 4
+(null) temp25 insert
+new instruction call func hanoi and goto hanoi without return value 
+hanoilabel3
+func_label_end2
+Func: main
+point7 = all

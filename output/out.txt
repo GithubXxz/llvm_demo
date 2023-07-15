@@ -1,62 +1,258 @@
+         	     0:          FuncLabelOP 	                     move 	      null
+         	     0:              LabelOP 	                moveentry 	      null
+         	     0:           AllocateOP 	                   point1 	      null
+         	     0:              StoreOP 	                   (null) 	    point1,     param0
+         	     0:           AllocateOP 	                   point2 	      null
+         	     0:              StoreOP 	                   (null) 	    point2,     param1
+         	     0:               LoadOP 	                    temp1 	    point1
+         	     0:              ParamOP 	                   param0 	     temp1
+         	     0:               CallOP 	                    temp2 	      null
+         	     0:              ParamOP 	                   param0 	        32
+         	     0:               CallOP 	                    temp3 	      null
+         	     0:               LoadOP 	                    temp4 	    point2
+         	     0:              ParamOP 	                   param0 	     temp4
+         	     0:               CallOP 	                    temp5 	      null
+         	     0:            FuncEndOP 	          func_label_end1 	      null
+         	     0:          FuncLabelOP 	                    hanoi 	      null
+         	     0:              LabelOP 	               hanoientry 	      null
+         	     0:           AllocateOP 	                   point3 	      null
+         	     0:              StoreOP 	                   (null) 	    point3,     param0
+         	     0:           AllocateOP 	                   point4 	      null
+         	     0:              StoreOP 	                   (null) 	    point4,     param1
+         	     0:           AllocateOP 	                   point5 	      null
+         	     0:              StoreOP 	                   (null) 	    point5,     param2
+         	     0:           AllocateOP 	                   point6 	      null
+         	     0:              StoreOP 	                   (null) 	    point6,     param3
+         	     0:               LoadOP 	                    temp6 	    point5
+         	     0:              EqualOP 	                    temp7 	     temp6,          1
+         	     0:  GotoWithConditionOP 	true:hanoilabel2  false:hanoilabel1 	     temp7
+         	     0:              LabelOP 	              hanoilabel2 	      null
+         	     0:               LoadOP 	                    temp8 	    point4
+         	     0:               LoadOP 	                    temp9 	    point6
+         	     0:              ParamOP 	                   param1 	     temp9
+         	     0:              ParamOP 	                   param0 	     temp8
+         	     0:               CallOP 	                   temp10 	      null
+         	     0:               GotoOP 	         goto hanoilabel3 	      null
+         	     0:              LabelOP 	              hanoilabel1 	      null
+         	     0:               LoadOP 	                   temp11 	    point5
+         	     0:                SubOP 	                   temp12 	    temp11,          1
+         	     0:               LoadOP 	                   temp13 	    point4
+         	     0:               LoadOP 	                   temp14 	    point6
+         	     0:               LoadOP 	                   temp15 	    point5
+         	     0:              ParamOP 	                   param3 	    temp15
+         	     0:              ParamOP 	                   param2 	    temp14
+         	     0:              ParamOP 	                   param1 	    temp13
+         	     0:              ParamOP 	                   param0 	    temp12
+         	     0:               CallOP 	                   temp16 	      null
+         	     0:               LoadOP 	                   temp17 	    point4
+         	     0:               LoadOP 	                   temp18 	    point6
+         	     0:              ParamOP 	                   param1 	    temp18
+         	     0:              ParamOP 	                   param0 	    temp17
+         	     0:               CallOP 	                   temp19 	      null
+         	     0:               LoadOP 	                   temp20 	    point5
+         	     0:                SubOP 	                   temp21 	    temp20,          1
+         	     0:               LoadOP 	                   temp22 	    point5
+         	     0:               LoadOP 	                   temp23 	    point4
+         	     0:               LoadOP 	                   temp24 	    point6
+         	     0:              ParamOP 	                   param3 	    temp24
+         	     0:              ParamOP 	                   param2 	    temp23
+         	     0:              ParamOP 	                   param1 	    temp22
+         	     0:              ParamOP 	                   param0 	    temp21
+         	     0:               CallOP 	                   temp25 	      null
+         	     0:               GotoOP 	         goto hanoilabel3 	      null
+         	     0:              LabelOP 	              hanoilabel3 	      null
+         	     0:            FuncEndOP 	          func_label_end2 	      null
          	     0:          FuncLabelOP 	                     main 	      null
          	     0:              LabelOP 	                mainentry 	      null
-         	     0:           AllocateOP 	                   point1 	      null
+         	     0:           AllocateOP 	                   point7 	      null
+         	     0: CallWithReturnValueOP 	                   temp26 	      null
+         	     0:              StoreOP 	                   (null) 	    point7,     temp26
+         	     0:               GotoOP 	          goto mainlabel4 	      null
+         	     0:              LabelOP 	               mainlabel4 	      null
+         	     0:               LoadOP 	                   temp27 	    point7
+         	     0:          GreatThanOP 	                   temp28 	    temp27,          0
+         	     0:  GotoWithConditionOP 	true:mainlabel6  false:mainlabel5 	    temp28
+         	     0:              LabelOP 	               mainlabel6 	      null
+         	     0: CallWithReturnValueOP 	                   temp29 	      null
+         	     0:              ParamOP 	                   param3 	         3
+         	     0:              ParamOP 	                   param2 	         2
+         	     0:              ParamOP 	                   param1 	         1
+         	     0:              ParamOP 	                   param0 	    temp29
+         	     0:               CallOP 	                   temp30 	      null
+         	     0:              ParamOP 	                   param0 	        10
+         	     0:               CallOP 	                   temp31 	      null
+         	     0:               LoadOP 	                   temp32 	    point7
+         	     0:                SubOP 	                   temp33 	    temp32,          1
+         	     0:              StoreOP 	                   (null) 	    point7,     temp33
+         	     0:               GotoOP 	          goto mainlabel4 	      null
+         	     0:              LabelOP 	               mainlabel5 	      null
+         	     0:             ReturnOP 	                   return 	         0
+         	     0:            FuncEndOP 	          func_label_end3 	      null
+
+
+
+	address:0x10030dbf0	moveentry:
+         	     0:              LabelOP 	                moveentry 	      null
          	     0:           AllocateOP 	                   point2 	      null
-         	     0:              StoreOP 	                   (null) 	    point1,         10
-         	     0:              StoreOP 	                   (null) 	    point2,         -1
+         	     0:           AllocateOP 	                   point1 	      null
+         	     0:              StoreOP 	                   (null) 	    point1,     param0
+         	     0:              StoreOP 	                   (null) 	    point2,     param1
          	     0:               LoadOP 	                    temp1 	    point1
-         	     0:               LoadOP 	                    temp2 	    point2
-         	     0:                SubOP 	                    temp3 	     temp1,      temp2
-         	     0:             ReturnOP 	                   return 	     temp3
+         	     0:              ParamOP 	                   param0 	     temp1
+         	     0:               CallOP 	                    temp2 	      null
+         	     0:              ParamOP 	                   param0 	        32
+         	     0:               CallOP 	                    temp3 	      null
+         	     0:               LoadOP 	                    temp4 	    point2
+         	     0:              ParamOP 	                   param0 	     temp4
+         	     0:               CallOP 	                    temp5 	      null
+         	     0:               GotoOP 	        goto moveendlabel 	      null
+	address:0x100313a30	moveendlabel:
+         	     0:              LabelOP 	             moveendlabel 	      null
          	     0:            FuncEndOP 	          func_label_end1 	      null
-main
-mainentry edge is mainend_label 
-mainend_label edge is 
-mainend_label,
+
+
+
+	address:0x10030eb90	hanoientry:
+         	     0:              LabelOP 	               hanoientry 	      null
+         	     0:           AllocateOP 	                   point6 	      null
+         	     0:           AllocateOP 	                   point5 	      null
+         	     0:           AllocateOP 	                   point4 	      null
+         	     0:           AllocateOP 	                   point3 	      null
+         	     0:              StoreOP 	                   (null) 	    point3,     param0
+         	     0:              StoreOP 	                   (null) 	    point4,     param1
+         	     0:              StoreOP 	                   (null) 	    point5,     param2
+         	     0:              StoreOP 	                   (null) 	    point6,     param3
+         	     0:               LoadOP 	                    temp6 	    point5
+         	     0:              EqualOP 	                    temp7 	     temp6,          1
+         	     0:  GotoWithConditionOP 	true:hanoilabel2  false:hanoilabel1 	     temp7
+	address:0x10030fb30	hanoilabel2:
+         	     0:              LabelOP 	              hanoilabel2 	      null
+         	     0:               LoadOP 	                    temp8 	    point4
+         	     0:               LoadOP 	                    temp9 	    point6
+         	     0:              ParamOP 	                   param1 	     temp9
+         	     0:              ParamOP 	                   param0 	     temp8
+         	     0:               CallOP 	                   temp10 	      null
+         	     0:               GotoOP 	         goto hanoilabel3 	      null
+	address:0x100310180	hanoilabel3:
+         	     0:              LabelOP 	              hanoilabel3 	      null
+         	     0:               GotoOP 	       goto hanoiendlabel 	      null
+	address:0x1003146a0	hanoiendlabel:
+         	     0:              LabelOP 	            hanoiendlabel 	      null
+         	     0:            FuncEndOP 	          func_label_end2 	      null
+	address:0x10030fa90	hanoilabel1:
+         	     0:              LabelOP 	              hanoilabel1 	      null
+         	     0:               LoadOP 	                   temp11 	    point5
+         	     0:                SubOP 	                   temp12 	    temp11,          1
+         	     0:               LoadOP 	                   temp13 	    point4
+         	     0:               LoadOP 	                   temp14 	    point6
+         	     0:               LoadOP 	                   temp15 	    point5
+         	     0:              ParamOP 	                   param3 	    temp15
+         	     0:              ParamOP 	                   param2 	    temp14
+         	     0:              ParamOP 	                   param1 	    temp13
+         	     0:              ParamOP 	                   param0 	    temp12
+         	     0:               CallOP 	                   temp16 	      null
+         	     0:               LoadOP 	                   temp17 	    point4
+         	     0:               LoadOP 	                   temp18 	    point6
+         	     0:              ParamOP 	                   param1 	    temp18
+         	     0:              ParamOP 	                   param0 	    temp17
+         	     0:               CallOP 	                   temp19 	      null
+         	     0:               LoadOP 	                   temp20 	    point5
+         	     0:                SubOP 	                   temp21 	    temp20,          1
+         	     0:               LoadOP 	                   temp22 	    point5
+         	     0:               LoadOP 	                   temp23 	    point4
+         	     0:               LoadOP 	                   temp24 	    point6
+         	     0:              ParamOP 	                   param3 	    temp24
+         	     0:              ParamOP 	                   param2 	    temp23
+         	     0:              ParamOP 	                   param1 	    temp22
+         	     0:              ParamOP 	                   param0 	    temp21
+         	     0:               CallOP 	                   temp25 	      null
+         	     0:               GotoOP 	         goto hanoilabel3 	      null
+
+
+
+	address:0x100311d60	mainentry:
+         	     0:              LabelOP 	                mainentry 	      null
+         	     0:           AllocateOP 	                   point7 	      null
+         	     0: CallWithReturnValueOP 	                   temp26 	      null
+         	     0:              StoreOP 	                   (null) 	    point7,     temp26
+         	     0:               GotoOP 	          goto mainlabel4 	      null
+	address:0x100312250	mainlabel4:
+         	     0:              LabelOP 	               mainlabel4 	      null
+         	     0:               LoadOP 	                   temp27 	    point7
+         	     0:          GreatThanOP 	                   temp28 	    temp27,          0
+         	     0:  GotoWithConditionOP 	true:mainlabel6  false:mainlabel5 	    temp28
+	address:0x1003126c0	mainlabel6:
+         	     0:              LabelOP 	               mainlabel6 	      null
+         	     0: CallWithReturnValueOP 	                   temp29 	      null
+         	     0:              ParamOP 	                   param3 	         3
+         	     0:              ParamOP 	                   param2 	         2
+         	     0:              ParamOP 	                   param1 	         1
+         	     0:              ParamOP 	                   param0 	    temp29
+         	     0:               CallOP 	                   temp30 	      null
+         	     0:              ParamOP 	                   param0 	        10
+         	     0:               CallOP 	                   temp31 	      null
+         	     0:               LoadOP 	                   temp32 	    point7
+         	     0:                SubOP 	                   temp33 	    temp32,          1
+         	     0:              StoreOP 	                   (null) 	    point7,     temp33
+         	     0:               GotoOP 	          goto mainlabel4 	      null
+	address:0x100312620	mainlabel5:
+         	     0:              LabelOP 	               mainlabel5 	      null
+         	     0:             ReturnOP 	                   return 	         0
+	address:0x100316430	mainendlabel:
+         	     0:              LabelOP 	             mainendlabel 	      null
+         	     0:            FuncEndOP 	          func_label_end3 	      null
+move
+moveentry edge is moveendlabel 
+moveendlabel edge is 
+moveendlabel,
 
 打印每个节点的立即支配节点
-idom(mainend_label) = mainentry
+idom(moveendlabel) = moveentry
 
 打印支配树中的层级关系
-mainentry: mainend_label,
-mainend_label: 
+moveentry: moveendlabel,
+moveendlabel: 
 
 打印每个基本块的支配边界节点
-cur node mainend_label's dom frontier is 
+cur node moveendlabel's dom frontier is 
 
 	labelID	number:               opcode 	                     name 	       use
-	address:0x561ae1fd8f10	mainentry:
-         	     0:              LabelOP 	                mainentry 	      null
+	address:0x10030dbf0	moveentry:
+         	     0:              LabelOP 	                moveentry 	      null
          	     0:           AllocateOP 	                   point2 	      null
          	     0:           AllocateOP 	                   point1 	      null
-         	     0:              StoreOP 	                   (null) 	    point1,         10
-         	     0:              StoreOP 	                   (null) 	    point2,         -1
+         	     0:              StoreOP 	                   (null) 	    point1,     param0
+         	     0:              StoreOP 	                   (null) 	    point2,     param1
          	     0:               LoadOP 	                    temp1 	    point1
-         	     0:               LoadOP 	                    temp2 	    point2
-         	     0:                SubOP 	                    temp3 	     temp1,      temp2
-         	     0:             ReturnOP 	                   return 	     temp3
-
-	address:0x561ae1fd7b20	mainend_label:
-         	     0:              LabelOP 	            mainend_label 	      null
+         	     0:              ParamOP 	                   param0 	     temp1
+         	     0:               CallOP 	                    temp2 	      null
+         	     0:              ParamOP 	                   param0 	        32
+         	     0:               CallOP 	                    temp3 	      null
+         	     0:               LoadOP 	                    temp4 	    point2
+         	     0:              ParamOP 	                   param0 	     temp4
+         	     0:               CallOP 	                    temp5 	      null
+         	     0:               GotoOP 	        goto moveendlabel 	      null
+	address:0x100313a30	moveendlabel:
+         	     0:              LabelOP 	             moveendlabel 	      null
          	     0:            FuncEndOP 	          func_label_end1 	      null
-
 
 
 begin rename pass and delete alloca,store,load instruction!
-size is 0
-size is 0
 rename pass over
 delete alloca,store,load instruction over
 	labelID	number:               opcode 	                     name 	       use
-	address:0x561ae1fd8f10	mainentry:
-         	     0:              LabelOP 	                mainentry 	      null
-         	     0:                SubOP 	                    temp3 	        10,         -1
-         	     0:             ReturnOP 	                   return 	     temp3
-
-	address:0x561ae1fd7b20	mainend_label:
-         	     0:              LabelOP 	            mainend_label 	      null
+	address:0x10030dbf0	moveentry:
+         	     0:              LabelOP 	                moveentry 	      null
+         	     0:              ParamOP 	                   param0 	    param0
+         	     0:               CallOP 	                    temp2 	      null
+         	     0:              ParamOP 	                   param0 	        32
+         	     0:               CallOP 	                    temp3 	      null
+         	     0:              ParamOP 	                   param0 	    param1
+         	     0:               CallOP 	                    temp5 	      null
+         	     0:               GotoOP 	        goto moveendlabel 	      null
+	address:0x100313a30	moveendlabel:
+         	     0:              LabelOP 	             moveendlabel 	      null
          	     0:            FuncEndOP 	          func_label_end1 	      null
-
 
 
 replace phi node begin
@@ -67,35 +263,473 @@ replace phi node over
 
 
 	labelID	number:               opcode 	                     name 	       use
-	address:0x561ae1fd8f10	mainentry:
-         	     0:              LabelOP 	                mainentry 	      null
-         	     0:                SubOP 	                    temp3 	        10,         -1
-         	     0:             ReturnOP 	                   return 	     temp3
-
-	address:0x561ae1fd7b20	mainend_label:
-         	     0:              LabelOP 	            mainend_label 	      null
+	address:0x10030dbf0	moveentry:
+         	     0:              LabelOP 	                moveentry 	      null
+         	     0:              ParamOP 	                   param0 	    param0
+         	     0:               CallOP 	                    temp2 	      null
+         	     0:              ParamOP 	                   param0 	        32
+         	     0:               CallOP 	                    temp3 	      null
+         	     0:              ParamOP 	                   param0 	    param1
+         	     0:               CallOP 	                    temp5 	      null
+         	     0:               GotoOP 	        goto moveendlabel 	      null
+	address:0x100313a30	moveendlabel:
+         	     0:              LabelOP 	             moveendlabel 	      null
          	     0:            FuncEndOP 	          func_label_end1 	      null
 
 
-
-mainentry live def add temp3
+moveentry live use add param0
+moveentry live use add param1
 
 
 
 	labelID	number:               opcode 	                     name 	       use
-	address:0x561ae1fd8f10	mainentry:
+	address:0x10030dbf0	moveentry:
+         	     0:              LabelOP 	                moveentry 	      null
+         	     1:              ParamOP 	                   param0 	    param0
+         	     2:               CallOP 	                    temp2 	      null
+         	     3:              ParamOP 	                   param0 	        32
+         	     4:               CallOP 	                    temp3 	      null
+         	     5:              ParamOP 	                   param0 	    param1
+         	     6:               CallOP 	                    temp5 	      null
+         	     7:               GotoOP 	        goto moveendlabel 	      null
+	address:0x100313a30	moveendlabel:
+         	     8:              LabelOP 	             moveendlabel 	      null
+         	     9:            FuncEndOP 	          func_label_end1 	      null
+
+
+	val:param0 	begin:0 	end:1 
+	val:param1 	begin:0 	end:5 
+
+	var:param0	address:R1
+ 	var:param1	address:R2
+ hanoi
+hanoientry edge is hanoilabel1 hanoilabel2 
+hanoilabel2 edge is hanoilabel3 
+hanoilabel3 edge is hanoiendlabel 
+hanoiendlabel edge is 
+hanoilabel1 edge is hanoilabel3 
+hanoilabel2,
+hanoilabel3,hanoiendlabel,
+hanoiendlabel,
+hanoilabel1,
+
+打印每个节点的立即支配节点
+idom(hanoilabel2) = hanoientry
+idom(hanoilabel3) = hanoientry
+idom(hanoiendlabel) = hanoilabel3
+idom(hanoilabel1) = hanoientry
+
+打印支配树中的层级关系
+hanoientry: hanoilabel2,hanoilabel3,hanoilabel1,
+hanoilabel1: 
+hanoilabel3: hanoiendlabel,
+hanoiendlabel: 
+hanoilabel2: 
+
+打印每个基本块的支配边界节点
+cur node hanoilabel2's dom frontier is hanoilabel3,
+cur node hanoilabel3's dom frontier is 
+cur node hanoiendlabel's dom frontier is 
+cur node hanoilabel1's dom frontier is hanoilabel3,
+
+	labelID	number:               opcode 	                     name 	       use
+	address:0x10030eb90	hanoientry:
+         	     0:              LabelOP 	               hanoientry 	      null
+         	     0:           AllocateOP 	                   point6 	      null
+         	     0:           AllocateOP 	                   point5 	      null
+         	     0:           AllocateOP 	                   point4 	      null
+         	     0:           AllocateOP 	                   point3 	      null
+         	     0:              StoreOP 	                   (null) 	    point3,     param0
+         	     0:              StoreOP 	                   (null) 	    point4,     param1
+         	     0:              StoreOP 	                   (null) 	    point5,     param2
+         	     0:              StoreOP 	                   (null) 	    point6,     param3
+         	     0:               LoadOP 	                    temp6 	    point5
+         	     0:              EqualOP 	                    temp7 	     temp6,          1
+         	     0:  GotoWithConditionOP 	true:hanoilabel2  false:hanoilabel1 	     temp7
+	address:0x10030fb30	hanoilabel2:
+         	     0:              LabelOP 	              hanoilabel2 	      null
+         	     0:               LoadOP 	                    temp8 	    point4
+         	     0:               LoadOP 	                    temp9 	    point6
+         	     0:              ParamOP 	                   param1 	     temp9
+         	     0:              ParamOP 	                   param0 	     temp8
+         	     0:               CallOP 	                   temp10 	      null
+         	     0:               GotoOP 	         goto hanoilabel3 	      null
+	address:0x100310180	hanoilabel3:
+         	     0:              LabelOP 	              hanoilabel3 	      null
+         	     0:               GotoOP 	       goto hanoiendlabel 	      null
+	address:0x1003146a0	hanoiendlabel:
+         	     0:              LabelOP 	            hanoiendlabel 	      null
+         	     0:            FuncEndOP 	          func_label_end2 	      null
+	address:0x10030fa90	hanoilabel1:
+         	     0:              LabelOP 	              hanoilabel1 	      null
+         	     0:               LoadOP 	                   temp11 	    point5
+         	     0:                SubOP 	                   temp12 	    temp11,          1
+         	     0:               LoadOP 	                   temp13 	    point4
+         	     0:               LoadOP 	                   temp14 	    point6
+         	     0:               LoadOP 	                   temp15 	    point5
+         	     0:              ParamOP 	                   param3 	    temp15
+         	     0:              ParamOP 	                   param2 	    temp14
+         	     0:              ParamOP 	                   param1 	    temp13
+         	     0:              ParamOP 	                   param0 	    temp12
+         	     0:               CallOP 	                   temp16 	      null
+         	     0:               LoadOP 	                   temp17 	    point4
+         	     0:               LoadOP 	                   temp18 	    point6
+         	     0:              ParamOP 	                   param1 	    temp18
+         	     0:              ParamOP 	                   param0 	    temp17
+         	     0:               CallOP 	                   temp19 	      null
+         	     0:               LoadOP 	                   temp20 	    point5
+         	     0:                SubOP 	                   temp21 	    temp20,          1
+         	     0:               LoadOP 	                   temp22 	    point5
+         	     0:               LoadOP 	                   temp23 	    point4
+         	     0:               LoadOP 	                   temp24 	    point6
+         	     0:              ParamOP 	                   param3 	    temp24
+         	     0:              ParamOP 	                   param2 	    temp23
+         	     0:              ParamOP 	                   param1 	    temp22
+         	     0:              ParamOP 	                   param0 	    temp21
+         	     0:               CallOP 	                   temp25 	      null
+         	     0:               GotoOP 	         goto hanoilabel3 	      null
+
+
+begin rename pass and delete alloca,store,load instruction!
+rename pass over
+delete alloca,store,load instruction over
+	labelID	number:               opcode 	                     name 	       use
+	address:0x10030eb90	hanoientry:
+         	     0:              LabelOP 	               hanoientry 	      null
+         	     0:              EqualOP 	                    temp7 	    param2,          1
+         	     0:  GotoWithConditionOP 	true:hanoilabel2  false:hanoilabel1 	     temp7
+	address:0x10030fb30	hanoilabel2:
+         	     0:              LabelOP 	              hanoilabel2 	      null
+         	     0:              ParamOP 	                   param1 	    param3
+         	     0:              ParamOP 	                   param0 	    param1
+         	     0:               CallOP 	                   temp10 	      null
+         	     0:               GotoOP 	         goto hanoilabel3 	      null
+	address:0x100310180	hanoilabel3:
+         	     0:              LabelOP 	              hanoilabel3 	      null
+         	     0:               GotoOP 	       goto hanoiendlabel 	      null
+	address:0x1003146a0	hanoiendlabel:
+         	     0:              LabelOP 	            hanoiendlabel 	      null
+         	     0:            FuncEndOP 	          func_label_end2 	      null
+	address:0x10030fa90	hanoilabel1:
+         	     0:              LabelOP 	              hanoilabel1 	      null
+         	     0:                SubOP 	                   temp12 	    param2,          1
+         	     0:              ParamOP 	                   param3 	    param2
+         	     0:              ParamOP 	                   param2 	    param3
+         	     0:              ParamOP 	                   param1 	    param1
+         	     0:              ParamOP 	                   param0 	    temp12
+         	     0:               CallOP 	                   temp16 	      null
+         	     0:              ParamOP 	                   param1 	    param3
+         	     0:              ParamOP 	                   param0 	    param1
+         	     0:               CallOP 	                   temp19 	      null
+         	     0:                SubOP 	                   temp21 	    param2,          1
+         	     0:              ParamOP 	                   param3 	    param3
+         	     0:              ParamOP 	                   param2 	    param1
+         	     0:              ParamOP 	                   param1 	    param2
+         	     0:              ParamOP 	                   param0 	    temp21
+         	     0:               CallOP 	                   temp25 	      null
+         	     0:               GotoOP 	         goto hanoilabel3 	      null
+
+
+replace phi node begin
+
+replace phi node over
+
+
+
+
+	labelID	number:               opcode 	                     name 	       use
+	address:0x10030eb90	hanoientry:
+         	     0:              LabelOP 	               hanoientry 	      null
+         	     0:              EqualOP 	                    temp7 	    param2,          1
+         	     0:  GotoWithConditionOP 	true:hanoilabel2  false:hanoilabel1 	     temp7
+	address:0x10030fb30	hanoilabel2:
+         	     0:              LabelOP 	              hanoilabel2 	      null
+         	     0:              ParamOP 	                   param1 	    param3
+         	     0:              ParamOP 	                   param0 	    param1
+         	     0:               CallOP 	                   temp10 	      null
+         	     0:               GotoOP 	         goto hanoilabel3 	      null
+	address:0x100310180	hanoilabel3:
+         	     0:              LabelOP 	              hanoilabel3 	      null
+         	     0:               GotoOP 	       goto hanoiendlabel 	      null
+	address:0x1003146a0	hanoiendlabel:
+         	     0:              LabelOP 	            hanoiendlabel 	      null
+         	     0:            FuncEndOP 	          func_label_end2 	      null
+	address:0x10030fa90	hanoilabel1:
+         	     0:              LabelOP 	              hanoilabel1 	      null
+         	     0:                SubOP 	                   temp12 	    param2,          1
+         	     0:              ParamOP 	                   param3 	    param2
+         	     0:              ParamOP 	                   param2 	    param3
+         	     0:              ParamOP 	                   param1 	    param1
+         	     0:              ParamOP 	                   param0 	    temp12
+         	     0:               CallOP 	                   temp16 	      null
+         	     0:              ParamOP 	                   param1 	    param3
+         	     0:              ParamOP 	                   param0 	    param1
+         	     0:               CallOP 	                   temp19 	      null
+         	     0:                SubOP 	                   temp21 	    param2,          1
+         	     0:              ParamOP 	                   param3 	    param3
+         	     0:              ParamOP 	                   param2 	    param1
+         	     0:              ParamOP 	                   param1 	    param2
+         	     0:              ParamOP 	                   param0 	    temp21
+         	     0:               CallOP 	                   temp25 	      null
+         	     0:               GotoOP 	         goto hanoilabel3 	      null
+
+
+hanoientry live use add param2
+hanoientry live def add temp7
+hanoilabel2 live use add param3
+hanoilabel2 live use add param1
+hanoilabel1 live use add param2
+hanoilabel1 live def add temp12
+hanoilabel1 live use add param2
+hanoilabel1 live use add param3
+hanoilabel1 live use add param1
+hanoilabel1 live use add param3
+hanoilabel1 live use add param1
+hanoilabel1 live use add param2
+hanoilabel1 live def add temp21
+hanoilabel1 live use add param3
+hanoilabel1 live use add param1
+hanoilabel1 live use add param2
+
+
+
+	labelID	number:               opcode 	                     name 	       use
+	address:0x10030eb90	hanoientry:
+         	     0:              LabelOP 	               hanoientry 	      null
+         	     1:              EqualOP 	                    temp7 	    param2,          1
+         	     2:  GotoWithConditionOP 	true:hanoilabel2  false:hanoilabel1 	     temp7
+	address:0x10030fb30	hanoilabel2:
+         	     3:              LabelOP 	              hanoilabel2 	      null
+         	     4:              ParamOP 	                   param1 	    param3
+         	     5:              ParamOP 	                   param0 	    param1
+         	     6:               CallOP 	                   temp10 	      null
+         	     7:               GotoOP 	         goto hanoilabel3 	      null
+	address:0x100310180	hanoilabel3:
+         	     8:              LabelOP 	              hanoilabel3 	      null
+         	     9:               GotoOP 	       goto hanoiendlabel 	      null
+	address:0x1003146a0	hanoiendlabel:
+         	     10:              LabelOP 	            hanoiendlabel 	      null
+         	     11:            FuncEndOP 	          func_label_end2 	      null
+	address:0x10030fa90	hanoilabel1:
+         	     12:              LabelOP 	              hanoilabel1 	      null
+         	     13:                SubOP 	                   temp12 	    param2,          1
+         	     14:              ParamOP 	                   param3 	    param2
+         	     15:              ParamOP 	                   param2 	    param3
+         	     16:              ParamOP 	                   param1 	    param1
+         	     17:              ParamOP 	                   param0 	    temp12
+         	     18:               CallOP 	                   temp16 	      null
+         	     19:              ParamOP 	                   param1 	    param3
+         	     20:              ParamOP 	                   param0 	    param1
+         	     21:               CallOP 	                   temp19 	      null
+         	     22:                SubOP 	                   temp21 	    param2,          1
+         	     23:              ParamOP 	                   param3 	    param3
+         	     24:              ParamOP 	                   param2 	    param1
+         	     25:              ParamOP 	                   param1 	    param2
+         	     26:              ParamOP 	                   param0 	    temp21
+         	     27:               CallOP 	                   temp25 	      null
+         	     28:               GotoOP 	         goto hanoilabel3 	      null
+
+
+	val:param3 	begin:0 	end:23 
+	val:param1 	begin:0 	end:24 
+	val:param2 	begin:0 	end:25 
+	val:temp7 	begin:1 	end:2 
+	val:temp12 	begin:13 	end:17 
+	val:temp21 	begin:22 	end:26 
+
+	var:temp12	address:R3
+ 	var:temp21	address:R3
+ 	var:param1	address:R2
+ 	var:param2	address:M
+ 	var:param3	address:R1
+ 	var:temp7	address:R3
+ main
+mainentry edge is mainlabel4 
+mainlabel4 edge is mainlabel5 mainlabel6 
+mainlabel6 edge is mainlabel4 
+mainlabel5 edge is mainendlabel 
+mainendlabel edge is 
+mainlabel4,mainlabel6,mainlabel5,mainendlabel,
+mainlabel6,
+mainlabel5,mainendlabel,
+mainendlabel,
+
+打印每个节点的立即支配节点
+idom(mainlabel4) = mainentry
+idom(mainlabel6) = mainlabel4
+idom(mainlabel5) = mainlabel4
+idom(mainendlabel) = mainlabel5
+
+打印支配树中的层级关系
+mainentry: mainlabel4,
+mainlabel4: mainlabel6,mainlabel5,
+mainlabel5: mainendlabel,
+mainendlabel: 
+mainlabel6: 
+
+打印每个基本块的支配边界节点
+cur node mainlabel4's dom frontier is mainlabel4,
+cur node mainlabel6's dom frontier is mainlabel4,
+cur node mainlabel5's dom frontier is 
+cur node mainendlabel's dom frontier is 
+
+	labelID	number:               opcode 	                     name 	       use
+	address:0x100311d60	mainentry:
          	     0:              LabelOP 	                mainentry 	      null
-         	     1:                SubOP 	                    temp3 	        10,         -1
-         	     2:             ReturnOP 	                   return 	     temp3
+         	     0:           AllocateOP 	                   point7 	      null
+         	     0: CallWithReturnValueOP 	                   temp26 	      null
+         	     0:              StoreOP 	                   (null) 	    point7,     temp26
+         	     0:               GotoOP 	          goto mainlabel4 	      null
+	address:0x100312250	mainlabel4:
+         	     0:              LabelOP 	               mainlabel4 	      null
+         	     0:            PhiFuncOp 	                %phi_var1 	size: 0 
+         	     0:               LoadOP 	                   temp27 	    point7
+         	     0:          GreatThanOP 	                   temp28 	    temp27,          0
+         	     0:  GotoWithConditionOP 	true:mainlabel6  false:mainlabel5 	    temp28
+	address:0x1003126c0	mainlabel6:
+         	     0:              LabelOP 	               mainlabel6 	      null
+         	     0: CallWithReturnValueOP 	                   temp29 	      null
+         	     0:              ParamOP 	                   param3 	         3
+         	     0:              ParamOP 	                   param2 	         2
+         	     0:              ParamOP 	                   param1 	         1
+         	     0:              ParamOP 	                   param0 	    temp29
+         	     0:               CallOP 	                   temp30 	      null
+         	     0:              ParamOP 	                   param0 	        10
+         	     0:               CallOP 	                   temp31 	      null
+         	     0:               LoadOP 	                   temp32 	    point7
+         	     0:                SubOP 	                   temp33 	    temp32,          1
+         	     0:              StoreOP 	                   (null) 	    point7,     temp33
+         	     0:               GotoOP 	          goto mainlabel4 	      null
+	address:0x100312620	mainlabel5:
+         	     0:              LabelOP 	               mainlabel5 	      null
+         	     0:             ReturnOP 	                   return 	         0
+	address:0x100316430	mainendlabel:
+         	     0:              LabelOP 	             mainendlabel 	      null
+         	     0:            FuncEndOP 	          func_label_end3 	      null
 
-	address:0x561ae1fd7b20	mainend_label:
-         	     3:              LabelOP 	            mainend_label 	      null
-         	     4:            FuncEndOP 	          func_label_end1 	      null
+
+begin rename pass and delete alloca,store,load instruction!
+rename pass over
+delete alloca,store,load instruction over
+	labelID	number:               opcode 	                     name 	       use
+	address:0x100311d60	mainentry:
+         	     0:              LabelOP 	                mainentry 	      null
+         	     0: CallWithReturnValueOP 	                   temp26 	      null
+         	     0:               GotoOP 	          goto mainlabel4 	      null
+	address:0x100312250	mainlabel4:
+         	     0:              LabelOP 	               mainlabel4 	      null
+         	     0:            PhiFuncOp 	                %phi_var1 	size: 2 	bblock: mainentry value: temp26, 	bblock: mainlabel6 value: temp33, 
+         	     0:          GreatThanOP 	                   temp28 	 %phi_var1,          0
+         	     0:  GotoWithConditionOP 	true:mainlabel6  false:mainlabel5 	    temp28
+	address:0x1003126c0	mainlabel6:
+         	     0:              LabelOP 	               mainlabel6 	      null
+         	     0: CallWithReturnValueOP 	                   temp29 	      null
+         	     0:              ParamOP 	                   param3 	         3
+         	     0:              ParamOP 	                   param2 	         2
+         	     0:              ParamOP 	                   param1 	         1
+         	     0:              ParamOP 	                   param0 	    temp29
+         	     0:               CallOP 	                   temp30 	      null
+         	     0:              ParamOP 	                   param0 	        10
+         	     0:               CallOP 	                   temp31 	      null
+         	     0:                SubOP 	                   temp33 	 %phi_var1,          1
+         	     0:               GotoOP 	          goto mainlabel4 	      null
+	address:0x100312620	mainlabel5:
+         	     0:              LabelOP 	               mainlabel5 	      null
+         	     0:             ReturnOP 	                   return 	         0
+	address:0x100316430	mainendlabel:
+         	     0:              LabelOP 	             mainendlabel 	      null
+         	     0:            FuncEndOP 	          func_label_end3 	      null
+
+
+replace phi node begin
+
+replace phi node over
 
 
 
-var name is temp3
-	val:temp3 	begin:1 	end:2 
 
-	var:temp3	address:R1
+	labelID	number:               opcode 	                     name 	       use
+	address:0x100311d60	mainentry:
+         	     0:              LabelOP 	                mainentry 	      null
+         	     0: CallWithReturnValueOP 	                   temp26 	      null
+         	     0:             AssignOP 	                %phi_var1 	    temp26
+         	     0:               GotoOP 	          goto mainlabel4 	      null
+	address:0x100312250	mainlabel4:
+         	     0:              LabelOP 	               mainlabel4 	      null
+         	     0:          GreatThanOP 	                   temp28 	 %phi_var1,          0
+         	     0:  GotoWithConditionOP 	true:mainlabel6  false:mainlabel5 	    temp28
+	address:0x1003126c0	mainlabel6:
+         	     0:              LabelOP 	               mainlabel6 	      null
+         	     0: CallWithReturnValueOP 	                   temp29 	      null
+         	     0:              ParamOP 	                   param3 	         3
+         	     0:              ParamOP 	                   param2 	         2
+         	     0:              ParamOP 	                   param1 	         1
+         	     0:              ParamOP 	                   param0 	    temp29
+         	     0:               CallOP 	                   temp30 	      null
+         	     0:              ParamOP 	                   param0 	        10
+         	     0:               CallOP 	                   temp31 	      null
+         	     0:                SubOP 	                   temp33 	 %phi_var1,          1
+         	     0:             AssignOP 	                %phi_var1 	    temp33
+         	     0:               GotoOP 	          goto mainlabel4 	      null
+	address:0x100312620	mainlabel5:
+         	     0:              LabelOP 	               mainlabel5 	      null
+         	     0:             ReturnOP 	                   return 	         0
+	address:0x100316430	mainendlabel:
+         	     0:              LabelOP 	             mainendlabel 	      null
+         	     0:            FuncEndOP 	          func_label_end3 	      null
+
+
+mainentry live def add temp26
+mainentry live def add %phi_var1
+mainlabel4 live use add %phi_var1
+mainlabel4 live def add temp28
+mainlabel6 live def add temp29
+mainlabel6 live use add %phi_var1
+mainlabel6 live def add temp33
+mainlabel6 live def add %phi_var1
+
+
+
+	labelID	number:               opcode 	                     name 	       use
+	address:0x100311d60	mainentry:
+         	     0:              LabelOP 	                mainentry 	      null
+         	     1: CallWithReturnValueOP 	                   temp26 	      null
+         	     2:             AssignOP 	                %phi_var1 	    temp26
+         	     3:               GotoOP 	          goto mainlabel4 	      null
+	address:0x100312250	mainlabel4:
+         	     4:              LabelOP 	               mainlabel4 	      null
+         	     5:          GreatThanOP 	                   temp28 	 %phi_var1,          0
+         	     6:  GotoWithConditionOP 	true:mainlabel6  false:mainlabel5 	    temp28
+	address:0x1003126c0	mainlabel6:
+         	     7:              LabelOP 	               mainlabel6 	      null
+         	     8: CallWithReturnValueOP 	                   temp29 	      null
+         	     9:              ParamOP 	                   param3 	         3
+         	     10:              ParamOP 	                   param2 	         2
+         	     11:              ParamOP 	                   param1 	         1
+         	     12:              ParamOP 	                   param0 	    temp29
+         	     13:               CallOP 	                   temp30 	      null
+         	     14:              ParamOP 	                   param0 	        10
+         	     15:               CallOP 	                   temp31 	      null
+         	     16:                SubOP 	                   temp33 	 %phi_var1,          1
+         	     17:             AssignOP 	                %phi_var1 	    temp33
+         	     18:               GotoOP 	          goto mainlabel4 	      null
+	address:0x100312620	mainlabel5:
+         	     19:              LabelOP 	               mainlabel5 	      null
+         	     20:             ReturnOP 	                   return 	         0
+	address:0x100316430	mainendlabel:
+         	     21:              LabelOP 	             mainendlabel 	      null
+         	     22:            FuncEndOP 	          func_label_end3 	      null
+
+
+	val:temp26 	begin:1 	end:2 
+	val:%phi_var1 	begin:2 	end:18 
+	val:temp28 	begin:5 	end:6 
+	val:temp29 	begin:8 	end:12 
+	val:temp33 	begin:16 	end:17 
+
+	var:%phi_var1	address:R2
+ 	var:temp26	address:R1
+ 	var:temp28	address:R1
+ 	var:temp29	address:R1
+ 	var:temp33	address:R1
  All over!

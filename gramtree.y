@@ -30,7 +30,8 @@ OptTag  Tag VarDec  FunDec VarList ParamDec Compst StmtList Stmt DefList Def Dec
 %right ASSIGNOP
 %left OR
 %left AND 
-%left GREAT GREATEQUAL LESS LESSEQUAL NOTEQUAL EQUAL
+%left NOTEQUAL EQUAL
+%left GREAT GREATEQUAL LESS LESSEQUAL
 %left PLUS MINUS
 %left STAR DIV MOD
 %right NOT
@@ -166,7 +167,8 @@ StmtList:Stmt StmtList{$$=newast("StmtList",2,$1,$2);}
 Stmt:Exp SEMI {$$=newast("Stmt",1,$1);}
     |SEMI
     |Compst {$$=newast("Stmt",1,$1);}
-	  |RETURN Exp SEMI {$$=newast("Stmt",2,$1,$2);}
+	|RETURN Exp SEMI {$$=newast("Stmt",2,$1,$2);}
+	|RETURN SEMI {$$=newast("Stmt",1,$1);}
     |BREAK SEMI{$$=newast("Stmt",1,$1);}
     |CONTINUE SEMI{$$=newast("Stmt",1,$1);}
     |IF LP Exp RP Stmt {$$=newast("Stmt",5,$1,$3,newast("assistIF",0,-1),$5,newast("assistELSE",0,-1));}

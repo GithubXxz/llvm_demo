@@ -454,6 +454,60 @@ void in_eval(ast *a, Value *left) {
 
 Value *post_eval(ast *a, Value *left, Value *right) {
   if (a != NULL) {
+    if (pre_astnode->l && a == pre_astnode->l) {
+      Value *work_ins = NULL;
+      bool flag = false;
+      if (!strcmp(a->name, "PLUS")) {
+        return right;
+        // flag = true;
+        // work_ins = (Value *)ins_new_single_operator_v2(PositiveOP, left);
+      } else if (!strcmp(a->name, "MINUS")) {
+        if (right->VTy->TID == ImmediateIntTyID ||
+            right->VTy->TID == ImmediateFloatTyID) {
+          char buffer[50];
+          if (right->name[0] == '-') {
+            sprintf(buffer, "%s", right->name + 1);
+          } else {
+            sprintf(buffer, "-%s", right->name);
+          }
+          if (right->VTy->TID == ImmediateIntTyID)
+            right->pdata->var_pdata.iVal = -right->pdata->var_pdata.iVal;
+          else
+            right->pdata->var_pdata.fVal = -right->pdata->var_pdata.fVal;
+          free(right->name);
+          right->name = strdup(buffer);
+        } else {
+          flag = true;
+          work_ins = (Value *)ins_new_single_operator_v2(NegativeOP, right);
+        }
+      } else if (!strcmp(a->name, "NOT")) {
+        if (right->VTy->TID == ImmediateIntTyID ||
+            right->VTy->TID == ImmediateFloatTyID) {
+          char buffer[50];
+          if (right->VTy->TID == ImmediateIntTyID) {
+            sprintf(buffer, "%d",
+                    right->pdata->var_pdata.iVal =
+                        (right->pdata->var_pdata.iVal == 0 ? 1 : 0));
+          } else {
+            sprintf(buffer, "%f",
+                    right->pdata->var_pdata.fVal =
+                        (right->pdata->var_pdata.fVal == 0.0f ? 1.0f : 0.0f));
+          }
+          free(right->name);
+          right->name = strdup(buffer);
+        } else {
+          flag = true;
+          work_ins = (Value *)ins_new_single_operator_v2(NotOP, right);
+        }
+      }
+      if (flag) {
+        work_ins->name = name_generate(TEMP_VAR);
+        work_ins->VTy->TID = right->VTy->TID;
+        ListPushBack(ins_list, work_ins);
+        right = work_ins;
+        return right;
+      }
+    }
     // 如果要定义数据变量 判断当前定义的数据类型
     // 并且修改 NowVarDecType
     if (!strcmp(a->name, "TYPE")) {
@@ -851,59 +905,6 @@ Value *post_eval(ast *a, Value *left, Value *right) {
         var_name = left->name;
       }
 
-      if (a->l) {
-        Value *work_ins = NULL;
-        bool flag = false;
-        if (!strcmp(a->l->name, "PLUS")) {
-          // flag = true;
-          // work_ins = (Value *)ins_new_single_operator_v2(PositiveOP, left);
-        } else if (!strcmp(a->l->name, "MINUS")) {
-          if (left->VTy->TID == ImmediateIntTyID ||
-              left->VTy->TID == ImmediateFloatTyID) {
-            char buffer[50];
-            if (left->name[0] == '-') {
-              sprintf(buffer, "%s", left->name + 1);
-            } else {
-              sprintf(buffer, "-%s", left->name);
-            }
-            if (left->VTy->TID == ImmediateIntTyID)
-              left->pdata->var_pdata.iVal = -left->pdata->var_pdata.iVal;
-            else
-              left->pdata->var_pdata.fVal = -left->pdata->var_pdata.fVal;
-            free(left->name);
-            left->name = strdup(buffer);
-          } else {
-            flag = true;
-            work_ins = (Value *)ins_new_single_operator_v2(NegativeOP, left);
-          }
-        } else if (!strcmp(a->l->name, "NOT")) {
-          if (left->VTy->TID == ImmediateIntTyID ||
-              left->VTy->TID == ImmediateFloatTyID) {
-            char buffer[50];
-            if (left->VTy->TID == ImmediateIntTyID) {
-              sprintf(buffer, "%d",
-                      left->pdata->var_pdata.iVal =
-                          (left->pdata->var_pdata.iVal == 0 ? 1 : 0));
-            } else {
-              sprintf(buffer, "%f",
-                      left->pdata->var_pdata.fVal =
-                          (left->pdata->var_pdata.fVal == 0.0f ? 1.0f : 0.0f));
-            }
-            free(left->name);
-            left->name = strdup(buffer);
-          } else {
-            flag = true;
-            work_ins = (Value *)ins_new_single_operator_v2(NotOP, left);
-          }
-        }
-        if (flag) {
-          work_ins->name = name_generate(TEMP_VAR);
-          work_ins->VTy->TID = left->VTy->TID;
-          ListPushBack(ins_list, work_ins);
-          left = work_ins;
-        }
-      }
-
       if (right == NULL) {
         return left;
       } else if (!strcmp(a->r->name, "ASSIGNOP")) {
@@ -1069,7 +1070,6 @@ Value *post_eval(ast *a, Value *left, Value *right) {
     }
 
     if (!strcmp(a->name, "assistFuncCall")) {
-      //  = 1;
       return right;
     }
 
@@ -1146,6 +1146,15 @@ Value *post_eval(ast *a, Value *left, Value *right) {
 
     if (!strcmp(a->name, "RETURN")) {
       char temp_str[20];
+
+      if (right == NULL) {
+        right = (Value *)malloc(sizeof(Value));
+        value_init(right);
+        right->VTy->TID = ImmediateIntTyID;
+        right->name = strdup("0");
+        // 为padata里的整数字面量常量赋值
+        right->pdata->var_pdata.iVal = 0;
+      }
 
       Value *func_return_ins =
           (Value *)ins_new_single_operator_v2(ReturnOP, right);
