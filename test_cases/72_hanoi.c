@@ -1,4 +1,3 @@
-
 void move(int x, int y) {
   putint(x);
   putch(32);

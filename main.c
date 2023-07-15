@@ -131,6 +131,7 @@ char *test_cases[] = {"./test_cases/00_main.c",
                       "./test_cases/99_matrix_tran.c"};
 
 int main(int argc, char **argv) {
+  // freopen("/dev/null", "w", stdout);
   printf("hello world\n");
   tty_path = ttyname(STDOUT_FILENO);
 
@@ -141,7 +142,8 @@ int main(int argc, char **argv) {
   if (argc == 2) {
     choose_case = read_code_from_file(argv[1]);
   } else {
-    choose_case = read_code_from_file(test_cases[72]);
+    choose_case = read_code_from_file(test_cases[85]);
+    // choose_case = read_code_from_file("./my_cases/test_const.c");
   }
   if (choose_case == NULL)
     return 1;

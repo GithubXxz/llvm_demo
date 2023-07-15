@@ -26,27 +26,27 @@ int my_getint()
     return sum;
 }
 
-void my_putint(int a)
-{
-    int b[16], i = 0;
-    while (a > 0) {
-        b[i] = a % 10 + ascii_0;
-        a = a / 10;
-        i = i + 1;
-    }
-    while (i > 0) {
-        i = i - 1;
-        putch(b[i]);
-    }
-}
+// void my_putint(int a)
+// {
+//     int b[16], i = 0;
+//     while (a > 0) {
+//         b[i] = a % 10 + ascii_0;
+//         a = a / 10;
+//         i = i + 1;
+//     }
+//     while (i > 0) {
+//         i = i - 1;
+//         putch(b[i]);
+//     }
+// }
 
-int main()
-{
-    int n = my_getint();
-    while (n > 0) {
-        int m = my_getint();
-        my_putint(m); putch(10);
-        n = n - 1;
-    }
-    return 0;
-}
+// int main()
+// {
+//     int n = my_getint();
+//     while (n > 0) {
+//         int m = my_getint();
+//         my_putint(m); putch(10);
+//         n = n - 1;
+//     }
+//     return 0;
+// }
