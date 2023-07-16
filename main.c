@@ -142,7 +142,7 @@ int main(int argc, char **argv) {
   if (argc == 2) {
     choose_case = read_code_from_file(argv[1]);
   } else {
-    choose_case = read_code_from_file(test_cases[85]);
+    choose_case = read_code_from_file(test_cases[86]);
     // choose_case = read_code_from_file("./my_cases/test_const.c");
   }
   if (choose_case == NULL)

@@ -1,4 +1,5 @@
 #include "Ast.h"
+#include "c_container_auxiliary.h"
 #include "type.h"
 #include "value.h"
 
@@ -339,6 +340,28 @@ void in_eval(ast *a, Value *left) {
       free(left->name);
       // 添加变量的名字
       left->name = name_generate(PARAM);
+      return;
+    }
+  }
+
+  if (!strcmp(a->name, "VarDec")) {
+    if (left->VTy->TID == ArrayTyID) {
+      if (a->r == NULL || !SEQ(a->r->name, "LB")) {
+        // TODO init the array
+        void *element;
+        ListGetFront(array_list, &element);
+        left->pdata->array_pdata.step_long =
+            total_array_member / (intptr_t)element;
+        ListPopFront(array_list);
+        element = (void *)(uintptr_t)1;
+        ListPushBack(array_list, element);
+        left->pdata->array_pdata.list_para = array_list;
+        left->pdata->array_pdata.total_member = total_array_member;
+        left->pdata->array_pdata.array_type = (int)nowVarDecType;
+        hashmap_init(&left->pdata->array_pdata.local_array_hashmap);
+        total_array_member = 1;
+        array_list = NULL;
+      }
     }
   }
 
@@ -821,39 +844,6 @@ Value *post_eval(ast *a, Value *left, Value *right) {
           } else {
             ListPushBack(array_list, (void *)(intptr_t)(1));
           }
-        } else if (a->r && !strcmp(a->r->name, "ASSIGNOP")) {
-        } else {
-          // printf("%s have %d members\n", left->name, total_array_member);
-          void *element;
-          ListGetFront(array_list, &element);
-          left->pdata->array_pdata.step_long =
-              total_array_member / (intptr_t)element;
-          ListPopFront(array_list);
-          element = (void *)(uintptr_t)1;
-          ListPushBack(array_list, element);
-          left->pdata->array_pdata.list_para = array_list;
-          left->pdata->array_pdata.total_member = total_array_member;
-          left->pdata->array_pdata.array_type = (int)nowVarDecType;
-          // left->pdata->array_pdata.array_value =
-          //     malloc(sizeof(Value) * total_array_member);
-          // for (int ii = 0; ii < total_array_member; ii++) {
-          //   // 在内存中为变量分配空间
-          //   Value *cur_var = (Value *)malloc(sizeof(Value));
-          //   value_init(cur_var);
-          //   // 添加变量类型
-          //   cur_var->VTy->TID = (int)nowVarDecType;
-
-          //   // 创建指针
-          //   Value *cur_ins = &(left->pdata->array_pdata.array_value[ii]);
-          //   value_init(cur_ins);
-          //   cur_ins->name = strdup("array_memeber");
-          //   // 添加变量类型
-          //   cur_ins->VTy->TID = PointerTyID;
-          //   // 设定allocate语句的指针所指向的value*
-          //   cur_ins->pdata->allocate_pdata.point_value = cur_var;
-          // }
-          total_array_member = 1;
-          array_list = NULL;
         }
         return left;
       }

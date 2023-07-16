@@ -1,4 +1,6 @@
 int a[5][20000];
+const int m = 3;
+int arr[m*m];
 int main() {
 	a[4][19999] = 1;
 	int ans =

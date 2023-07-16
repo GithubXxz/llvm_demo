@@ -36,6 +36,8 @@ HashSet *bblock_pass_hashset = NULL;
 // (char *name,HeadNode *node)
 HashMap *bblock_to_dom_graph_hashmap = NULL;
 
+HashMap *global_array_init_hashmap = NULL;
+
 // 出栈/链表删除 伴随运行的函数 我真他妈 心态崩了 学艺不精
 void CleanObject(void *element) {}
 
@@ -179,22 +181,14 @@ void AllInit() {
   stack_param = StackInit();
   StackSetClean(stack_param, CleanObject);
 
-  func_hashMap = HashMapInit();
-  // 哈希表的初始化 用于查找调用的函数名和对应的函数label
-  HashMapSetHash(func_hashMap, HashKey);
-  HashMapSetCompare(func_hashMap, CompareKey);
-  HashMapSetCleanKey(func_hashMap, CleanHashMapKey);
-  HashMapSetCleanValue(func_hashMap, CleanValue);
+  hashmap_init(&func_hashMap);
   system_func_init();
 
   hashmap_init(&bblock_hashmap);
 
-  bblock_to_dom_graph_hashmap = HashMapInit();
-  // 用于遍历生成cfg图结构时候查找bblock
-  HashMapSetHash(bblock_to_dom_graph_hashmap, HashKey);
-  HashMapSetCompare(bblock_to_dom_graph_hashmap, CompareKey);
-  HashMapSetCleanKey(bblock_to_dom_graph_hashmap, CleanHashMapKey);
-  HashMapSetCleanValue(bblock_to_dom_graph_hashmap, CleanValue);
+  hashmap_init(&bblock_to_dom_graph_hashmap);
+
+  hashmap_init(&global_array_init_hashmap);
 
   hashset_init(&bblock_pass_hashset);
 }

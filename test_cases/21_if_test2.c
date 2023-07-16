@@ -4,9 +4,10 @@ int ifElseIf() {
   a = 5;
   int b;
   b = 10;
-  if (a == 6 || b == 0xb) {
+  if(a == 6 || b == 0xb) {
     return a;
-  } else {
+  }
+  else {
     if (b == 10 && a == 1)
       a = 25;
     else if (b == 10 && a == -5)
@@ -18,7 +19,7 @@ int ifElseIf() {
   return a;
 }
 
-int main() {
-  // putint(ifElseIf());
+int main(){
+  putint(ifElseIf());
   return 0;
 }

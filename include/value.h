@@ -63,7 +63,6 @@ union _PData {
     TypeID return_type; // 返回类型
     // Type param_type_lists[10];  // 参数的类型数组
     int param_num; // 传入参数的个数
-
   } symtab_func_pdata;
   struct {
     char *name;
@@ -104,8 +103,18 @@ union _PData {
     int total_member;
     // 步长
     int step_long;
+    // 记录局部的数组的赋值和引用的信息
+    HashMap *local_array_hashmap;
   } array_pdata;
 };
+
+// 用于全局数组初始化后 后端memory copy
+typedef struct {
+  int offset;
+  int value;
+} global_array_init_item;
+
+// 局部数组 且未被函数当作参数传递 的表
 
 void value_init(Value *this);
 
