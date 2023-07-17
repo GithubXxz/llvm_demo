@@ -37,6 +37,7 @@ INTEGER [1-9]+[0-9]*|0
 FLOAT   [0-9]+\.[0-9]*
 OCT_INT 0[0-7]+
 HEX_INT 0[xX][0-9a-fA-F]+
+HEX_FLOAT 0[xX][0-9a-fA-F]*\.[0-9a-fA-F]*[pP][+-]?[0-9]+
 SCI_INT [0-9]+[eE][+-]?[0-9]+
 SCI_FLOAT [0-9]*\.[0-9]+([eE][+-]?[0-9]+)?
 
@@ -91,6 +92,7 @@ AERROR .
 {FLOAT}          {yylval.a=newast("FLOAT",0,yylineno); return FLOAT;}
 {OCT_INT}        {yylval.a=newast("OCT_INT",0,yylineno); return INTEGER;}
 {HEX_INT}        {yylval.a=newast("HEX_INT",0,yylineno); return INTEGER;}
+{HEX_FLOAT}      {yylval.a=newast("HEX_FLOAT",0,yylineno); return FLOAT;}
 {SCI_INT}        {yylval.a=newast("SCI_INT",0,yylineno); return INTEGER;}
 {SCI_FLOAT}      {yylval.a=newast("SCI_FLOAT",0,yylineno); return FLOAT;}
 

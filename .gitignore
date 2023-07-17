@@ -3,4 +3,9 @@ build/
 .cache/
 bin/
 llvm_demo
+my_cases/
+test_cases/
+hidden_cases/
+
+
 

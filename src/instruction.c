@@ -1,6 +1,7 @@
 #include "instruction.h"
 
 #include "stdio.h"
+#include "type.h"
 
 // TODO 应该从上级获得两个操作数的信息来更新User中value的type?
 Instruction *ins_new(int op_num, Value *self) {
@@ -44,18 +45,23 @@ Instruction *ins_new_binary_operator(Value *self, TAC_OP Op, Value *S1,
   return inst;
 }
 
+TypeID imm_res_type(Value *left, Value *right) {
+  if (left->VTy->TID == ImmediateIntTyID &&
+      right->VTy->TID == ImmediateIntTyID) {
+    return ImmediateIntTyID;
+  } else {
+    return ImmediateFloatTyID;
+  }
+}
+
 TypeID ins_res_type(Value *left, Value *right) {
-  TypeID type_id = VoidTyID;
+  TypeID type_id = FloatTyID;
   TypeID s1_type = left->VTy->TID;
   TypeID s2_type = right->VTy->TID;
+
   if ((s1_type == IntegerTyID || s1_type == ImmediateIntTyID) &&
       (s2_type == IntegerTyID || s2_type == ImmediateIntTyID)) {
     type_id = IntegerTyID;
-  }
-
-  if ((s1_type == FloatTyID || s1_type == ImmediateFloatTyID) &&
-      (s2_type == FloatTyID || s2_type == ImmediateFloatTyID)) {
-    type_id = FloatTyID;
   }
   return type_id;
 }

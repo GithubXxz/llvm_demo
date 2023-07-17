@@ -1,5 +1,6 @@
 #include "Ast.h"
 #include "c_container_auxiliary.h"
+#include "container/hash_map.h"
 #include "type.h"
 #include "value.h"
 
@@ -128,27 +129,30 @@ ast *newast(char *name, int num, ...) // 抽象语法树建立
   {
     int t = va_arg(valist, int); // 取第1个变长参数
     a->line = t;
-    if ((!strcmp(a->name, "ID")) ||
-        (!strcmp(a->name, "TYPE"))) //"ID,TYPE,INTEGER，借助union保存yytext的值
+    if ((SEQ(a->name, "ID")) ||
+        (SEQ(a->name, "TYPE"))) //"ID,TYPE,INTEGER，借助union保存yytext的值
     {
       char *t = strdup(yytext);
       a->idtype = t;
-    } else if (!strcmp(a->name, "INTEGER")) {
+    } else if (SEQ(a->name, "INTEGER")) {
       a->intgr = atoi(yytext);
-    } else if (!strcmp(a->name, "FLOAT")) {
+    } else if (SEQ(a->name, "FLOAT")) {
       a->flt = atof(yytext);
-    } else if (!strcmp(a->name, "OCT_INT")) {
+    } else if (SEQ(a->name, "OCT_INT")) {
       a->name = "INTEGER";
       a->intgr = strtol(yytext, NULL, 8);
-    } else if (!strcmp(a->name, "HEX_INT")) {
+    } else if (SEQ(a->name, "HEX_INT")) {
       a->name = "INTEGER";
       a->intgr = strtol(yytext, NULL, 16);
-    } else if (!strcmp(a->name, "SCI_INT")) {
+    } else if (SEQ(a->name, "SCI_INT")) {
       a->name = "INTEGER";
       a->intgr = (int)strtod(yytext, NULL);
-    } else if (!strcmp(a->name, "SCI_FLOAT")) {
+    } else if (SEQ(a->name, "SCI_FLOAT")) {
       a->name = "FLOAT";
       a->flt = strtof(yytext, NULL);
+    } else if (SEQ(a->name, "HEX_FLOAT")) {
+      a->name = "FLOAT";
+      a->flt = (float)strtod(yytext, NULL);
     } else {
     }
   }
@@ -163,9 +167,9 @@ void eval_print(ast *a, int level) {
     if (a->line != -1) { // 产生空的语法单元不需要打印信息
       printf("%s ",
              a->name); // 打印语法单元名字，ID/TYPE/INTEGER要打印yytext的值
-      if ((!strcmp(a->name, "ID")) || (!strcmp(a->name, "TYPE")))
+      if ((SEQ(a->name, "ID")) || (SEQ(a->name, "TYPE")))
         printf(":%s ", a->idtype);
-      else if (!strcmp(a->name, "INTEGER"))
+      else if (SEQ(a->name, "INTEGER"))
         printf(":%d ", a->intgr);
       else
         printf("(%d)", a->line);
@@ -174,7 +178,7 @@ void eval_print(ast *a, int level) {
              a->name); // 打印语法单元名字，ID/TYPE/INTEGER要打印yytext的值
     }
 
-    // if (!strcmp(a->name, "SEMI")) {
+    // if (SEQ(a->name, "SEMI")) {
     //   printf("     free a node\n");
     //   free(a);
     //   a = NULL;
@@ -189,7 +193,7 @@ void eval_print(ast *a, int level) {
 
 void pre_eval(ast *a) {
   if (a != NULL) {
-    if (!strcmp(a->name, "FunDec")) {
+    if (SEQ(a->name, "FunDec")) {
       // 新建一个符号表用于存放参数
       cur_symboltable = (SymbolTable *)malloc(sizeof(SymbolTable));
       symbol_table_init(cur_symboltable);
@@ -226,12 +230,12 @@ void pre_eval(ast *a) {
       // printf("entry\n");
     }
 
-    if (!strcmp(a->name, "LC")) {
+    if (SEQ(a->name, "LC")) {
       cur_symboltable = (SymbolTable *)malloc(sizeof(SymbolTable));
       symbol_table_init(cur_symboltable);
     }
 
-    if (!strcmp(a->name, "RC")) {
+    if (SEQ(a->name, "RC")) {
       // printf("cur_symboltable->symbol_map contains Value's name %s\n",
       //        ((Value *)cur_symboltable->symbol_map->get(
       //             cur_symboltable->symbol_map, "a"))
@@ -245,7 +249,7 @@ void pre_eval(ast *a) {
       StackTop(stack_symbol_table, (void **)&cur_symboltable);
     }
 
-    if (!strcmp(a->name, "ELSE")) {
+    if (SEQ(a->name, "ELSE")) {
       Value *else_label_ins = NULL;
       StackTop(stack_else_label, (void **)&else_label_ins);
       StackPop(stack_else_label);
@@ -254,12 +258,12 @@ void pre_eval(ast *a) {
     }
 
     // 全局变量的符号表
-    if (!strcmp(a->name, "Program") && StackSize(stack_symbol_table) == 0) {
+    if (SEQ(a->name, "Program") && StackSize(stack_symbol_table) == 0) {
       cur_symboltable = (SymbolTable *)malloc(sizeof(SymbolTable));
       symbol_table_init(cur_symboltable);
     }
 
-    if (a->r && !strcmp(a->r->name, "assistWHILE")) {
+    if (a->r && SEQ(a->r->name, "assistWHILE")) {
       // 创建while这条语句的label，用于返回循环头
       char *temp_str = name_generate(LABEL);
 
@@ -283,7 +287,7 @@ void pre_eval(ast *a) {
       // 插入while循环头的label
       ListPushBack(ins_list, while_head_label_ins);
     }
-    if (!strcmp(a->name, "assistELSE")) {
+    if (SEQ(a->name, "assistELSE")) {
       Value *then_label_ins = (Value *)ins_new_no_operator_v2(LabelOP);
 
       // 添加变量的名字
@@ -315,7 +319,7 @@ void pre_eval(ast *a) {
 
 void in_eval(ast *a, Value *left) {
   // store the para
-  if (!strcmp(a->name, "ParamDec")) {
+  if (SEQ(a->name, "ParamDec")) {
     if (left->VTy->TID != ArrayTyID) {
       // 新建一个符号表用于存放参数
       // 在内存中为变量分配空间
@@ -344,7 +348,7 @@ void in_eval(ast *a, Value *left) {
     }
   }
 
-  if (!strcmp(a->name, "VarDec")) {
+  if (SEQ(a->name, "VarDec")) {
     if (left->VTy->TID == ArrayTyID) {
       if (a->r == NULL || !SEQ(a->r->name, "LB")) {
         // TODO init the array
@@ -365,13 +369,13 @@ void in_eval(ast *a, Value *left) {
     }
   }
 
-  if (!strcmp(a->name, "FunDec")) {
+  if (SEQ(a->name, "FunDec")) {
     cur_construction_func->pdata->symtab_func_pdata.param_num = param_seed;
     // 将参数的个数清零
     param_seed = 0;
   }
 
-  if (a->r && !strcmp(a->r->name, "assistIF")) {
+  if (a->r && SEQ(a->r->name, "assistIF")) {
     // 创建false条件下的label标签
     char *temp_str = NULL;
     temp_str = name_generate(LABEL);
@@ -418,7 +422,7 @@ void in_eval(ast *a, Value *left) {
   }
 
   // args_insert
-  if (a->r && !strcmp(a->r->name, "assistArgs")) {
+  if (a->r && SEQ(a->r->name, "assistArgs")) {
     Value *func_param_ins = (Value *)ins_new_single_operator_v2(ParamOP, left);
 
     // 添加变量的名字 类型 和返回值
@@ -433,7 +437,7 @@ void in_eval(ast *a, Value *left) {
     printf("%s %s insert\n", func_param_ins->name, left->name);
   }
 
-  if (a->r && !strcmp(a->r->name, "assistWHILE")) {
+  if (a->r && SEQ(a->r->name, "assistWHILE")) {
 
     Value *while_false_label_ins = (Value *)ins_new_no_operator_v2(LabelOP);
     while_false_label_ins->name = name_generate(LABEL);
@@ -479,42 +483,39 @@ Value *post_eval(ast *a, Value *left, Value *right) {
     if (pre_astnode->l && a == pre_astnode->l) {
       Value *work_ins = NULL;
       bool flag = false;
-      if (!strcmp(a->name, "PLUS")) {
+      if (SEQ(a->name, "PLUS")) {
         return right;
-        // flag = true;
-        // work_ins = (Value *)ins_new_single_operator_v2(PositiveOP, left);
-      } else if (!strcmp(a->name, "MINUS")) {
+      } else if (SEQ(a->name, "MINUS")) {
         if (right->VTy->TID == ImmediateIntTyID ||
             right->VTy->TID == ImmediateFloatTyID) {
-          char buffer[50];
+          char buffer[30];
           if (right->name[0] == '-') {
             sprintf(buffer, "%s", right->name + 1);
           } else {
             sprintf(buffer, "-%s", right->name);
           }
-          if (right->VTy->TID == ImmediateIntTyID)
-            right->pdata->var_pdata.iVal = -right->pdata->var_pdata.iVal;
-          else
-            right->pdata->var_pdata.fVal = -right->pdata->var_pdata.fVal;
+          right->pdata->var_pdata.iVal = -right->pdata->var_pdata.iVal;
+          right->pdata->var_pdata.fVal = -right->pdata->var_pdata.fVal;
           free(right->name);
           right->name = strdup(buffer);
         } else {
           flag = true;
           work_ins = (Value *)ins_new_single_operator_v2(NegativeOP, right);
         }
-      } else if (!strcmp(a->name, "NOT")) {
+      } else if (SEQ(a->name, "NOT")) {
         if (right->VTy->TID == ImmediateIntTyID ||
             right->VTy->TID == ImmediateFloatTyID) {
-          char buffer[50];
-          if (right->VTy->TID == ImmediateIntTyID) {
-            sprintf(buffer, "%d",
-                    right->pdata->var_pdata.iVal =
-                        (right->pdata->var_pdata.iVal == 0 ? 1 : 0));
+          char buffer[30];
+          if (right->pdata->var_pdata.iVal != 0) {
+            right->pdata->var_pdata.iVal = 0;
+            right->pdata->var_pdata.fVal = 0.f;
+            sprintf(buffer, "%d", 0);
           } else {
-            sprintf(buffer, "%f",
-                    right->pdata->var_pdata.fVal =
-                        (right->pdata->var_pdata.fVal == 0.0f ? 1.0f : 0.0f));
+            right->pdata->var_pdata.iVal = 1;
+            right->pdata->var_pdata.fVal = 1.f;
+            sprintf(buffer, "%d", 1);
           }
+          right->VTy->TID = ImmediateIntTyID;
           free(right->name);
           right->name = strdup(buffer);
         } else {
@@ -532,37 +533,37 @@ Value *post_eval(ast *a, Value *left, Value *right) {
     }
     // 如果要定义数据变量 判断当前定义的数据类型
     // 并且修改 NowVarDecType
-    if (!strcmp(a->name, "TYPE")) {
-      if (!strcmp(pre_astnode->name, "Specifire")) {
-        if (!strcmp(a->idtype, NowVarDecStr[0])) {
+    if (SEQ(a->name, "TYPE")) {
+      if (SEQ(pre_astnode->name, "Specifire")) {
+        if (SEQ(a->idtype, NowVarDecStr[0])) {
           nowVarDecType = NowVoid;
-        } else if (!strcmp(a->idtype, NowVarDecStr[1])) {
+        } else if (SEQ(a->idtype, NowVarDecStr[1])) {
           nowVarDecType = NowInt;
-        } else if (!strcmp(a->idtype, NowVarDecStr[2]))
+        } else if (SEQ(a->idtype, NowVarDecStr[2]))
           nowVarDecType = NowFloat;
-        else if (!strcmp(a->idtype, NowVarDecStr[3]))
+        else if (SEQ(a->idtype, NowVarDecStr[3]))
           nowVarDecType = NowStruct;
       }
-      if (a->r && !strcmp(a->r->name, "CONST"))
+      if (a->r && SEQ(a->r->name, "CONST"))
         NowConst = true;
     }
 
-    if (!strcmp(a->name, "Dec")) {
+    if (SEQ(a->name, "Dec")) {
       if (a->r == NULL)
         NowConst = false;
       return NULL;
     }
 
-    if (!strcmp(a->name, "Specifire")) {
+    if (SEQ(a->name, "Specifire")) {
       return right;
     }
 
     // 判断父节点是不是变量声明 如果是 则创建一个该变量对应的value并返回
     // pre_var_dec
-    if (!strcmp(pre_astnode->name, "VarDec")) {
-      if (!strcmp(a->name, "ID")) {
+    if (SEQ(pre_astnode->name, "VarDec")) {
+      if (SEQ(a->name, "ID")) {
         // allocate for array
-        if (pre_astnode->r && !strcmp(pre_astnode->r->name, "LB")) {
+        if (pre_astnode->r && SEQ(pre_astnode->r->name, "LB")) {
           char *array_name = NULL;
           // 创建指针
           Value *cur_ins = (Value *)ins_new_no_operator_v2(AllocateOP);
@@ -635,23 +636,24 @@ Value *post_eval(ast *a, Value *left, Value *right) {
           ListPushBack(ins_list, cur_ins);
 
           char *var_name = strdup(a->idtype);
+          printf("var_name");
           // 将变量加入符号表
           HashMapPut(cur_symboltable->symbol_map, var_name, cur_ins);
           // 返回指针
           return cur_ins;
         }
       } else if // 变量声明的时候同时初始化
-          (!strcmp(a->name, "ASSIGNOP")) {
+          (SEQ(a->name, "ASSIGNOP")) {
         return right;
       } else if // 变量声明的时候同时初始化
-          (!strcmp(a->name, "LB")) {
+          (SEQ(a->name, "LB")) {
         return right;
       }
     }
 
-    if (!strcmp(pre_astnode->name, "Exp")) {
+    if (SEQ(pre_astnode->name, "Exp")) {
       // 父节点是表达式的情况 且不是赋值表达式 且当前节点是ID的情况
-      if (!strcmp(a->name, "ID") &&
+      if (SEQ(a->name, "ID") &&
           (pre_astnode->r ? strcmp(pre_astnode->r->name, "ASSIGNOP") : true)) {
         // 被引用变量的名字
         char *load_var_name = strdup(a->idtype);
@@ -672,7 +674,12 @@ Value *post_eval(ast *a, Value *left, Value *right) {
         if (load_var_pointer->VTy->TID == ArrayTyID) {
           return load_var_pointer;
         } else if (load_var_pointer->IsConst) {
-          return load_var_pointer->pdata->allocate_pdata.point_value;
+          Value *temp = malloc(sizeof(Value));
+          value_init(temp);
+          value_copy(temp, load_var_pointer->pdata->allocate_pdata.point_value);
+          temp->name =
+              strdup(load_var_pointer->pdata->allocate_pdata.point_value->name);
+          return temp;
         } else {
           // load instruction
           Value *load_ins =
@@ -691,8 +698,8 @@ Value *post_eval(ast *a, Value *left, Value *right) {
 
           return load_ins;
         }
-      } else if (!strcmp(a->name, "ID") && pre_astnode->r &&
-                 !strcmp(pre_astnode->r->name, "ASSIGNOP")) {
+      } else if (SEQ(a->name, "ID") && pre_astnode->r &&
+                 SEQ(pre_astnode->r->name, "ASSIGNOP")) {
         // 被赋值变量的名字
         char *assign_var_name = strdup(a->idtype);
         // 指向被赋值变量的指针
@@ -709,7 +716,7 @@ Value *post_eval(ast *a, Value *left, Value *right) {
           assert(pre_symboltable || assign_var_pointer);
         };
         return assign_var_pointer;
-      } else if (!strcmp(a->name, "INTEGER")) {
+      } else if (SEQ(a->name, "INTEGER")) {
         Value *cur = (Value *)malloc(sizeof(Value));
         value_init(cur);
         cur->VTy->TID = ImmediateIntTyID;
@@ -719,8 +726,9 @@ Value *post_eval(ast *a, Value *left, Value *right) {
         cur->name = strdup(text);
         // 为padata里的整数字面量常量赋值
         cur->pdata->var_pdata.iVal = a->intgr;
+        cur->pdata->var_pdata.fVal = (float)a->intgr;
         return cur;
-      } else if (!strcmp(a->name, "FLOAT")) {
+      } else if (SEQ(a->name, "FLOAT")) {
         Value *cur = (Value *)malloc(sizeof(Value));
         value_init(cur);
         cur->VTy->TID = ImmediateFloatTyID;
@@ -729,29 +737,30 @@ Value *post_eval(ast *a, Value *left, Value *right) {
         // 添加变量的名字
         cur->name = strdup(text);
         // 为padata里的浮点数字面量常量赋值
+        cur->pdata->var_pdata.iVal = (int)a->flt;
         cur->pdata->var_pdata.fVal = a->flt;
         return cur;
       }
       // 加减乘除的情况
-      else if (!strcmp(a->name, "MINUS") || !strcmp(a->name, "PLUS") ||
-               !strcmp(a->name, "STAR") || !strcmp(a->name, "DIV") ||
-               !strcmp(a->name, "MOD") || !strcmp(a->name, "ASSIGNOP") ||
-               !strcmp(a->name, "EQUAL") || !strcmp(a->name, "NOTEQUAL") ||
-               !strcmp(a->name, "GREAT") || !strcmp(a->name, "GREATEQUAL") ||
-               !strcmp(a->name, "LESSEQUAL") || !strcmp(a->name, "LESS") ||
-               !strcmp(a->name, "AND") || !strcmp(a->name, "OR") ||
-               !strcmp(a->name, "NOT") || !strcmp(a->name, "LB")) {
+      else if (SEQ(a->name, "MINUS") || SEQ(a->name, "PLUS") ||
+               SEQ(a->name, "STAR") || SEQ(a->name, "DIV") ||
+               SEQ(a->name, "MOD") || SEQ(a->name, "ASSIGNOP") ||
+               SEQ(a->name, "EQUAL") || SEQ(a->name, "NOTEQUAL") ||
+               SEQ(a->name, "GREAT") || SEQ(a->name, "GREATEQUAL") ||
+               SEQ(a->name, "LESSEQUAL") || SEQ(a->name, "LESS") ||
+               SEQ(a->name, "AND") || SEQ(a->name, "OR") ||
+               SEQ(a->name, "NOT") || SEQ(a->name, "LB")) {
         // 返回当前节点的右节点
         return right;
-      } else if (!strcmp(a->name, "Stmt")) {
+      } else if (SEQ(a->name, "Stmt")) {
         // 返回当前节点的右节点
         return NULL;
       }
     }
 
     // funccall
-    if (!strcmp(pre_astnode->name, "assistFuncCall")) {
-      if (!strcmp(a->name, "ID")) {
+    if (SEQ(pre_astnode->name, "assistFuncCall")) {
+      if (SEQ(a->name, "ID")) {
         // 要跳转到的func_label
         Value *func_label = HashMapGet(func_hashMap, (void *)a->idtype);
 
@@ -809,20 +818,25 @@ Value *post_eval(ast *a, Value *left, Value *right) {
     }
 
     // 判断当前节点是否是变量声明 如果是则生成一条声明变量的instruction
-    if (!strcmp(a->name, "VarDec")) {
+    if (SEQ(a->name, "VarDec")) {
       char *var_name = strdup(left->name);
       if (left->VTy->TID != ArrayTyID) {
         if (right == NULL) {
           return left;
         } else {
-          if (a->r && !strcmp(a->r->name, "ASSIGNOP")) {
+          if (a->r && SEQ(a->r->name, "ASSIGNOP")) {
             // 把right存给left left是赋值号左边操作数的地址
-            Value *store_ins =
-                (Value *)ins_new_binary_operator_v2(StoreOP, left, right);
             if (left->IsConst) {
+              if (nowVarDecType != (int)right->VTy->TID - 4) {
+                right->VTy->TID = (int)nowVarDecType + 4;
+                right->pdata->var_pdata.fVal = right->pdata->var_pdata.fVal;
+                right->pdata->var_pdata.iVal = right->pdata->var_pdata.iVal;
+              }
               value_free(left->pdata->allocate_pdata.point_value);
               left->pdata->allocate_pdata.point_value = right;
             } else {
+              Value *store_ins =
+                  (Value *)ins_new_binary_operator_v2(StoreOP, left, right);
               ListPushBack(ins_list, (void *)store_ins);
               printf("store %s %s, %s,align 4\n",
                      NowVarDecStr[right->VTy->TID < 4 ? right->VTy->TID
@@ -834,7 +848,7 @@ Value *post_eval(ast *a, Value *left, Value *right) {
         }
       } else {
         // init the array
-        if (a->r && !strcmp(a->r->name, "LB")) {
+        if (a->r && SEQ(a->r->name, "LB")) {
           if (right != NULL) {
             total_array_member *= right->pdata->var_pdata.iVal;
             // printf("total array member multiple %d\n",
@@ -842,6 +856,7 @@ Value *post_eval(ast *a, Value *left, Value *right) {
             ListPushBack(array_list,
                          (void *)(intptr_t)(right->pdata->var_pdata.iVal));
           } else {
+            //数组作为函数参数
             ListPushBack(array_list, (void *)(intptr_t)(1));
           }
         }
@@ -850,7 +865,7 @@ Value *post_eval(ast *a, Value *left, Value *right) {
     }
 
     // 判断当前节点是否为表达式节点
-    if (!strcmp(a->name, "Exp")) {
+    if (SEQ(a->name, "Exp")) {
       char *var_name = NULL;
       if (left) {
         var_name = left->name;
@@ -858,7 +873,7 @@ Value *post_eval(ast *a, Value *left, Value *right) {
 
       if (right == NULL) {
         return left;
-      } else if (!strcmp(a->r->name, "ASSIGNOP")) {
+      } else if (SEQ(a->r->name, "ASSIGNOP")) {
         // assign_var_pointer是赋值号左边操作数的地址
         Instruction *store_ins =
             ins_new_binary_operator_v2(StoreOP, left, right);
@@ -869,7 +884,7 @@ Value *post_eval(ast *a, Value *left, Value *right) {
                right->name, left->name);
         // TODO 返回值是什么有待考虑
         return right;
-      } else if (!strcmp(a->r->name, "LB")) {
+      } else if (SEQ(a->r->name, "LB")) {
         // oprand the array
         char temp_str[15];
         char text[10];
@@ -947,10 +962,86 @@ Value *post_eval(ast *a, Value *left, Value *right) {
         return cur_ins;
       } else {
 
-        // 放入符号表
-        // HashMapPut(cur_symboltable->symbol_map, strdup(temp_str), cur);
+        if ((left->VTy->TID == ImmediateIntTyID ||
+             left->VTy->TID == ImmediateFloatTyID) &&
+            (right->VTy->TID == ImmediateIntTyID ||
+             right->VTy->TID == ImmediateFloatTyID)) {
+          Value *temp = malloc(sizeof(Value));
+          value_init(temp);
+          temp->VTy->TID = imm_res_type(left, right);
+          char buffer[30];
+          if (SEQ(a->r->name, "PLUS")) {
+            temp->pdata->var_pdata.iVal =
+                left->pdata->var_pdata.fVal + right->pdata->var_pdata.fVal;
+            temp->pdata->var_pdata.fVal =
+                left->pdata->var_pdata.fVal + right->pdata->var_pdata.fVal;
+          } else if (SEQ(a->r->name, "MINUS")) {
+            temp->pdata->var_pdata.iVal =
+                left->pdata->var_pdata.fVal - right->pdata->var_pdata.fVal;
+            temp->pdata->var_pdata.fVal =
+                left->pdata->var_pdata.fVal - right->pdata->var_pdata.fVal;
+          } else if (SEQ(a->r->name, "STAR")) {
+            temp->pdata->var_pdata.iVal =
+                left->pdata->var_pdata.fVal * right->pdata->var_pdata.fVal;
+            temp->pdata->var_pdata.fVal =
+                left->pdata->var_pdata.fVal * right->pdata->var_pdata.fVal;
+          } else if (SEQ(a->r->name, "DIV")) {
+            temp->pdata->var_pdata.iVal =
+                left->pdata->var_pdata.fVal / right->pdata->var_pdata.fVal;
+            temp->pdata->var_pdata.fVal =
+                left->pdata->var_pdata.fVal / right->pdata->var_pdata.fVal;
+          } else if (SEQ(a->r->name, "EQUAL")) {
+            temp->pdata->var_pdata.iVal =
+                left->pdata->var_pdata.fVal == right->pdata->var_pdata.fVal;
+            temp->pdata->var_pdata.fVal =
+                left->pdata->var_pdata.fVal == right->pdata->var_pdata.fVal;
+          } else if (SEQ(a->r->name, "NOTEQUAL")) {
+            temp->pdata->var_pdata.iVal =
+                left->pdata->var_pdata.fVal != right->pdata->var_pdata.fVal;
+            temp->pdata->var_pdata.fVal =
+                left->pdata->var_pdata.fVal != right->pdata->var_pdata.fVal;
+          } else if (SEQ(a->r->name, "GREAT")) {
+            temp->pdata->var_pdata.iVal =
+                left->pdata->var_pdata.fVal > right->pdata->var_pdata.fVal;
+            temp->pdata->var_pdata.fVal =
+                left->pdata->var_pdata.fVal > right->pdata->var_pdata.fVal;
+          } else if (SEQ(a->r->name, "LESS")) {
+            temp->pdata->var_pdata.iVal =
+                left->pdata->var_pdata.fVal < right->pdata->var_pdata.fVal;
+            temp->pdata->var_pdata.fVal =
+                left->pdata->var_pdata.fVal < right->pdata->var_pdata.fVal;
+          } else if (SEQ(a->r->name, "GREATEQUAL")) {
+            temp->pdata->var_pdata.iVal =
+                left->pdata->var_pdata.iVal >= right->pdata->var_pdata.fVal;
+            temp->pdata->var_pdata.fVal =
+                left->pdata->var_pdata.fVal >= right->pdata->var_pdata.fVal;
+          } else if (SEQ(a->r->name, "LESSEQUAL")) {
+            temp->pdata->var_pdata.iVal =
+                left->pdata->var_pdata.fVal <= right->pdata->var_pdata.fVal;
+            temp->pdata->var_pdata.fVal =
+                left->pdata->var_pdata.fVal <= right->pdata->var_pdata.fVal;
+          } else if (SEQ(a->r->name, "MOD")) {
+            temp->pdata->var_pdata.iVal =
+                left->pdata->var_pdata.iVal % right->pdata->var_pdata.iVal;
+            temp->pdata->var_pdata.fVal = (float)temp->pdata->var_pdata.iVal;
+          } else if (SEQ(a->r->name, "AND")) {
+            temp->pdata->var_pdata.iVal =
+                left->pdata->var_pdata.fVal && right->pdata->var_pdata.fVal;
+            temp->pdata->var_pdata.fVal =
+                left->pdata->var_pdata.fVal && right->pdata->var_pdata.fVal;
+          } else if (SEQ(a->r->name, "OR")) {
+            temp->pdata->var_pdata.iVal =
+                left->pdata->var_pdata.fVal || right->pdata->var_pdata.fVal;
+            temp->pdata->var_pdata.fVal =
+                left->pdata->var_pdata.fVal || right->pdata->var_pdata.fVal;
+          }
+          sprintf(buffer, "%d", temp->pdata->var_pdata.iVal);
+          value_free(left);
+          value_free(right);
+          temp->name = strdup(buffer);
+          return temp;
+        }
 
-        // printf("allocate storage for %s\n", temp_str);
         Value *cur_ins =
             (Value *)ins_new_binary_operator_v2(DefaultOP, left, right);
         // 添加变量的名字
@@ -961,55 +1052,55 @@ Value *post_eval(ast *a, Value *left, Value *right) {
             NowVarDecStr[cur_ins->VTy->TID < 4 ? cur_ins->VTy->TID
                                                : cur_ins->VTy->TID - 4];
 
-        if (!strcmp(a->r->name, "PLUS")) {
+        if (SEQ(a->r->name, "PLUS")) {
           ((Instruction *)cur_ins)->opcode = AddOP;
           printf("%s = add nsw %s %s, %s\n", cur_ins->name, oprand_type,
                  left->name, right->name);
-        } else if (!strcmp(a->r->name, "MINUS")) {
+        } else if (SEQ(a->r->name, "MINUS")) {
           ((Instruction *)cur_ins)->opcode = SubOP;
           printf("%s = sub nsw %s %s, %s\n", cur_ins->name, oprand_type,
                  left->name, right->name);
-        } else if (!strcmp(a->r->name, "STAR")) {
+        } else if (SEQ(a->r->name, "STAR")) {
           ((Instruction *)cur_ins)->opcode = MulOP;
           printf("%s = mul nsw %s %s, %s\n", cur_ins->name, oprand_type,
                  left->name, right->name);
-        } else if (!strcmp(a->r->name, "DIV")) {
+        } else if (SEQ(a->r->name, "DIV")) {
           ((Instruction *)cur_ins)->opcode = DivOP;
           printf("%s = div nsw %s %s, %s\n", cur_ins->name, oprand_type,
                  left->name, right->name);
-        } else if (!strcmp(a->r->name, "EQUAL")) {
+        } else if (SEQ(a->r->name, "EQUAL")) {
           ((Instruction *)cur_ins)->opcode = EqualOP;
           printf("%s = icmp eq %s %s, %s\n", cur_ins->name, oprand_type,
                  left->name, right->name);
-        } else if (!strcmp(a->r->name, "NOTEQUAL")) {
+        } else if (SEQ(a->r->name, "NOTEQUAL")) {
           ((Instruction *)cur_ins)->opcode = NotEqualOP;
           printf("%s = icmp neq %s %s, %s\n", cur_ins->name, oprand_type,
                  left->name, right->name);
-        } else if (!strcmp(a->r->name, "GREAT")) {
+        } else if (SEQ(a->r->name, "GREAT")) {
           ((Instruction *)cur_ins)->opcode = GreatThanOP;
           printf("%s = icmp > %s %s, %s\n", cur_ins->name, oprand_type,
                  left->name, right->name);
-        } else if (!strcmp(a->r->name, "LESS")) {
+        } else if (SEQ(a->r->name, "LESS")) {
           ((Instruction *)cur_ins)->opcode = LessThanOP;
           printf("%s = icmp < %s %s, %s\n", cur_ins->name, oprand_type,
                  left->name, right->name);
-        } else if (!strcmp(a->r->name, "GREATEQUAL")) {
+        } else if (SEQ(a->r->name, "GREATEQUAL")) {
           ((Instruction *)cur_ins)->opcode = GreatEqualOP;
           printf("%s = icmp >= %s %s, %s\n", cur_ins->name, oprand_type,
                  left->name, right->name);
-        } else if (!strcmp(a->r->name, "LESSEQUAL")) {
+        } else if (SEQ(a->r->name, "LESSEQUAL")) {
           ((Instruction *)cur_ins)->opcode = LessEqualOP;
           printf("%s = icmp <= %s %s, %s\n", cur_ins->name, oprand_type,
                  left->name, right->name);
-        } else if (!strcmp(a->r->name, "MOD")) {
+        } else if (SEQ(a->r->name, "MOD")) {
           ((Instruction *)cur_ins)->opcode = ModOP;
           printf("%s = icmp %% %s %s, %s\n", cur_ins->name, oprand_type,
                  left->name, right->name);
-        } else if (!strcmp(a->r->name, "AND")) {
+        } else if (SEQ(a->r->name, "AND")) {
           ((Instruction *)cur_ins)->opcode = LogicAndOP;
           printf("%s = icmp && %s %s, %s\n", cur_ins->name, oprand_type,
                  left->name, right->name);
-        } else if (!strcmp(a->r->name, "OR")) {
+        } else if (SEQ(a->r->name, "OR")) {
           ((Instruction *)cur_ins)->opcode = LogicOrOP;
           printf("%s = icmp || %s %s, %s\n", cur_ins->name, oprand_type,
                  left->name, right->name);
@@ -1020,12 +1111,12 @@ Value *post_eval(ast *a, Value *left, Value *right) {
       }
     }
 
-    if (!strcmp(a->name, "assistFuncCall")) {
+    if (SEQ(a->name, "assistFuncCall")) {
       return right;
     }
 
     // 后续遍历到if标识该if管辖的全区域块结束 插入跳转点label
-    if (!strcmp(a->name, "IF")) {
+    if (SEQ(a->name, "IF")) {
       Instruction *ins_back = NULL;
       ListGetBack(ins_list, (void **)&ins_back);
 
@@ -1070,7 +1161,7 @@ Value *post_eval(ast *a, Value *left, Value *right) {
       }
     }
 
-    if (!strcmp(a->name, "FunDec")) {
+    if (SEQ(a->name, "FunDec")) {
       StackPop(stack_symbol_table);
       // 销毁当前的符号表中的哈希表然后销毁符号表
       HashMapDeinit(cur_symboltable->symbol_map);
@@ -1095,7 +1186,7 @@ Value *post_eval(ast *a, Value *left, Value *right) {
       printf("%s\n", func_label_end);
     }
 
-    if (!strcmp(a->name, "RETURN")) {
+    if (SEQ(a->name, "RETURN")) {
       char temp_str[20];
 
       if (right == NULL) {
@@ -1105,6 +1196,7 @@ Value *post_eval(ast *a, Value *left, Value *right) {
         right->name = strdup("0");
         // 为padata里的整数字面量常量赋值
         right->pdata->var_pdata.iVal = 0;
+        right->pdata->var_pdata.fVal = 0.f;
       }
 
       Value *func_return_ins =
@@ -1119,7 +1211,7 @@ Value *post_eval(ast *a, Value *left, Value *right) {
       printf("%s\n", func_return_ins->name);
     }
 
-    if (!strcmp(a->name, "ELSE")) {
+    if (SEQ(a->name, "ELSE")) {
       have_else = true;
       Value *then_label_ins = NULL;
       StackTop(stack_then_label, (void **)&then_label_ins);
@@ -1135,7 +1227,7 @@ Value *post_eval(ast *a, Value *left, Value *right) {
       ListPushBack(ins_list, (void *)goto_then_ins);
     }
 
-    if (!strcmp(a->name, "WHILE")) {
+    if (SEQ(a->name, "WHILE")) {
       Value *while_head_label_ins = NULL;
       StackTop(stack_while_head_label, (void **)&while_head_label_ins);
       StackPop(stack_while_head_label);
@@ -1163,7 +1255,7 @@ Value *post_eval(ast *a, Value *left, Value *right) {
       return NULL;
     }
 
-    if (!strcmp(a->name, "BREAK")) {
+    if (SEQ(a->name, "BREAK")) {
       Value *goto_break_label_ins = NULL;
       if (StackSize(stack_while_then_label) == 0) {
         // 没有地方可以去 报错？
@@ -1186,7 +1278,7 @@ Value *post_eval(ast *a, Value *left, Value *right) {
       printf("break :br %s \n", goto_break_label_ins->name);
     }
 
-    if (!strcmp(a->name, "CONTINUE")) {
+    if (SEQ(a->name, "CONTINUE")) {
       Value *goto_head_label_ins = NULL;
       if (StackSize(stack_while_head_label) == 0) {
         // 没有地方可以去 报错？

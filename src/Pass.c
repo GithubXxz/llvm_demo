@@ -83,8 +83,8 @@ BasicBlock *name_get_bblock(char *name) {
 
 // 将other merge 到 self
 void hashmap_union(HashMap *self, HashMap *other) {
-  HashMapFirst(other);
   node_pair *element = NULL;
+  HashMapFirst(other);
   while ((element = (node_pair *)HashMapNext(other)) != NULL) {
     if (HashMapContain(self, element->key) == false)
       HashMapPut(self, strdup(element->key), element->value);
@@ -479,7 +479,6 @@ void insert_phi_func_pass(Function *self) {
   hashset_init(&(bblock_pass_hashset));
 
   ListFirst(entry_bblock->inst_list, false);
-
   // &&!strcmp(((Value *)bblock_ins)->name, "\%point1")
   while (ListNext(entry_bblock->inst_list, &bblock_ins)) {
     if (((Instruction *)bblock_ins)->opcode == AllocateOP &&
@@ -511,15 +510,17 @@ void insert_phi_func_pass(Function *self) {
         hashmap_init(&(cur_pass_add_phi_insert_bblock));
 
         node_pair *element;
-        HashMapFirst(phi_insert_bblock);
 
+        HashMapFirst(phi_insert_bblock);
         while ((element = (node_pair *)HashMapNext(phi_insert_bblock)) !=
-                   NULL &&
-               element->value->is_visited == false) {
-          element->value->is_visited = true;
-          hashmap_union(cur_pass_add_phi_insert_bblock,
-                        element->value->dom_frontier_set);
+               NULL) {
+          if (element->value->is_visited == false) {
+            element->value->is_visited = true;
+            hashmap_union(cur_pass_add_phi_insert_bblock,
+                          element->value->dom_frontier_set);
+          }
         }
+
         hashmap_union(phi_insert_bblock, cur_pass_add_phi_insert_bblock);
       }
 
@@ -734,6 +735,7 @@ void rename_pass(Function *self) {
   rename_pass_help_new(var_stack_hashmap, dom_tree_root);
 
   Pair *ptr_pair;
+  HashMapFirst(var_stack_hashmap);
   while ((ptr_pair = HashMapNext(var_stack_hashmap)) != NULL) {
     StackDeinit(ptr_pair->value);
   }
@@ -1422,23 +1424,22 @@ void print_bblock_pass(BasicBlock *self) {
 }
 
 void delete_return_deadcode_pass(List *self) {
-  void *element;
+  Instruction *element;
   ListFirst(self, true);
   ListSetClean(self, CommonCleanInstruction);
   unsigned i = 0;
   HashSet *reach_label = NULL;
   hashset_init(&reach_label);
   while (i != ListSize(self)) {
-    ListGetAt(self, i, &element);
+    ListGetAt(self, i, (void *)&element);
     switch (((Instruction *)element)->opcode) {
     case GotoOP:
       HashSetAdd(reach_label,
                  ((Value *)element)->pdata->no_condition_goto.goto_location);
       i++;
-      while (i < ListSize(self) && ListGetAt(self, i, &element) &&
-             (((Instruction *)element)->opcode != FuncLabelOP &&
-              ((Instruction *)element)->opcode != LabelOP &&
-              ((Instruction *)element)->opcode != FuncEndOP)) {
+      while (i < ListSize(self) && ListGetAt(self, i, (void *)&element) &&
+             ((element)->opcode != FuncLabelOP &&
+              (element)->opcode != LabelOP && (element)->opcode != FuncEndOP)) {
         ListRemove(self, i);
       }
       break;
@@ -1448,19 +1449,17 @@ void delete_return_deadcode_pass(List *self) {
       HashSetAdd(reach_label,
                  ((Value *)element)->pdata->condition_goto.false_goto_location);
       i++;
-      while (i < ListSize(self) && ListGetAt(self, i, &element) &&
-             (((Instruction *)element)->opcode != FuncLabelOP &&
-              ((Instruction *)element)->opcode != LabelOP &&
-              ((Instruction *)element)->opcode != FuncEndOP)) {
+      while (i < ListSize(self) && ListGetAt(self, i, (void *)&element) &&
+             ((element)->opcode != FuncLabelOP &&
+              (element)->opcode != LabelOP && (element)->opcode != FuncEndOP)) {
         ListRemove(self, i);
       }
       break;
     case ReturnOP:
       i++;
-      while (i < ListSize(self) && ListGetAt(self, i, &element) &&
-             (((Instruction *)element)->opcode != FuncLabelOP &&
-              ((Instruction *)element)->opcode != LabelOP &&
-              ((Instruction *)element)->opcode != FuncEndOP)) {
+      while (i < ListSize(self) && ListGetAt(self, i, (void *)&element) &&
+             ((element)->opcode != FuncLabelOP &&
+              (element)->opcode != LabelOP && (element)->opcode != FuncEndOP)) {
         // printf("remove %s\n", ((Value *)element)->name);
         ListRemove(self, i);
       }
@@ -1469,13 +1468,17 @@ void delete_return_deadcode_pass(List *self) {
       if (!HashSetFind(reach_label, (Value *)element) &&
           !strstr(((Value *)element)->name, "entry")) {
         ListRemove(self, i);
-        while (i < ListSize(self) && ListGetAt(self, i, &element) &&
-               (((Instruction *)element)->opcode != FuncLabelOP &&
-                ((Instruction *)element)->opcode != LabelOP &&
-                ((Instruction *)element)->opcode != FuncEndOP)) {
-          // printf("remove %s\n", ((Value *)element)->name);
+        bool is_over = false;
+        while (i < ListSize(self) && ListGetAt(self, i, (void *)&element) &&
+               ((element)->opcode != FuncLabelOP &&
+                (element)->opcode != LabelOP &&
+                (element)->opcode != FuncEndOP)) {
+          printf("remove %s\n", ((Value *)element)->name);
           ListRemove(self, i);
+          is_over = true;
         }
+        if (is_over)
+          i--;
       }
       i++;
       break;
@@ -1896,10 +1899,10 @@ void bblock_to_dom_graph_pass(Function *self) {
 
   // 打印邻接边
   for (int i = 0; i < num_of_block; i++) {
-    HashMapFirst(graph_for_dom_tree->node_set[i]->edge_list);
     node_pair *element;
     printf("%s edge is ",
            graph_for_dom_tree->node_set[i]->bblock_head->label->name);
+    HashMapFirst(graph_for_dom_tree->node_set[i]->edge_list);
     while ((element = (node_pair *)HashMapNext(
                 graph_for_dom_tree->node_set[i]->edge_list)) != NULL) {
       printf("%s ", element->value->bblock_head->label->name);

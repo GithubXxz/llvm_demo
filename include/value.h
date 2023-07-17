@@ -53,10 +53,8 @@ union _PData {
 
   // 常数字面量
   struct {
-    union {
-      int iVal;
-      float fVal;
-    };
+    int iVal;
+    float fVal;
   } var_pdata;
 
   struct {

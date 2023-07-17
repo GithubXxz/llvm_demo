@@ -97,6 +97,9 @@ void CommonCleanInstruction_v2(void *element);
 // 二元运算判断左值的类型
 TypeID ins_res_type_v2(Value *left, Value *right);
 
+// 立即数二元运算结构类型
+TypeID imm_res_type(Value *left, Value *right);
+
 void use_relation_test();
 
 // https://llvm.org/doxygen/InstrTypes_8h_source.html

@@ -130,6 +130,50 @@ char *test_cases[] = {"./test_cases/00_main.c",
                       "./test_cases/98_matrix_mul.c",
                       "./test_cases/99_matrix_tran.c"};
 
+// --------------------------------------------------
+char *hidden_cases[] = {
+    "./hidden_cases/00_comment2.c",
+    "./hidden_cases/01_multiple_returns.c",
+    "./hidden_cases/02_ret_in_block.c",
+    "./hidden_cases/03_branch.c",
+    "./hidden_cases/04_break_continue.c",
+    "./hidden_cases/05_param_name.c",
+    "./hidden_cases/06_func_name.c",
+    "./hidden_cases/07_arr_init_nd.c",
+    "./hidden_cases/08_global_arr_init.c",
+    "./hidden_cases/09_BFS.c",
+    "./hidden_cases/10_DFS.c",
+    "./hidden_cases/11_BST.c",
+    "./hidden_cases/12_DSU.c",
+    "./hidden_cases/13_LCA.c",
+    "./hidden_cases/14_dp.c",
+    "./hidden_cases/15_graph_coloring.c",
+    "./hidden_cases/16_k_smallest.c",
+    "./hidden_cases/17_maximal_clique.c",
+    "./hidden_cases/18_prim.c",
+    "./hidden_cases/19_search.c",
+    "./hidden_cases/20_sort.c",
+    "./hidden_cases/21_union_find.c",
+    "./hidden_cases/22_matrix_multiply.c",
+    "./hidden_cases/23_json.c",
+    "./hidden_cases/24_array_only.c",
+    "./hidden_cases/25_scope3.c",
+    "./hidden_cases/26_scope4.c",
+    "./hidden_cases/27_scope5.c",
+    "./hidden_cases/28_side_effect2.c",
+    "./hidden_cases/29_long_line.c",
+    "./hidden_cases/30_many_dimensions.c",
+    "./hidden_cases/31_many_indirections.c",
+    "./hidden_cases/32_many_params3.c",
+    "./hidden_cases/33_multi_branch.c",
+    "./hidden_cases/34_multi_loop.c",
+    "./hidden_cases/35_math.c",
+    "./hidden_cases/36_rotate.c",
+    "./hidden_cases/37_dct.c",
+    "./hidden_cases/38_light2d.c",
+    "./hidden_cases/39_fp_params.c",
+};
+// --------------------------------------------------
 int main(int argc, char **argv) {
   // freopen("/dev/null", "w", stdout);
   printf("hello world\n");
@@ -142,8 +186,9 @@ int main(int argc, char **argv) {
   if (argc == 2) {
     choose_case = read_code_from_file(argv[1]);
   } else {
-    choose_case = read_code_from_file(test_cases[86]);
-    // choose_case = read_code_from_file("./my_cases/test_const.c");
+    // choose_case = read_code_from_file(test_cases[81]);
+    choose_case = read_code_from_file(hidden_cases[4]);
+    // choose_case = read_code_from_file("./my_cases/test_case.c");
   }
   if (choose_case == NULL)
     return 1;
@@ -157,7 +202,8 @@ int main(int argc, char **argv) {
   freopen("./output/out.txt", "w", stdout);
   setvbuf(stdout, NULL, _IOLBF, BUFSIZ);
 
-  // print_ins_pass(ins_list);
+  print_ins_pass(ins_list);
+  printf("\n\n\n\n");
 
   delete_return_deadcode_pass(ins_list);
 

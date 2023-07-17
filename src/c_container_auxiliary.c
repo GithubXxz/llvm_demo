@@ -50,7 +50,7 @@ unsigned HashKeyAddress(void *key) { return HashDjb2(key); }
 // 将键类型强转位字符串然后来比较
 int CompareKey(void *lhs, void *rhs) {
   // printf("compare %s and %s\n", (char*)lhs, (char*)lhs);
-  return strcmp((char *)lhs, (char *)lhs);
+  return strcmp((char *)lhs, (char *)rhs);
 }
 
 // 因为数据结构心态再一次崩掉
