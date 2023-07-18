@@ -53,7 +53,7 @@
          	     0:         GreatEqualOP 	                   temp28 	    temp27,          3
          	     0:  GotoWithConditionOP 	true:mainlabel20  false:mainlabel19 	    temp28
          	     0:              LabelOP 	              mainlabel20 	      null
-         	     0:               GotoOP 	   (break)br :mainlabel11 	      null
+         	     0:               GotoOP 	       (break)mainlabel11 	      null
          	     0:               GotoOP 	(continue)br :mainlabel10 	      null
          	     0:               GotoOP 	         goto mainlabel19 	      null
          	     0:              LabelOP 	              mainlabel19 	      null
@@ -75,7 +75,7 @@
          	     0:                AddOP 	                   temp32 	    temp31,          1
          	     0:              StoreOP 	                   (null) 	    point6,     temp32
          	     0:               GotoOP 	(continue)br :mainlabel25 	      null
-         	     0:               GotoOP 	   (break)br :mainlabel26 	      null
+         	     0:               GotoOP 	       (break)mainlabel26 	      null
          	     0:               LoadOP 	                   temp33 	    point1
          	     0:                AddOP 	                   temp34 	    temp33,          1
          	     0:              StoreOP 	                   (null) 	    point1,     temp34
@@ -97,10 +97,10 @@
          	     0:              LabelOP 	              mainlabel31 	      null
          	     0:  GotoWithConditionOP 	true:mainlabel33  false:mainlabel32 	         1
          	     0:              LabelOP 	              mainlabel33 	      null
-         	     0:               GotoOP 	   (break)br :mainlabel32 	      null
+         	     0:               GotoOP 	       (break)mainlabel32 	      null
          	     0:               GotoOP 	         goto mainlabel31 	      null
          	     0:              LabelOP 	              mainlabel32 	      null
-         	     0:               GotoOP 	   (break)br :mainlabel29 	      null
+         	     0:               GotoOP 	       (break)mainlabel29 	      null
          	     0:               GotoOP 	         goto mainlabel28 	      null
          	     0:              LabelOP 	              mainlabel29 	      null
          	     0:               LoadOP 	                   temp39 	    point4
@@ -184,7 +184,7 @@
          	     0:         GreatEqualOP 	                   temp28 	    temp27,          3
          	     0:  GotoWithConditionOP 	true:mainlabel20  false:mainlabel19 	    temp28
          	     0:              LabelOP 	              mainlabel20 	      null
-         	     0:               GotoOP 	   (break)br :mainlabel11 	      null
+         	     0:               GotoOP 	       (break)mainlabel11 	      null
          	     0:              LabelOP 	              mainlabel19 	      null
          	     0:               GotoOP 	         goto mainlabel17 	      null
          	     0:              LabelOP 	              mainlabel17 	      null
@@ -221,9 +221,9 @@
          	     0:              LabelOP 	              mainlabel31 	      null
          	     0:  GotoWithConditionOP 	true:mainlabel33  false:mainlabel32 	         1
          	     0:              LabelOP 	              mainlabel33 	      null
-         	     0:               GotoOP 	   (break)br :mainlabel32 	      null
+         	     0:               GotoOP 	       (break)mainlabel32 	      null
          	     0:              LabelOP 	              mainlabel32 	      null
-         	     0:               GotoOP 	   (break)br :mainlabel29 	      null
+         	     0:               GotoOP 	       (break)mainlabel29 	      null
          	     0:              LabelOP 	              mainlabel29 	      null
          	     0:               LoadOP 	                   temp39 	    point4
          	     0:                AddOP 	                   temp40 	    temp39,          1
@@ -242,154 +242,6 @@
          	     0:              LabelOP 	               mainlabel2 	      null
          	     0:               LoadOP 	                   temp47 	    point1
          	     0:             ReturnOP 	                   return 	    temp47
-         	     0:            FuncEndOP 	          func_label_end1 	      null
-
-
-
-	address:0x137f09cb0	mainentry:
-         	     0:              LabelOP 	                mainentry 	      null
-         	     0:           AllocateOP 	                   point6 	      null
-         	     0:           AllocateOP 	                   point5 	      null
-         	     0:           AllocateOP 	                   point4 	      null
-         	     0:           AllocateOP 	                   point3 	      null
-         	     0:           AllocateOP 	                   point2 	      null
-         	     0:           AllocateOP 	                   point1 	      null
-         	     0:              StoreOP 	                   (null) 	    point1,          0
-         	     0:              StoreOP 	                   (null) 	    point2,          0
-         	     0:               GotoOP 	          goto mainlabel1 	      null
-	address:0x137f0a470	mainlabel1:
-         	     0:              LabelOP 	               mainlabel1 	      null
-         	     0:               LoadOP 	                   temp10 	    point2
-         	     0:           LessThanOP 	                   temp11 	    temp10,         20
-         	     0:  GotoWithConditionOP 	true:mainlabel3  false:mainlabel2 	    temp11
-	address:0x137f0a940	mainlabel3:
-         	     0:              LabelOP 	               mainlabel3 	      null
-         	     0:              StoreOP 	                   (null) 	    point3,          0
-         	     0:               GotoOP 	          goto mainlabel4 	      null
-	address:0x137f0af00	mainlabel4:
-         	     0:              LabelOP 	               mainlabel4 	      null
-         	     0:               LoadOP 	                   temp12 	    point3
-         	     0:           LessThanOP 	                   temp13 	    temp12,         10
-         	     0:  GotoWithConditionOP 	true:mainlabel6  false:mainlabel5 	    temp13
-	address:0x137f0b3d0	mainlabel6:
-         	     0:              LabelOP 	               mainlabel6 	      null
-         	     0:              StoreOP 	                   (null) 	    point4,          0
-         	     0:               GotoOP 	          goto mainlabel7 	      null
-	address:0x137f0bb90	mainlabel7:
-         	     0:              LabelOP 	               mainlabel7 	      null
-         	     0:               LoadOP 	                   temp14 	    point4
-         	     0:           LessThanOP 	                   temp15 	    temp14,          5
-         	     0:  GotoWithConditionOP 	true:mainlabel9  false:mainlabel8 	    temp15
-	address:0x137f0c060	mainlabel9:
-         	     0:              LabelOP 	               mainlabel9 	      null
-         	     0:              StoreOP 	                   (null) 	    point5,          0
-         	     0:               GotoOP 	         goto mainlabel10 	      null
-	address:0x137f0c620	mainlabel10:
-         	     0:              LabelOP 	              mainlabel10 	      null
-         	     0:               LoadOP 	                   temp16 	    point5
-         	     0:           LessThanOP 	                   temp17 	    temp16,          3
-         	     0:  GotoWithConditionOP 	true:mainlabel12  false:mainlabel11 	    temp17
-	address:0x137f0caf0	mainlabel12:
-         	     0:              LabelOP 	              mainlabel12 	      null
-         	     0:               LoadOP 	                   temp18 	    point5
-         	     0:                AddOP 	                   temp19 	    temp18,          1
-         	     0:         GreatEqualOP 	                   temp20 	    temp19,          3
-         	     0:  GotoWithConditionOP 	true:mainlabel14  false:mainlabel13 	    temp20
-	address:0x137f0d270	mainlabel14:
-         	     0:              LabelOP 	              mainlabel14 	      null
-         	     0:               LoadOP 	                   temp21 	    point5
-         	     0:  GotoWithConditionOP 	true:mainlabel16  false:mainlabel15 	    temp21
-	address:0x137f0d600	mainlabel16:
-         	     0:              LabelOP 	              mainlabel16 	      null
-         	     0:               LoadOP 	                   temp22 	    point5
-         	     0:               LoadOP 	                   temp23 	    point5
-         	     0:                NotOP 	                   temp24 	    temp23
-         	     0:            LogicOrOP 	                   temp25 	    temp22,     temp24
-         	     0:  GotoWithConditionOP 	true:mainlabel18  false:mainlabel17 	    temp25
-	address:0x137f0da90	mainlabel18:
-         	     0:              LabelOP 	              mainlabel18 	      null
-         	     0:               LoadOP 	                   temp26 	    point5
-         	     0:                SubOP 	                   temp27 	    temp26,         -1
-         	     0:         GreatEqualOP 	                   temp28 	    temp27,          3
-         	     0:  GotoWithConditionOP 	true:mainlabel20  false:mainlabel19 	    temp28
-	address:0x137f0e140	mainlabel20:
-         	     0:              LabelOP 	              mainlabel20 	      null
-         	     0:               GotoOP 	   (break)br :mainlabel11 	      null
-	address:0x137f0ca40	mainlabel11:
-         	     0:              LabelOP 	              mainlabel11 	      null
-         	     0:               GotoOP 	         goto mainlabel28 	      null
-	address:0x137f10400	mainlabel28:
-         	     0:              LabelOP 	              mainlabel28 	      null
-         	     0:  GotoWithConditionOP 	true:mainlabel30  false:mainlabel29 	         1
-	address:0x137f106c0	mainlabel30:
-         	     0:              LabelOP 	              mainlabel30 	      null
-         	     0:               GotoOP 	         goto mainlabel31 	      null
-	address:0x137f10970	mainlabel31:
-         	     0:              LabelOP 	              mainlabel31 	      null
-         	     0:  GotoWithConditionOP 	true:mainlabel33  false:mainlabel32 	         1
-	address:0x137f10c30	mainlabel33:
-         	     0:              LabelOP 	              mainlabel33 	      null
-         	     0:               GotoOP 	   (break)br :mainlabel32 	      null
-	address:0x137f10b80	mainlabel32:
-         	     0:              LabelOP 	              mainlabel32 	      null
-         	     0:               GotoOP 	   (break)br :mainlabel29 	      null
-	address:0x137f10610	mainlabel29:
-         	     0:              LabelOP 	              mainlabel29 	      null
-         	     0:               LoadOP 	                   temp39 	    point4
-         	     0:                AddOP 	                   temp40 	    temp39,          1
-         	     0:              StoreOP 	                   (null) 	    point4,     temp40
-         	     0:               GotoOP 	          goto mainlabel7 	      null
-	address:0x137f0e090	mainlabel19:
-         	     0:              LabelOP 	              mainlabel19 	      null
-         	     0:               GotoOP 	         goto mainlabel17 	      null
-	address:0x137f0d9e0	mainlabel17:
-         	     0:              LabelOP 	              mainlabel17 	      null
-         	     0:               GotoOP 	         goto mainlabel15 	      null
-	address:0x137f0d550	mainlabel15:
-         	     0:              LabelOP 	              mainlabel15 	      null
-         	     0:               GotoOP 	         goto mainlabel13 	      null
-	address:0x137f0d1c0	mainlabel13:
-         	     0:              LabelOP 	              mainlabel13 	      null
-         	     0:              StoreOP 	                   (null) 	    point6,          0
-         	     0:               GotoOP 	         goto mainlabel25 	      null
-	address:0x137f0ebf0	mainlabel25:
-         	     0:              LabelOP 	              mainlabel25 	      null
-         	     0:               LoadOP 	                   temp29 	    point6
-         	     0:           LessThanOP 	                   temp30 	    temp29,          2
-         	     0:  GotoWithConditionOP 	true:mainlabel27  false:mainlabel26 	    temp30
-	address:0x137f0f0c0	mainlabel27:
-         	     0:              LabelOP 	              mainlabel27 	      null
-         	     0:               LoadOP 	                   temp31 	    point6
-         	     0:                AddOP 	                   temp32 	    temp31,          1
-         	     0:              StoreOP 	                   (null) 	    point6,     temp32
-         	     0:               GotoOP 	(continue)br :mainlabel25 	      null
-	address:0x137f0f010	mainlabel26:
-         	     0:              LabelOP 	              mainlabel26 	      null
-         	     0:               LoadOP 	                   temp35 	    point5
-         	     0:                AddOP 	                   temp36 	    temp35,          1
-         	     0:              StoreOP 	                   (null) 	    point5,     temp36
-         	     0:               LoadOP 	                   temp37 	    point1
-         	     0:                AddOP 	                   temp38 	    temp37,        233
-         	     0:              StoreOP 	                   (null) 	    point1,     temp38
-         	     0:               GotoOP 	         goto mainlabel10 	      null
-	address:0x137f0bfb0	mainlabel8:
-         	     0:              LabelOP 	               mainlabel8 	      null
-         	     0:               LoadOP 	                   temp41 	    point3
-         	     0:                AddOP 	                   temp42 	    temp41,          1
-         	     0:              StoreOP 	                   (null) 	    point3,     temp42
-         	     0:               GotoOP 	 (continue)br :mainlabel4 	      null
-	address:0x137f0b320	mainlabel5:
-         	     0:              LabelOP 	               mainlabel5 	      null
-         	     0:               LoadOP 	                   temp45 	    point2
-         	     0:                AddOP 	                   temp46 	    temp45,          1
-         	     0:              StoreOP 	                   (null) 	    point2,     temp46
-         	     0:               GotoOP 	          goto mainlabel1 	      null
-	address:0x137f0a890	mainlabel2:
-         	     0:              LabelOP 	               mainlabel2 	      null
-         	     0:               LoadOP 	                   temp47 	    point1
-         	     0:             ReturnOP 	                   return 	    temp47
-	address:0x137f119e0	mainendlabel:
-         	     0:              LabelOP 	             mainendlabel 	      null
          	     0:            FuncEndOP 	          func_label_end1 	      null
 main
 mainentry edge is mainlabel1 
@@ -550,10 +402,9 @@ cur node mainlabel8's dom frontier is mainlabel4,
 cur node mainlabel5's dom frontier is mainlabel1,
 cur node mainlabel2's dom frontier is 
 cur node mainendlabel's dom frontier is 
-fuck you!
 
 	labelID	number:               opcode 	                     name 	       use
-	address:0x137f09cb0	mainentry:
+	address:0x12de0c740	mainentry:
          	     0:              LabelOP 	                mainentry 	      null
          	     0:           AllocateOP 	                   point6 	      null
          	     0:           AllocateOP 	                   point5 	      null
@@ -564,7 +415,7 @@ fuck you!
          	     0:              StoreOP 	                   (null) 	    point1,          0
          	     0:              StoreOP 	                   (null) 	    point2,          0
          	     0:               GotoOP 	          goto mainlabel1 	      null
-	address:0x137f0a470	mainlabel1:
+	address:0x12de0ceb0	mainlabel1:
          	     0:              LabelOP 	               mainlabel1 	      null
          	     0:            PhiFuncOp 	               %phi_var17 	size: 0 
          	     0:            PhiFuncOp 	               %phi_var15 	size: 0 
@@ -575,11 +426,11 @@ fuck you!
          	     0:               LoadOP 	                   temp10 	    point2
          	     0:           LessThanOP 	                   temp11 	    temp10,         20
          	     0:  GotoWithConditionOP 	true:mainlabel3  false:mainlabel2 	    temp11
-	address:0x137f0a940	mainlabel3:
+	address:0x12de0d330	mainlabel3:
          	     0:              LabelOP 	               mainlabel3 	      null
          	     0:              StoreOP 	                   (null) 	    point3,          0
          	     0:               GotoOP 	          goto mainlabel4 	      null
-	address:0x137f0af00	mainlabel4:
+	address:0x12de0d8b0	mainlabel4:
          	     0:              LabelOP 	               mainlabel4 	      null
          	     0:            PhiFuncOp 	               %phi_var18 	size: 0 
          	     0:            PhiFuncOp 	               %phi_var14 	size: 0 
@@ -589,11 +440,11 @@ fuck you!
          	     0:               LoadOP 	                   temp12 	    point3
          	     0:           LessThanOP 	                   temp13 	    temp12,         10
          	     0:  GotoWithConditionOP 	true:mainlabel6  false:mainlabel5 	    temp13
-	address:0x137f0b3d0	mainlabel6:
+	address:0x12de0dd30	mainlabel6:
          	     0:              LabelOP 	               mainlabel6 	      null
          	     0:              StoreOP 	                   (null) 	    point4,          0
          	     0:               GotoOP 	          goto mainlabel7 	      null
-	address:0x137f0bb90	mainlabel7:
+	address:0x12de0e4b0	mainlabel7:
          	     0:              LabelOP 	               mainlabel7 	      null
          	     0:            PhiFuncOp 	               %phi_var19 	size: 0 
          	     0:            PhiFuncOp 	               %phi_var12 	size: 0 
@@ -602,11 +453,11 @@ fuck you!
          	     0:               LoadOP 	                   temp14 	    point4
          	     0:           LessThanOP 	                   temp15 	    temp14,          5
          	     0:  GotoWithConditionOP 	true:mainlabel9  false:mainlabel8 	    temp15
-	address:0x137f0c060	mainlabel9:
+	address:0x12de0e930	mainlabel9:
          	     0:              LabelOP 	               mainlabel9 	      null
          	     0:              StoreOP 	                   (null) 	    point5,          0
          	     0:               GotoOP 	         goto mainlabel10 	      null
-	address:0x137f0c620	mainlabel10:
+	address:0x12de0eeb0	mainlabel10:
          	     0:              LabelOP 	              mainlabel10 	      null
          	     0:            PhiFuncOp 	               %phi_var16 	size: 0 
          	     0:            PhiFuncOp 	                %phi_var6 	size: 0 
@@ -614,82 +465,82 @@ fuck you!
          	     0:               LoadOP 	                   temp16 	    point5
          	     0:           LessThanOP 	                   temp17 	    temp16,          3
          	     0:  GotoWithConditionOP 	true:mainlabel12  false:mainlabel11 	    temp17
-	address:0x137f0caf0	mainlabel12:
+	address:0x12de0f330	mainlabel12:
          	     0:              LabelOP 	              mainlabel12 	      null
          	     0:               LoadOP 	                   temp18 	    point5
          	     0:                AddOP 	                   temp19 	    temp18,          1
          	     0:         GreatEqualOP 	                   temp20 	    temp19,          3
          	     0:  GotoWithConditionOP 	true:mainlabel14  false:mainlabel13 	    temp20
-	address:0x137f0d270	mainlabel14:
+	address:0x12de0fa50	mainlabel14:
          	     0:              LabelOP 	              mainlabel14 	      null
          	     0:               LoadOP 	                   temp21 	    point5
          	     0:  GotoWithConditionOP 	true:mainlabel16  false:mainlabel15 	    temp21
-	address:0x137f0d600	mainlabel16:
+	address:0x12de0fda0	mainlabel16:
          	     0:              LabelOP 	              mainlabel16 	      null
          	     0:               LoadOP 	                   temp22 	    point5
          	     0:               LoadOP 	                   temp23 	    point5
          	     0:                NotOP 	                   temp24 	    temp23
          	     0:            LogicOrOP 	                   temp25 	    temp22,     temp24
          	     0:  GotoWithConditionOP 	true:mainlabel18  false:mainlabel17 	    temp25
-	address:0x137f0da90	mainlabel18:
+	address:0x12de101c0	mainlabel18:
          	     0:              LabelOP 	              mainlabel18 	      null
          	     0:               LoadOP 	                   temp26 	    point5
          	     0:                SubOP 	                   temp27 	    temp26,         -1
          	     0:         GreatEqualOP 	                   temp28 	    temp27,          3
          	     0:  GotoWithConditionOP 	true:mainlabel20  false:mainlabel19 	    temp28
-	address:0x137f0e140	mainlabel20:
+	address:0x12de10770	mainlabel20:
          	     0:              LabelOP 	              mainlabel20 	      null
-         	     0:               GotoOP 	   (break)br :mainlabel11 	      null
-	address:0x137f0ca40	mainlabel11:
+         	     0:               GotoOP 	       (break)mainlabel11 	      null
+	address:0x12de0f290	mainlabel11:
          	     0:              LabelOP 	              mainlabel11 	      null
          	     0:               GotoOP 	         goto mainlabel28 	      null
-	address:0x137f10400	mainlabel28:
+	address:0x12de12820	mainlabel28:
          	     0:              LabelOP 	              mainlabel28 	      null
          	     0:  GotoWithConditionOP 	true:mainlabel30  false:mainlabel29 	         1
-	address:0x137f106c0	mainlabel30:
+	address:0x12de12ab0	mainlabel30:
          	     0:              LabelOP 	              mainlabel30 	      null
          	     0:               GotoOP 	         goto mainlabel31 	      null
-	address:0x137f10970	mainlabel31:
+	address:0x12de12d40	mainlabel31:
          	     0:              LabelOP 	              mainlabel31 	      null
          	     0:  GotoWithConditionOP 	true:mainlabel33  false:mainlabel32 	         1
-	address:0x137f10c30	mainlabel33:
+	address:0x12de12fd0	mainlabel33:
          	     0:              LabelOP 	              mainlabel33 	      null
-         	     0:               GotoOP 	   (break)br :mainlabel32 	      null
-	address:0x137f10b80	mainlabel32:
+         	     0:               GotoOP 	       (break)mainlabel32 	      null
+	address:0x12de12f30	mainlabel32:
          	     0:              LabelOP 	              mainlabel32 	      null
-         	     0:               GotoOP 	   (break)br :mainlabel29 	      null
-	address:0x137f10610	mainlabel29:
+         	     0:               GotoOP 	       (break)mainlabel29 	      null
+	address:0x12de12a10	mainlabel29:
          	     0:              LabelOP 	              mainlabel29 	      null
          	     0:               LoadOP 	                   temp39 	    point4
          	     0:                AddOP 	                   temp40 	    temp39,          1
          	     0:              StoreOP 	                   (null) 	    point4,     temp40
          	     0:               GotoOP 	          goto mainlabel7 	      null
-	address:0x137f0e090	mainlabel19:
+	address:0x12de106d0	mainlabel19:
          	     0:              LabelOP 	              mainlabel19 	      null
          	     0:               GotoOP 	         goto mainlabel17 	      null
-	address:0x137f0d9e0	mainlabel17:
+	address:0x12de10120	mainlabel17:
          	     0:              LabelOP 	              mainlabel17 	      null
          	     0:               GotoOP 	         goto mainlabel15 	      null
-	address:0x137f0d550	mainlabel15:
+	address:0x12de0fd00	mainlabel15:
          	     0:              LabelOP 	              mainlabel15 	      null
          	     0:               GotoOP 	         goto mainlabel13 	      null
-	address:0x137f0d1c0	mainlabel13:
+	address:0x12de0f9b0	mainlabel13:
          	     0:              LabelOP 	              mainlabel13 	      null
          	     0:              StoreOP 	                   (null) 	    point6,          0
          	     0:               GotoOP 	         goto mainlabel25 	      null
-	address:0x137f0ebf0	mainlabel25:
+	address:0x12de11180	mainlabel25:
          	     0:              LabelOP 	              mainlabel25 	      null
          	     0:            PhiFuncOp 	                %phi_var2 	size: 0 
          	     0:               LoadOP 	                   temp29 	    point6
          	     0:           LessThanOP 	                   temp30 	    temp29,          2
          	     0:  GotoWithConditionOP 	true:mainlabel27  false:mainlabel26 	    temp30
-	address:0x137f0f0c0	mainlabel27:
+	address:0x12de11600	mainlabel27:
          	     0:              LabelOP 	              mainlabel27 	      null
          	     0:               LoadOP 	                   temp31 	    point6
          	     0:                AddOP 	                   temp32 	    temp31,          1
          	     0:              StoreOP 	                   (null) 	    point6,     temp32
          	     0:               GotoOP 	(continue)br :mainlabel25 	      null
-	address:0x137f0f010	mainlabel26:
+	address:0x12de11560	mainlabel26:
          	     0:              LabelOP 	              mainlabel26 	      null
          	     0:               LoadOP 	                   temp35 	    point5
          	     0:                AddOP 	                   temp36 	    temp35,          1
@@ -698,23 +549,23 @@ fuck you!
          	     0:                AddOP 	                   temp38 	    temp37,        233
          	     0:              StoreOP 	                   (null) 	    point1,     temp38
          	     0:               GotoOP 	         goto mainlabel10 	      null
-	address:0x137f0bfb0	mainlabel8:
+	address:0x12de0e890	mainlabel8:
          	     0:              LabelOP 	               mainlabel8 	      null
          	     0:               LoadOP 	                   temp41 	    point3
          	     0:                AddOP 	                   temp42 	    temp41,          1
          	     0:              StoreOP 	                   (null) 	    point3,     temp42
          	     0:               GotoOP 	 (continue)br :mainlabel4 	      null
-	address:0x137f0b320	mainlabel5:
+	address:0x12de0dc90	mainlabel5:
          	     0:              LabelOP 	               mainlabel5 	      null
          	     0:               LoadOP 	                   temp45 	    point2
          	     0:                AddOP 	                   temp46 	    temp45,          1
          	     0:              StoreOP 	                   (null) 	    point2,     temp46
          	     0:               GotoOP 	          goto mainlabel1 	      null
-	address:0x137f0a890	mainlabel2:
+	address:0x12de0d290	mainlabel2:
          	     0:              LabelOP 	               mainlabel2 	      null
          	     0:               LoadOP 	                   temp47 	    point1
          	     0:             ReturnOP 	                   return 	    temp47
-	address:0x137f119e0	mainendlabel:
+	address:0x12de13e90	mainendlabel:
          	     0:              LabelOP 	             mainendlabel 	      null
          	     0:            FuncEndOP 	          func_label_end1 	      null
 
@@ -723,10 +574,10 @@ begin rename pass and delete alloca,store,load instruction!
 rename pass over
 delete alloca,store,load instruction over
 	labelID	number:               opcode 	                     name 	       use
-	address:0x137f09cb0	mainentry:
+	address:0x12de0c740	mainentry:
          	     0:              LabelOP 	                mainentry 	      null
          	     0:               GotoOP 	          goto mainlabel1 	      null
-	address:0x137f0a470	mainlabel1:
+	address:0x12de0ceb0	mainlabel1:
          	     0:              LabelOP 	               mainlabel1 	      null
          	     0:            PhiFuncOp 	               %phi_var17 	size: 2 	bblock: mainentry value: 0, 	bblock: mainlabel5 value: %phi_var18, 
          	     0:            PhiFuncOp 	               %phi_var15 	size: 2 	bblock: mainentry value: 0, 	bblock: mainlabel5 value: temp46, 
@@ -736,10 +587,10 @@ delete alloca,store,load instruction over
          	     0:            PhiFuncOp 	                %phi_var3 	size: 2 	bblock: mainentry value: undefined, 	bblock: mainlabel5 value: %phi_var4, 
          	     0:           LessThanOP 	                   temp11 	%phi_var15,         20
          	     0:  GotoWithConditionOP 	true:mainlabel3  false:mainlabel2 	    temp11
-	address:0x137f0a940	mainlabel3:
+	address:0x12de0d330	mainlabel3:
          	     0:              LabelOP 	               mainlabel3 	      null
          	     0:               GotoOP 	          goto mainlabel4 	      null
-	address:0x137f0af00	mainlabel4:
+	address:0x12de0d8b0	mainlabel4:
          	     0:              LabelOP 	               mainlabel4 	      null
          	     0:            PhiFuncOp 	               %phi_var18 	size: 2 	bblock: mainlabel3 value: %phi_var17, 	bblock: mainlabel8 value: %phi_var19, 
          	     0:            PhiFuncOp 	               %phi_var14 	size: 2 	bblock: mainlabel3 value: 0, 	bblock: mainlabel8 value: temp42, 
@@ -748,10 +599,10 @@ delete alloca,store,load instruction over
          	     0:            PhiFuncOp 	                %phi_var4 	size: 2 	bblock: mainlabel3 value: %phi_var3, 	bblock: mainlabel8 value: %phi_var5, 
          	     0:           LessThanOP 	                   temp13 	%phi_var14,         10
          	     0:  GotoWithConditionOP 	true:mainlabel6  false:mainlabel5 	    temp13
-	address:0x137f0b3d0	mainlabel6:
+	address:0x12de0dd30	mainlabel6:
          	     0:              LabelOP 	               mainlabel6 	      null
          	     0:               GotoOP 	          goto mainlabel7 	      null
-	address:0x137f0bb90	mainlabel7:
+	address:0x12de0e4b0	mainlabel7:
          	     0:              LabelOP 	               mainlabel7 	      null
          	     0:            PhiFuncOp 	               %phi_var19 	size: 2 	bblock: mainlabel29 value: %phi_var16, 	bblock: mainlabel6 value: %phi_var18, 
          	     0:            PhiFuncOp 	               %phi_var12 	size: 2 	bblock: mainlabel29 value: temp40, 	bblock: mainlabel6 value: 0, 
@@ -759,97 +610,97 @@ delete alloca,store,load instruction over
          	     0:            PhiFuncOp 	                %phi_var5 	size: 2 	bblock: mainlabel29 value: %phi_var1, 	bblock: mainlabel6 value: %phi_var4, 
          	     0:           LessThanOP 	                   temp15 	%phi_var12,          5
          	     0:  GotoWithConditionOP 	true:mainlabel9  false:mainlabel8 	    temp15
-	address:0x137f0c060	mainlabel9:
+	address:0x12de0e930	mainlabel9:
          	     0:              LabelOP 	               mainlabel9 	      null
          	     0:               GotoOP 	         goto mainlabel10 	      null
-	address:0x137f0c620	mainlabel10:
+	address:0x12de0eeb0	mainlabel10:
          	     0:              LabelOP 	              mainlabel10 	      null
          	     0:            PhiFuncOp 	               %phi_var16 	size: 2 	bblock: mainlabel26 value: temp38, 	bblock: mainlabel9 value: %phi_var19, 
          	     0:            PhiFuncOp 	                %phi_var6 	size: 2 	bblock: mainlabel26 value: temp36, 	bblock: mainlabel9 value: 0, 
          	     0:            PhiFuncOp 	                %phi_var1 	size: 2 	bblock: mainlabel26 value: %phi_var2, 	bblock: mainlabel9 value: %phi_var5, 
          	     0:           LessThanOP 	                   temp17 	 %phi_var6,          3
          	     0:  GotoWithConditionOP 	true:mainlabel12  false:mainlabel11 	    temp17
-	address:0x137f0caf0	mainlabel12:
+	address:0x12de0f330	mainlabel12:
          	     0:              LabelOP 	              mainlabel12 	      null
          	     0:                AddOP 	                   temp19 	 %phi_var6,          1
          	     0:         GreatEqualOP 	                   temp20 	    temp19,          3
          	     0:  GotoWithConditionOP 	true:mainlabel14  false:mainlabel13 	    temp20
-	address:0x137f0d270	mainlabel14:
+	address:0x12de0fa50	mainlabel14:
          	     0:              LabelOP 	              mainlabel14 	      null
          	     0:  GotoWithConditionOP 	true:mainlabel16  false:mainlabel15 	 %phi_var6
-	address:0x137f0d600	mainlabel16:
+	address:0x12de0fda0	mainlabel16:
          	     0:              LabelOP 	              mainlabel16 	      null
          	     0:                NotOP 	                   temp24 	 %phi_var6
          	     0:            LogicOrOP 	                   temp25 	 %phi_var6,     temp24
          	     0:  GotoWithConditionOP 	true:mainlabel18  false:mainlabel17 	    temp25
-	address:0x137f0da90	mainlabel18:
+	address:0x12de101c0	mainlabel18:
          	     0:              LabelOP 	              mainlabel18 	      null
          	     0:                SubOP 	                   temp27 	 %phi_var6,         -1
          	     0:         GreatEqualOP 	                   temp28 	    temp27,          3
          	     0:  GotoWithConditionOP 	true:mainlabel20  false:mainlabel19 	    temp28
-	address:0x137f0e140	mainlabel20:
+	address:0x12de10770	mainlabel20:
          	     0:              LabelOP 	              mainlabel20 	      null
-         	     0:               GotoOP 	   (break)br :mainlabel11 	      null
-	address:0x137f0ca40	mainlabel11:
+         	     0:               GotoOP 	       (break)mainlabel11 	      null
+	address:0x12de0f290	mainlabel11:
          	     0:              LabelOP 	              mainlabel11 	      null
          	     0:               GotoOP 	         goto mainlabel28 	      null
-	address:0x137f10400	mainlabel28:
+	address:0x12de12820	mainlabel28:
          	     0:              LabelOP 	              mainlabel28 	      null
          	     0:  GotoWithConditionOP 	true:mainlabel30  false:mainlabel29 	         1
-	address:0x137f106c0	mainlabel30:
+	address:0x12de12ab0	mainlabel30:
          	     0:              LabelOP 	              mainlabel30 	      null
          	     0:               GotoOP 	         goto mainlabel31 	      null
-	address:0x137f10970	mainlabel31:
+	address:0x12de12d40	mainlabel31:
          	     0:              LabelOP 	              mainlabel31 	      null
          	     0:  GotoWithConditionOP 	true:mainlabel33  false:mainlabel32 	         1
-	address:0x137f10c30	mainlabel33:
+	address:0x12de12fd0	mainlabel33:
          	     0:              LabelOP 	              mainlabel33 	      null
-         	     0:               GotoOP 	   (break)br :mainlabel32 	      null
-	address:0x137f10b80	mainlabel32:
+         	     0:               GotoOP 	       (break)mainlabel32 	      null
+	address:0x12de12f30	mainlabel32:
          	     0:              LabelOP 	              mainlabel32 	      null
-         	     0:               GotoOP 	   (break)br :mainlabel29 	      null
-	address:0x137f10610	mainlabel29:
+         	     0:               GotoOP 	       (break)mainlabel29 	      null
+	address:0x12de12a10	mainlabel29:
          	     0:              LabelOP 	              mainlabel29 	      null
          	     0:                AddOP 	                   temp40 	%phi_var12,          1
          	     0:               GotoOP 	          goto mainlabel7 	      null
-	address:0x137f0e090	mainlabel19:
+	address:0x12de106d0	mainlabel19:
          	     0:              LabelOP 	              mainlabel19 	      null
          	     0:               GotoOP 	         goto mainlabel17 	      null
-	address:0x137f0d9e0	mainlabel17:
+	address:0x12de10120	mainlabel17:
          	     0:              LabelOP 	              mainlabel17 	      null
          	     0:               GotoOP 	         goto mainlabel15 	      null
-	address:0x137f0d550	mainlabel15:
+	address:0x12de0fd00	mainlabel15:
          	     0:              LabelOP 	              mainlabel15 	      null
          	     0:               GotoOP 	         goto mainlabel13 	      null
-	address:0x137f0d1c0	mainlabel13:
+	address:0x12de0f9b0	mainlabel13:
          	     0:              LabelOP 	              mainlabel13 	      null
          	     0:               GotoOP 	         goto mainlabel25 	      null
-	address:0x137f0ebf0	mainlabel25:
+	address:0x12de11180	mainlabel25:
          	     0:              LabelOP 	              mainlabel25 	      null
          	     0:            PhiFuncOp 	                %phi_var2 	size: 2 	bblock: mainlabel13 value: 0, 	bblock: mainlabel27 value: temp32, 
          	     0:           LessThanOP 	                   temp30 	 %phi_var2,          2
          	     0:  GotoWithConditionOP 	true:mainlabel27  false:mainlabel26 	    temp30
-	address:0x137f0f0c0	mainlabel27:
+	address:0x12de11600	mainlabel27:
          	     0:              LabelOP 	              mainlabel27 	      null
          	     0:                AddOP 	                   temp32 	 %phi_var2,          1
          	     0:               GotoOP 	(continue)br :mainlabel25 	      null
-	address:0x137f0f010	mainlabel26:
+	address:0x12de11560	mainlabel26:
          	     0:              LabelOP 	              mainlabel26 	      null
          	     0:                AddOP 	                   temp36 	 %phi_var6,          1
          	     0:                AddOP 	                   temp38 	%phi_var16,        233
          	     0:               GotoOP 	         goto mainlabel10 	      null
-	address:0x137f0bfb0	mainlabel8:
+	address:0x12de0e890	mainlabel8:
          	     0:              LabelOP 	               mainlabel8 	      null
          	     0:                AddOP 	                   temp42 	%phi_var14,          1
          	     0:               GotoOP 	 (continue)br :mainlabel4 	      null
-	address:0x137f0b320	mainlabel5:
+	address:0x12de0dc90	mainlabel5:
          	     0:              LabelOP 	               mainlabel5 	      null
          	     0:                AddOP 	                   temp46 	%phi_var15,          1
          	     0:               GotoOP 	          goto mainlabel1 	      null
-	address:0x137f0a890	mainlabel2:
+	address:0x12de0d290	mainlabel2:
          	     0:              LabelOP 	               mainlabel2 	      null
          	     0:             ReturnOP 	                   return 	%phi_var17
-	address:0x137f119e0	mainendlabel:
+	address:0x12de13e90	mainendlabel:
          	     0:              LabelOP 	             mainendlabel 	      null
          	     0:            FuncEndOP 	          func_label_end1 	      null
 
@@ -862,92 +713,92 @@ replace phi node over
 
 
 	labelID	number:               opcode 	                     name 	       use
-	address:0x137f09cb0	mainentry:
+	address:0x12de0c740	mainentry:
          	     0:              LabelOP 	                mainentry 	      null
-         	     0:             AssignOP 	               %phi_var15 	         0
-         	     0:             AssignOP 	                %phi_var7 	 undefined
-         	     0:             AssignOP 	               %phi_var10 	 %phi_var7
-         	     0:             AssignOP 	               %phi_var13 	%phi_var10
+         	     0:             AssignOP 	               %phi_var13 	 undefined
          	     0:             AssignOP 	                %phi_var3 	%phi_var13
+         	     0:             AssignOP 	                %phi_var7 	 %phi_var3
+         	     0:             AssignOP 	               %phi_var10 	 %phi_var7
+         	     0:             AssignOP 	               %phi_var15 	         0
          	     0:             AssignOP 	               %phi_var17 	%phi_var15
          	     0:               GotoOP 	          goto mainlabel1 	      null
-	address:0x137f0a470	mainlabel1:
+	address:0x12de0ceb0	mainlabel1:
          	     0:              LabelOP 	               mainlabel1 	      null
          	     0:           LessThanOP 	                   temp11 	%phi_var15,         20
          	     0:  GotoWithConditionOP 	true:mainlabel3  false:mainlabel2 	    temp11
-	address:0x137f0a940	mainlabel3:
+	address:0x12de0d330	mainlabel3:
          	     0:              LabelOP 	               mainlabel3 	      null
-         	     0:             AssignOP 	               %phi_var18 	%phi_var17
          	     0:             AssignOP 	               %phi_var11 	%phi_var10
-         	     0:             AssignOP 	               %phi_var14 	         0
          	     0:             AssignOP 	                %phi_var8 	 %phi_var7
          	     0:             AssignOP 	                %phi_var4 	 %phi_var3
+         	     0:             AssignOP 	               %phi_var18 	%phi_var17
+         	     0:             AssignOP 	               %phi_var14 	         0
          	     0:               GotoOP 	          goto mainlabel4 	      null
-	address:0x137f0af00	mainlabel4:
+	address:0x12de0d8b0	mainlabel4:
          	     0:              LabelOP 	               mainlabel4 	      null
          	     0:           LessThanOP 	                   temp13 	%phi_var14,         10
          	     0:  GotoWithConditionOP 	true:mainlabel6  false:mainlabel5 	    temp13
-	address:0x137f0b3d0	mainlabel6:
+	address:0x12de0dd30	mainlabel6:
          	     0:              LabelOP 	               mainlabel6 	      null
+         	     0:             AssignOP 	                %phi_var5 	 %phi_var4
          	     0:             AssignOP 	               %phi_var19 	%phi_var18
          	     0:             AssignOP 	                %phi_var9 	 %phi_var8
          	     0:             AssignOP 	               %phi_var12 	         0
-         	     0:             AssignOP 	                %phi_var5 	 %phi_var4
          	     0:               GotoOP 	          goto mainlabel7 	      null
-	address:0x137f0bb90	mainlabel7:
+	address:0x12de0e4b0	mainlabel7:
          	     0:              LabelOP 	               mainlabel7 	      null
          	     0:           LessThanOP 	                   temp15 	%phi_var12,          5
          	     0:  GotoWithConditionOP 	true:mainlabel9  false:mainlabel8 	    temp15
-	address:0x137f0c060	mainlabel9:
+	address:0x12de0e930	mainlabel9:
          	     0:              LabelOP 	               mainlabel9 	      null
          	     0:             AssignOP 	               %phi_var16 	%phi_var19
          	     0:             AssignOP 	                %phi_var6 	         0
          	     0:             AssignOP 	                %phi_var1 	 %phi_var5
          	     0:               GotoOP 	         goto mainlabel10 	      null
-	address:0x137f0c620	mainlabel10:
+	address:0x12de0eeb0	mainlabel10:
          	     0:              LabelOP 	              mainlabel10 	      null
          	     0:           LessThanOP 	                   temp17 	 %phi_var6,          3
          	     0:  GotoWithConditionOP 	true:mainlabel12  false:mainlabel11 	    temp17
-	address:0x137f0caf0	mainlabel12:
+	address:0x12de0f330	mainlabel12:
          	     0:              LabelOP 	              mainlabel12 	      null
          	     0:                AddOP 	                   temp19 	 %phi_var6,          1
          	     0:         GreatEqualOP 	                   temp20 	    temp19,          3
          	     0:  GotoWithConditionOP 	true:mainlabel14  false:mainlabel13 	    temp20
-	address:0x137f0d270	mainlabel14:
+	address:0x12de0fa50	mainlabel14:
          	     0:              LabelOP 	              mainlabel14 	      null
          	     0:  GotoWithConditionOP 	true:mainlabel16  false:mainlabel15 	 %phi_var6
-	address:0x137f0d600	mainlabel16:
+	address:0x12de0fda0	mainlabel16:
          	     0:              LabelOP 	              mainlabel16 	      null
          	     0:                NotOP 	                   temp24 	 %phi_var6
          	     0:            LogicOrOP 	                   temp25 	 %phi_var6,     temp24
          	     0:  GotoWithConditionOP 	true:mainlabel18  false:mainlabel17 	    temp25
-	address:0x137f0da90	mainlabel18:
+	address:0x12de101c0	mainlabel18:
          	     0:              LabelOP 	              mainlabel18 	      null
          	     0:                SubOP 	                   temp27 	 %phi_var6,         -1
          	     0:         GreatEqualOP 	                   temp28 	    temp27,          3
          	     0:  GotoWithConditionOP 	true:mainlabel20  false:mainlabel19 	    temp28
-	address:0x137f0e140	mainlabel20:
+	address:0x12de10770	mainlabel20:
          	     0:              LabelOP 	              mainlabel20 	      null
-         	     0:               GotoOP 	   (break)br :mainlabel11 	      null
-	address:0x137f0ca40	mainlabel11:
+         	     0:               GotoOP 	       (break)mainlabel11 	      null
+	address:0x12de0f290	mainlabel11:
          	     0:              LabelOP 	              mainlabel11 	      null
          	     0:               GotoOP 	         goto mainlabel28 	      null
-	address:0x137f10400	mainlabel28:
+	address:0x12de12820	mainlabel28:
          	     0:              LabelOP 	              mainlabel28 	      null
          	     0:  GotoWithConditionOP 	true:mainlabel30  false:mainlabel29 	         1
-	address:0x137f106c0	mainlabel30:
+	address:0x12de12ab0	mainlabel30:
          	     0:              LabelOP 	              mainlabel30 	      null
          	     0:               GotoOP 	         goto mainlabel31 	      null
-	address:0x137f10970	mainlabel31:
+	address:0x12de12d40	mainlabel31:
          	     0:              LabelOP 	              mainlabel31 	      null
          	     0:  GotoWithConditionOP 	true:mainlabel33  false:mainlabel32 	         1
-	address:0x137f10c30	mainlabel33:
+	address:0x12de12fd0	mainlabel33:
          	     0:              LabelOP 	              mainlabel33 	      null
-         	     0:               GotoOP 	   (break)br :mainlabel32 	      null
-	address:0x137f10b80	mainlabel32:
+         	     0:               GotoOP 	       (break)mainlabel32 	      null
+	address:0x12de12f30	mainlabel32:
          	     0:              LabelOP 	              mainlabel32 	      null
-         	     0:               GotoOP 	   (break)br :mainlabel29 	      null
-	address:0x137f10610	mainlabel29:
+         	     0:               GotoOP 	       (break)mainlabel29 	      null
+	address:0x12de12a10	mainlabel29:
          	     0:              LabelOP 	              mainlabel29 	      null
          	     0:                AddOP 	                   temp40 	%phi_var12,          1
          	     0:             AssignOP 	               %phi_var19 	%phi_var16
@@ -955,89 +806,89 @@ replace phi node over
          	     0:             AssignOP 	               %phi_var12 	    temp40
          	     0:             AssignOP 	                %phi_var5 	 %phi_var1
          	     0:               GotoOP 	          goto mainlabel7 	      null
-	address:0x137f0e090	mainlabel19:
+	address:0x12de106d0	mainlabel19:
          	     0:              LabelOP 	              mainlabel19 	      null
          	     0:               GotoOP 	         goto mainlabel17 	      null
-	address:0x137f0d9e0	mainlabel17:
+	address:0x12de10120	mainlabel17:
          	     0:              LabelOP 	              mainlabel17 	      null
          	     0:               GotoOP 	         goto mainlabel15 	      null
-	address:0x137f0d550	mainlabel15:
+	address:0x12de0fd00	mainlabel15:
          	     0:              LabelOP 	              mainlabel15 	      null
          	     0:               GotoOP 	         goto mainlabel13 	      null
-	address:0x137f0d1c0	mainlabel13:
+	address:0x12de0f9b0	mainlabel13:
          	     0:              LabelOP 	              mainlabel13 	      null
          	     0:             AssignOP 	                %phi_var2 	         0
          	     0:               GotoOP 	         goto mainlabel25 	      null
-	address:0x137f0ebf0	mainlabel25:
+	address:0x12de11180	mainlabel25:
          	     0:              LabelOP 	              mainlabel25 	      null
          	     0:           LessThanOP 	                   temp30 	 %phi_var2,          2
          	     0:  GotoWithConditionOP 	true:mainlabel27  false:mainlabel26 	    temp30
-	address:0x137f0f0c0	mainlabel27:
+	address:0x12de11600	mainlabel27:
          	     0:              LabelOP 	              mainlabel27 	      null
          	     0:                AddOP 	                   temp32 	 %phi_var2,          1
          	     0:             AssignOP 	                %phi_var2 	    temp32
          	     0:               GotoOP 	(continue)br :mainlabel25 	      null
-	address:0x137f0f010	mainlabel26:
+	address:0x12de11560	mainlabel26:
          	     0:              LabelOP 	              mainlabel26 	      null
          	     0:                AddOP 	                   temp36 	 %phi_var6,          1
          	     0:                AddOP 	                   temp38 	%phi_var16,        233
+         	     0:             AssignOP 	                %phi_var1 	 %phi_var2
          	     0:             AssignOP 	               %phi_var16 	    temp38
          	     0:             AssignOP 	                %phi_var6 	    temp36
-         	     0:             AssignOP 	                %phi_var1 	 %phi_var2
          	     0:               GotoOP 	         goto mainlabel10 	      null
-	address:0x137f0bfb0	mainlabel8:
+	address:0x12de0e890	mainlabel8:
          	     0:              LabelOP 	               mainlabel8 	      null
          	     0:                AddOP 	                   temp42 	%phi_var14,          1
-         	     0:             AssignOP 	               %phi_var14 	    temp42
-         	     0:             AssignOP 	               %phi_var11 	%phi_var12
          	     0:             AssignOP 	               %phi_var18 	%phi_var19
          	     0:             AssignOP 	                %phi_var8 	 %phi_var9
+         	     0:             AssignOP 	               %phi_var11 	%phi_var12
+         	     0:             AssignOP 	               %phi_var14 	    temp42
          	     0:             AssignOP 	                %phi_var4 	 %phi_var5
          	     0:               GotoOP 	 (continue)br :mainlabel4 	      null
-	address:0x137f0b320	mainlabel5:
+	address:0x12de0dc90	mainlabel5:
          	     0:              LabelOP 	               mainlabel5 	      null
          	     0:                AddOP 	                   temp46 	%phi_var15,          1
-         	     0:             AssignOP 	               %phi_var17 	%phi_var18
-         	     0:             AssignOP 	                %phi_var7 	 %phi_var8
          	     0:             AssignOP 	                %phi_var3 	 %phi_var4
-         	     0:             AssignOP 	               %phi_var13 	%phi_var14
-         	     0:             AssignOP 	               %phi_var10 	%phi_var11
+         	     0:             AssignOP 	               %phi_var17 	%phi_var18
          	     0:             AssignOP 	               %phi_var15 	    temp46
+         	     0:             AssignOP 	                %phi_var7 	 %phi_var8
+         	     0:             AssignOP 	               %phi_var10 	%phi_var11
+         	     0:             AssignOP 	               %phi_var13 	%phi_var14
          	     0:               GotoOP 	          goto mainlabel1 	      null
-	address:0x137f0a890	mainlabel2:
+	address:0x12de0d290	mainlabel2:
          	     0:              LabelOP 	               mainlabel2 	      null
          	     0:             ReturnOP 	                   return 	%phi_var17
-	address:0x137f119e0	mainendlabel:
+	address:0x12de13e90	mainendlabel:
          	     0:              LabelOP 	             mainendlabel 	      null
          	     0:            FuncEndOP 	          func_label_end1 	      null
 
 
-mainentry live def add %phi_var15
-mainentry live def add %phi_var7
-mainentry live def add %phi_var10
 mainentry live def add %phi_var13
 mainentry live def add %phi_var3
+mainentry live def add %phi_var7
+mainentry live def add %phi_var10
+mainentry live def add %phi_var15
 mainentry live def add %phi_var17
 mainlabel1 live use add %phi_var15
 mainlabel1 live def add temp11
-mainlabel3 live use add %phi_var17
-mainlabel3 live def add %phi_var18
 mainlabel3 live use add %phi_var10
 mainlabel3 live def add %phi_var11
-mainlabel3 live def add %phi_var14
 mainlabel3 live use add %phi_var7
 mainlabel3 live def add %phi_var8
 mainlabel3 live use add %phi_var3
 mainlabel3 live def add %phi_var4
+mainlabel3 live use add %phi_var17
+mainlabel3 live def add %phi_var18
+mainlabel3 live def add %phi_var14
 mainlabel4 live use add %phi_var14
 mainlabel4 live def add temp13
+mainlabel6 live use add %phi_var4
+mainlabel6 live def add %phi_var5
 mainlabel6 live use add %phi_var18
 mainlabel6 live def add %phi_var19
 mainlabel6 live use add %phi_var8
 mainlabel6 live def add %phi_var9
 mainlabel6 live def add %phi_var12
-mainlabel6 live use add %phi_var4
-mainlabel6 live def add %phi_var5
 mainlabel7 live use add %phi_var12
 mainlabel7 live def add temp15
 mainlabel9 live use add %phi_var19
@@ -1077,125 +928,125 @@ mainlabel26 live use add %phi_var6
 mainlabel26 live def add temp36
 mainlabel26 live use add %phi_var16
 mainlabel26 live def add temp38
-mainlabel26 live def add %phi_var16
-mainlabel26 live def add %phi_var6
 mainlabel26 live use add %phi_var2
 mainlabel26 live def add %phi_var1
+mainlabel26 live def add %phi_var16
+mainlabel26 live def add %phi_var6
 mainlabel8 live use add %phi_var14
 mainlabel8 live def add temp42
-mainlabel8 live def add %phi_var14
-mainlabel8 live use add %phi_var12
-mainlabel8 live def add %phi_var11
 mainlabel8 live use add %phi_var19
 mainlabel8 live def add %phi_var18
 mainlabel8 live use add %phi_var9
 mainlabel8 live def add %phi_var8
+mainlabel8 live use add %phi_var12
+mainlabel8 live def add %phi_var11
+mainlabel8 live def add %phi_var14
 mainlabel8 live use add %phi_var5
 mainlabel8 live def add %phi_var4
 mainlabel5 live use add %phi_var15
 mainlabel5 live def add temp46
-mainlabel5 live use add %phi_var18
-mainlabel5 live def add %phi_var17
-mainlabel5 live use add %phi_var8
-mainlabel5 live def add %phi_var7
 mainlabel5 live use add %phi_var4
 mainlabel5 live def add %phi_var3
-mainlabel5 live use add %phi_var14
-mainlabel5 live def add %phi_var13
+mainlabel5 live use add %phi_var18
+mainlabel5 live def add %phi_var17
+mainlabel5 live def add %phi_var15
+mainlabel5 live use add %phi_var8
+mainlabel5 live def add %phi_var7
 mainlabel5 live use add %phi_var11
 mainlabel5 live def add %phi_var10
-mainlabel5 live def add %phi_var15
+mainlabel5 live use add %phi_var14
+mainlabel5 live def add %phi_var13
 mainlabel2 live use add %phi_var17
 
 
 
 	labelID	number:               opcode 	                     name 	       use
-	address:0x137f09cb0	mainentry:
+	address:0x12de0c740	mainentry:
          	     0:              LabelOP 	                mainentry 	      null
-         	     1:             AssignOP 	               %phi_var15 	         0
-         	     2:             AssignOP 	                %phi_var7 	 undefined
-         	     3:             AssignOP 	               %phi_var10 	 %phi_var7
-         	     4:             AssignOP 	               %phi_var13 	%phi_var10
-         	     5:             AssignOP 	                %phi_var3 	%phi_var13
+         	     1:             AssignOP 	               %phi_var13 	 undefined
+         	     2:             AssignOP 	                %phi_var3 	%phi_var13
+         	     3:             AssignOP 	                %phi_var7 	 %phi_var3
+         	     4:             AssignOP 	               %phi_var10 	 %phi_var7
+         	     5:             AssignOP 	               %phi_var15 	         0
          	     6:             AssignOP 	               %phi_var17 	%phi_var15
          	     7:               GotoOP 	          goto mainlabel1 	      null
-	address:0x137f0a470	mainlabel1:
+	address:0x12de0ceb0	mainlabel1:
          	     8:              LabelOP 	               mainlabel1 	      null
          	     9:           LessThanOP 	                   temp11 	%phi_var15,         20
          	     10:  GotoWithConditionOP 	true:mainlabel3  false:mainlabel2 	    temp11
-	address:0x137f0a940	mainlabel3:
+	address:0x12de0d330	mainlabel3:
          	     11:              LabelOP 	               mainlabel3 	      null
-         	     12:             AssignOP 	               %phi_var18 	%phi_var17
-         	     13:             AssignOP 	               %phi_var11 	%phi_var10
-         	     14:             AssignOP 	               %phi_var14 	         0
-         	     15:             AssignOP 	                %phi_var8 	 %phi_var7
-         	     16:             AssignOP 	                %phi_var4 	 %phi_var3
+         	     12:             AssignOP 	               %phi_var11 	%phi_var10
+         	     13:             AssignOP 	                %phi_var8 	 %phi_var7
+         	     14:             AssignOP 	                %phi_var4 	 %phi_var3
+         	     15:             AssignOP 	               %phi_var18 	%phi_var17
+         	     16:             AssignOP 	               %phi_var14 	         0
          	     17:               GotoOP 	          goto mainlabel4 	      null
-	address:0x137f0af00	mainlabel4:
+	address:0x12de0d8b0	mainlabel4:
          	     18:              LabelOP 	               mainlabel4 	      null
          	     19:           LessThanOP 	                   temp13 	%phi_var14,         10
          	     20:  GotoWithConditionOP 	true:mainlabel6  false:mainlabel5 	    temp13
-	address:0x137f0b3d0	mainlabel6:
+	address:0x12de0dd30	mainlabel6:
          	     21:              LabelOP 	               mainlabel6 	      null
-         	     22:             AssignOP 	               %phi_var19 	%phi_var18
-         	     23:             AssignOP 	                %phi_var9 	 %phi_var8
-         	     24:             AssignOP 	               %phi_var12 	         0
-         	     25:             AssignOP 	                %phi_var5 	 %phi_var4
+         	     22:             AssignOP 	                %phi_var5 	 %phi_var4
+         	     23:             AssignOP 	               %phi_var19 	%phi_var18
+         	     24:             AssignOP 	                %phi_var9 	 %phi_var8
+         	     25:             AssignOP 	               %phi_var12 	         0
          	     26:               GotoOP 	          goto mainlabel7 	      null
-	address:0x137f0bb90	mainlabel7:
+	address:0x12de0e4b0	mainlabel7:
          	     27:              LabelOP 	               mainlabel7 	      null
          	     28:           LessThanOP 	                   temp15 	%phi_var12,          5
          	     29:  GotoWithConditionOP 	true:mainlabel9  false:mainlabel8 	    temp15
-	address:0x137f0c060	mainlabel9:
+	address:0x12de0e930	mainlabel9:
          	     30:              LabelOP 	               mainlabel9 	      null
          	     31:             AssignOP 	               %phi_var16 	%phi_var19
          	     32:             AssignOP 	                %phi_var6 	         0
          	     33:             AssignOP 	                %phi_var1 	 %phi_var5
          	     34:               GotoOP 	         goto mainlabel10 	      null
-	address:0x137f0c620	mainlabel10:
+	address:0x12de0eeb0	mainlabel10:
          	     35:              LabelOP 	              mainlabel10 	      null
          	     36:           LessThanOP 	                   temp17 	 %phi_var6,          3
          	     37:  GotoWithConditionOP 	true:mainlabel12  false:mainlabel11 	    temp17
-	address:0x137f0caf0	mainlabel12:
+	address:0x12de0f330	mainlabel12:
          	     38:              LabelOP 	              mainlabel12 	      null
          	     39:                AddOP 	                   temp19 	 %phi_var6,          1
          	     40:         GreatEqualOP 	                   temp20 	    temp19,          3
          	     41:  GotoWithConditionOP 	true:mainlabel14  false:mainlabel13 	    temp20
-	address:0x137f0d270	mainlabel14:
+	address:0x12de0fa50	mainlabel14:
          	     42:              LabelOP 	              mainlabel14 	      null
          	     43:  GotoWithConditionOP 	true:mainlabel16  false:mainlabel15 	 %phi_var6
-	address:0x137f0d600	mainlabel16:
+	address:0x12de0fda0	mainlabel16:
          	     44:              LabelOP 	              mainlabel16 	      null
          	     45:                NotOP 	                   temp24 	 %phi_var6
          	     46:            LogicOrOP 	                   temp25 	 %phi_var6,     temp24
          	     47:  GotoWithConditionOP 	true:mainlabel18  false:mainlabel17 	    temp25
-	address:0x137f0da90	mainlabel18:
+	address:0x12de101c0	mainlabel18:
          	     48:              LabelOP 	              mainlabel18 	      null
          	     49:                SubOP 	                   temp27 	 %phi_var6,         -1
          	     50:         GreatEqualOP 	                   temp28 	    temp27,          3
          	     51:  GotoWithConditionOP 	true:mainlabel20  false:mainlabel19 	    temp28
-	address:0x137f0e140	mainlabel20:
+	address:0x12de10770	mainlabel20:
          	     52:              LabelOP 	              mainlabel20 	      null
-         	     53:               GotoOP 	   (break)br :mainlabel11 	      null
-	address:0x137f0ca40	mainlabel11:
+         	     53:               GotoOP 	       (break)mainlabel11 	      null
+	address:0x12de0f290	mainlabel11:
          	     54:              LabelOP 	              mainlabel11 	      null
          	     55:               GotoOP 	         goto mainlabel28 	      null
-	address:0x137f10400	mainlabel28:
+	address:0x12de12820	mainlabel28:
          	     56:              LabelOP 	              mainlabel28 	      null
          	     57:  GotoWithConditionOP 	true:mainlabel30  false:mainlabel29 	         1
-	address:0x137f106c0	mainlabel30:
+	address:0x12de12ab0	mainlabel30:
          	     58:              LabelOP 	              mainlabel30 	      null
          	     59:               GotoOP 	         goto mainlabel31 	      null
-	address:0x137f10970	mainlabel31:
+	address:0x12de12d40	mainlabel31:
          	     60:              LabelOP 	              mainlabel31 	      null
          	     61:  GotoWithConditionOP 	true:mainlabel33  false:mainlabel32 	         1
-	address:0x137f10c30	mainlabel33:
+	address:0x12de12fd0	mainlabel33:
          	     62:              LabelOP 	              mainlabel33 	      null
-         	     63:               GotoOP 	   (break)br :mainlabel32 	      null
-	address:0x137f10b80	mainlabel32:
+         	     63:               GotoOP 	       (break)mainlabel32 	      null
+	address:0x12de12f30	mainlabel32:
          	     64:              LabelOP 	              mainlabel32 	      null
-         	     65:               GotoOP 	   (break)br :mainlabel29 	      null
-	address:0x137f10610	mainlabel29:
+         	     65:               GotoOP 	       (break)mainlabel29 	      null
+	address:0x12de12a10	mainlabel29:
          	     66:              LabelOP 	              mainlabel29 	      null
          	     67:                AddOP 	                   temp40 	%phi_var12,          1
          	     68:             AssignOP 	               %phi_var19 	%phi_var16
@@ -1203,80 +1054,80 @@ mainlabel2 live use add %phi_var17
          	     70:             AssignOP 	               %phi_var12 	    temp40
          	     71:             AssignOP 	                %phi_var5 	 %phi_var1
          	     72:               GotoOP 	          goto mainlabel7 	      null
-	address:0x137f0e090	mainlabel19:
+	address:0x12de106d0	mainlabel19:
          	     73:              LabelOP 	              mainlabel19 	      null
          	     74:               GotoOP 	         goto mainlabel17 	      null
-	address:0x137f0d9e0	mainlabel17:
+	address:0x12de10120	mainlabel17:
          	     75:              LabelOP 	              mainlabel17 	      null
          	     76:               GotoOP 	         goto mainlabel15 	      null
-	address:0x137f0d550	mainlabel15:
+	address:0x12de0fd00	mainlabel15:
          	     77:              LabelOP 	              mainlabel15 	      null
          	     78:               GotoOP 	         goto mainlabel13 	      null
-	address:0x137f0d1c0	mainlabel13:
+	address:0x12de0f9b0	mainlabel13:
          	     79:              LabelOP 	              mainlabel13 	      null
          	     80:             AssignOP 	                %phi_var2 	         0
          	     81:               GotoOP 	         goto mainlabel25 	      null
-	address:0x137f0ebf0	mainlabel25:
+	address:0x12de11180	mainlabel25:
          	     82:              LabelOP 	              mainlabel25 	      null
          	     83:           LessThanOP 	                   temp30 	 %phi_var2,          2
          	     84:  GotoWithConditionOP 	true:mainlabel27  false:mainlabel26 	    temp30
-	address:0x137f0f0c0	mainlabel27:
+	address:0x12de11600	mainlabel27:
          	     85:              LabelOP 	              mainlabel27 	      null
          	     86:                AddOP 	                   temp32 	 %phi_var2,          1
          	     87:             AssignOP 	                %phi_var2 	    temp32
          	     88:               GotoOP 	(continue)br :mainlabel25 	      null
-	address:0x137f0f010	mainlabel26:
+	address:0x12de11560	mainlabel26:
          	     89:              LabelOP 	              mainlabel26 	      null
          	     90:                AddOP 	                   temp36 	 %phi_var6,          1
          	     91:                AddOP 	                   temp38 	%phi_var16,        233
-         	     92:             AssignOP 	               %phi_var16 	    temp38
-         	     93:             AssignOP 	                %phi_var6 	    temp36
-         	     94:             AssignOP 	                %phi_var1 	 %phi_var2
+         	     92:             AssignOP 	                %phi_var1 	 %phi_var2
+         	     93:             AssignOP 	               %phi_var16 	    temp38
+         	     94:             AssignOP 	                %phi_var6 	    temp36
          	     95:               GotoOP 	         goto mainlabel10 	      null
-	address:0x137f0bfb0	mainlabel8:
+	address:0x12de0e890	mainlabel8:
          	     96:              LabelOP 	               mainlabel8 	      null
          	     97:                AddOP 	                   temp42 	%phi_var14,          1
-         	     98:             AssignOP 	               %phi_var14 	    temp42
-         	     99:             AssignOP 	               %phi_var11 	%phi_var12
-         	     100:             AssignOP 	               %phi_var18 	%phi_var19
-         	     101:             AssignOP 	                %phi_var8 	 %phi_var9
+         	     98:             AssignOP 	               %phi_var18 	%phi_var19
+         	     99:             AssignOP 	                %phi_var8 	 %phi_var9
+         	     100:             AssignOP 	               %phi_var11 	%phi_var12
+         	     101:             AssignOP 	               %phi_var14 	    temp42
          	     102:             AssignOP 	                %phi_var4 	 %phi_var5
          	     103:               GotoOP 	 (continue)br :mainlabel4 	      null
-	address:0x137f0b320	mainlabel5:
+	address:0x12de0dc90	mainlabel5:
          	     104:              LabelOP 	               mainlabel5 	      null
          	     105:                AddOP 	                   temp46 	%phi_var15,          1
-         	     106:             AssignOP 	               %phi_var17 	%phi_var18
-         	     107:             AssignOP 	                %phi_var7 	 %phi_var8
-         	     108:             AssignOP 	                %phi_var3 	 %phi_var4
-         	     109:             AssignOP 	               %phi_var13 	%phi_var14
+         	     106:             AssignOP 	                %phi_var3 	 %phi_var4
+         	     107:             AssignOP 	               %phi_var17 	%phi_var18
+         	     108:             AssignOP 	               %phi_var15 	    temp46
+         	     109:             AssignOP 	                %phi_var7 	 %phi_var8
          	     110:             AssignOP 	               %phi_var10 	%phi_var11
-         	     111:             AssignOP 	               %phi_var15 	    temp46
+         	     111:             AssignOP 	               %phi_var13 	%phi_var14
          	     112:               GotoOP 	          goto mainlabel1 	      null
-	address:0x137f0a890	mainlabel2:
+	address:0x12de0d290	mainlabel2:
          	     113:              LabelOP 	               mainlabel2 	      null
          	     114:             ReturnOP 	                   return 	%phi_var17
-	address:0x137f119e0	mainendlabel:
+	address:0x12de13e90	mainendlabel:
          	     115:              LabelOP 	             mainendlabel 	      null
          	     116:            FuncEndOP 	          func_label_end1 	      null
 
 
-	val:%phi_var15 	begin:1 	end:112 
-	val:%phi_var7 	begin:2 	end:112 
-	val:%phi_var10 	begin:3 	end:112 
-	val:%phi_var13 	begin:4 	end:5 
-	val:%phi_var3 	begin:5 	end:112 
+	val:%phi_var13 	begin:1 	end:2 
+	val:%phi_var3 	begin:2 	end:112 
+	val:%phi_var7 	begin:3 	end:112 
+	val:%phi_var10 	begin:4 	end:112 
+	val:%phi_var15 	begin:5 	end:112 
 	val:%phi_var17 	begin:6 	end:114 
 	val:temp11 	begin:9 	end:10 
-	val:%phi_var18 	begin:12 	end:106 
-	val:%phi_var11 	begin:13 	end:110 
-	val:%phi_var14 	begin:14 	end:109 
-	val:%phi_var8 	begin:15 	end:107 
-	val:%phi_var4 	begin:16 	end:108 
+	val:%phi_var11 	begin:12 	end:110 
+	val:%phi_var8 	begin:13 	end:109 
+	val:%phi_var4 	begin:14 	end:106 
+	val:%phi_var18 	begin:15 	end:107 
+	val:%phi_var14 	begin:16 	end:111 
 	val:temp13 	begin:19 	end:20 
-	val:%phi_var19 	begin:22 	end:100 
-	val:%phi_var9 	begin:23 	end:101 
-	val:%phi_var12 	begin:24 	end:99 
-	val:%phi_var5 	begin:25 	end:102 
+	val:%phi_var5 	begin:22 	end:102 
+	val:%phi_var19 	begin:23 	end:98 
+	val:%phi_var9 	begin:24 	end:99 
+	val:%phi_var12 	begin:25 	end:100 
 	val:temp15 	begin:28 	end:29 
 	val:%phi_var16 	begin:31 	end:95 
 	val:%phi_var6 	begin:32 	end:95 
@@ -1289,24 +1140,30 @@ mainlabel2 live use add %phi_var17
 	val:temp27 	begin:49 	end:50 
 	val:temp28 	begin:50 	end:51 
 	val:temp40 	begin:67 	end:70 
-	val:%phi_var2 	begin:80 	end:94 
+	val:%phi_var2 	begin:80 	end:92 
 	val:temp30 	begin:83 	end:84 
 	val:temp32 	begin:86 	end:87 
-	val:temp36 	begin:90 	end:93 
-	val:temp38 	begin:91 	end:92 
-	val:temp42 	begin:97 	end:98 
-	val:temp46 	begin:105 	end:111 
+	val:temp36 	begin:90 	end:94 
+	val:temp38 	begin:91 	end:93 
+	val:temp42 	begin:97 	end:101 
+	val:temp46 	begin:105 	end:108 
 
 	var:%phi_var10	address:M
  	var:%phi_var11	address:M
- 	var:%phi_var13	address:R3
+ 	var:%phi_var12	address:R1
+ 	var:%phi_var13	address:R1
  	var:%phi_var14	address:M
  	var:%phi_var15	address:M
  	var:%phi_var17	address:M
- 	var:%phi_var18	address:R3
+ 	var:%phi_var18	address:M
+ 	var:%phi_var19	address:R3
  	var:%phi_var3	address:M
- 	var:%phi_var4	address:R1
+ 	var:%phi_var4	address:M
+ 	var:%phi_var5	address:M
  	var:%phi_var7	address:M
- 	var:%phi_var8	address:R2
+ 	var:%phi_var8	address:M
+ 	var:%phi_var9	address:R2
  	var:temp11	address:R3
+ 	var:temp13	address:R1
+ 	var:temp46	address:R2
  All over!

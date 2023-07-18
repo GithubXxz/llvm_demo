@@ -3,47 +3,7 @@
 #include "stdio.h"
 #include "type.h"
 
-// TODO 应该从上级获得两个操作数的信息来更新User中value的type?
-Instruction *ins_new(int op_num, Value *self) {
-  // 计算use的大小
-  // 二元运算就是两个use所需要的内存空间拼接到Instruction中构成Instruction的use链表
-  int user_size = user_get_size(op_num);
-  int use_size = user_size - sizeof(User);
-  // use 是额外的，所以要单独计算大小
-  // 为了 instruction 分配内存块 并且返回内存块的首地址
-  uint8_t *storage = (uint8_t *)malloc(sizeof(Instruction) + use_size);
-  // 不考虑SSA形式下的instruction
-  ((User *)(storage + use_size))->res = self;
-  // 将instruction里面的内容分布在内存块中
-  user_construct(storage, op_num);
-  // 计算偏移量然后返回User的首地址 低地址存储的位Use
-  return (Instruction *)(storage + use_size);
-}
-
-Instruction *ins_new_no_operator(Value *self, TAC_OP Op) {
-  Instruction *inst = ins_new(0, self);
-  inst->opcode = Op;
-  return inst;
-}
-
-Instruction *ins_new_single_operator(Value *self, TAC_OP Op, Value *S1) {
-  Instruction *inst = ins_new(1, self);
-  inst->opcode = Op;
-  Use *puse = user_get_operand_use((User *)inst, 0);
-  value_add_use(S1, puse);
-  return inst;
-}
-
-Instruction *ins_new_binary_operator(Value *self, TAC_OP Op, Value *S1,
-                                     Value *S2) {
-  Instruction *inst = ins_new(2, self);
-  inst->opcode = Op;
-  Use *puse = user_get_operand_use((User *)inst, 0);
-  value_add_use(S1, puse);
-  puse = user_get_operand_use((User *)inst, 1);
-  value_add_use(S2, puse);
-  return inst;
-}
+// // TODO 应该从上级获得两个操作数的信息来更新User中value的type?
 
 TypeID imm_res_type(Value *left, Value *right) {
   if (left->VTy->TID == ImmediateIntTyID &&
@@ -87,12 +47,7 @@ SSA版本
 */
 
 Instruction *ins_new_v2(int op_num) {
-  // 计算use的大小
-  // 二元运算就是两个use所需要的内存空间拼接到Instruction中构成Instruction的use链表
-  int user_size = user_get_size(op_num);
-  int use_size = user_size - sizeof(User);
-  // use 是额外的，所以要单独计算大小
-  // 为了 instruction 分配内存块 并且返回内存块的首地址
+  int use_size = sizeof(Use) * op_num;
   uint8_t *storage = (uint8_t *)malloc(sizeof(Instruction) + use_size);
   if (storage == NULL) {
     printf("no no no no no!!!!!!\n");
@@ -151,37 +106,6 @@ TypeID ins_res_type_v2(Value *left, Value *right) {
     type_id = FloatTyID;
   }
   return type_id;
-}
-
-void free_common_ins_v2(Instruction *self) {
-  if (self->opcode == AddOP || self->opcode == SubOP || self->opcode == MulOP ||
-      self->opcode == DivOP || self->opcode == EqualOP ||
-      self->opcode == ModOP || self->opcode == GreatThanOP ||
-      self->opcode == LessThanOP || self->opcode == ParamOP ||
-      self->opcode == NotEqualOP || self->opcode == GreatEqualOP ||
-      self->opcode == LessEqualOP) {
-    // 释放连接这条instruction的use链
-    for (int i = 0; i < self->user.num_oprands; i++) {
-      use_remove_from_list(user_get_operand_use((User *)self, i));
-      free(user_get_operand_use((User *)self, i));
-    }
-    free(self);
-  } else if (self->opcode == GotoOP || self->opcode == GotoWithConditionOP ||
-             self->opcode == CallOP || self->opcode == ReturnOP) {
-    // 释放连接这条instruction的use链
-    for (int i = 0; i < self->user.num_oprands; i++) {
-      use_remove_from_list(user_get_operand_use((User *)self, i));
-      free(user_get_operand_use((User *)self, i));
-    }
-    value_free(((User *)self)->res);
-    free(self);
-  }
-}
-
-// clean the instruction
-void CommonCleanInstruction_v2(void *element) {
-  free_common_ins((Instruction *)element);
-  element = NULL;
 }
 
 void use_relation_test() {

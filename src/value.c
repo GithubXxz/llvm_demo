@@ -7,9 +7,9 @@
 
 /// This method should only be used by the Use class.
 // void addUse(Use &U) { U.addToList(&UseList); }
-void value_add_use(Value *this, Use *U) {
-  use_add_to_list(U, &(this->use_list));
-  U->Val = this;
+void value_add_use(Value *S1, Use *cur_use) {
+  use_add_to_list(cur_use, &(S1->use_list));
+  cur_use->Val = S1;
 }
 
 void value_init(Value *this) {

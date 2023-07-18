@@ -19,6 +19,7 @@ typedef struct _Function {
   List* all_var_live_interval;
   // 函数对应的cfg图
   struct _ALGraph* self_cfg;
+  HashMap* var_localtion;
 } Function;
 
 void function_init(Function* this);

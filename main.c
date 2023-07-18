@@ -12,7 +12,7 @@
 #include "symbol_table.h"
 
 extern List *ins_list;
-extern List *func_list;
+extern List *global_func_list;
 extern List *global_var_list;
 
 SymbolTable *cur_symboltable = NULL;
@@ -28,6 +28,7 @@ int parser(char *input);
 char *tty_path;
 
 char *read_code_from_file(const char *);
+void register_replace(Function *func_list);
 
 char *test_cases[] = {"./test_cases/00_main.c",
                       "./test_cases/01_var_defn2.c",
@@ -214,12 +215,14 @@ int main(int argc, char **argv) {
 
   print_ins_pass(global_var_list);
 
-  ListFirst(func_list, false);
+  ListFirst(global_func_list, false);
   void *element;
-  while (ListNext(func_list, &element)) {
+  while (ListNext(global_func_list, &element)) {
     puts(((Function *)element)->label->name);
     bblock_to_dom_graph_pass((Function *)element);
+    register_replace((Function *)element);
   }
+
 #endif
 
   free(tty_path);

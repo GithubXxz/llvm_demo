@@ -1,6 +1,7 @@
 #include "Ast.h"
 #include "c_container_auxiliary.h"
 #include "container/hash_map.h"
+#include "container/stack.h"
 #include "type.h"
 #include "value.h"
 
@@ -914,23 +915,23 @@ Value *post_eval(ast *a, Value *left, Value *right) {
             cur_ins->pdata->array_pdata.total_member / (intptr_t)element;
         ListPushBack(ins_list, cur_ins);
 
-        char para_buffer[100];
-        memset(para_buffer, 0, sizeof(para_buffer));
-        ListFirst(left->pdata->array_pdata.list_para, false);
-        while (ListNext(left->pdata->array_pdata.list_para, &element)) {
-          char text[10];
-          sprintf(text, "[%lu x ", (uintptr_t)element);
-          strcat(para_buffer, text);
-        }
-        strcat(para_buffer, "i32");
-        for (int ii = 0; ii < ListSize(left->pdata->array_pdata.list_para);
-             ii++) {
-          strcat(para_buffer, "]");
-        }
-        printf("%s = getelementptr inbounds %s, %s"
-               " * %s, i32 0, i32 %s, !dbg !24\n",
-               cur_ins->name, para_buffer, para_buffer, left->name,
-               right->name);
+        // char para_buffer[100];
+        // memset(para_buffer, 0, sizeof(para_buffer));
+        // ListFirst(left->pdata->array_pdata.list_para, false);
+        // while (ListNext(left->pdata->array_pdata.list_para, &element)) {
+        //   char text[10];
+        //   sprintf(text, "[%lu x ", (uintptr_t)element);
+        //   strcat(para_buffer, text);
+        // }
+        // strcat(para_buffer, "i32");
+        // for (int ii = 0; ii < ListSize(left->pdata->array_pdata.list_para);
+        //      ii++) {
+        //   strcat(para_buffer, "]");
+        // }
+        // printf("%s = getelementptr inbounds %s, %s"
+        //        " * %s, i32 0, i32 %s, !dbg !24\n",
+        //        cur_ins->name, para_buffer, para_buffer, left->name,
+        //        right->name);
 
         if (ListSize(cur_ins->pdata->array_pdata.list_para) == 0 &&
             (pre_astnode->r ? strcmp(pre_astnode->r->name, "ASSIGNOP")
@@ -1182,6 +1183,9 @@ Value *post_eval(ast *a, Value *left, Value *right) {
 
       // 插入
       ListPushBack(ins_list, (void *)func_end_ins);
+      if (StackSize(stack_while_then_label)) {
+        printf("nimasile\n");
+      }
 
       printf("%s\n", func_label_end);
     }
@@ -1264,8 +1268,8 @@ Value *post_eval(ast *a, Value *left, Value *right) {
 
       StackTop(stack_while_then_label, (void **)&goto_break_label_ins);
 
-      char temp_str[30];
-      strcpy(temp_str, "(break)br :");
+      char temp_str[40];
+      strcpy(temp_str, "(break)");
       strcat(temp_str, goto_break_label_ins->name);
 
       Value *break_ins = (Value *)ins_new_no_operator_v2(GotoOP);
@@ -1282,6 +1286,7 @@ Value *post_eval(ast *a, Value *left, Value *right) {
       Value *goto_head_label_ins = NULL;
       if (StackSize(stack_while_head_label) == 0) {
         // 没有地方可以去 报错？
+        printf("wocaonimade\n");
         return NULL;
       }
 

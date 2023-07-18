@@ -40,7 +40,7 @@ User *user_construct(void *place, int use_num) {
   Use *End = Start + use_num;
   User *Obj = (User *)(End);
   // 将uselist执行第一条USE边的内存
-  Obj->use_list = Start;
+  // Obj->use_list = Start;
   Obj->num_oprands = use_num;
   ((Value *)Obj)->HasHungOffUses = false;
 
@@ -62,16 +62,7 @@ int user_get_size(int use_num) {
 
 Use *user_get_operand_use(User *this, unsigned ind) {
   // 通过数组来表示地址偏移量
-  return this->use_list + ind;
-}
-
-Use *get_operand(User *this, int ind) {
-  if (this->value.HasHungOffUses) {
-    return this->use_list;
-  } else {
-    assert(this->value.NumUserOperands > ind && "operand index overflow");
-    return this->use_list + ind;
-  }
+  return (Use *)this - this->num_oprands + ind;
 }
 
 Value *user_get_value(User *this) { return (Value *)this; }

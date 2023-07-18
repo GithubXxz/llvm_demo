@@ -22,7 +22,7 @@ HashMap *func_hashMap = NULL;
 
 List *ins_list = NULL;
 
-List *func_list = NULL;
+List *global_func_list = NULL;
 
 List *global_var_list = NULL;
 
@@ -151,8 +151,8 @@ void AllInit() {
   ListSetClean(global_var_list, CleanObject);
 
   // 初始化函数链表
-  func_list = ListInit();
-  ListSetClean(func_list, CleanObject);
+  global_func_list = ListInit();
+  ListSetClean(global_func_list, CleanObject);
 
   // 初始化前置ast节点栈
   stack_ast_pre = StackInit();
