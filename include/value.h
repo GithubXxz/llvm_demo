@@ -12,6 +12,7 @@
 struct _Symtab;
 struct _Use;
 
+
 #define NumUserOperandsBits 15
 
 typedef struct _Value Value;
@@ -102,7 +103,7 @@ union _PData {
     // 步长
     int step_long;
     // 记录局部的数组的赋值和引用的信息
-    HashMap *local_array_hashmap;
+    // HashMap *local_array_hashmap;
   } array_pdata;
 };
 

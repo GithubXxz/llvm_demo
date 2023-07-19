@@ -162,6 +162,7 @@ ast *newast(char *name, int num, ...) // 抽象语法树建立
 
 void eval_print(ast *a, int level) {
   // 打印该节点
+#ifdef PRINT_OK
   if (a != NULL) {
     for (int i = 0; i < level; ++i) // 孩子结点相对父节点缩进2个空格
       printf("  ");
@@ -190,6 +191,7 @@ void eval_print(ast *a, int level) {
     eval_print(a->l, level + 1); // 遍历左子树
     eval_print(a->r, level);     // 遍历右子树
   }
+#endif
 }
 
 void pre_eval(ast *a) {
@@ -213,7 +215,9 @@ void pre_eval(ast *a) {
         free(cur_handle_func);
       cur_handle_func = strdup(a->l->idtype);
 
+#ifdef PRINT_OK
       printf("Func: %s\n", a->l->idtype);
+#endif
 
       // 将函数的<name,label>插入函数表
       HashMapPut(func_hashMap, strdup(a->l->idtype), func_label_ins);
@@ -227,8 +231,6 @@ void pre_eval(ast *a) {
       entry_label_ins->VTy->TID = LabelTyID;
 
       ListPushBack(ins_list, entry_label_ins);
-
-      // printf("entry\n");
     }
 
     if (SEQ(a->name, "LC")) {
@@ -237,10 +239,6 @@ void pre_eval(ast *a) {
     }
 
     if (SEQ(a->name, "RC")) {
-      // printf("cur_symboltable->symbol_map contains Value's name %s\n",
-      //        ((Value *)cur_symboltable->symbol_map->get(
-      //             cur_symboltable->symbol_map, "a"))
-      //            ->name);
       StackPop(stack_symbol_table);
       // 销毁当前的符号表中的哈希表然后销毁符号表
       HashMapDeinit(cur_symboltable->symbol_map);
@@ -255,7 +253,9 @@ void pre_eval(ast *a) {
       StackTop(stack_else_label, (void **)&else_label_ins);
       StackPop(stack_else_label);
       ListPushBack(ins_list, (void *)else_label_ins);
+#ifdef PRINT_OK
       printf("%s\n", else_label_ins->name);
+#endif
     }
 
     // 全局变量的符号表
@@ -281,8 +281,10 @@ void pre_eval(ast *a) {
       goto_label_ins->VTy->TID = GotoTyID;
       goto_label_ins->pdata->no_condition_goto.goto_location =
           while_head_label_ins;
+#ifdef PRINT_OK
       printf("br %s\n", while_head_label_ins->name);
       printf("%s\n", while_head_label_ins->name);
+#endif
       // 插入跳转语句
       ListPushBack(ins_list, goto_label_ins);
       // 插入while循环头的label
@@ -313,7 +315,9 @@ void pre_eval(ast *a) {
 
       ListPushBack(ins_list, (void *)goto_else_ins);
 
+#ifdef PRINT_OK
       printf("br %s \n", then_label_ins->name);
+#endif
     }
   }
 }
@@ -335,10 +339,12 @@ void in_eval(ast *a, Value *left) {
           (Value *)ins_new_binary_operator_v2(StoreOP, left, cur_var);
       store_ins->IsInitArgs = 1;
       store_ins->pdata->param_init_pdata.the_param_index = param_seed;
+#ifdef PRINT_OK
       printf("store %s %s, %s,align 4\n",
              NowVarDecStr[cur_var->VTy->TID < 4 ? cur_var->VTy->TID
                                                 : cur_var->VTy->TID - 4],
              cur_var->name, left->name);
+#endif
       ListPushBack(ins_list, store_ins);
       return;
     } else {
@@ -363,7 +369,7 @@ void in_eval(ast *a, Value *left) {
         left->pdata->array_pdata.list_para = array_list;
         left->pdata->array_pdata.total_member = total_array_member;
         left->pdata->array_pdata.array_type = (int)nowVarDecType;
-        hashmap_init(&left->pdata->array_pdata.local_array_hashmap);
+        // hashmap_init(&left->pdata->array_pdata.local_array_hashmap);
         total_array_member = 1;
         array_list = NULL;
       }
@@ -413,13 +419,13 @@ void in_eval(ast *a, Value *left) {
         true_label_ins;
 
     ListPushBack(ins_list, (void *)goto_condition_ins);
-
-    printf("br %s, true: %s  false : %s \n", left->name, true_label_ins->name,
-           else_label_ins->name);
-
     ListPushBack(ins_list, true_label_ins);
 
+#ifdef PRINT_OK
+    printf("br %s, true: %s  false : %s \n", left->name, true_label_ins->name,
+           else_label_ins->name);
     printf("%s\n", temp_str);
+#endif
   }
 
   // args_insert
@@ -435,7 +441,9 @@ void in_eval(ast *a, Value *left) {
     // 插入
     // ListPushBack(ins_list, (void *)func_param_ins);
 
+#ifdef PRINT_OK
     printf("%s %s insert\n", func_param_ins->name, left->name);
+#endif
   }
 
   if (a->r && SEQ(a->r->name, "assistWHILE")) {
@@ -469,13 +477,13 @@ void in_eval(ast *a, Value *left) {
         while_true_label_ins;
 
     ListPushBack(ins_list, (void *)goto_condition_ins);
-
-    printf("while br %s, true: %s  false : %s \n", left->name,
-           while_true_label_ins->name, while_false_label_ins->name);
-
     ListPushBack(ins_list, while_true_label_ins);
 
+#ifdef PRINT_OK
+    printf("while br %s, true: %s  false : %s \n", left->name,
+           while_true_label_ins->name, while_false_label_ins->name);
     printf("%s\n", while_true_label_ins->name);
+#endif
   }
 }
 
@@ -589,8 +597,10 @@ Value *post_eval(ast *a, Value *left, Value *right) {
           array_list = ListInit();
           ListSetClean(array_list, CleanObject);
 
+#ifdef PRINT_OK
           printf("%s = alloca %s array,align 4\n", array_name,
                  NowVarDecStr[nowVarDecType]);
+#endif
 
           ListPushBack(ins_list, cur_ins);
 
@@ -606,7 +616,9 @@ Value *post_eval(ast *a, Value *left, Value *right) {
 
           // 添加变量类型
           if (StackSize(stack_symbol_table) == 1) {
+#ifdef PRINT_OK
             puts("global var");
+#endif
             temp_var = name_generate(GLOBAL);
             cur_ins->IsGlobalVar = 1;
           } else {
@@ -631,13 +643,14 @@ Value *post_eval(ast *a, Value *left, Value *right) {
           // 设定allocate语句的指针所指向的value*
           cur_ins->pdata->allocate_pdata.point_value = cur_var;
 
+#ifdef PRINT_OK
           printf("%s = alloca %s,align 4\n", temp_var,
                  NowVarDecStr[nowVarDecType]);
+#endif
 
           ListPushBack(ins_list, cur_ins);
 
           char *var_name = strdup(a->idtype);
-          printf("var_name");
           // 将变量加入符号表
           HashMapPut(cur_symboltable->symbol_map, var_name, cur_ins);
           // 返回指针
@@ -692,10 +705,12 @@ Value *post_eval(ast *a, Value *left, Value *right) {
 
           ListPushBack(ins_list, (void *)load_ins);
 
+#ifdef PRINT_OK
           printf("%s = load %s, %s,align 4\n", load_ins->name,
                  NowVarDecStr[load_ins->VTy->TID < 4 ? load_ins->VTy->TID
                                                      : load_ins->VTy->TID - 4],
                  load_var_pointer->name);
+#endif
 
           return load_ins;
         }
@@ -795,10 +810,12 @@ Value *post_eval(ast *a, Value *left, Value *right) {
 
           ListPushBack(ins_list, (void *)call_fun_ins);
 
+#ifdef PRINT_OK
           printf(
               "new instruction call func %s and goto %s without return value "
               "\n",
               a->idtype, func_label->name);
+#endif
 
           return NULL;
         } else {
@@ -811,9 +828,11 @@ Value *post_eval(ast *a, Value *left, Value *right) {
 
           ListPushBack(ins_list, (void *)call_fun_ins);
 
+#ifdef PRINT_OK
           printf(
               "new instruction call func %s and goto %s with return value \n",
               a->idtype, func_label->name);
+#endif
 
           return call_fun_ins;
         }
@@ -841,10 +860,12 @@ Value *post_eval(ast *a, Value *left, Value *right) {
               Value *store_ins =
                   (Value *)ins_new_binary_operator_v2(StoreOP, left, right);
               ListPushBack(ins_list, (void *)store_ins);
+#ifdef PRINT_OK
               printf("store %s %s, %s,align 4\n",
                      NowVarDecStr[right->VTy->TID < 4 ? right->VTy->TID
                                                       : right->VTy->TID - 4],
                      right->name, var_name);
+#endif
             }
             return NULL;
           }
@@ -854,8 +875,6 @@ Value *post_eval(ast *a, Value *left, Value *right) {
         if (a->r && SEQ(a->r->name, "LB")) {
           if (right != NULL) {
             total_array_member *= right->pdata->var_pdata.iVal;
-            // printf("total array member multiple %d\n",
-            //        right->pdata->var_pdata.iVal);
             ListPushBack(array_list,
                          (void *)(intptr_t)(right->pdata->var_pdata.iVal));
           } else {
@@ -881,10 +900,12 @@ Value *post_eval(ast *a, Value *left, Value *right) {
         Instruction *store_ins =
             ins_new_binary_operator_v2(StoreOP, left, right);
         ListPushBack(ins_list, (void *)store_ins);
+#ifdef PRINT_OK
         printf("store %s %s, %s,align 4\n",
                NowVarDecStr[right->VTy->TID < 4 ? right->VTy->TID
                                                 : right->VTy->TID - 4],
                right->name, left->name);
+#endif
         // TODO 返回值是什么有待考虑
         return right;
       } else if (SEQ(a->r->name, "LB")) {
@@ -955,10 +976,12 @@ Value *post_eval(ast *a, Value *left, Value *right) {
 
           ListPushBack(ins_list, (void *)load_ins);
 
+#ifdef PRINT_OK
           printf("%s = load %s, %s,align 4\n", temp_str,
                  NowVarDecStr[load_ins->VTy->TID < 4 ? load_ins->VTy->TID
                                                      : load_ins->VTy->TID - 4],
                  cur_ins->name);
+#endif
 
           return load_ins;
         }
@@ -1057,56 +1080,30 @@ Value *post_eval(ast *a, Value *left, Value *right) {
 
         if (SEQ(a->r->name, "PLUS")) {
           ((Instruction *)cur_ins)->opcode = AddOP;
-          printf("%s = add nsw %s %s, %s\n", cur_ins->name, oprand_type,
-                 left->name, right->name);
         } else if (SEQ(a->r->name, "MINUS")) {
           ((Instruction *)cur_ins)->opcode = SubOP;
-          printf("%s = sub nsw %s %s, %s\n", cur_ins->name, oprand_type,
-                 left->name, right->name);
         } else if (SEQ(a->r->name, "STAR")) {
           ((Instruction *)cur_ins)->opcode = MulOP;
-          printf("%s = mul nsw %s %s, %s\n", cur_ins->name, oprand_type,
-                 left->name, right->name);
         } else if (SEQ(a->r->name, "DIV")) {
           ((Instruction *)cur_ins)->opcode = DivOP;
-          printf("%s = div nsw %s %s, %s\n", cur_ins->name, oprand_type,
-                 left->name, right->name);
         } else if (SEQ(a->r->name, "EQUAL")) {
           ((Instruction *)cur_ins)->opcode = EqualOP;
-          printf("%s = icmp eq %s %s, %s\n", cur_ins->name, oprand_type,
-                 left->name, right->name);
         } else if (SEQ(a->r->name, "NOTEQUAL")) {
           ((Instruction *)cur_ins)->opcode = NotEqualOP;
-          printf("%s = icmp neq %s %s, %s\n", cur_ins->name, oprand_type,
-                 left->name, right->name);
         } else if (SEQ(a->r->name, "GREAT")) {
           ((Instruction *)cur_ins)->opcode = GreatThanOP;
-          printf("%s = icmp > %s %s, %s\n", cur_ins->name, oprand_type,
-                 left->name, right->name);
         } else if (SEQ(a->r->name, "LESS")) {
           ((Instruction *)cur_ins)->opcode = LessThanOP;
-          printf("%s = icmp < %s %s, %s\n", cur_ins->name, oprand_type,
-                 left->name, right->name);
         } else if (SEQ(a->r->name, "GREATEQUAL")) {
           ((Instruction *)cur_ins)->opcode = GreatEqualOP;
-          printf("%s = icmp >= %s %s, %s\n", cur_ins->name, oprand_type,
-                 left->name, right->name);
         } else if (SEQ(a->r->name, "LESSEQUAL")) {
           ((Instruction *)cur_ins)->opcode = LessEqualOP;
-          printf("%s = icmp <= %s %s, %s\n", cur_ins->name, oprand_type,
-                 left->name, right->name);
         } else if (SEQ(a->r->name, "MOD")) {
           ((Instruction *)cur_ins)->opcode = ModOP;
-          printf("%s = icmp %% %s %s, %s\n", cur_ins->name, oprand_type,
-                 left->name, right->name);
         } else if (SEQ(a->r->name, "AND")) {
           ((Instruction *)cur_ins)->opcode = LogicAndOP;
-          printf("%s = icmp && %s %s, %s\n", cur_ins->name, oprand_type,
-                 left->name, right->name);
         } else if (SEQ(a->r->name, "OR")) {
           ((Instruction *)cur_ins)->opcode = LogicOrOP;
-          printf("%s = icmp || %s %s, %s\n", cur_ins->name, oprand_type,
-                 left->name, right->name);
         }
 
         ListPushBack(ins_list, (void *)cur_ins);
@@ -1142,7 +1139,9 @@ Value *post_eval(ast *a, Value *left, Value *right) {
         ((Value *)ins_back)->pdata->no_condition_goto.goto_location =
             else_label_ins;
         ListPushBack(ins_list, (void *)else_label_ins);
+#ifdef PRINT_OK
         printf("%s\n", else_label_ins->name);
+#endif
 
         Instruction *then_label_ins = NULL;
         StackTop(stack_then_label, (void **)&then_label_ins);
@@ -1159,7 +1158,9 @@ Value *post_eval(ast *a, Value *left, Value *right) {
         StackTop(stack_then_label, (void **)&then_label_ins);
         StackPop(stack_then_label);
         ListPushBack(ins_list, (void *)then_label_ins);
+#ifdef PRINT_OK
         printf("%s\n", then_label_ins->name);
+#endif
         return NULL;
       }
     }
@@ -1186,10 +1187,12 @@ Value *post_eval(ast *a, Value *left, Value *right) {
       // 插入
       ListPushBack(ins_list, (void *)func_end_ins);
       if (StackSize(stack_while_then_label)) {
-        printf("nimasile\n");
+        assert(0);
       }
 
+#ifdef PRINT_OK
       printf("%s\n", func_label_end);
+#endif
     }
 
     if (SEQ(a->name, "RETURN")) {
@@ -1214,7 +1217,9 @@ Value *post_eval(ast *a, Value *left, Value *right) {
       // 插入
       ListPushBack(ins_list, (void *)func_return_ins);
 
+#ifdef PRINT_OK
       printf("%s\n", func_return_ins->name);
+#endif
     }
 
     if (SEQ(a->name, "ELSE")) {
@@ -1257,7 +1262,9 @@ Value *post_eval(ast *a, Value *left, Value *right) {
       StackPop(stack_while_then_label);
       ListPushBack(ins_list, (void *)while_then_label_ins);
 
+#ifdef PRINT_OK
       printf("%s\n", while_then_label_ins->name);
+#endif
       return NULL;
     }
 
@@ -1281,14 +1288,16 @@ Value *post_eval(ast *a, Value *left, Value *right) {
       break_ins->pdata->no_condition_goto.goto_location = goto_break_label_ins;
 
       ListPushBack(ins_list, (void *)break_ins);
+#ifdef PRINT_OK
       printf("break :br %s \n", goto_break_label_ins->name);
+#endif
     }
 
     if (SEQ(a->name, "CONTINUE")) {
       Value *goto_head_label_ins = NULL;
       if (StackSize(stack_while_head_label) == 0) {
         // 没有地方可以去 报错？
-        printf("wocaonimade\n");
+        assert(0);
         return NULL;
       }
 
@@ -1305,7 +1314,9 @@ Value *post_eval(ast *a, Value *left, Value *right) {
       break_ins->pdata->no_condition_goto.goto_location = goto_head_label_ins;
 
       ListPushBack(ins_list, (void *)break_ins);
+#ifdef PRINT_OK
       printf("continue :br %s \n", goto_head_label_ins->name);
+#endif
     }
   }
 

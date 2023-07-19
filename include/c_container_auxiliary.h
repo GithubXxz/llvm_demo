@@ -3,6 +3,8 @@
 
 #include "cds.h"
 
+// #define PRINT_OK
+
 #define SEQ(x, y) ((x) && (y) && (!strcmp(x, y)))
 
 void CleanObject(void *element);
@@ -38,6 +40,5 @@ void hashset_init_string(HashSet **self);
 void hashmap_init(HashMap **self);
 
 void list_copy(List *dest, List *src);
-
 
 #endif

@@ -1,6 +1,7 @@
 #include "optimization.h"
 #include "container/hash_map.h"
 #include "container/list.h"
+#include <string.h>
 
 typedef struct _live_interval {
   unsigned begin;
@@ -36,25 +37,31 @@ void calculate_live_use_def_by_graph(ALGraph *self) {
                    ImmediateIntTyID &&
                user_get_operand_use((User *)element, j)->Val->VTy->TID !=
                    ImmediateFloatTyID)) {
+#ifdef PRINT_OK
             printf("%s live use add %s\n",
                    (self->node_set)[i]->bblock_head->label->name,
                    user_get_operand_use((User *)element, j)->Val->name);
+#endif
             HashSetAdd(
                 (self->node_set)[i]->bblock_head->live_use,
                 strdup(user_get_operand_use((User *)element, j)->Val->name));
           }
         }
         if (((Instruction *)element)->opcode < RETURN_USED) {
+#ifdef PRINT_OK
           printf("%s live def add %s\n",
                  (self->node_set)[i]->bblock_head->label->name,
                  ((Value *)element)->name);
+#endif
           HashSetAdd((self->node_set)[i]->bblock_head->live_def,
                      strdup(((Value *)element)->name));
         }
       }
     }
   }
+#ifdef PRINT_OK
   printf("\n\n\n");
+#endif
 }
 
 void calculate_live_in_out(ALGraph *self) {
@@ -167,7 +174,9 @@ void calculate_live_interval(ALGraph *self_cfg, Function *self_func) {
       element->ins_id = ins_id_seed++;
   }
 
+#ifdef PRINT_OK
   printf_cur_func_ins(self_func);
+#endif
 
   for (int i = self_cfg->node_num - 1; i >= 0; i--) {
     HashSetFirst((self_cfg->node_set)[i]->bblock_head->live_out);
@@ -335,11 +344,13 @@ void line_scan_register_allocation(Function *handle_func) {
   HashMap *var_location = handle_func->var_localtion;
   var_live_interval *element;
   ListFirst(handle_func->all_var_live_interval, false);
+#ifdef PRINT_OK
   while (ListNext(handle_func->all_var_live_interval, (void **)&element)) {
     printf("\tval:%s \tbegin:%d \tend:%d \n", element->self,
            element->this_var_total_live_interval->begin,
            element->this_var_total_live_interval->end);
   }
+#endif
 
   List *active = ListInit();
   ListSetClean(active, CleanObject);
@@ -349,18 +360,28 @@ void line_scan_register_allocation(Function *handle_func) {
     register_situation[i] = false;
   }
 
+  if (ListSize(handle_func->all_var_live_interval) == 0) {
+    return;
+  }
+
   var_live_interval *cur_handle = NULL;
   ListFirst(handle_func->all_var_live_interval, false);
 
-  ListNext(handle_func->all_var_live_interval, (void **)&cur_handle);
-  if (cur_handle == NULL)
-    return;
-  register_situation[R1] = true;
-  HashMapPut(var_location, strdup(cur_handle->self), (void *)(intptr_t)R1);
-  // printf("hashmap put %s\n", cur_handle->self);
-  ListPushBack(active, cur_handle);
+  // ListNext(handle_func->all_var_live_interval, (void **)&cur_handle);
+  // if (cur_handle == NULL)
+  //   return;
+  // register_situation[R1] = true;
+  // HashMapPut(var_location, strdup(cur_handle->self), (void *)(intptr_t)R1);
+  // // printf("hashmap put %s\n", cur_handle->self);
+  // ListPushBack(active, cur_handle);
 
   while (ListNext(handle_func->all_var_live_interval, (void **)&cur_handle)) {
+    if (strstr(cur_handle->self, "global") ||
+        strstr(cur_handle->self, "point")) {
+      HashMapPut(var_location, strdup(cur_handle->self),
+                 (void *)(intptr_t)MEMORY);
+      continue;
+    }
     // Expire OLD Intervals
     var_live_interval *iter_active = NULL;
     while (ListSize(active) != 0) {
@@ -391,8 +412,9 @@ void line_scan_register_allocation(Function *handle_func) {
         HashMapPut(var_location, strdup(cur_handle->self),
                    (void *)(intptr_t)cur_add_var_location);
         ListPopBack(active);
-        ListPushBack(active, cur_handle);
-        for (int i = 0; i < ListSize(active); i++) {
+        int list_size = ListSize(active);
+        int i = 0;
+        for (; i < list_size; i++) {
           var_live_interval *iter_active_live_interval = NULL;
           ListGetAt(active, i, (void **)&iter_active_live_interval);
           if (cur_handle->this_var_total_live_interval->end <
@@ -401,6 +423,8 @@ void line_scan_register_allocation(Function *handle_func) {
             break;
           }
         }
+        if (i == list_size)
+          ListPushBack(active, cur_handle);
       } else {
         LOCATION cur_add_var_location = MEMORY;
         HashMapPut(var_location, strdup(cur_handle->self),
@@ -412,9 +436,9 @@ void line_scan_register_allocation(Function *handle_func) {
           LOCATION cur_add_var_location = i;
           HashMapPut(var_location, strdup(cur_handle->self),
                      (void *)(intptr_t)cur_add_var_location);
-          // printf("hashmap put %s\n", cur_handle->self);
           int j = 0;
-          for (; j < ListSize(active); j++) {
+          int list_size = ListSize(active);
+          for (; j < list_size; j++) {
             var_live_interval *iter_active_live_interval = NULL;
             ListGetAt(active, j, (void **)&iter_active_live_interval);
             if (cur_handle->this_var_total_live_interval->end <
@@ -423,17 +447,13 @@ void line_scan_register_allocation(Function *handle_func) {
               break;
             }
           }
-          if (j == ListSize(active))
+          if (j == list_size)
             ListPushBack(active, cur_handle);
 
           register_situation[i] = true;
           break;
         }
       }
-      // if (found)
-      //   printf("found 1111111111111111111\n");
-      // else
-      //   printf("Not found\n");
     }
   }
 
@@ -445,7 +465,7 @@ void line_scan_register_allocation(Function *handle_func) {
     printf("need to allocate register size is %d\n",
            ListSize(handle_func->all_var_live_interval));
     printf("indeed allocate register size is %d\n", HashMapSize(var_location));
-    printf("hello world");
+    assert(0);
   };
 }
 

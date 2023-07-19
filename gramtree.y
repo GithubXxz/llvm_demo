@@ -42,9 +42,9 @@ OptTag  Tag VarDec  FunDec VarList ParamDec Compst StmtList Stmt DefList Def Dec
 Program:|ExtDefList {
     $$=newast("Program",1,$1);
     
+    #ifdef PRINT_OK
     eval_print($$,0);    
-
-    // printf("\nprint over\n");
+    #endif
 
     eval($$);
 }        
@@ -199,9 +199,19 @@ Dec:VarDec {$$=newast("Dec",1,$1);}
 	|VarDec ASSIGNOP LC InitList RC{$$=newast("Dec",3,$1,$2,$4);}
 	;
 
+/*
 InitList:InitList COMMA InitList {$$=newast("InitList",3,$1,$2,$3);}
     | LC InitList COMMA InitList RC  {$$=newast("InitList",2,$2,$4);}
     | Exp  {$$=newast("InitList",1,$1);}
+*/
+
+InitList:InitList COMMA InitList {$$=newast("InitList",3,$1,$2,$3);}
+    | LC InitList COMMA InitList RC  {$$=newast("InitList",3,$1,$2,$4);}
+    | LC InitList RC {$$=newast("InitList",2,$1,$2);}
+    | LC RC   {$$=newast("InitList",1,$1);}
+    | Exp   {$$=newast("InitList",1,$1);}
+    | {$$=newast("InitList",0,-1);}
+    ;
 
 /*Expressions*/
 Exp:Exp ASSIGNOP Exp{$$=newast("Exp",3,$1,$2,$3);} // Exp = Exp

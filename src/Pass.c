@@ -73,6 +73,8 @@ extern HashMap *bblock_to_dom_graph_hashmap;
 
 extern List *global_var_list;
 
+extern HashMap *global_array_init_hashmap;
+
 extern char *tty_path;
 
 extern bool is_functional_test;
@@ -226,34 +228,6 @@ void dom_relation_pass_help(HeadNode *self) {
 void dom_relation_pass() {
   int node_num = graph_for_dom_tree->node_num;
 
-#ifdef DEBUG
-  //// 打印图中的每个节点的后继的名字和地址信息
-  // for (int i = 0; i < node_num; i++) {
-  //   printf("%s: ",
-  //   graph_for_dom_tree->node_set[i]->bblock_head->label->name); void
-  //   *element; HashSetFirst(graph_for_dom_tree->node_set[i]->edge_list); while
-  //   ((element = HashSetNext(
-  //               graph_for_dom_tree->node_set[i]->edge_list)) != NULL) {
-  //     printf("%s|%8x,", ((HeadNode *)element)->bblock_head->label->name,
-  //            element);
-  //   }
-  //   printf("\n");
-  // }
-
-  printf("\n");
-
-  //// 打印当前函数含有的bblock的数量
-  // printf("cur graph has %d node\n", node_num);
-  printf("打印基本块之间的支配关系\n");
-  // 打印入口节点的支配节点信息和地址
-  printf("node entry dom ");
-  for (int j = 0; j < node_num; j++) {
-    printf("%s|%p,", graph_for_dom_tree->node_set[j]->bblock_head->label->name,
-           graph_for_dom_tree->node_set[j]);
-  }
-  printf("\n");
-#endif
-
   for (int i = 1; i < node_num; i++) {
     // 删除该节点的入边和出边 计算出根节点的不可达节点便是该节点的支配节点
     int delete_marked[node_num];
@@ -299,8 +273,10 @@ void dom_relation_pass() {
             graph_for_dom_tree->node_set[i]->dom_set,
             strdup(graph_for_dom_tree->node_set[j]->bblock_head->label->name),
             graph_for_dom_tree->node_set[j]->bblock_head);
+#ifdef PRINT_OK
         printf("%s,",
                graph_for_dom_tree->node_set[j]->bblock_head->label->name);
+#endif
       } else {
         graph_for_dom_tree->node_set[j]->is_visited = false;
       }
@@ -308,20 +284,10 @@ void dom_relation_pass() {
     printf("\n");
   }
 
-  // for (int i = 0; i < node_num; i++) {
-  //   HashSetFirst(graph_for_dom_tree->node_set[i]->dom_set);
-  //   void *element;
-  //   printf("%s dom node is ",
-  //          graph_for_dom_tree->node_set[i]->bblock_head->label->name);
-  //   while ((element = HashSetNext(graph_for_dom_tree->node_set[i]->dom_set))
-  //   !=
-  //          NULL) {
-  //     printf("%s,", ((HeadNode *)element)->bblock_head->label->name);
-  //   }
-  //   printf("\n");
-  // }
-
+#ifdef PRINT_OK
   printf("\n打印每个节点的立即支配节点\n");
+#endif
+
   // 计算每个节点的idom
   for (int i = 1; i < node_num; i++) {
     int cur_idom_nodeset_num = INT_MAX;
@@ -344,13 +310,18 @@ void dom_relation_pass() {
 
     graph_for_dom_tree->node_set[i]->idom_node =
         graph_for_dom_tree->node_set[cur_subscript];
+#ifdef PRINT_OK
     printf(
         "idom(%s) = %s\n",
         graph_for_dom_tree->node_set[i]->bblock_head->label->name,
         graph_for_dom_tree->node_set[i]->idom_node->bblock_head->label->name);
+#endif
   }
 
+#ifdef PRINT_OK
   printf("\n打印支配树中的层级关系\n");
+#endif
+
   Stack *dom_tree_stack = NULL;
   dom_tree_stack = StackInit();
   StackSetClean(dom_tree_stack, CleanObject);
@@ -360,15 +331,20 @@ void dom_relation_pass() {
     void *element;
     StackTop(dom_tree_stack, &element);
     StackPop(dom_tree_stack);
-    // 打印树中每一层的信息
+// 打印树中每一层的信息
+#ifdef PRINT_OK
     printf("%s: ",
            ((dom_tree *)element)->bblock_node->bblock_head->label->name);
+#endif
+
     for (int i = 1; i < node_num; i++) {
       if (graph_for_dom_tree->node_set[i]->idom_node ==
           ((dom_tree *)element)->bblock_node) {
         dom_tree *cur = (dom_tree *)malloc(sizeof(dom_tree));
         cur->bblock_node = graph_for_dom_tree->node_set[i];
+#ifdef PRINT_OK
         printf("%s,", cur->bblock_node->bblock_head->label->name);
+#endif
         cur->child = ListInit();
         ListSetClean(cur->child, CleanObject);
         ListPushBack(((dom_tree *)element)->child, cur);
@@ -378,19 +354,12 @@ void dom_relation_pass() {
     printf("\n");
   }
 
+#ifdef PRINT_OK
   printf("\n打印每个基本块的支配边界节点\n");
+#endif
 
   // 每个节点的前驱节点
   for (int i = 1; i < node_num; i++) {
-    // printf("cur node %s's pre node is ",
-    //        graph_for_dom_tree->node_set[i]->bblock_head->label->name);
-    // HeadNode *element;
-    // ListFirst(graph_for_dom_tree->node_set[i]->pre_node_list, false);
-    // while (ListNext(graph_for_dom_tree->node_set[i]->pre_node_list,
-    // &element)) {
-    //   printf("%s,", element->bblock_head->label->name);
-    // }
-    // printf("\n");
 
     // 寻找支配边界
     if (ListSize(graph_for_dom_tree->node_set[i]->pre_node_list) > 1) {
@@ -399,20 +368,18 @@ void dom_relation_pass() {
       while (
           ListNext(graph_for_dom_tree->node_set[i]->pre_node_list, &runner)) {
         while (runner != graph_for_dom_tree->node_set[i]->idom_node) {
-          // printf("%s,", runner->bblock_head->label->name);
           HashMapPut(
               ((HeadNode *)(runner))->dom_frontier_set,
               strdup(graph_for_dom_tree->node_set[i]->bblock_head->label->name),
               graph_for_dom_tree->node_set[i]);
           runner = ((HeadNode *)(runner))->idom_node;
         }
-        // printf("\n");
       }
-      // printf("\n");
     }
   }
 
   // 打印每个节点和对应的支配边界
+#ifdef PRINT_OK
   for (int i = 1; i < node_num; i++) {
     printf("cur node %s's dom frontier is ",
            graph_for_dom_tree->node_set[i]->bblock_head->label->name);
@@ -425,6 +392,7 @@ void dom_relation_pass() {
     }
     printf("\n");
   }
+#endif
 }
 
 void find_bblock_store_ins_pass(HeadNode *self, Value *pointer) {
@@ -434,9 +402,6 @@ void find_bblock_store_ins_pass(HeadNode *self, Value *pointer) {
   while (ListNext(self->bblock_head->inst_list, &element)) {
     if (((Instruction *)element)->opcode == StoreOP &&
         user_get_operand_use(((User *)element), 0)->Val == pointer) {
-      // printf("%s is def in %s\n",
-      //        pointer->pdata->allocate_pdata.point_value->name,
-      //        self->bblock_head->label->name);
       self->is_visited = true;
       return;
     }
@@ -476,13 +441,6 @@ void insert_phi_func_pass(Function *self) {
   hashset_init(&(non_locals));
 
   find_non_locals_var_help(entry_bblock, non_locals);
-
-  // void *temp_element = NULL;
-  // HashSetFirst(non_locals);
-
-  // while ((temp_element = HashSetNext(non_locals)) != NULL) {
-  //   printf("%s 1111\n", ((Value *)temp_element)->name);
-  // }
 
   // 清空哈希表 然后重新初始化供后面使用
   HashSetDeinit(bblock_pass_hashset);
@@ -565,8 +523,6 @@ void insert_phi_func_pass(Function *self) {
         cur_ins->name = strdup(temp_str);
         cur_ins->pdata->phi_func_pdata.phi_pointer = (Value *)bblock_ins;
         hashmap_init(&(cur_ins->pdata->phi_func_pdata.phi_value));
-
-        // printf("%s = phi,align 4\n", temp_str);
 
         ListInsert(element->value->bblock_head->inst_list, 1, cur_ins);
       }
@@ -685,11 +641,6 @@ void rename_pass_help_new(HashMap *rename_var_stack_hashmap,
                               ((Value *)neighbor_bblock_ins)
                                   ->pdata->phi_func_pdata.phi_pointer->name),
                    (void *)&cur_insert);
-          // printf("%p:phinode %s add %s from bblock %s\n",
-          // neighbor_bblock_ins,
-          //        ((Value *)neighbor_bblock_ins)->name,
-          //        ((Value *)stack_top_var)->name,
-          //        cur_bblock->bblock_node->bblock_head->label->name);
         } else {
           cur_insert = (Value *)malloc(sizeof(Value));
           value_init(cur_insert);
@@ -844,62 +795,6 @@ void delete_alloca_store_load_ins_pass(ALGraph *self) {
       i++;
     }
   }
-
-  // if (self != NULL && HashSetFind(bblock_pass_hashset, self) == false) {
-  //   // printf("begin %s: %p\n", self->label->name, self->label);
-
-  //   unsigned i = 0;
-  //   void *element;
-  //   ListFirst(self->inst_list, false);
-  //   ListSetClean(self->inst_list, CommonCleanInstruction);
-
-  //   while (i != ListSize(self->inst_list)) {
-  //     // printf("in %s: %p\n", self->label->name, self->label);
-  //     ListGetAt(self->inst_list, i, &element);
-  //     switch (((Instruction *)element)->opcode) {
-  //       // case AllocateOP:
-  //       //   if (((Value *)element)->VTy->TID != ArrayTyID) {
-  //       //     ListRemove(self->inst_list, i);
-  //       //   } else {
-  //       //     i++;
-  //       //   }
-  //       //   break;
-  //       case StoreOP:
-  //         if (user_get_operand_use(element, 0)->Val->VTy->TID != ArrayTyID) {
-  //           ListRemove(self->inst_list, i);
-  //         } else {
-  //           i++;
-  //         }
-  //         break;
-  //       case LoadOP:
-  //         if (user_get_operand_use(element, 0)->Val->VTy->TID != ArrayTyID) {
-  //           ListRemove(self->inst_list, i);
-  //         } else {
-  //           i++;
-  //         }
-  //         break;
-  //       case PhiFuncOp:
-  //         // memset(user_get_operand_use((User *)self, 1), 0, sizeof(Use));
-  //         // ((Instruction *)element)->user.num_oprands--;
-  //         i++;
-  //         break;
-  //       default:
-  //         i++;
-  //         break;
-  //     }
-  //   }
-
-  //   // if (entry->false_bblock != false_situation ||
-  //   //     entry->true_bblock != true_situation) {
-  //   //   printf("!11\n");
-  //   // }
-
-  //   HashSetAdd(bblock_pass_hashset, self);
-
-  //   delete_alloca_store_load_ins_pass(self->true_bblock);
-
-  //   delete_alloca_store_load_ins_pass(self->false_bblock);
-  // }
 }
 
 void printf_cur_func_ins(Function *self) {
@@ -954,9 +849,6 @@ void insert_copies_help(HashMap *insert_copies_stack_hashmap,
             cur_bblock->bblock_node->bblock_head->label->name));
         cur_copy_pair->dest = (Value *)neighbor_bblock_ins;
 
-        // printf("<%s,%s> is added\n", cur_copy_pair->src->name,
-        //        cur_copy_pair->dest->name);
-
         HashSetAdd(copy_set, cur_copy_pair);
         HashMapPut(var_replace_hashmap, strdup(cur_copy_pair->src->name),
                    cur_copy_pair->src);
@@ -992,22 +884,12 @@ void insert_copies_help(HashMap *insert_copies_stack_hashmap,
       phi_assign_ins->name = strdup(cur_pick_pair->dest->name);
       phi_assign_ins->VTy->TID = cur_pick_pair->dest->VTy->TID;
 
-      // phi_assign_ins->pdata->phi_replace_pdata.phi_replace_value =
-      //     cur_pick_pair->dest;
 
       // Insert a copy operation from map[src] to dest at the end of cur_bblock
       ListInsert(cur_bblock->bblock_node->bblock_head->inst_list,
                  ListSize(cur_bblock->bblock_node->bblock_head->inst_list) - 1,
                  phi_assign_ins);
 
-      // if (!strcmp(cur_bblock->bblock_node->bblock_head->label->name,
-      //             "label3")) {
-      //   Value *element = NULL;
-      //   ListGetAt(cur_bblock->bblock_node->bblock_head->inst_list,
-      // ListSize(cur_bblock->bblock_node->bblock_head->inst_list) -
-      //             2, (void *)&element);
-      //   printf("cur bblock tail name is %s\n", element->name);
-      // }
 
       // map[src] <- dest
       HashMapPut(var_replace_hashmap, strdup(cur_pick_pair->src->name),
@@ -1043,8 +925,6 @@ void insert_copies_help(HashMap *insert_copies_stack_hashmap,
                  ListSize(cur_bblock->bblock_node->bblock_head->inst_list) - 1,
                  assign_dest_to_temp);
 
-      // printf("insert %s =%s\n", ((Value *)assign_dest_to_temp)->name,
-      //        cur_pick_pair->dest->name);
 
       HashMapPut(var_replace_hashmap, strdup(cur_pick_pair->dest->name),
                  (Value *)assign_dest_to_temp);
@@ -1097,10 +977,8 @@ void remove_bblock_phi_func_pass(ALGraph *self_cfg) {
   }
 }
 
-// ins_list
 void print_ins_pass(List *self) {
   int i = 0;
-  // printf("\nbegin print the instruction: \n");
   Instruction *element;
   ListFirst(self, false);
   while (ListNext(self, (void *)&element)) {
@@ -1195,7 +1073,7 @@ void delete_return_deadcode_pass(List *self) {
                ((element)->opcode != FuncLabelOP &&
                 (element)->opcode != LabelOP &&
                 (element)->opcode != FuncEndOP)) {
-          printf("remove %s\n", ((Value *)element)->name);
+          // printf("remove %s\n", ((Value *)element)->name);
           ListRemove(self, i);
           is_over = true;
         }
@@ -1453,7 +1331,7 @@ void bblock_to_dom_graph_pass(Function *self) {
   HashMapDeinit(bblock_to_dom_graph_hashmap);
   hashmap_init(&bblock_to_dom_graph_hashmap);
 
-  // 打印邻接边
+#ifdef PRINT_OK
   for (int i = 0; i < num_of_block; i++) {
     node_pair *element;
     printf("%s edge is ",
@@ -1465,14 +1343,17 @@ void bblock_to_dom_graph_pass(Function *self) {
     }
     printf("\n");
   }
+#endif
 
   delete_non_used_var_pass(self);
 
   if (!is_functional_test) {
+#ifdef PRINT_OK
     printf("performance is begin!!!!!!!\n");
     printf("performance is begin!!!!!!!\n");
     printf("performance is begin!!!!!!!\n");
     printf("performance is begin!!!!!!!\n");
+#endif
     // 初始化dom_tree树根
     dom_tree_root = (dom_tree *)malloc(sizeof(dom_tree));
     dom_tree_root->bblock_node = init_headnode;
@@ -1487,18 +1368,23 @@ void bblock_to_dom_graph_pass(Function *self) {
 
     printf("\n");
 
+#ifdef PRINT_OK
     printf_cur_func_ins(self);
-
     printf("begin rename pass and delete alloca,store,load instruction!\n");
+#endif
 
     rename_pass(self);
 
+#ifdef PRINT_OK
     printf("rename pass over\n");
+#endif
 
     // 删除alloca store load语句
     delete_alloca_store_load_ins_pass(graph_for_dom_tree);
 
+#ifdef PRINT_OK
     printf("delete alloca,store,load instruction over\n");
+#endif
 
     // 清空哈希表 然后重新初始化供后面使用
     HashSetDeinit(bblock_pass_hashset);
@@ -1510,7 +1396,9 @@ void bblock_to_dom_graph_pass(Function *self) {
     //   exit(-1);
     // }
 
+#ifdef PRINT_OK
     printf_cur_func_ins(self);
+#endif
 
     // fflush(stdout);
     // freopen(tty_path, "w", stdout);
@@ -1518,15 +1406,19 @@ void bblock_to_dom_graph_pass(Function *self) {
     replace_phi_nodes(dom_tree_root);
 
     remove_bblock_phi_func_pass(graph_for_dom_tree);
+#ifdef PRINT_OK
     printf("performance is over!!!!!!!\n");
     printf("performance is over!!!!!!!\n");
     printf("performance is over!!!!!!!\n");
     printf("performance is over!!!!!!!\n");
+#endif
   }
 
   printf("\n\n\n");
 
+#ifdef PRINT_OK
   printf_cur_func_ins(self);
+#endif
 
   calculate_live_use_def_by_graph(graph_for_dom_tree);
 

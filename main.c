@@ -172,15 +172,22 @@ char *hidden_cases[] = {
     "./hidden_cases/38_light2d.c",
     "./hidden_cases/39_fp_params.c",
 };
+
 // --------------------------------------------------
 int main(int argc, char **argv) {
   // freopen("/dev/null", "w", stdout);
+
+#ifdef PRINT_OK
   printf("hello world\n");
+#endif
+
   tty_path = ttyname(STDOUT_FILENO);
 
   AllInit();
 
+#ifdef PRINT_OK
   printf("%%begin the pass\n");
+#endif
   char *choose_case = NULL;
   if (argc == 5) {
     is_functional_test = true;
@@ -190,38 +197,51 @@ int main(int argc, char **argv) {
     choose_case = read_code_from_file(argv[4]);
   } else {
     is_functional_test = true;
-    choose_case = read_code_from_file(test_cases[92]);
+    choose_case = read_code_from_file(test_cases[82]);
     // choose_case = read_code_from_file(hidden_cases[4]);
     // choose_case = read_code_from_file("./my_cases/delete_non_used_pass.c");
   }
   if (choose_case == NULL)
     return 1;
 
+#ifdef PRINT_OK
   freopen("./output/printf_ast.txt", "w", stdout);
+#endif
 
 #define PARSER
   parser(choose_case);
 
+#ifdef PRINT_OK
   freopen(tty_path, "w", stdout);
   freopen("./output/out.txt", "w", stdout);
   setvbuf(stdout, NULL, _IOLBF, BUFSIZ);
+#endif
 
+#ifdef PRINT_OK
   print_ins_pass(ins_list);
   printf("\n\n\n\n");
+#endif
+
+#ifdef PARSER
 
   delete_return_deadcode_pass(ins_list);
 
+#ifdef PRINT_OK
   print_ins_pass(ins_list);
+#endif
 
-#ifdef PARSER
   ins_toBBlock_pass(ins_list);
 
+#ifdef PRINT_OK
   print_ins_pass(global_var_list);
+#endif
 
   ListFirst(global_func_list, false);
   void *element;
   while (ListNext(global_func_list, &element)) {
+#ifdef PRINT_OK
     puts(((Function *)element)->label->name);
+#endif
     bblock_to_dom_graph_pass((Function *)element);
     register_replace((Function *)element);
   }

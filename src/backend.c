@@ -10,10 +10,12 @@ void register_replace(Function *handle_func) {
   HashMap *var_location = handle_func->var_localtion;
   ALGraph *self_cfg = handle_func->self_cfg;
 
+#ifdef PRINT_OK
   Pair *ptr_pair;
   HashMapFirst(var_location);
   while ((ptr_pair = HashMapNext(var_location)) != NULL) {
     printf("\tvar:%s\taddress:%s\n ", (char *)ptr_pair->key,
            location_string[(LOCATION)(intptr_t)ptr_pair->value]);
   }
+#endif
 }
