@@ -3,6 +3,7 @@
 #include "c_container_auxiliary.h"
 #include "container/hash_map.h"
 #include "optimization.h"
+#include "type.h"
 
 #include <stdarg.h> //变长参数函数所需的头文件
 #include <stdbool.h>
@@ -25,19 +26,42 @@ typedef struct _node_pair {
   HeadNode *value;
 } node_pair;
 
-char *op_string[] = {
-    "DefaultOP",   "AddOP",       "SubOP",           "ModOP",
-    "MulOP",       "DivOP",       "EqualOP",         "NotEqualOP",
-    "GreatThanOP", "LessThanOP",  "GreatEqualOP",    "LessEqualOP",
-    "AssignOP",    "PhiAssignOp", "GetelementptrOP", "CallWithReturnValueOP",
-    "LoadOP",      "NegativeOP",  "PositiveOP",      "NotOP",
-    "LogicOrOP",   "LogicAndOP",
+char *op_string[] = {"DefaultOP",
+                     "AddOP",
+                     "SubOP",
+                     "ModOP",
+                     "MulOP",
+                     "DivOP",
+                     "EqualOP",
+                     "NotEqualOP",
+                     "GreatThanOP",
+                     "LessThanOP",
+                     "GreatEqualOP",
+                     "LessEqualOP",
+                     "AssignOP",
+                     "PhiAssignOp",
+                     "GetelementptrOP",
+                     "CallWithReturnValueOP",
+                     "LoadOP",
+                     "NegativeOP",
+                     "PositiveOP",
+                     "NotOP",
+                     "LogicOrOP",
+                     "LogicAndOP",
+                     "PhiFuncOp",
+                     "AllocateOP",
 
-    "ReturnOP",    "AllocateOP",  "StoreOP",         "GotoWithConditionOP",
-    "ParamOP",
+                     "ReturnOP",
+                     "StoreOP",
+                     "GotoWithConditionOP",
+                     "ParamOP",
 
-    "GotoOP",      "CallOP",      "LabelOP",         "FuncLabelOP",
-    "FuncEndOP",   "PhiFuncOp",   "InitArgO"};
+                     "GotoOP",
+                     "CallOP",
+                     "LabelOP",
+                     "FuncLabelOP",
+                     "FuncEndOP",
+                     "InitArgOP"};
 
 extern List *global_func_list;
 
@@ -50,6 +74,8 @@ extern HashMap *bblock_to_dom_graph_hashmap;
 extern List *global_var_list;
 
 extern char *tty_path;
+
+extern bool is_functional_test;
 
 static Function *cur_func = NULL;
 
@@ -528,7 +554,10 @@ void insert_phi_func_pass(Function *self) {
         strcat(temp_str, text);
         // 创建phi函数语句 左值是被定义的变量 可以被引用
         // 第一个操作数是phi函数 第二个操作数是phi函数所对应的变量的指针
-        Value *cur_ins = (Value *)ins_new_no_operator_v2(PhiFuncOp);
+        // Value *cur_ins = (Value *)ins_new_no_operator_v2(PhiFuncOp);
+        Value *cur_ins = (Value *)ins_new_phi_func_v2(
+            PhiFuncOp, ListSize(element->value->pre_node_list));
+        cur_ins->pdata->phi_func_pdata.offset_var_use = 0;
         // 添加变量类型
         cur_ins->VTy->TID =
             ((Value *)bblock_ins)->pdata->allocate_pdata.point_value->VTy->TID;
@@ -568,55 +597,66 @@ void rename_pass_help_new(HashMap *rename_var_stack_hashmap,
   hashmap_init(&num_of_var_def);
   // printf("%s\n", cur_bblock->bblock_node->bblock_head->label->name);
   ListFirst(cur_bblock->bblock_node->bblock_head->inst_list, false);
-  void *element;
+  Instruction *element;
   // 遍历当前bblock的instruction找出赋值语句
-  while (ListNext(cur_bblock->bblock_node->bblock_head->inst_list, &element)) {
-    Value *cur_handle = user_get_operand_use(element, 0)->Val;
-    // 如果是赋值语句则将操作数放在栈顶 用于后续的替换
-    if ((((Instruction *)element)->opcode == StoreOP) &&
-        cur_handle->VTy->TID != ArrayTyID && cur_handle->IsGlobalVar == 0) {
-      if (HashMapContain(num_of_var_def, cur_handle->name)) {
-        void *var_num = HashMapGet(num_of_var_def, cur_handle->name);
-        var_num = (void *)((uintptr_t)var_num + 1);
-        HashMapPut(num_of_var_def, strdup(cur_handle->name), (void *)var_num);
-      } else {
-        HashMapPut(num_of_var_def, strdup(cur_handle->name), (void *)1);
-      }
-      StackPush(HashMapGet(rename_var_stack_hashmap, cur_handle->name),
-                user_get_operand_use(((User *)element), 1)->Val);
-    } else if (((Instruction *)element)->opcode == PhiFuncOp) {
-      if (HashMapContain(
-              num_of_var_def,
-              ((Value *)element)->pdata->phi_func_pdata.phi_pointer->name)) {
-        void *var_num = HashMapGet(
-            num_of_var_def,
-            ((Value *)element)->pdata->phi_func_pdata.phi_pointer->name);
-        var_num = (void *)((uintptr_t)var_num + 1);
-        HashMapPut(
-            num_of_var_def,
-            strdup(((Value *)element)->pdata->phi_func_pdata.phi_pointer->name),
-            (void *)var_num);
-      } else {
-        HashMapPut(
-            num_of_var_def,
-            strdup(((Value *)element)->pdata->phi_func_pdata.phi_pointer->name),
-            (void *)1);
-      }
-      StackPush(
-          HashMapGet(
-              rename_var_stack_hashmap,
-              ((Value *)element)->pdata->phi_func_pdata.phi_pointer->name),
-          element);
-    } else if (((Instruction *)element)->opcode == LoadOP &&
-               cur_handle->VTy->TID != ArrayTyID &&
-               cur_handle->IsGlobalVar == 0) {
+  while (ListNext(cur_bblock->bblock_node->bblock_head->inst_list,
+                  (void *)&element)) {
+    Value *cur_handle = NULL;
+    Use *first_oprand = user_get_operand_use((void *)element, 0);
+    if (first_oprand)
+      cur_handle = first_oprand->Val;
+    if (cur_handle && cur_handle->VTy->TID != ArrayTyID &&
+        cur_handle->IsGlobalVar == 0) {
       void *stack_top_var;
-      if (StackSize(HashMapGet(rename_var_stack_hashmap, cur_handle->name)) !=
-          0) {
-        StackTop(HashMapGet(rename_var_stack_hashmap, cur_handle->name),
-                 &stack_top_var);
-        // 使用栈顶Value替换使用当前instruction的value
-        replace_use_other_by_self(stack_top_var, element);
+      switch (element->opcode) {
+      case StoreOP:
+        if (HashMapContain(num_of_var_def, cur_handle->name)) {
+          void *var_num = HashMapGet(num_of_var_def, cur_handle->name);
+          var_num = (void *)((uintptr_t)var_num + 1);
+          HashMapPut(num_of_var_def, strdup(cur_handle->name), (void *)var_num);
+        } else {
+          HashMapPut(num_of_var_def, strdup(cur_handle->name), (void *)1);
+        }
+        StackPush(HashMapGet(rename_var_stack_hashmap, cur_handle->name),
+                  user_get_operand_use(((User *)element), 1)->Val);
+        break;
+      case PhiFuncOp:
+        if (HashMapContain(
+                num_of_var_def,
+                ((Value *)element)->pdata->phi_func_pdata.phi_pointer->name)) {
+          void *var_num = HashMapGet(
+              num_of_var_def,
+              ((Value *)element)->pdata->phi_func_pdata.phi_pointer->name);
+          var_num = (void *)((uintptr_t)var_num + 1);
+          HashMapPut(
+              num_of_var_def,
+              strdup(
+                  ((Value *)element)->pdata->phi_func_pdata.phi_pointer->name),
+              (void *)var_num);
+        } else {
+          HashMapPut(
+              num_of_var_def,
+              strdup(
+                  ((Value *)element)->pdata->phi_func_pdata.phi_pointer->name),
+              (void *)1);
+        }
+        StackPush(
+            HashMapGet(
+                rename_var_stack_hashmap,
+                ((Value *)element)->pdata->phi_func_pdata.phi_pointer->name),
+            element);
+        break;
+      case LoadOP:
+        if (StackSize(HashMapGet(rename_var_stack_hashmap, cur_handle->name)) !=
+            0) {
+          StackTop(HashMapGet(rename_var_stack_hashmap, cur_handle->name),
+                   &stack_top_var);
+          // 使用栈顶Value替换使用当前instruction的value
+          replace_use_other_by_self(stack_top_var, (Value *)element);
+        }
+        break;
+      default:
+        break;
       }
     }
   }
@@ -636,35 +676,41 @@ void rename_pass_help_new(HashMap *rename_var_stack_hashmap,
     while (ListNext(neighbor_bblock->value->bblock_head->inst_list,
                     &neighbor_bblock_ins)) {
       if (((Instruction *)neighbor_bblock_ins)->opcode == PhiFuncOp) {
+        Value *cur_insert;
         if (StackSize(HashMapGet(
                 rename_var_stack_hashmap,
                 ((Value *)neighbor_bblock_ins)
                     ->pdata->phi_func_pdata.phi_pointer->name)) != 0) {
-          void *stack_top_var;
           StackTop(HashMapGet(rename_var_stack_hashmap,
                               ((Value *)neighbor_bblock_ins)
                                   ->pdata->phi_func_pdata.phi_pointer->name),
-                   &stack_top_var);
+                   (void *)&cur_insert);
           // printf("%p:phinode %s add %s from bblock %s\n",
           // neighbor_bblock_ins,
           //        ((Value *)neighbor_bblock_ins)->name,
           //        ((Value *)stack_top_var)->name,
           //        cur_bblock->bblock_node->bblock_head->label->name);
-          HashMapPut(
-              ((Value *)neighbor_bblock_ins)->pdata->phi_func_pdata.phi_value,
-              strdup(cur_bblock->bblock_node->bblock_head->label->name),
-              stack_top_var);
         } else {
-          Value *cur = (Value *)malloc(sizeof(Value));
-          value_init(cur);
-          cur->VTy->TID = ImmediateIntTyID;
-          cur->name = strdup("undefined");
+          cur_insert = (Value *)malloc(sizeof(Value));
+          value_init(cur_insert);
+          cur_insert->VTy->TID =
+              (((Value *)neighbor_bblock_ins)->VTy->TID == IntegerTyID
+                   ? ImmediateIntTyID
+                   : ImmediateFloatTyID);
+          cur_insert->name = strdup("undefined");
           // 为padata里的整数字面量常量赋值
-          cur->pdata->var_pdata.iVal = 0;
-          HashMapPut(
-              ((Value *)neighbor_bblock_ins)->pdata->phi_func_pdata.phi_value,
-              strdup(cur_bblock->bblock_node->bblock_head->label->name), cur);
+          cur_insert->pdata->var_pdata.iVal = 0;
+          cur_insert->pdata->var_pdata.fVal = 0.f;
         }
+        HashMapPut(
+            ((Value *)neighbor_bblock_ins)->pdata->phi_func_pdata.phi_value,
+            strdup(cur_bblock->bblock_node->bblock_head->label->name),
+            cur_insert);
+        Use *puse =
+            user_get_operand_use((User *)neighbor_bblock_ins,
+                                 ((Value *)neighbor_bblock_ins)
+                                     ->pdata->phi_func_pdata.offset_var_use++);
+        value_add_use(cur_insert, puse);
       }
     }
   }
@@ -1420,55 +1466,63 @@ void bblock_to_dom_graph_pass(Function *self) {
     printf("\n");
   }
 
-  // 初始化dom_tree树根
-  dom_tree_root = (dom_tree *)malloc(sizeof(dom_tree));
-  dom_tree_root->bblock_node = init_headnode;
-  dom_tree_root->child = ListInit();
-  ListSetClean(dom_tree_root->child, CleanObject);
+  delete_non_used_var_pass(self);
 
-  // 建立支配关系的函数
-  dom_relation_pass();
+  if (!is_functional_test) {
+    printf("performance is begin!!!!!!!\n");
+    printf("performance is begin!!!!!!!\n");
+    printf("performance is begin!!!!!!!\n");
+    printf("performance is begin!!!!!!!\n");
+    // 初始化dom_tree树根
+    dom_tree_root = (dom_tree *)malloc(sizeof(dom_tree));
+    dom_tree_root->bblock_node = init_headnode;
+    dom_tree_root->child = ListInit();
+    ListSetClean(dom_tree_root->child, CleanObject);
 
-  // 插入phi函数
-  insert_phi_func_pass(self);
+    // 建立支配关系的函数
+    dom_relation_pass();
 
-  printf("\n");
+    // 插入phi函数
+    insert_phi_func_pass(self);
 
-  printf_cur_func_ins(self);
+    printf("\n");
 
-  printf("begin rename pass and delete alloca,store,load instruction!\n");
+    printf_cur_func_ins(self);
 
-  rename_pass(self);
+    printf("begin rename pass and delete alloca,store,load instruction!\n");
 
-  printf("rename pass over\n");
+    rename_pass(self);
 
-  // 删除alloca store load语句
-  delete_alloca_store_load_ins_pass(graph_for_dom_tree);
+    printf("rename pass over\n");
 
-  printf("delete alloca,store,load instruction over\n");
+    // 删除alloca store load语句
+    delete_alloca_store_load_ins_pass(graph_for_dom_tree);
 
-  // 清空哈希表 然后重新初始化供后面使用
-  HashSetDeinit(bblock_pass_hashset);
-  bblock_pass_hashset = NULL;
-  hashset_init(&(bblock_pass_hashset));
+    printf("delete alloca,store,load instruction over\n");
 
-  // if (freopen("instruction_list.txt", "w", stdout) == NULL) {
-  //   fprintf(stderr, "打开文件失败！");
-  //   exit(-1);
-  // }
+    // 清空哈希表 然后重新初始化供后面使用
+    HashSetDeinit(bblock_pass_hashset);
+    bblock_pass_hashset = NULL;
+    hashset_init(&(bblock_pass_hashset));
 
-  printf_cur_func_ins(self);
+    // if (freopen("instruction_list.txt", "w", stdout) == NULL) {
+    //   fprintf(stderr, "打开文件失败！");
+    //   exit(-1);
+    // }
 
-  // fflush(stdout);
-  // freopen(tty_path, "w", stdout);
+    printf_cur_func_ins(self);
 
-  puts("replace phi node begin\n");
-  replace_phi_nodes(dom_tree_root);
-  puts("replace phi node over\n");
+    // fflush(stdout);
+    // freopen(tty_path, "w", stdout);
 
-  remove_bblock_phi_func_pass(graph_for_dom_tree);
-  // puts("over once");
-  remove_bblock_phi_func_pass(graph_for_dom_tree);
+    replace_phi_nodes(dom_tree_root);
+
+    remove_bblock_phi_func_pass(graph_for_dom_tree);
+    printf("performance is over!!!!!!!\n");
+    printf("performance is over!!!!!!!\n");
+    printf("performance is over!!!!!!!\n");
+    printf("performance is over!!!!!!!\n");
+  }
 
   printf("\n\n\n");
 

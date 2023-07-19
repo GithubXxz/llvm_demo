@@ -17,9 +17,7 @@ extern List *global_var_list;
 
 SymbolTable *cur_symboltable = NULL;
 
-Value *return_val = NULL;
-
-ast *pre_astnode = NULL;
+bool is_functional_test = true;
 
 int yyparse(void);
 
@@ -184,12 +182,17 @@ int main(int argc, char **argv) {
 
   printf("%%begin the pass\n");
   char *choose_case = NULL;
-  if (argc == 2) {
-    choose_case = read_code_from_file(argv[1]);
+  if (argc == 5) {
+    is_functional_test = true;
+    choose_case = read_code_from_file(argv[4]);
+  } else if (argc == 6) {
+    is_functional_test = false;
+    choose_case = read_code_from_file(argv[4]);
   } else {
-    // choose_case = read_code_from_file(test_cases[81]);
-    choose_case = read_code_from_file(hidden_cases[4]);
-    // choose_case = read_code_from_file("./my_cases/test_case.c");
+    is_functional_test = true;
+    choose_case = read_code_from_file(test_cases[92]);
+    // choose_case = read_code_from_file(hidden_cases[4]);
+    // choose_case = read_code_from_file("./my_cases/delete_non_used_pass.c");
   }
   if (choose_case == NULL)
     return 1;

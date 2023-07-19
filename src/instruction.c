@@ -61,7 +61,6 @@ Instruction *ins_new_v2(int op_num) {
 
 Instruction *ins_new_phi_func_v2(TAC_OP Op, int num_of_predecessor) {
   Instruction *inst = ins_new_v2(num_of_predecessor);
-  ((Value *)inst)->HasHungOffUses = true;
   inst->opcode = Op;
   return inst;
 }

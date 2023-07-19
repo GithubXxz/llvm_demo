@@ -19,7 +19,7 @@ extern Stack *stack_then_label;
 extern Stack *stack_while_head_label; // while循环头(条件判断)
 extern Stack *stack_while_then_label; // while条件为false时所要跳转的label栈
 extern Stack *stack_param;
-extern ast *pre_astnode;
+static ast *pre_astnode = NULL;
 extern List *ins_list;
 extern HashMap *func_hashMap;
 extern SymbolTable *cur_symboltable;
@@ -804,6 +804,8 @@ Value *post_eval(ast *a, Value *left, Value *right) {
         } else {
           Value *call_fun_ins =
               (Value *)ins_new_no_operator_v2(CallWithReturnValueOP);
+          call_fun_ins->VTy->TID =
+              func_label->pdata->symtab_func_pdata.return_type;
 
           call_fun_ins->name = strdup(temp_str);
 

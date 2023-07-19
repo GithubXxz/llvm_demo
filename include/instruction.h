@@ -28,9 +28,10 @@ typedef enum _TAC_OP {
   NotOP,
   LogicOrOP,
   LogicAndOP,
+  PhiFuncOp,
+  AllocateOP,
 
   ReturnOP,
-  AllocateOP,
   StoreOP,
   GotoWithConditionOP,
   ParamOP,
@@ -40,7 +41,6 @@ typedef enum _TAC_OP {
   LabelOP,
   FuncLabelOP,
   FuncEndOP,
-  PhiFuncOp,
   InitArgOP
 } TAC_OP;
 

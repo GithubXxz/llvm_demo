@@ -19,12 +19,10 @@ struct _User {
   // user 的构造函数 （重载 new），在创建 user 的同时，创建了相应的
   // use，相关于在 user 之前有1个 use 或 多个 use llvm
   // 是隐式的创建，这里是显式的创建
-  struct _Use *use_list;
+  // struct _Use *use_list;
 
   int num_oprands;
 };
-
-User *user_new();
 
 User *user_new1(unsigned use_num);
 

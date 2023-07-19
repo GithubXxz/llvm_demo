@@ -5,24 +5,6 @@
 
 #include "use.h"
 
-User *user_new() {
-  int size = sizeof(User);
-  void *Storage = malloc(size);
-  // User是如何管理Use对象的了
-  // 第一种是独立分配, 在构造User对象时额外分配一个指针用来保存Use数组,
-  // 这种情况下HasHungOffUses为true.
-  //   然后将返回地址的起始作为Use指针并置空,
-  //   之后的地址作为User对象的地址初始化并返回.
-  //   即在每个User对象之前有一个Use指针大小的空间保存了一个默认为空的Use指针.
-  // Use **HungOffOperandList = (Use **)(Storage);
-  // User *Obj = (User *)(HungOffOperandList + 1);
-  User *Obj = (User *)(Storage);
-  (Obj->use_list) = Storage;
-  (Obj->value).NumUserOperands = 0;
-  (Obj->value).HasHungOffUses = true;
-  return Obj;
-}
-
 User *user_new1(unsigned use_num) {
   // 另一种是 co-allocated,
   // 在构造User对象时传入边的数量并分配连续内存同时保存User与Use,
@@ -62,7 +44,10 @@ int user_get_size(int use_num) {
 
 Use *user_get_operand_use(User *this, unsigned ind) {
   // 通过数组来表示地址偏移量
-  return (Use *)this - this->num_oprands + ind;
+  if (this->num_oprands)
+    return (Use *)this - this->num_oprands + ind;
+  else
+    return NULL;
 }
 
 Value *user_get_value(User *this) { return (Value *)this; }
