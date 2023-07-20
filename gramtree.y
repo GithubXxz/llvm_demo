@@ -45,6 +45,7 @@ Program:|ExtDefList {
     #ifdef PRINT_OK
     eval_print($$,0);    
     #endif
+    fflush(stdout);
 
     eval($$);
 }        

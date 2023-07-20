@@ -197,9 +197,9 @@ int main(int argc, char **argv) {
     choose_case = read_code_from_file(argv[4]);
   } else {
     is_functional_test = true;
-    choose_case = read_code_from_file(test_cases[82]);
+    choose_case = read_code_from_file(test_cases[96]);
     // choose_case = read_code_from_file(hidden_cases[4]);
-    // choose_case = read_code_from_file("./my_cases/delete_non_used_pass.c");
+    // choose_case = read_code_from_file("./my_cases/array_init.c");
   }
   if (choose_case == NULL)
     return 1;

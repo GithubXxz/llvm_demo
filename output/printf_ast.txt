@@ -3,232 +3,292 @@ Program (1)
     ExtDef (1)
       Specifire (1)
         TYPE :int 
-      FunDec (1)
-        ID :main 
-        LP (1)
-        RP (1)
-      Compst (1)
-        LC (1)
-        TACList (2)
-          TAC (2)
-            DefList (2)
-              Def (2)
-                Specifire (2)
-                  TYPE :int 
-                DecList (2)
-                  Dec (2)
-                    VarDec (2)
-                      ID :a 
-                    ASSIGNOP (2)
-                    Exp (2)
-                      INTEGER :10 
-              DefList (3)
-                Def (3)
-                  Specifire (3)
-                    TYPE :int 
-                  DecList (3)
-                    Dec (3)
-                      VarDec (3)
-                        ID :b 
-                      ASSIGNOP (3)
-                      Exp (3)
-                        Exp (3)
-                          ID :a 
-                        PLUS (3)
-                        Exp (3)
-                          INTEGER :10 
-                DefList (4)
-                  Def (4)
-                    Specifire (4)
-                      TYPE :int 
-                    DecList (4)
-                      Dec (4)
-                        VarDec (4)
-                          ID :c 
-                        ASSIGNOP (4)
-                        Exp (4)
-                          INTEGER :555 
-                  DefList (5)
-                    Def (5)
-                      Specifire (5)
+      ExtDecList (1)
+        Dec (1)
+          VarDec (1)
+            ID :M 
+    ExtDefList (2)
+      ExtDef (2)
+        Specifire (2)
+          TYPE :int 
+        ExtDecList (2)
+          Dec (2)
+            VarDec (2)
+              ID :L 
+      ExtDefList (3)
+        ExtDef (3)
+          Specifire (3)
+            TYPE :int 
+          ExtDecList (3)
+            Dec (3)
+              VarDec (3)
+                ID :N 
+        ExtDefList (6)
+          ExtDef (6)
+            Specifire (6)
+              TYPE :int 
+            FunDec (6)
+              ID :add 
+              LP (6)
+              VarList (6)
+                ParamDec (6)
+                  Specifire (6)
+                    TYPE :float 
+                  VarDec (6)
+                    VarDec (6)
+                      ID :a0 
+                    LB (6)
+                VarList (6)
+                  ParamDec (6)
+                    Specifire (6)
+                      TYPE :float 
+                    VarDec (6)
+                      VarDec (6)
+                        ID :a1 
+                      LB (6)
+                  VarList (6)
+                    ParamDec (6)
+                      Specifire (6)
+                        TYPE :float 
+                      VarDec (6)
+                        VarDec (6)
+                          ID :a2 
+                        LB (6)
+                    VarList (6)
+                      ParamDec (6)
+                        Specifire (6)
+                          TYPE :float 
+                        VarDec (6)
+                          VarDec (6)
+                            ID :b0 
+                          LB (6)
+                      VarList (6)
+                        ParamDec (6)
+                          Specifire (6)
+                            TYPE :float 
+                          VarDec (6)
+                            VarDec (6)
+                              ID :b1 
+                            LB (6)
+                        VarList (6)
+                          ParamDec (6)
+                            Specifire (6)
+                              TYPE :float 
+                            VarDec (6)
+                              VarDec (6)
+                                ID :b2 
+                              LB (6)
+                          VarList (6)
+                            ParamDec (6)
+                              Specifire (6)
+                                TYPE :float 
+                              VarDec (6)
+                                VarDec (6)
+                                  ID :c0 
+                                LB (6)
+                            VarList (6)
+                              ParamDec (6)
+                                Specifire (6)
+                                  TYPE :float 
+                                VarDec (6)
+                                  VarDec (6)
+                                    ID :c1 
+                                  LB (6)
+                              VarList (6)
+                                ParamDec (6)
+                                  Specifire (6)
+                                    TYPE :float 
+                                  VarDec (6)
+                                    VarDec (6)
+                                      ID :c2 
+                                    LB (6)
+              RP (6)
+            Compst (7)
+              LC (7)
+              TACList (8)
+                TAC (8)
+                  DefList (8)
+                    Def (8)
+                      Specifire (8)
                         TYPE :int 
-                      DecList (5)
-                        Dec (5)
-                          VarDec (5)
-                            ID :m 
-                          ASSIGNOP (5)
-                          Exp (5)
-                            INTEGER :111 
+                      DecList (8)
+                        Dec (8)
+                          VarDec (8)
+                            ID :i 
                     DefList 
-            StmtList (6)
-              Stmt (6)
-                IF (6)
-                Exp (6)
-                  Exp (6)
-                    ID :b 
-                  GREAT (6)
-                  Exp (6)
-                    INTEGER :15 
-                assistIF 
-                Stmt (6)
-                  Compst (6)
-                    LC (6)
-                    TACList 
-                      TAC 
-                        DefList 
-                        StmtList (7)
-                          Stmt (7)
-                            Exp (7)
-                              Exp (7)
-                                ID :b 
-                              ASSIGNOP (7)
-                              Exp (7)
-                                Exp (7)
-                                  ID :b 
-                                PLUS (7)
-                                Exp (7)
-                                  ID :a 
-                          StmtList (8)
-                            Stmt (8)
-                              Exp (8)
-                                Exp (8)
-                                  ID :m 
-                                ASSIGNOP (8)
-                                Exp (8)
-                                  ID :c 
-                            StmtList (9)
-                              Stmt (9)
-                                IF (9)
-                                Exp (9)
-                                  Exp (9)
-                                    ID :b 
-                                  GREAT (9)
-                                  Exp (9)
-                                    INTEGER :25 
-                                assistIF 
-                                Stmt (9)
-                                  Compst (9)
-                                    LC (9)
-                                    TACList 
-                                      TAC 
-                                        DefList 
-                                        StmtList (10)
-                                          Stmt (10)
-                                            Exp (10)
-                                              Exp (10)
-                                                ID :c 
-                                              ASSIGNOP (10)
-                                              Exp (10)
-                                                INTEGER :211 
-                                          StmtList 
-                                      TACList 
-                                    RC (11)
-                                assistELSE 
-                                ELSE (11)
-                                Stmt (11)
-                                  Compst (11)
-                                    LC (11)
-                                    TACList 
-                                      TAC 
-                                        DefList 
-                                        StmtList (12)
-                                          Stmt (12)
-                                            Exp (12)
-                                              Exp (12)
-                                                ID :c 
-                                              ASSIGNOP (12)
-                                              Exp (12)
-                                                INTEGER :985 
-                                          StmtList 
-                                      TACList 
-                                    RC (13)
-                              StmtList (14)
-                                Stmt (14)
-                                  Exp (14)
-                                    Exp (14)
-                                      ID :c 
-                                    ASSIGNOP (14)
-                                    Exp (14)
-                                      INTEGER :666 
-                                StmtList 
-                      TACList 
-                    RC (15)
-                assistELSE 
-              StmtList 
-          TACList (16)
-            TAC (16)
-              DefList (16)
-                Def (16)
-                  Specifire (16)
-                    TYPE :int 
-                  DecList (16)
-                    Dec (16)
-                      VarDec (16)
-                        ID :x 
-                      ASSIGNOP (16)
-                      Exp (16)
-                        ID :c 
-                DefList (17)
-                  Def (17)
-                    Specifire (17)
-                      TYPE :int 
-                    DecList (17)
-                      Dec (17)
-                        VarDec (17)
-                          ID :y 
-                        ASSIGNOP (17)
-                        Exp (17)
-                          Exp (17)
-                            ID :x 
-                          PLUS (17)
-                          Exp (17)
-                            ID :c 
-                  DefList 
-              StmtList (19)
-                Stmt (19)
-                  RETURN (19)
-                  Exp (19)
-                    ID :m 
-                StmtList 
-            TACList 
-        RC (20)
-    ExtDefList 
-Func: main
+                  StmtList (9)
+                    Stmt (9)
+                      Exp (9)
+                        Exp (9)
+                          ID :i 
+                        ASSIGNOP (9)
+                        Exp (9)
+                          INTEGER :0 
+                    StmtList (10)
+                      Stmt (10)
+                        WHILE (10)
+                        Exp (10)
+                          Exp (10)
+                            ID :i 
+                          LESS (10)
+                          Exp (10)
+                            ID :M 
+                        assistWHILE 
+                        Stmt (11)
+                          Compst (11)
+                            LC (11)
+                            TACList 
+                              TAC 
+                                DefList 
+                                StmtList (12)
+                                  Stmt (12)
+                                    Exp (12)
+                                      Exp (12)
+                                        Exp (12)
+                                          ID :c0 
+                                        LB (12)
+                                        Exp (12)
+                                          ID :i 
+                                        RB (12)
+                                      ASSIGNOP (12)
+                                      Exp (12)
+                                        Exp (12)
+                                          Exp (12)
+                                            ID :a0 
+                                          LB (12)
+                                          Exp (12)
+                                            ID :i 
+                                          RB (12)
+                                        PLUS (12)
+                                        Exp (12)
+                                          Exp (12)
+                                            ID :b0 
+                                          LB (12)
+                                          Exp (12)
+                                            ID :i 
+                                          RB (12)
+                                  StmtList (13)
+                                    Stmt (13)
+                                      Exp (13)
+                                        Exp (13)
+                                          Exp (13)
+                                            ID :c1 
+                                          LB (13)
+                                          Exp (13)
+                                            ID :i 
+                                          RB (13)
+                                        ASSIGNOP (13)
+                                        Exp (13)
+                                          Exp (13)
+                                            Exp (13)
+                                              ID :a1 
+                                            LB (13)
+                                            Exp (13)
+                                              ID :i 
+                                            RB (13)
+                                          PLUS (13)
+                                          Exp (13)
+                                            Exp (13)
+                                              ID :b1 
+                                            LB (13)
+                                            Exp (13)
+                                              ID :i 
+                                            RB (13)
+                                    StmtList (14)
+                                      Stmt (14)
+                                        Exp (14)
+                                          Exp (14)
+                                            Exp (14)
+                                              ID :c2 
+                                            LB (14)
+                                            Exp (14)
+                                              ID :i 
+                                            RB (14)
+                                          ASSIGNOP (14)
+                                          Exp (14)
+                                            Exp (14)
+                                              Exp (14)
+                                                ID :a2 
+                                              LB (14)
+                                              Exp (14)
+                                                ID :i 
+                                              RB (14)
+                                            PLUS (14)
+                                            Exp (14)
+                                              Exp (14)
+                                                ID :b2 
+                                              LB (14)
+                                              Exp (14)
+                                                ID :i 
+                                              RB (14)
+                                      StmtList (15)
+                                        Stmt (15)
+                                          Exp (15)
+                                            Exp (15)
+                                              ID :i 
+                                            ASSIGNOP (15)
+                                            Exp (15)
+                                              Exp (15)
+                                                ID :i 
+                                              PLUS (15)
+                                              Exp (15)
+                                                INTEGER :1 
+                                        StmtList 
+                              TACList 
+                            RC (16)
+                      StmtList (18)
+                        Stmt (18)
+                          RETURN (18)
+                          Exp (18)
+                            INTEGER :0 
+                        StmtList 
+                TACList 
+              RC (20)
+          ExtDefList 
+global var
+global1 = alloca int,align 4
+global var
+global2 = alloca int,align 4
+global var
+global3 = alloca int,align 4
+Func: add
+array1 = alloca float array,align 4
+array2 = alloca float array,align 4
+array3 = alloca float array,align 4
+array4 = alloca float array,align 4
+array5 = alloca float array,align 4
+array6 = alloca float array,align 4
+array7 = alloca float array,align 4
+array8 = alloca float array,align 4
+array9 = alloca float array,align 4
 point1 = alloca int,align 4
-store int 10, point1,align 4
-point2 = alloca int,align 4
+store int 0, point1,align 4
+br addlabel1
+addlabel1
 temp10 = load int, point1,align 4
-store int temp11, point2,align 4
-point3 = alloca int,align 4
-store int 555, point3,align 4
-point4 = alloca int,align 4
-store int 111, point4,align 4
-temp12 = load int, point2,align 4
-br temp13, true: mainlabel2  false : mainlabel1 
-mainlabel2
-temp14 = load int, point2,align 4
+temp11 = load int, global1,align 4
+while br temp12, true: addlabel3  false : addlabel2 
+addlabel3
+temp13 = load int, point1,align 4
 temp15 = load int, point1,align 4
-store int temp16, point2,align 4
-temp17 = load int, point3,align 4
-store int temp17, point4,align 4
-temp18 = load int, point2,align 4
-br temp19, true: mainlabel4  false : mainlabel3 
-mainlabel4
-store int 211, point3,align 4
-br mainlabel5 
-mainlabel3
-store int 985, point3,align 4
-mainlabel5
-store int 666, point3,align 4
-br mainlabel6 
-mainlabel1
-point5 = alloca int,align 4
-temp20 = load int, point3,align 4
-store int temp20, point5,align 4
-point6 = alloca int,align 4
-temp21 = load int, point5,align 4
-temp22 = load int, point3,align 4
-store int temp23, point6,align 4
-temp24 = load int, point4,align 4
+%temp17 = load float, %temp16,align 4
+temp18 = load int, point1,align 4
+%temp20 = load float, %temp19,align 4
+store float temp21, %temp14,align 4
+temp22 = load int, point1,align 4
+temp24 = load int, point1,align 4
+%temp26 = load float, %temp25,align 4
+temp27 = load int, point1,align 4
+%temp29 = load float, %temp28,align 4
+store float temp30, %temp23,align 4
+temp31 = load int, point1,align 4
+temp33 = load int, point1,align 4
+%temp35 = load float, %temp34,align 4
+temp36 = load int, point1,align 4
+%temp38 = load float, %temp37,align 4
+store float temp39, %temp32,align 4
+temp40 = load int, point1,align 4
+store int temp41, point1,align 4
+addlabel2
 return
 func_label_end1

@@ -1,6 +1,7 @@
 #include "Ast.h"
 #include "c_container_auxiliary.h"
 #include "container/hash_map.h"
+#include "container/list.h"
 #include "container/stack.h"
 #include "type.h"
 #include "value.h"
@@ -41,6 +42,16 @@ enum NameSeed {
   ARRAY,
   POINT
 };
+
+static struct {
+  int nest_levels;
+  int array_level;
+  int *added;
+  int *array_info;
+  bool is_init_array;
+  Value *cur_init_array;
+  bool is_empty;
+} array_init_assist;
 
 char *NowVarDecStr[] = {"void", "int", "float", "struct"};
 
@@ -234,8 +245,18 @@ void pre_eval(ast *a) {
     }
 
     if (SEQ(a->name, "LC")) {
-      cur_symboltable = (SymbolTable *)malloc(sizeof(SymbolTable));
-      symbol_table_init(cur_symboltable);
+      if (array_init_assist.is_init_array) {
+        array_init_assist.nest_levels++;
+        // if (array_init_assist.added[array_init_assist.nest_levels - 1] != 0)
+        // {
+        //   array_init_assist.added[array_init_assist.nest_levels - 1] = 0;
+        //   array_init_assist.added[array_init_assist.nest_levels]++;
+        // }
+        array_init_assist.is_empty = true;
+      } else {
+        cur_symboltable = (SymbolTable *)malloc(sizeof(SymbolTable));
+        symbol_table_init(cur_symboltable);
+      }
     }
 
     if (SEQ(a->name, "RC")) {
@@ -355,14 +376,87 @@ void in_eval(ast *a, Value *left) {
     }
   }
 
+  if (SEQ(a->name, "InitList") && a->l && SEQ(a->l->name, "Exp")) {
+    // }
+    // if (SEQ(a->name, "InitList") && left) {
+    Value *outside_array = array_init_assist.cur_init_array;
+    for (int i = array_init_assist.array_level - 1; i >= 0; i--) {
+
+      Value *cur = (Value *)malloc(sizeof(Value));
+      value_init(cur);
+      cur->VTy->TID = ImmediateIntTyID;
+      char text[50];
+      sprintf(text, "%d", array_init_assist.added[i]);
+      // 添加变量的名字
+      cur->name = strdup(text);
+      // 为padata里的浮点数字面量常量赋值
+      cur->pdata->var_pdata.iVal = array_init_assist.added[i];
+      cur->pdata->var_pdata.fVal = (float)array_init_assist.added[i];
+
+      // oprand the array
+      char *temp_str = name_generate(TEMP_VAR);
+      Value *cur_ins = (Value *)ins_new_binary_operator_v2(GetelementptrOP,
+                                                           outside_array, cur);
+      // 将数组的信息拷贝一份
+      cur_ins->name = strdup(temp_str);
+      cur_ins->VTy->TID = ArrayTyID;
+      cur_ins->pdata->array_pdata.array_type =
+          outside_array->pdata->array_pdata.array_type;
+      cur_ins->pdata->array_pdata.list_para = ListInit();
+      ListSetClean(cur_ins->pdata->array_pdata.list_para, CleanObject);
+      list_copy(cur_ins->pdata->array_pdata.list_para,
+                outside_array->pdata->array_pdata.list_para);
+      cur_ins->pdata->array_pdata.total_member =
+          outside_array->pdata->array_pdata.step_long;
+      void *element;
+      ListGetFront(cur_ins->pdata->array_pdata.list_para, &element);
+      ListPopFront(cur_ins->pdata->array_pdata.list_para);
+      cur_ins->pdata->array_pdata.step_long =
+          cur_ins->pdata->array_pdata.total_member / (intptr_t)element;
+      ListPushBack(ins_list, cur_ins);
+      outside_array = cur_ins;
+    }
+    // store ready
+    Value *store_ins =
+        (Value *)ins_new_binary_operator_v2(StoreOP, outside_array, left);
+    ListPushBack(ins_list, (void *)store_ins);
+
+    array_init_assist.is_empty = false;
+    array_init_assist.added[0]++;
+    for (int i = 0; i < array_init_assist.array_level; i++) {
+      if (array_init_assist.added[i] == array_init_assist.array_info[i]) {
+        array_init_assist.added[i] = 0;
+        array_init_assist.added[i + 1]++;
+      } else {
+        break;
+      }
+    }
+  }
+
   if (SEQ(a->name, "VarDec")) {
     if (left->VTy->TID == ArrayTyID) {
-      if (a->r == NULL || !SEQ(a->r->name, "LB")) {
+      if (a->r == NULL || SEQ(a->r->name, "ASSIGNOP")) {
         // TODO init the array
         void *element;
         ListGetFront(array_list, &element);
         left->pdata->array_pdata.step_long =
             total_array_member / (intptr_t)element;
+
+        if (a->r && SEQ(a->r->name, "ASSIGNOP")) {
+          int list_size = ListSize(array_list);
+          array_init_assist.nest_levels = 0;
+          array_init_assist.array_level = list_size;
+          array_init_assist.is_init_array = true;
+          array_init_assist.cur_init_array = left;
+          array_init_assist.added = malloc(sizeof(int) * list_size);
+          memset(array_init_assist.added, 0, list_size * sizeof(int));
+          array_init_assist.array_info = malloc(sizeof(int) * list_size);
+          ListFirst(array_list, true);
+          int i = 0;
+          while (ListReverseNext(array_list, &element))
+            array_init_assist.array_info[i++] = (intptr_t)element;
+        }
+
         ListPopFront(array_list);
         element = (void *)(uintptr_t)1;
         ListPushBack(array_list, element);
@@ -378,6 +472,7 @@ void in_eval(ast *a, Value *left) {
 
   if (SEQ(a->name, "FunDec")) {
     cur_construction_func->pdata->symtab_func_pdata.param_num = param_seed;
+    cur_construction_func = NULL;
     // 将参数的个数清零
     param_seed = 0;
   }
@@ -489,6 +584,28 @@ void in_eval(ast *a, Value *left) {
 
 Value *post_eval(ast *a, Value *left, Value *right) {
   if (a != NULL) {
+    if (SEQ(a->name, "LC")) {
+      if (array_init_assist.is_init_array) {
+        int ensure_zero =
+            array_init_assist.array_level - array_init_assist.nest_levels;
+        array_init_assist.nest_levels--;
+        bool is_all_zero = true;
+        for (int i = 0; i < ensure_zero; i++) {
+          if (array_init_assist.added[i] != 0) {
+            is_all_zero = false;
+            array_init_assist.added[i] = 0;
+          }
+        }
+        if (!is_all_zero)
+          array_init_assist.added[ensure_zero]++;
+
+        if (array_init_assist.is_empty)
+          array_init_assist.added[ensure_zero]++;
+
+        return NULL;
+      }
+    }
+
     if (pre_astnode->l && a == pre_astnode->l) {
       Value *work_ins = NULL;
       bool flag = false;
@@ -656,11 +773,9 @@ Value *post_eval(ast *a, Value *left, Value *right) {
           // 返回指针
           return cur_ins;
         }
-      } else if // 变量声明的时候同时初始化
-          (SEQ(a->name, "ASSIGNOP")) {
+      } else if (SEQ(a->name, "ASSIGNOP")) {
         return right;
-      } else if // 变量声明的时候同时初始化
-          (SEQ(a->name, "LB")) {
+      } else if (SEQ(a->name, "LB")) {
         return right;
       }
     }
@@ -881,6 +996,15 @@ Value *post_eval(ast *a, Value *left, Value *right) {
             //数组作为函数参数
             ListPushBack(array_list, (void *)(intptr_t)(1));
           }
+        } else if (a->r && SEQ(a->r->name, "ASSIGNOP")) {
+          array_init_assist.nest_levels = 0;
+          array_init_assist.array_level = 0;
+          array_init_assist.is_init_array = false;
+          array_init_assist.cur_init_array = NULL;
+          free(array_init_assist.added);
+          array_init_assist.added = NULL;
+          free(array_init_assist.array_info);
+          array_init_assist.array_info = NULL;
         }
         return left;
       }
