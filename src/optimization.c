@@ -19,9 +19,21 @@ typedef struct _node_pair {
   HeadNode *value;
 } node_pair;
 
-static const int REGISTER_NUM = 3;
+// static const int REGISTER_NUM = 3;
+// typedef enum _LOCATION { R1 = 1, R2, R3, MEMORY } LOCATION;
 
-typedef enum _LOCATION { R1 = 1, R2, R3, MEMORY } LOCATION;
+static const int REGISTER_NUM = 8;
+typedef enum _LOCATION {
+  ALLOC_R4 = 1,
+  ALLOC_R5,
+  ALLOC_R6,
+  ALLOC_R8,
+  ALLOC_R9,
+  ALLOC_R10,
+  ALLOC_R11,
+  ALLOC_R12,
+  MEMORY
+} LOCATION;
 
 void calculate_live_use_def_by_graph(ALGraph *self) {
   for (int i = 0; i < self->node_num; i++) {
@@ -483,6 +495,7 @@ void delete_non_used_var_pass(Function *handle_func) {
       while (i != ListSize(cur_handle)) {
         ListGetAt(cur_handle, i, (void *)&element);
         if (element->opcode < RETURN_USED &&
+            element->opcode != CallWithReturnValueOP &&
             ((Value *)element)->use_list == NULL) {
           ListRemove(cur_handle, i);
           is_over = false;

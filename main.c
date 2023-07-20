@@ -196,8 +196,8 @@ int main(int argc, char **argv) {
     is_functional_test = false;
     choose_case = read_code_from_file(argv[4]);
   } else {
-    is_functional_test = true;
-    choose_case = read_code_from_file(test_cases[96]);
+    is_functional_test = false;
+    choose_case = read_code_from_file(test_cases[56]);
     // choose_case = read_code_from_file(hidden_cases[4]);
     // choose_case = read_code_from_file("./my_cases/array_init.c");
   }
