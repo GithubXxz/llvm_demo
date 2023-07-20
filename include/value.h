@@ -12,7 +12,6 @@
 struct _Symtab;
 struct _Use;
 
-
 #define NumUserOperandsBits 15
 
 typedef struct _Value Value;
@@ -37,8 +36,8 @@ struct _Value {
   unsigned HasName : 1;
   unsigned IsInitArgs : 1;     // is cur ins the func param init?
   unsigned HasHungOffUses : 1; // 用于指示有多少个操作数
-  unsigned IsGlobalVar : 1;    //  is the pointer ponits to global var
-  unsigned IsConst : 1;        //  is the pointer ponits to global var
+  unsigned IsGlobalVar : 1;
+  unsigned IsConst : 1;
 };
 
 union _PData {
@@ -110,7 +109,7 @@ union _PData {
 // 用于全局数组初始化后 后端memory copy
 typedef struct {
   int offset;
-  int value;
+  float value;
 } global_array_init_item;
 
 // 局部数组 且未被函数当作参数传递 的表

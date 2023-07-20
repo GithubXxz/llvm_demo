@@ -6,6 +6,7 @@
 #include "type.h"
 #include "value.h"
 
+#include <malloc/_malloc.h>
 #include <math.h>
 #include <stdarg.h> //变长参数函数所需的头文件
 #include <stdbool.h>
@@ -24,6 +25,7 @@ static ast *pre_astnode = NULL;
 extern List *ins_list;
 extern HashMap *func_hashMap;
 extern SymbolTable *cur_symboltable;
+extern HashMap *global_array_init_hashmap;
 
 void CleanObject(void *element);
 
@@ -51,9 +53,41 @@ static struct {
   bool is_init_array;
   Value *cur_init_array;
   bool is_empty;
+  List *offset_list;
 } array_init_assist;
 
-char *NowVarDecStr[] = {"void", "int", "float", "struct"};
+static void array_init_assist_func(List *array_list, Value *cur_init_array) {
+  if (array_list != NULL) {
+    int list_size = ListSize(array_list);
+    array_init_assist.nest_levels = 0;
+    array_init_assist.array_level = list_size;
+    array_init_assist.is_init_array = true;
+    array_init_assist.cur_init_array = cur_init_array;
+    array_init_assist.added = malloc(sizeof(int) * list_size);
+    memset(array_init_assist.added, 0, list_size * sizeof(int));
+    array_init_assist.array_info = malloc(sizeof(int) * list_size);
+    array_init_assist.offset_list = ListInit();
+    ListSetClean(array_init_assist.offset_list, CleanObject);
+
+    ListFirst(array_list, true);
+    void *element;
+    int i = 0;
+    while (ListReverseNext(array_list, &element))
+      array_init_assist.array_info[i++] = (intptr_t)element;
+  } else {
+    array_init_assist.nest_levels = 0;
+    array_init_assist.array_level = 0;
+    array_init_assist.is_init_array = false;
+    array_init_assist.cur_init_array = NULL;
+    array_init_assist.offset_list = NULL;
+    free(array_init_assist.added);
+    array_init_assist.added = NULL;
+    free(array_init_assist.array_info);
+    array_init_assist.array_info = NULL;
+  }
+}
+
+static char *NowVarDecStr[] = {"void", "int", "float", "struct"};
 
 static int temp_var_seed = 10;  // 用于标识变量的名字
 static int label_var_seed = 1;  // 用于标识label的名字
@@ -172,7 +206,6 @@ ast *newast(char *name, int num, ...) // 抽象语法树建立
 }
 
 void eval_print(ast *a, int level) {
-  // 打印该节点
 #ifdef PRINT_OK
   if (a != NULL) {
     for (int i = 0; i < level; ++i) // 孩子结点相对父节点缩进2个空格
@@ -377,49 +410,62 @@ void in_eval(ast *a, Value *left) {
   }
 
   if (SEQ(a->name, "InitList") && a->l && SEQ(a->l->name, "Exp")) {
-    // }
-    // if (SEQ(a->name, "InitList") && left) {
-    Value *outside_array = array_init_assist.cur_init_array;
-    for (int i = array_init_assist.array_level - 1; i >= 0; i--) {
+    if (left->VTy->TID == ImmediateIntTyID ||
+        left->VTy->TID == ImmediateFloatTyID) {
+      int cur_init_total_offset = array_init_assist.added[0];
+      for (int i = 1; i < array_init_assist.array_level; i++) {
+        cur_init_total_offset +=
+            array_init_assist.added[i] * array_init_assist.array_info[i - 1];
+      }
+      global_array_init_item *cur_init_offset =
+          malloc(sizeof(global_array_init_item));
+      cur_init_offset->offset = cur_init_total_offset;
+      cur_init_offset->value = left->pdata->var_pdata.fVal;
+      ListPushBack(array_init_assist.offset_list, cur_init_offset);
+    } else {
+      Value *outside_array = array_init_assist.cur_init_array;
+      for (int i = array_init_assist.array_level - 1; i >= 0; i--) {
 
-      Value *cur = (Value *)malloc(sizeof(Value));
-      value_init(cur);
-      cur->VTy->TID = ImmediateIntTyID;
-      char text[50];
-      sprintf(text, "%d", array_init_assist.added[i]);
-      // 添加变量的名字
-      cur->name = strdup(text);
-      // 为padata里的浮点数字面量常量赋值
-      cur->pdata->var_pdata.iVal = array_init_assist.added[i];
-      cur->pdata->var_pdata.fVal = (float)array_init_assist.added[i];
+        Value *cur = (Value *)malloc(sizeof(Value));
+        value_init(cur);
+        cur->VTy->TID = ImmediateIntTyID;
+        char text[50];
+        sprintf(text, "%d", array_init_assist.added[i]);
+        // 添加变量的名字
+        cur->name = strdup(text);
+        // 为padata里的浮点数字面量常量赋值
+        cur->pdata->var_pdata.iVal = array_init_assist.added[i];
+        cur->pdata->var_pdata.fVal = (float)array_init_assist.added[i];
 
-      // oprand the array
-      char *temp_str = name_generate(TEMP_VAR);
-      Value *cur_ins = (Value *)ins_new_binary_operator_v2(GetelementptrOP,
-                                                           outside_array, cur);
-      // 将数组的信息拷贝一份
-      cur_ins->name = strdup(temp_str);
-      cur_ins->VTy->TID = ArrayTyID;
-      cur_ins->pdata->array_pdata.array_type =
-          outside_array->pdata->array_pdata.array_type;
-      cur_ins->pdata->array_pdata.list_para = ListInit();
-      ListSetClean(cur_ins->pdata->array_pdata.list_para, CleanObject);
-      list_copy(cur_ins->pdata->array_pdata.list_para,
-                outside_array->pdata->array_pdata.list_para);
-      cur_ins->pdata->array_pdata.total_member =
-          outside_array->pdata->array_pdata.step_long;
-      void *element;
-      ListGetFront(cur_ins->pdata->array_pdata.list_para, &element);
-      ListPopFront(cur_ins->pdata->array_pdata.list_para);
-      cur_ins->pdata->array_pdata.step_long =
-          cur_ins->pdata->array_pdata.total_member / (intptr_t)element;
-      ListPushBack(ins_list, cur_ins);
-      outside_array = cur_ins;
+        // oprand the array
+        char *temp_str = name_generate(TEMP_VAR);
+        Value *cur_ins = (Value *)ins_new_binary_operator_v2(
+            GetelementptrOP, outside_array, cur);
+        // 将数组的信息拷贝一份
+        cur_ins->name = strdup(temp_str);
+        cur_ins->VTy->TID = ArrayTyID;
+        cur_ins->pdata->array_pdata.array_type =
+            outside_array->pdata->array_pdata.array_type;
+        cur_ins->pdata->array_pdata.list_para = ListInit();
+        ListSetClean(cur_ins->pdata->array_pdata.list_para, CleanObject);
+        list_copy(cur_ins->pdata->array_pdata.list_para,
+                  outside_array->pdata->array_pdata.list_para);
+        cur_ins->pdata->array_pdata.total_member =
+            outside_array->pdata->array_pdata.step_long;
+        void *element;
+        ListGetFront(cur_ins->pdata->array_pdata.list_para, &element);
+        ListPopFront(cur_ins->pdata->array_pdata.list_para);
+        cur_ins->pdata->array_pdata.step_long =
+            cur_ins->pdata->array_pdata.total_member / (intptr_t)element;
+        ListPushBack(ins_list, cur_ins);
+        outside_array = cur_ins;
+      }
+
+      // store ready
+      Value *store_ins =
+          (Value *)ins_new_binary_operator_v2(StoreOP, outside_array, left);
+      ListPushBack(ins_list, (void *)store_ins);
     }
-    // store ready
-    Value *store_ins =
-        (Value *)ins_new_binary_operator_v2(StoreOP, outside_array, left);
-    ListPushBack(ins_list, (void *)store_ins);
 
     array_init_assist.is_empty = false;
     array_init_assist.added[0]++;
@@ -442,20 +488,8 @@ void in_eval(ast *a, Value *left) {
         left->pdata->array_pdata.step_long =
             total_array_member / (intptr_t)element;
 
-        if (a->r && SEQ(a->r->name, "ASSIGNOP")) {
-          int list_size = ListSize(array_list);
-          array_init_assist.nest_levels = 0;
-          array_init_assist.array_level = list_size;
-          array_init_assist.is_init_array = true;
-          array_init_assist.cur_init_array = left;
-          array_init_assist.added = malloc(sizeof(int) * list_size);
-          memset(array_init_assist.added, 0, list_size * sizeof(int));
-          array_init_assist.array_info = malloc(sizeof(int) * list_size);
-          ListFirst(array_list, true);
-          int i = 0;
-          while (ListReverseNext(array_list, &element))
-            array_init_assist.array_info[i++] = (intptr_t)element;
-        }
+        if (a->r && SEQ(a->r->name, "ASSIGNOP"))
+          array_init_assist_func(array_list, left);
 
         ListPopFront(array_list);
         element = (void *)(uintptr_t)1;
@@ -966,8 +1000,8 @@ Value *post_eval(ast *a, Value *left, Value *right) {
             if (left->IsConst) {
               if (nowVarDecType != (int)right->VTy->TID - 4) {
                 right->VTy->TID = (int)nowVarDecType + 4;
-                right->pdata->var_pdata.fVal = right->pdata->var_pdata.fVal;
-                right->pdata->var_pdata.iVal = right->pdata->var_pdata.iVal;
+                // right->pdata->var_pdata.fVal = right->pdata->var_pdata.fVal;
+                // right->pdata->var_pdata.iVal = right->pdata->var_pdata.iVal;
               }
               value_free(left->pdata->allocate_pdata.point_value);
               left->pdata->allocate_pdata.point_value = right;
@@ -997,14 +1031,18 @@ Value *post_eval(ast *a, Value *left, Value *right) {
             ListPushBack(array_list, (void *)(intptr_t)(1));
           }
         } else if (a->r && SEQ(a->r->name, "ASSIGNOP")) {
-          array_init_assist.nest_levels = 0;
-          array_init_assist.array_level = 0;
-          array_init_assist.is_init_array = false;
-          array_init_assist.cur_init_array = NULL;
-          free(array_init_assist.added);
-          array_init_assist.added = NULL;
-          free(array_init_assist.array_info);
-          array_init_assist.array_info = NULL;
+#ifdef PRINT_OK
+          ListFirst(array_init_assist.offset_list, false);
+          global_array_init_item *element;
+          printf("cur init array name \t%s\n", left->name);
+          while (ListNext(array_init_assist.offset_list, (void *)&element)) {
+            printf("offset:\t%d value:\t%f\n", element->offset, element->value);
+          }
+#endif
+
+          HashMapPut(global_array_init_hashmap, strdup(left->name),
+                     array_init_assist.offset_list);
+          array_init_assist_func(NULL, NULL);
         }
         return left;
       }
@@ -1120,72 +1158,137 @@ Value *post_eval(ast *a, Value *left, Value *right) {
           value_init(temp);
           temp->VTy->TID = imm_res_type(left, right);
           char buffer[30];
-          if (SEQ(a->r->name, "PLUS")) {
-            temp->pdata->var_pdata.iVal =
-                left->pdata->var_pdata.fVal + right->pdata->var_pdata.fVal;
-            temp->pdata->var_pdata.fVal =
-                left->pdata->var_pdata.fVal + right->pdata->var_pdata.fVal;
-          } else if (SEQ(a->r->name, "MINUS")) {
-            temp->pdata->var_pdata.iVal =
-                left->pdata->var_pdata.fVal - right->pdata->var_pdata.fVal;
-            temp->pdata->var_pdata.fVal =
-                left->pdata->var_pdata.fVal - right->pdata->var_pdata.fVal;
-          } else if (SEQ(a->r->name, "STAR")) {
-            temp->pdata->var_pdata.iVal =
-                left->pdata->var_pdata.fVal * right->pdata->var_pdata.fVal;
-            temp->pdata->var_pdata.fVal =
-                left->pdata->var_pdata.fVal * right->pdata->var_pdata.fVal;
-          } else if (SEQ(a->r->name, "DIV")) {
-            temp->pdata->var_pdata.iVal =
-                left->pdata->var_pdata.fVal / right->pdata->var_pdata.fVal;
-            temp->pdata->var_pdata.fVal =
-                left->pdata->var_pdata.fVal / right->pdata->var_pdata.fVal;
-          } else if (SEQ(a->r->name, "EQUAL")) {
-            temp->pdata->var_pdata.iVal =
-                left->pdata->var_pdata.fVal == right->pdata->var_pdata.fVal;
-            temp->pdata->var_pdata.fVal =
-                left->pdata->var_pdata.fVal == right->pdata->var_pdata.fVal;
-          } else if (SEQ(a->r->name, "NOTEQUAL")) {
-            temp->pdata->var_pdata.iVal =
-                left->pdata->var_pdata.fVal != right->pdata->var_pdata.fVal;
-            temp->pdata->var_pdata.fVal =
-                left->pdata->var_pdata.fVal != right->pdata->var_pdata.fVal;
-          } else if (SEQ(a->r->name, "GREAT")) {
-            temp->pdata->var_pdata.iVal =
-                left->pdata->var_pdata.fVal > right->pdata->var_pdata.fVal;
-            temp->pdata->var_pdata.fVal =
-                left->pdata->var_pdata.fVal > right->pdata->var_pdata.fVal;
-          } else if (SEQ(a->r->name, "LESS")) {
-            temp->pdata->var_pdata.iVal =
-                left->pdata->var_pdata.fVal < right->pdata->var_pdata.fVal;
-            temp->pdata->var_pdata.fVal =
-                left->pdata->var_pdata.fVal < right->pdata->var_pdata.fVal;
-          } else if (SEQ(a->r->name, "GREATEQUAL")) {
-            temp->pdata->var_pdata.iVal =
-                left->pdata->var_pdata.iVal >= right->pdata->var_pdata.fVal;
-            temp->pdata->var_pdata.fVal =
-                left->pdata->var_pdata.fVal >= right->pdata->var_pdata.fVal;
-          } else if (SEQ(a->r->name, "LESSEQUAL")) {
-            temp->pdata->var_pdata.iVal =
-                left->pdata->var_pdata.fVal <= right->pdata->var_pdata.fVal;
-            temp->pdata->var_pdata.fVal =
-                left->pdata->var_pdata.fVal <= right->pdata->var_pdata.fVal;
-          } else if (SEQ(a->r->name, "MOD")) {
-            temp->pdata->var_pdata.iVal =
-                left->pdata->var_pdata.iVal % right->pdata->var_pdata.iVal;
-            temp->pdata->var_pdata.fVal = (float)temp->pdata->var_pdata.iVal;
-          } else if (SEQ(a->r->name, "AND")) {
-            temp->pdata->var_pdata.iVal =
-                left->pdata->var_pdata.fVal && right->pdata->var_pdata.fVal;
-            temp->pdata->var_pdata.fVal =
-                left->pdata->var_pdata.fVal && right->pdata->var_pdata.fVal;
-          } else if (SEQ(a->r->name, "OR")) {
-            temp->pdata->var_pdata.iVal =
-                left->pdata->var_pdata.fVal || right->pdata->var_pdata.fVal;
-            temp->pdata->var_pdata.fVal =
-                left->pdata->var_pdata.fVal || right->pdata->var_pdata.fVal;
+          if (temp->VTy->TID == ImmediateFloatTyID) {
+            if (SEQ(a->r->name, "PLUS")) {
+              temp->pdata->var_pdata.iVal =
+                  left->pdata->var_pdata.fVal + right->pdata->var_pdata.fVal;
+              temp->pdata->var_pdata.fVal =
+                  left->pdata->var_pdata.fVal + right->pdata->var_pdata.fVal;
+            } else if (SEQ(a->r->name, "MINUS")) {
+              temp->pdata->var_pdata.iVal =
+                  left->pdata->var_pdata.fVal - right->pdata->var_pdata.fVal;
+              temp->pdata->var_pdata.fVal =
+                  left->pdata->var_pdata.fVal - right->pdata->var_pdata.fVal;
+            } else if (SEQ(a->r->name, "STAR")) {
+              temp->pdata->var_pdata.iVal =
+                  left->pdata->var_pdata.fVal * right->pdata->var_pdata.fVal;
+              temp->pdata->var_pdata.fVal =
+                  left->pdata->var_pdata.fVal * right->pdata->var_pdata.fVal;
+            } else if (SEQ(a->r->name, "DIV")) {
+              temp->pdata->var_pdata.iVal =
+                  left->pdata->var_pdata.fVal / right->pdata->var_pdata.fVal;
+              temp->pdata->var_pdata.fVal =
+                  left->pdata->var_pdata.fVal / right->pdata->var_pdata.fVal;
+            } else if (SEQ(a->r->name, "EQUAL")) {
+              temp->pdata->var_pdata.iVal =
+                  left->pdata->var_pdata.fVal == right->pdata->var_pdata.fVal;
+              temp->pdata->var_pdata.fVal =
+                  left->pdata->var_pdata.fVal == right->pdata->var_pdata.fVal;
+            } else if (SEQ(a->r->name, "NOTEQUAL")) {
+              temp->pdata->var_pdata.iVal =
+                  left->pdata->var_pdata.fVal != right->pdata->var_pdata.fVal;
+              temp->pdata->var_pdata.fVal =
+                  left->pdata->var_pdata.fVal != right->pdata->var_pdata.fVal;
+            } else if (SEQ(a->r->name, "GREAT")) {
+              temp->pdata->var_pdata.iVal =
+                  left->pdata->var_pdata.fVal > right->pdata->var_pdata.fVal;
+              temp->pdata->var_pdata.fVal =
+                  left->pdata->var_pdata.fVal > right->pdata->var_pdata.fVal;
+            } else if (SEQ(a->r->name, "LESS")) {
+              temp->pdata->var_pdata.iVal =
+                  left->pdata->var_pdata.fVal < right->pdata->var_pdata.fVal;
+              temp->pdata->var_pdata.fVal =
+                  left->pdata->var_pdata.fVal < right->pdata->var_pdata.fVal;
+            } else if (SEQ(a->r->name, "GREATEQUAL")) {
+              temp->pdata->var_pdata.iVal =
+                  left->pdata->var_pdata.iVal >= right->pdata->var_pdata.fVal;
+              temp->pdata->var_pdata.fVal =
+                  left->pdata->var_pdata.fVal >= right->pdata->var_pdata.fVal;
+            } else if (SEQ(a->r->name, "LESSEQUAL")) {
+              temp->pdata->var_pdata.iVal =
+                  left->pdata->var_pdata.fVal <= right->pdata->var_pdata.fVal;
+              temp->pdata->var_pdata.fVal =
+                  left->pdata->var_pdata.fVal <= right->pdata->var_pdata.fVal;
+            } else if (SEQ(a->r->name, "AND")) {
+              temp->pdata->var_pdata.iVal =
+                  left->pdata->var_pdata.fVal && right->pdata->var_pdata.fVal;
+              temp->pdata->var_pdata.fVal =
+                  left->pdata->var_pdata.fVal && right->pdata->var_pdata.fVal;
+            } else if (SEQ(a->r->name, "OR")) {
+              temp->pdata->var_pdata.iVal =
+                  left->pdata->var_pdata.fVal || right->pdata->var_pdata.fVal;
+              temp->pdata->var_pdata.fVal =
+                  left->pdata->var_pdata.fVal || right->pdata->var_pdata.fVal;
+            }
+            sprintf(buffer, "%f", temp->pdata->var_pdata.fVal);
+          } else {
+            if (SEQ(a->r->name, "PLUS")) {
+              temp->pdata->var_pdata.iVal =
+                  left->pdata->var_pdata.iVal + right->pdata->var_pdata.iVal;
+              temp->pdata->var_pdata.fVal =
+                  left->pdata->var_pdata.iVal + right->pdata->var_pdata.iVal;
+            } else if (SEQ(a->r->name, "MINUS")) {
+              temp->pdata->var_pdata.iVal =
+                  left->pdata->var_pdata.iVal - right->pdata->var_pdata.iVal;
+              temp->pdata->var_pdata.fVal =
+                  left->pdata->var_pdata.iVal - right->pdata->var_pdata.iVal;
+            } else if (SEQ(a->r->name, "STAR")) {
+              temp->pdata->var_pdata.iVal =
+                  left->pdata->var_pdata.iVal * right->pdata->var_pdata.iVal;
+              temp->pdata->var_pdata.fVal =
+                  left->pdata->var_pdata.iVal * right->pdata->var_pdata.iVal;
+            } else if (SEQ(a->r->name, "DIV")) {
+              temp->pdata->var_pdata.iVal =
+                  left->pdata->var_pdata.iVal / right->pdata->var_pdata.iVal;
+              temp->pdata->var_pdata.fVal = (float)left->pdata->var_pdata.iVal /
+                                            right->pdata->var_pdata.iVal;
+            } else if (SEQ(a->r->name, "EQUAL")) {
+              temp->pdata->var_pdata.iVal =
+                  left->pdata->var_pdata.iVal == right->pdata->var_pdata.iVal;
+              temp->pdata->var_pdata.fVal =
+                  left->pdata->var_pdata.iVal == right->pdata->var_pdata.iVal;
+            } else if (SEQ(a->r->name, "NOTEQUAL")) {
+              temp->pdata->var_pdata.iVal =
+                  left->pdata->var_pdata.iVal != right->pdata->var_pdata.iVal;
+              temp->pdata->var_pdata.fVal =
+                  left->pdata->var_pdata.iVal != right->pdata->var_pdata.iVal;
+            } else if (SEQ(a->r->name, "GREAT")) {
+              temp->pdata->var_pdata.iVal =
+                  left->pdata->var_pdata.iVal > right->pdata->var_pdata.iVal;
+              temp->pdata->var_pdata.fVal =
+                  left->pdata->var_pdata.iVal > right->pdata->var_pdata.iVal;
+            } else if (SEQ(a->r->name, "LESS")) {
+              temp->pdata->var_pdata.iVal =
+                  left->pdata->var_pdata.iVal < right->pdata->var_pdata.iVal;
+              temp->pdata->var_pdata.fVal =
+                  left->pdata->var_pdata.iVal < right->pdata->var_pdata.iVal;
+            } else if (SEQ(a->r->name, "GREATEQUAL")) {
+              temp->pdata->var_pdata.iVal =
+                  left->pdata->var_pdata.iVal >= right->pdata->var_pdata.iVal;
+              temp->pdata->var_pdata.fVal =
+                  left->pdata->var_pdata.iVal >= right->pdata->var_pdata.iVal;
+            } else if (SEQ(a->r->name, "LESSEQUAL")) {
+              temp->pdata->var_pdata.iVal =
+                  left->pdata->var_pdata.iVal <= right->pdata->var_pdata.iVal;
+              temp->pdata->var_pdata.fVal =
+                  left->pdata->var_pdata.iVal <= right->pdata->var_pdata.iVal;
+            } else if (SEQ(a->r->name, "MOD")) {
+              temp->pdata->var_pdata.iVal =
+                  left->pdata->var_pdata.iVal % right->pdata->var_pdata.iVal;
+              temp->pdata->var_pdata.fVal = (float)temp->pdata->var_pdata.iVal;
+            } else if (SEQ(a->r->name, "AND")) {
+              temp->pdata->var_pdata.iVal =
+                  left->pdata->var_pdata.iVal && right->pdata->var_pdata.iVal;
+              temp->pdata->var_pdata.fVal =
+                  left->pdata->var_pdata.iVal && right->pdata->var_pdata.iVal;
+            } else if (SEQ(a->r->name, "OR")) {
+              temp->pdata->var_pdata.iVal =
+                  left->pdata->var_pdata.iVal || right->pdata->var_pdata.iVal;
+              temp->pdata->var_pdata.fVal =
+                  left->pdata->var_pdata.iVal || right->pdata->var_pdata.iVal;
+            }
+            sprintf(buffer, "%d", temp->pdata->var_pdata.iVal);
           }
-          sprintf(buffer, "%d", temp->pdata->var_pdata.iVal);
           value_free(left);
           value_free(right);
           temp->name = strdup(buffer);

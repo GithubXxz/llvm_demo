@@ -1,758 +1,100 @@
          	     0:           AllocateOP 	                  global1 	      null
-         	     0:          FuncLabelOP 	               insertsort 	      null
-         	     0:              LabelOP 	          insertsortentry 	      null
-         	     0:           AllocateOP 	                   param0 	      null
-         	     0:           AllocateOP 	                   point1 	      null
-         	     0:              StoreOP 	                   (null) 	    point1,          1
-         	     0:               GotoOP 	    goto insertsortlabel1 	      null
-         	     0:              LabelOP 	         insertsortlabel1 	      null
-         	     0:               LoadOP 	                   temp10 	    point1
-         	     0:               LoadOP 	                   temp11 	   global1
-         	     0:           LessThanOP 	                   temp12 	    temp10,     temp11
-         	     0:  GotoWithConditionOP 	true:insertsortlabel3  false:insertsortlabel2 	    temp12
-         	     0:              LabelOP 	         insertsortlabel3 	      null
-         	     0:           AllocateOP 	                   point2 	      null
-         	     0:               LoadOP 	                   temp13 	    point1
-         	     0:      GetelementptrOP 	                  %temp14 	    param0,     temp13
-         	     0:               LoadOP 	                  %temp15 	   %temp14
-         	     0:              StoreOP 	                   (null) 	    point2,    %temp15
-         	     0:           AllocateOP 	                   point3 	      null
-         	     0:               LoadOP 	                   temp16 	    point1
-         	     0:                SubOP 	                   temp17 	    temp16,          1
-         	     0:              StoreOP 	                   (null) 	    point3,     temp17
-         	     0:               GotoOP 	    goto insertsortlabel4 	      null
-         	     0:              LabelOP 	         insertsortlabel4 	      null
-         	     0:               LoadOP 	                   temp18 	    point3
-         	     0:          GreatThanOP 	                   temp19 	    temp18,         -1
-         	     0:               LoadOP 	                   temp20 	    point2
-         	     0:               LoadOP 	                   temp21 	    point3
-         	     0:      GetelementptrOP 	                  %temp22 	    param0,     temp21
-         	     0:               LoadOP 	                  %temp23 	   %temp22
-         	     0:           LessThanOP 	                   temp24 	    temp20,    %temp23
-         	     0:           LogicAndOP 	                   temp25 	    temp19,     temp24
-         	     0:  GotoWithConditionOP 	true:insertsortlabel6  false:insertsortlabel5 	    temp25
-         	     0:              LabelOP 	         insertsortlabel6 	      null
-         	     0:               LoadOP 	                   temp26 	    point3
-         	     0:                AddOP 	                   temp27 	    temp26,          1
-         	     0:      GetelementptrOP 	                  %temp28 	    param0,     temp27
-         	     0:               LoadOP 	                   temp29 	    point3
-         	     0:      GetelementptrOP 	                  %temp30 	    param0,     temp29
-         	     0:               LoadOP 	                  %temp31 	   %temp30
-         	     0:              StoreOP 	                   (null) 	   %temp28,    %temp31
-         	     0:               LoadOP 	                   temp32 	    point3
-         	     0:                SubOP 	                   temp33 	    temp32,          1
-         	     0:              StoreOP 	                   (null) 	    point3,     temp33
-         	     0:               GotoOP 	    goto insertsortlabel4 	      null
-         	     0:              LabelOP 	         insertsortlabel5 	      null
-         	     0:               LoadOP 	                   temp34 	    point3
-         	     0:                AddOP 	                   temp35 	    temp34,          1
-         	     0:      GetelementptrOP 	                  %temp36 	    param0,     temp35
-         	     0:               LoadOP 	                   temp37 	    point2
-         	     0:              StoreOP 	                   (null) 	   %temp36,     temp37
-         	     0:               LoadOP 	                   temp38 	    point1
-         	     0:                AddOP 	                   temp39 	    temp38,          1
-         	     0:              StoreOP 	                   (null) 	    point1,     temp39
-         	     0:               GotoOP 	    goto insertsortlabel1 	      null
-         	     0:              LabelOP 	         insertsortlabel2 	      null
-         	     0:             ReturnOP 	                   return 	         0
-         	     0:            FuncEndOP 	          func_label_end1 	      null
          	     0:          FuncLabelOP 	                     main 	      null
          	     0:              LabelOP 	                mainentry 	      null
-         	     0:              StoreOP 	                   (null) 	   global1,         10
-         	     0:           AllocateOP 	                   array2 	      null
-         	     0:      GetelementptrOP 	                  %temp40 	    array2,          0
-         	     0:              StoreOP 	                   (null) 	   %temp40,          4
-         	     0:      GetelementptrOP 	                  %temp41 	    array2,          1
-         	     0:              StoreOP 	                   (null) 	   %temp41,          3
-         	     0:      GetelementptrOP 	                  %temp42 	    array2,          2
-         	     0:              StoreOP 	                   (null) 	   %temp42,          9
-         	     0:      GetelementptrOP 	                  %temp43 	    array2,          3
-         	     0:              StoreOP 	                   (null) 	   %temp43,          2
-         	     0:      GetelementptrOP 	                  %temp44 	    array2,          4
-         	     0:              StoreOP 	                   (null) 	   %temp44,          0
-         	     0:      GetelementptrOP 	                  %temp45 	    array2,          5
-         	     0:              StoreOP 	                   (null) 	   %temp45,          1
-         	     0:      GetelementptrOP 	                  %temp46 	    array2,          6
-         	     0:              StoreOP 	                   (null) 	   %temp46,          6
-         	     0:      GetelementptrOP 	                  %temp47 	    array2,          7
-         	     0:              StoreOP 	                   (null) 	   %temp47,          5
-         	     0:      GetelementptrOP 	                  %temp48 	    array2,          8
-         	     0:              StoreOP 	                   (null) 	   %temp48,          7
-         	     0:      GetelementptrOP 	                  %temp49 	    array2,          9
-         	     0:              StoreOP 	                   (null) 	   %temp49,          8
-         	     0:           AllocateOP 	                   point4 	      null
-         	     0:              ParamOP 	                   param0 	    array2
-         	     0: CallWithReturnValueOP 	                   temp50 	      null
-         	     0:              StoreOP 	                   (null) 	    point4,     temp50
-         	     0:               GotoOP 	          goto mainlabel7 	      null
-         	     0:              LabelOP 	               mainlabel7 	      null
-         	     0:               LoadOP 	                   temp51 	    point4
-         	     0:               LoadOP 	                   temp52 	   global1
-         	     0:           LessThanOP 	                   temp53 	    temp51,     temp52
-         	     0:  GotoWithConditionOP 	true:mainlabel9  false:mainlabel8 	    temp53
-         	     0:              LabelOP 	               mainlabel9 	      null
-         	     0:           AllocateOP 	                   point5 	      null
-         	     0:               LoadOP 	                   temp54 	    point4
-         	     0:      GetelementptrOP 	                  %temp55 	    array2,     temp54
-         	     0:               LoadOP 	                  %temp56 	   %temp55
-         	     0:              StoreOP 	                   (null) 	    point5,    %temp56
-         	     0:               LoadOP 	                   temp57 	    point5
-         	     0:              ParamOP 	                   param0 	    temp57
-         	     0:               CallOP 	                   temp58 	      null
-         	     0:              StoreOP 	                   (null) 	    point5,         10
-         	     0:               LoadOP 	                   temp59 	    point5
-         	     0:              ParamOP 	                   param0 	    temp59
-         	     0:               CallOP 	                   temp60 	      null
-         	     0:               LoadOP 	                   temp61 	    point4
-         	     0:                AddOP 	                   temp62 	    temp61,          1
-         	     0:              StoreOP 	                   (null) 	    point4,     temp62
-         	     0:               GotoOP 	          goto mainlabel7 	      null
-         	     0:              LabelOP 	               mainlabel8 	      null
+         	     0:           AllocateOP 	                   point1 	      null
+         	     0:              StoreOP 	                   (null) 	    point1,        233
+         	     0:           AllocateOP 	                   array1 	      null
+         	     0:               LoadOP 	                   temp10 	    point1
+         	     0:      GetelementptrOP 	                   temp11 	    array1,          4
+         	     0:      GetelementptrOP 	                   temp12 	    temp11,          0
+         	     0:              StoreOP 	                   (null) 	    temp12,     temp10
+         	     0:               LoadOP 	                   temp13 	    point1
+         	     0:                AddOP 	                   temp14 	    temp13,        123
+         	     0:      GetelementptrOP 	                   temp15 	    array1,          4
+         	     0:      GetelementptrOP 	                   temp16 	    temp15,          1
+         	     0:              StoreOP 	                   (null) 	    temp16,     temp14
          	     0:             ReturnOP 	                   return 	         0
-         	     0:            FuncEndOP 	          func_label_end2 	      null
+         	     0:            FuncEndOP 	          func_label_end1 	      null
 
 
 
 
          	     0:           AllocateOP 	                  global1 	      null
-         	     0:          FuncLabelOP 	               insertsort 	      null
-         	     0:              LabelOP 	          insertsortentry 	      null
-         	     0:           AllocateOP 	                   param0 	      null
-         	     0:           AllocateOP 	                   point1 	      null
-         	     0:              StoreOP 	                   (null) 	    point1,          1
-         	     0:               GotoOP 	    goto insertsortlabel1 	      null
-         	     0:              LabelOP 	         insertsortlabel1 	      null
-         	     0:               LoadOP 	                   temp10 	    point1
-         	     0:               LoadOP 	                   temp11 	   global1
-         	     0:           LessThanOP 	                   temp12 	    temp10,     temp11
-         	     0:  GotoWithConditionOP 	true:insertsortlabel3  false:insertsortlabel2 	    temp12
-         	     0:              LabelOP 	         insertsortlabel3 	      null
-         	     0:           AllocateOP 	                   point2 	      null
-         	     0:               LoadOP 	                   temp13 	    point1
-         	     0:      GetelementptrOP 	                  %temp14 	    param0,     temp13
-         	     0:               LoadOP 	                  %temp15 	   %temp14
-         	     0:              StoreOP 	                   (null) 	    point2,    %temp15
-         	     0:           AllocateOP 	                   point3 	      null
-         	     0:               LoadOP 	                   temp16 	    point1
-         	     0:                SubOP 	                   temp17 	    temp16,          1
-         	     0:              StoreOP 	                   (null) 	    point3,     temp17
-         	     0:               GotoOP 	    goto insertsortlabel4 	      null
-         	     0:              LabelOP 	         insertsortlabel4 	      null
-         	     0:               LoadOP 	                   temp18 	    point3
-         	     0:          GreatThanOP 	                   temp19 	    temp18,         -1
-         	     0:               LoadOP 	                   temp20 	    point2
-         	     0:               LoadOP 	                   temp21 	    point3
-         	     0:      GetelementptrOP 	                  %temp22 	    param0,     temp21
-         	     0:               LoadOP 	                  %temp23 	   %temp22
-         	     0:           LessThanOP 	                   temp24 	    temp20,    %temp23
-         	     0:           LogicAndOP 	                   temp25 	    temp19,     temp24
-         	     0:  GotoWithConditionOP 	true:insertsortlabel6  false:insertsortlabel5 	    temp25
-         	     0:              LabelOP 	         insertsortlabel6 	      null
-         	     0:               LoadOP 	                   temp26 	    point3
-         	     0:                AddOP 	                   temp27 	    temp26,          1
-         	     0:      GetelementptrOP 	                  %temp28 	    param0,     temp27
-         	     0:               LoadOP 	                   temp29 	    point3
-         	     0:      GetelementptrOP 	                  %temp30 	    param0,     temp29
-         	     0:               LoadOP 	                  %temp31 	   %temp30
-         	     0:              StoreOP 	                   (null) 	   %temp28,    %temp31
-         	     0:               LoadOP 	                   temp32 	    point3
-         	     0:                SubOP 	                   temp33 	    temp32,          1
-         	     0:              StoreOP 	                   (null) 	    point3,     temp33
-         	     0:               GotoOP 	    goto insertsortlabel4 	      null
-         	     0:              LabelOP 	         insertsortlabel5 	      null
-         	     0:               LoadOP 	                   temp34 	    point3
-         	     0:                AddOP 	                   temp35 	    temp34,          1
-         	     0:      GetelementptrOP 	                  %temp36 	    param0,     temp35
-         	     0:               LoadOP 	                   temp37 	    point2
-         	     0:              StoreOP 	                   (null) 	   %temp36,     temp37
-         	     0:               LoadOP 	                   temp38 	    point1
-         	     0:                AddOP 	                   temp39 	    temp38,          1
-         	     0:              StoreOP 	                   (null) 	    point1,     temp39
-         	     0:               GotoOP 	    goto insertsortlabel1 	      null
-         	     0:              LabelOP 	         insertsortlabel2 	      null
-         	     0:             ReturnOP 	                   return 	         0
-         	     0:            FuncEndOP 	          func_label_end1 	      null
          	     0:          FuncLabelOP 	                     main 	      null
          	     0:              LabelOP 	                mainentry 	      null
-         	     0:              StoreOP 	                   (null) 	   global1,         10
-         	     0:           AllocateOP 	                   array2 	      null
-         	     0:      GetelementptrOP 	                  %temp40 	    array2,          0
-         	     0:              StoreOP 	                   (null) 	   %temp40,          4
-         	     0:      GetelementptrOP 	                  %temp41 	    array2,          1
-         	     0:              StoreOP 	                   (null) 	   %temp41,          3
-         	     0:      GetelementptrOP 	                  %temp42 	    array2,          2
-         	     0:              StoreOP 	                   (null) 	   %temp42,          9
-         	     0:      GetelementptrOP 	                  %temp43 	    array2,          3
-         	     0:              StoreOP 	                   (null) 	   %temp43,          2
-         	     0:      GetelementptrOP 	                  %temp44 	    array2,          4
-         	     0:              StoreOP 	                   (null) 	   %temp44,          0
-         	     0:      GetelementptrOP 	                  %temp45 	    array2,          5
-         	     0:              StoreOP 	                   (null) 	   %temp45,          1
-         	     0:      GetelementptrOP 	                  %temp46 	    array2,          6
-         	     0:              StoreOP 	                   (null) 	   %temp46,          6
-         	     0:      GetelementptrOP 	                  %temp47 	    array2,          7
-         	     0:              StoreOP 	                   (null) 	   %temp47,          5
-         	     0:      GetelementptrOP 	                  %temp48 	    array2,          8
-         	     0:              StoreOP 	                   (null) 	   %temp48,          7
-         	     0:      GetelementptrOP 	                  %temp49 	    array2,          9
-         	     0:              StoreOP 	                   (null) 	   %temp49,          8
-         	     0:           AllocateOP 	                   point4 	      null
-         	     0:              ParamOP 	                   param0 	    array2
-         	     0: CallWithReturnValueOP 	                   temp50 	      null
-         	     0:              StoreOP 	                   (null) 	    point4,     temp50
-         	     0:               GotoOP 	          goto mainlabel7 	      null
-         	     0:              LabelOP 	               mainlabel7 	      null
-         	     0:               LoadOP 	                   temp51 	    point4
-         	     0:               LoadOP 	                   temp52 	   global1
-         	     0:           LessThanOP 	                   temp53 	    temp51,     temp52
-         	     0:  GotoWithConditionOP 	true:mainlabel9  false:mainlabel8 	    temp53
-         	     0:              LabelOP 	               mainlabel9 	      null
-         	     0:           AllocateOP 	                   point5 	      null
-         	     0:               LoadOP 	                   temp54 	    point4
-         	     0:      GetelementptrOP 	                  %temp55 	    array2,     temp54
-         	     0:               LoadOP 	                  %temp56 	   %temp55
-         	     0:              StoreOP 	                   (null) 	    point5,    %temp56
-         	     0:               LoadOP 	                   temp57 	    point5
-         	     0:              ParamOP 	                   param0 	    temp57
-         	     0:               CallOP 	                   temp58 	      null
-         	     0:              StoreOP 	                   (null) 	    point5,         10
-         	     0:               LoadOP 	                   temp59 	    point5
-         	     0:              ParamOP 	                   param0 	    temp59
-         	     0:               CallOP 	                   temp60 	      null
-         	     0:               LoadOP 	                   temp61 	    point4
-         	     0:                AddOP 	                   temp62 	    temp61,          1
-         	     0:              StoreOP 	                   (null) 	    point4,     temp62
-         	     0:               GotoOP 	          goto mainlabel7 	      null
-         	     0:              LabelOP 	               mainlabel8 	      null
-         	     0:             ReturnOP 	                   return 	         0
-         	     0:            FuncEndOP 	          func_label_end2 	      null
-         	     0:           AllocateOP 	                  global1 	      null
-insertsort
-insertsortentry edge is insertsortlabel1 
-insertsortlabel1 edge is insertsortlabel2 insertsortlabel3 
-insertsortlabel3 edge is insertsortlabel4 
-insertsortlabel4 edge is insertsortlabel5 insertsortlabel6 
-insertsortlabel6 edge is insertsortlabel4 
-insertsortlabel5 edge is insertsortlabel1 
-insertsortlabel2 edge is insertsortendlabel 
-insertsortendlabel edge is 
-performance is begin!!!!!!!
-performance is begin!!!!!!!
-performance is begin!!!!!!!
-performance is begin!!!!!!!
-insertsortlabel1,insertsortlabel3,insertsortlabel4,insertsortlabel6,insertsortlabel5,insertsortlabel2,insertsortendlabel,
-insertsortlabel3,insertsortlabel4,insertsortlabel6,insertsortlabel5,
-insertsortlabel4,insertsortlabel6,insertsortlabel5,
-insertsortlabel6,
-insertsortlabel5,
-insertsortlabel2,insertsortendlabel,
-insertsortendlabel,
-
-打印每个节点的立即支配节点
-idom(insertsortlabel1) = insertsortentry
-idom(insertsortlabel3) = insertsortlabel1
-idom(insertsortlabel4) = insertsortlabel3
-idom(insertsortlabel6) = insertsortlabel4
-idom(insertsortlabel5) = insertsortlabel4
-idom(insertsortlabel2) = insertsortlabel1
-idom(insertsortendlabel) = insertsortlabel2
-
-打印支配树中的层级关系
-insertsortentry: insertsortlabel1,
-insertsortlabel1: insertsortlabel3,insertsortlabel2,
-insertsortlabel2: insertsortendlabel,
-insertsortendlabel: 
-insertsortlabel3: insertsortlabel4,
-insertsortlabel4: insertsortlabel6,insertsortlabel5,
-insertsortlabel5: 
-insertsortlabel6: 
-
-打印每个基本块的支配边界节点
-cur node insertsortlabel1's dom frontier is insertsortlabel1,
-cur node insertsortlabel3's dom frontier is insertsortlabel1,
-cur node insertsortlabel4's dom frontier is insertsortlabel1,insertsortlabel4,
-cur node insertsortlabel6's dom frontier is insertsortlabel4,
-cur node insertsortlabel5's dom frontier is insertsortlabel1,
-cur node insertsortlabel2's dom frontier is 
-cur node insertsortendlabel's dom frontier is 
-
-	labelID	number:               opcode 	                     name 	       use
-	address:0x12e704450	insertsortentry:
-         	     0:              LabelOP 	          insertsortentry 	      null
-         	     0:           AllocateOP 	                   point3 	      null
-         	     0:           AllocateOP 	                   point2 	      null
          	     0:           AllocateOP 	                   point1 	      null
-         	     0:           AllocateOP 	                   param0 	      null
-         	     0:              StoreOP 	                   (null) 	    point1,          1
-         	     0:               GotoOP 	    goto insertsortlabel1 	      null
-	address:0x12e704a80	insertsortlabel1:
-         	     0:              LabelOP 	         insertsortlabel1 	      null
-         	     0:            PhiFuncOp 	                %phi_var4 	size: 0 
-         	     0:            PhiFuncOp 	                %phi_var3 	size: 0 
-         	     0:            PhiFuncOp 	                %phi_var1 	size: 0 
+         	     0:              StoreOP 	                   (null) 	    point1,        233
+         	     0:           AllocateOP 	                   array1 	      null
          	     0:               LoadOP 	                   temp10 	    point1
-         	     0:               LoadOP 	                   temp11 	   global1
-         	     0:           LessThanOP 	                   temp12 	    temp10,     temp11
-         	     0:  GotoWithConditionOP 	true:insertsortlabel3  false:insertsortlabel2 	    temp12
-	address:0x12e704f30	insertsortlabel3:
-         	     0:              LabelOP 	         insertsortlabel3 	      null
+         	     0:      GetelementptrOP 	                   temp11 	    array1,          4
+         	     0:      GetelementptrOP 	                   temp12 	    temp11,          0
+         	     0:              StoreOP 	                   (null) 	    temp12,     temp10
          	     0:               LoadOP 	                   temp13 	    point1
-         	     0:      GetelementptrOP 	                  %temp14 	    param0,     temp13
-         	     0:               LoadOP 	                  %temp15 	   %temp14
-         	     0:              StoreOP 	                   (null) 	    point2,    %temp15
-         	     0:               LoadOP 	                   temp16 	    point1
-         	     0:                SubOP 	                   temp17 	    temp16,          1
-         	     0:              StoreOP 	                   (null) 	    point3,     temp17
-         	     0:               GotoOP 	    goto insertsortlabel4 	      null
-	address:0x12e705e10	insertsortlabel4:
-         	     0:              LabelOP 	         insertsortlabel4 	      null
-         	     0:            PhiFuncOp 	                %phi_var2 	size: 0 
-         	     0:               LoadOP 	                   temp18 	    point3
-         	     0:          GreatThanOP 	                   temp19 	    temp18,         -1
-         	     0:               LoadOP 	                   temp20 	    point2
-         	     0:               LoadOP 	                   temp21 	    point3
-         	     0:      GetelementptrOP 	                  %temp22 	    param0,     temp21
-         	     0:               LoadOP 	                  %temp23 	   %temp22
-         	     0:           LessThanOP 	                   temp24 	    temp20,    %temp23
-         	     0:           LogicAndOP 	                   temp25 	    temp19,     temp24
-         	     0:  GotoWithConditionOP 	true:insertsortlabel6  false:insertsortlabel5 	    temp25
-	address:0x12e706880	insertsortlabel6:
-         	     0:              LabelOP 	         insertsortlabel6 	      null
-         	     0:               LoadOP 	                   temp26 	    point3
-         	     0:                AddOP 	                   temp27 	    temp26,          1
-         	     0:      GetelementptrOP 	                  %temp28 	    param0,     temp27
-         	     0:               LoadOP 	                   temp29 	    point3
-         	     0:      GetelementptrOP 	                  %temp30 	    param0,     temp29
-         	     0:               LoadOP 	                  %temp31 	   %temp30
-         	     0:              StoreOP 	                   (null) 	   %temp28,    %temp31
-         	     0:               LoadOP 	                   temp32 	    point3
-         	     0:                SubOP 	                   temp33 	    temp32,          1
-         	     0:              StoreOP 	                   (null) 	    point3,     temp33
-         	     0:               GotoOP 	    goto insertsortlabel4 	      null
-	address:0x12e7067e0	insertsortlabel5:
-         	     0:              LabelOP 	         insertsortlabel5 	      null
-         	     0:               LoadOP 	                   temp34 	    point3
-         	     0:                AddOP 	                   temp35 	    temp34,          1
-         	     0:      GetelementptrOP 	                  %temp36 	    param0,     temp35
-         	     0:               LoadOP 	                   temp37 	    point2
-         	     0:              StoreOP 	                   (null) 	   %temp36,     temp37
-         	     0:               LoadOP 	                   temp38 	    point1
-         	     0:                AddOP 	                   temp39 	    temp38,          1
-         	     0:              StoreOP 	                   (null) 	    point1,     temp39
-         	     0:               GotoOP 	    goto insertsortlabel1 	      null
-	address:0x12e704e90	insertsortlabel2:
-         	     0:              LabelOP 	         insertsortlabel2 	      null
+         	     0:                AddOP 	                   temp14 	    temp13,        123
+         	     0:      GetelementptrOP 	                   temp15 	    array1,          4
+         	     0:      GetelementptrOP 	                   temp16 	    temp15,          1
+         	     0:              StoreOP 	                   (null) 	    temp16,     temp14
          	     0:             ReturnOP 	                   return 	         0
-	address:0x12e70cc40	insertsortendlabel:
-         	     0:              LabelOP 	       insertsortendlabel 	      null
          	     0:            FuncEndOP 	          func_label_end1 	      null
-
-
-begin rename pass and delete alloca,store,load instruction!
-rename pass over
-delete alloca,store,load instruction over
-	labelID	number:               opcode 	                     name 	       use
-	address:0x12e704450	insertsortentry:
-         	     0:              LabelOP 	          insertsortentry 	      null
-         	     0:           AllocateOP 	                   param0 	      null
-         	     0:               GotoOP 	    goto insertsortlabel1 	      null
-	address:0x12e704a80	insertsortlabel1:
-         	     0:              LabelOP 	         insertsortlabel1 	      null
-         	     0:            PhiFuncOp 	                %phi_var4 	size: 2 	bblock: insertsortentry value: 1, 	bblock: insertsortlabel5 value: temp39, 
-         	     0:            PhiFuncOp 	                %phi_var3 	size: 2 	bblock: insertsortentry value: undefined, 	bblock: insertsortlabel5 value: %temp15, 
-         	     0:            PhiFuncOp 	                %phi_var1 	size: 2 	bblock: insertsortentry value: undefined, 	bblock: insertsortlabel5 value: %phi_var2, 
-         	     0:               LoadOP 	                   temp11 	   global1
-         	     0:           LessThanOP 	                   temp12 	 %phi_var4,     temp11
-         	     0:  GotoWithConditionOP 	true:insertsortlabel3  false:insertsortlabel2 	    temp12
-	address:0x12e704f30	insertsortlabel3:
-         	     0:              LabelOP 	         insertsortlabel3 	      null
-         	     0:      GetelementptrOP 	                  %temp14 	    param0,  %phi_var4
-         	     0:               LoadOP 	                  %temp15 	   %temp14
-         	     0:                SubOP 	                   temp17 	 %phi_var4,          1
-         	     0:               GotoOP 	    goto insertsortlabel4 	      null
-	address:0x12e705e10	insertsortlabel4:
-         	     0:              LabelOP 	         insertsortlabel4 	      null
-         	     0:            PhiFuncOp 	                %phi_var2 	size: 2 	bblock: insertsortlabel3 value: temp17, 	bblock: insertsortlabel6 value: temp33, 
-         	     0:          GreatThanOP 	                   temp19 	 %phi_var2,         -1
-         	     0:      GetelementptrOP 	                  %temp22 	    param0,  %phi_var2
-         	     0:               LoadOP 	                  %temp23 	   %temp22
-         	     0:           LessThanOP 	                   temp24 	   %temp15,    %temp23
-         	     0:           LogicAndOP 	                   temp25 	    temp19,     temp24
-         	     0:  GotoWithConditionOP 	true:insertsortlabel6  false:insertsortlabel5 	    temp25
-	address:0x12e706880	insertsortlabel6:
-         	     0:              LabelOP 	         insertsortlabel6 	      null
-         	     0:                AddOP 	                   temp27 	 %phi_var2,          1
-         	     0:      GetelementptrOP 	                  %temp28 	    param0,     temp27
-         	     0:      GetelementptrOP 	                  %temp30 	    param0,  %phi_var2
-         	     0:               LoadOP 	                  %temp31 	   %temp30
-         	     0:              StoreOP 	                   (null) 	   %temp28,    %temp31
-         	     0:                SubOP 	                   temp33 	 %phi_var2,          1
-         	     0:               GotoOP 	    goto insertsortlabel4 	      null
-	address:0x12e7067e0	insertsortlabel5:
-         	     0:              LabelOP 	         insertsortlabel5 	      null
-         	     0:                AddOP 	                   temp35 	 %phi_var2,          1
-         	     0:      GetelementptrOP 	                  %temp36 	    param0,     temp35
-         	     0:              StoreOP 	                   (null) 	   %temp36,    %temp15
-         	     0:                AddOP 	                   temp39 	 %phi_var4,          1
-         	     0:               GotoOP 	    goto insertsortlabel1 	      null
-	address:0x12e704e90	insertsortlabel2:
-         	     0:              LabelOP 	         insertsortlabel2 	      null
-         	     0:             ReturnOP 	                   return 	         0
-	address:0x12e70cc40	insertsortendlabel:
-         	     0:              LabelOP 	       insertsortendlabel 	      null
-         	     0:            FuncEndOP 	          func_label_end1 	      null
-
-
-performance is over!!!!!!!
-performance is over!!!!!!!
-performance is over!!!!!!!
-performance is over!!!!!!!
-
-
-
-	labelID	number:               opcode 	                     name 	       use
-	address:0x12e704450	insertsortentry:
-         	     0:              LabelOP 	          insertsortentry 	      null
-         	     0:           AllocateOP 	                   param0 	      null
-         	     0:             AssignOP 	                %phi_var4 	         1
-         	     0:               GotoOP 	    goto insertsortlabel1 	      null
-	address:0x12e704a80	insertsortlabel1:
-         	     0:              LabelOP 	         insertsortlabel1 	      null
-         	     0:               LoadOP 	                   temp11 	   global1
-         	     0:           LessThanOP 	                   temp12 	 %phi_var4,     temp11
-         	     0:  GotoWithConditionOP 	true:insertsortlabel3  false:insertsortlabel2 	    temp12
-	address:0x12e704f30	insertsortlabel3:
-         	     0:              LabelOP 	         insertsortlabel3 	      null
-         	     0:      GetelementptrOP 	                  %temp14 	    param0,  %phi_var4
-         	     0:               LoadOP 	                  %temp15 	   %temp14
-         	     0:                SubOP 	                   temp17 	 %phi_var4,          1
-         	     0:             AssignOP 	                %phi_var2 	    temp17
-         	     0:               GotoOP 	    goto insertsortlabel4 	      null
-	address:0x12e705e10	insertsortlabel4:
-         	     0:              LabelOP 	         insertsortlabel4 	      null
-         	     0:          GreatThanOP 	                   temp19 	 %phi_var2,         -1
-         	     0:      GetelementptrOP 	                  %temp22 	    param0,  %phi_var2
-         	     0:               LoadOP 	                  %temp23 	   %temp22
-         	     0:           LessThanOP 	                   temp24 	   %temp15,    %temp23
-         	     0:           LogicAndOP 	                   temp25 	    temp19,     temp24
-         	     0:  GotoWithConditionOP 	true:insertsortlabel6  false:insertsortlabel5 	    temp25
-	address:0x12e706880	insertsortlabel6:
-         	     0:              LabelOP 	         insertsortlabel6 	      null
-         	     0:                AddOP 	                   temp27 	 %phi_var2,          1
-         	     0:      GetelementptrOP 	                  %temp28 	    param0,     temp27
-         	     0:      GetelementptrOP 	                  %temp30 	    param0,  %phi_var2
-         	     0:               LoadOP 	                  %temp31 	   %temp30
-         	     0:              StoreOP 	                   (null) 	   %temp28,    %temp31
-         	     0:                SubOP 	                   temp33 	 %phi_var2,          1
-         	     0:             AssignOP 	                %phi_var2 	    temp33
-         	     0:               GotoOP 	    goto insertsortlabel4 	      null
-	address:0x12e7067e0	insertsortlabel5:
-         	     0:              LabelOP 	         insertsortlabel5 	      null
-         	     0:                AddOP 	                   temp35 	 %phi_var2,          1
-         	     0:      GetelementptrOP 	                  %temp36 	    param0,     temp35
-         	     0:              StoreOP 	                   (null) 	   %temp36,    %temp15
-         	     0:                AddOP 	                   temp39 	 %phi_var4,          1
-         	     0:             AssignOP 	                %phi_var4 	    temp39
-         	     0:               GotoOP 	    goto insertsortlabel1 	      null
-	address:0x12e704e90	insertsortlabel2:
-         	     0:              LabelOP 	         insertsortlabel2 	      null
-         	     0:             ReturnOP 	                   return 	         0
-	address:0x12e70cc40	insertsortendlabel:
-         	     0:              LabelOP 	       insertsortendlabel 	      null
-         	     0:            FuncEndOP 	          func_label_end1 	      null
-
-
-insertsortentry live def add param0
-insertsortentry live def add %phi_var4
-insertsortlabel1 live use add global1
-insertsortlabel1 live def add temp11
-insertsortlabel1 live use add %phi_var4
-insertsortlabel1 live def add temp12
-insertsortlabel3 live use add param0
-insertsortlabel3 live use add %phi_var4
-insertsortlabel3 live def add %temp14
-insertsortlabel3 live def add %temp15
-insertsortlabel3 live use add %phi_var4
-insertsortlabel3 live def add temp17
-insertsortlabel3 live def add %phi_var2
-insertsortlabel4 live use add %phi_var2
-insertsortlabel4 live def add temp19
-insertsortlabel4 live use add param0
-insertsortlabel4 live use add %phi_var2
-insertsortlabel4 live def add %temp22
-insertsortlabel4 live def add %temp23
-insertsortlabel4 live use add %temp15
-insertsortlabel4 live def add temp24
-insertsortlabel4 live def add temp25
-insertsortlabel6 live use add %phi_var2
-insertsortlabel6 live def add temp27
-insertsortlabel6 live use add param0
-insertsortlabel6 live def add %temp28
-insertsortlabel6 live use add param0
-insertsortlabel6 live use add %phi_var2
-insertsortlabel6 live def add %temp30
-insertsortlabel6 live def add %temp31
-insertsortlabel6 live use add %phi_var2
-insertsortlabel6 live def add temp33
-insertsortlabel6 live def add %phi_var2
-insertsortlabel5 live use add %phi_var2
-insertsortlabel5 live def add temp35
-insertsortlabel5 live use add param0
-insertsortlabel5 live def add %temp36
-insertsortlabel5 live use add %temp15
-insertsortlabel5 live use add %phi_var4
-insertsortlabel5 live def add temp39
-insertsortlabel5 live def add %phi_var4
-
-
-
-	labelID	number:               opcode 	                     name 	       use
-	address:0x12e704450	insertsortentry:
-         	     0:              LabelOP 	          insertsortentry 	      null
-         	     1:           AllocateOP 	                   param0 	      null
-         	     2:             AssignOP 	                %phi_var4 	         1
-         	     3:               GotoOP 	    goto insertsortlabel1 	      null
-	address:0x12e704a80	insertsortlabel1:
-         	     4:              LabelOP 	         insertsortlabel1 	      null
-         	     5:               LoadOP 	                   temp11 	   global1
-         	     6:           LessThanOP 	                   temp12 	 %phi_var4,     temp11
-         	     7:  GotoWithConditionOP 	true:insertsortlabel3  false:insertsortlabel2 	    temp12
-	address:0x12e704f30	insertsortlabel3:
-         	     8:              LabelOP 	         insertsortlabel3 	      null
-         	     9:      GetelementptrOP 	                  %temp14 	    param0,  %phi_var4
-         	     10:               LoadOP 	                  %temp15 	   %temp14
-         	     11:                SubOP 	                   temp17 	 %phi_var4,          1
-         	     12:             AssignOP 	                %phi_var2 	    temp17
-         	     13:               GotoOP 	    goto insertsortlabel4 	      null
-	address:0x12e705e10	insertsortlabel4:
-         	     14:              LabelOP 	         insertsortlabel4 	      null
-         	     15:          GreatThanOP 	                   temp19 	 %phi_var2,         -1
-         	     16:      GetelementptrOP 	                  %temp22 	    param0,  %phi_var2
-         	     17:               LoadOP 	                  %temp23 	   %temp22
-         	     18:           LessThanOP 	                   temp24 	   %temp15,    %temp23
-         	     19:           LogicAndOP 	                   temp25 	    temp19,     temp24
-         	     20:  GotoWithConditionOP 	true:insertsortlabel6  false:insertsortlabel5 	    temp25
-	address:0x12e706880	insertsortlabel6:
-         	     21:              LabelOP 	         insertsortlabel6 	      null
-         	     22:                AddOP 	                   temp27 	 %phi_var2,          1
-         	     23:      GetelementptrOP 	                  %temp28 	    param0,     temp27
-         	     24:      GetelementptrOP 	                  %temp30 	    param0,  %phi_var2
-         	     25:               LoadOP 	                  %temp31 	   %temp30
-         	     26:              StoreOP 	                   (null) 	   %temp28,    %temp31
-         	     27:                SubOP 	                   temp33 	 %phi_var2,          1
-         	     28:             AssignOP 	                %phi_var2 	    temp33
-         	     29:               GotoOP 	    goto insertsortlabel4 	      null
-	address:0x12e7067e0	insertsortlabel5:
-         	     30:              LabelOP 	         insertsortlabel5 	      null
-         	     31:                AddOP 	                   temp35 	 %phi_var2,          1
-         	     32:      GetelementptrOP 	                  %temp36 	    param0,     temp35
-         	     33:              StoreOP 	                   (null) 	   %temp36,    %temp15
-         	     34:                AddOP 	                   temp39 	 %phi_var4,          1
-         	     35:             AssignOP 	                %phi_var4 	    temp39
-         	     36:               GotoOP 	    goto insertsortlabel1 	      null
-	address:0x12e704e90	insertsortlabel2:
-         	     37:              LabelOP 	         insertsortlabel2 	      null
-         	     38:             ReturnOP 	                   return 	         0
-	address:0x12e70cc40	insertsortendlabel:
-         	     39:              LabelOP 	       insertsortendlabel 	      null
-         	     40:            FuncEndOP 	          func_label_end1 	      null
-
-
-	val:global1 	begin:0 	end:36 
-	val:param0 	begin:1 	end:36 
-	val:%phi_var4 	begin:2 	end:36 
-	val:temp11 	begin:5 	end:6 
-	val:temp12 	begin:6 	end:7 
-	val:%temp14 	begin:9 	end:10 
-	val:%temp15 	begin:10 	end:33 
-	val:temp17 	begin:11 	end:12 
-	val:%phi_var2 	begin:12 	end:31 
-	val:temp19 	begin:15 	end:19 
-	val:%temp22 	begin:16 	end:17 
-	val:%temp23 	begin:17 	end:18 
-	val:temp24 	begin:18 	end:19 
-	val:temp25 	begin:19 	end:20 
-	val:temp27 	begin:22 	end:23 
-	val:%temp28 	begin:23 	end:26 
-	val:%temp30 	begin:24 	end:25 
-	val:%temp31 	begin:25 	end:26 
-	val:temp33 	begin:27 	end:28 
-	val:temp35 	begin:31 	end:32 
-	val:%temp36 	begin:32 	end:33 
-	val:temp39 	begin:34 	end:35 
-
-	var:%temp14	address:R6
- 	var:%temp15	address:R8
- 	var:%temp22	address:R10
- 	var:%temp23	address:R11
- 	var:%temp28	address:R10
- 	var:%temp30	address:R6
- 	var:%temp31	address:R11
- 	var:%temp36	address:R9
- 	var:global1	address:M
- 	var:%phi_var2	address:R9
- 	var:%phi_var4	address:R5
- 	var:temp11	address:R6
- 	var:temp12	address:R8
- 	var:temp17	address:R6
- 	var:temp19	address:R6
- 	var:temp24	address:R10
- 	var:temp25	address:R11
- 	var:temp27	address:R6
- 	var:temp33	address:R6
- 	var:temp35	address:R6
- 	var:temp39	address:R6
- 	var:param0	address:R4
- main
-mainentry edge is mainlabel7 
-mainlabel7 edge is mainlabel8 mainlabel9 
-mainlabel9 edge is mainlabel7 
-mainlabel8 edge is mainendlabel 
+         	     0:           AllocateOP 	                  global1 	      null
+main
+mainentry edge is mainendlabel 
 mainendlabel edge is 
 performance is begin!!!!!!!
 performance is begin!!!!!!!
 performance is begin!!!!!!!
 performance is begin!!!!!!!
-mainlabel7,mainlabel9,mainlabel8,mainendlabel,
-mainlabel9,
-mainlabel8,mainendlabel,
 mainendlabel,
 
 打印每个节点的立即支配节点
-idom(mainlabel7) = mainentry
-idom(mainlabel9) = mainlabel7
-idom(mainlabel8) = mainlabel7
-idom(mainendlabel) = mainlabel8
+idom(mainendlabel) = mainentry
 
 打印支配树中的层级关系
-mainentry: mainlabel7,
-mainlabel7: mainlabel9,mainlabel8,
-mainlabel8: mainendlabel,
+mainentry: mainendlabel,
 mainendlabel: 
-mainlabel9: 
 
 打印每个基本块的支配边界节点
-cur node mainlabel7's dom frontier is mainlabel7,
-cur node mainlabel9's dom frontier is mainlabel7,
-cur node mainlabel8's dom frontier is 
 cur node mainendlabel's dom frontier is 
 
 	labelID	number:               opcode 	                     name 	       use
-	address:0x12e7080f0	mainentry:
+	address:0x159e0b2c0	mainentry:
          	     0:              LabelOP 	                mainentry 	      null
-         	     0:           AllocateOP 	                   point5 	      null
-         	     0:           AllocateOP 	                   point4 	      null
-         	     0:           AllocateOP 	                   array2 	      null
-         	     0:              StoreOP 	                   (null) 	   global1,         10
-         	     0:      GetelementptrOP 	                  %temp40 	    array2,          0
-         	     0:              StoreOP 	                   (null) 	   %temp40,          4
-         	     0:      GetelementptrOP 	                  %temp41 	    array2,          1
-         	     0:              StoreOP 	                   (null) 	   %temp41,          3
-         	     0:      GetelementptrOP 	                  %temp42 	    array2,          2
-         	     0:              StoreOP 	                   (null) 	   %temp42,          9
-         	     0:      GetelementptrOP 	                  %temp43 	    array2,          3
-         	     0:              StoreOP 	                   (null) 	   %temp43,          2
-         	     0:      GetelementptrOP 	                  %temp44 	    array2,          4
-         	     0:              StoreOP 	                   (null) 	   %temp44,          0
-         	     0:      GetelementptrOP 	                  %temp45 	    array2,          5
-         	     0:              StoreOP 	                   (null) 	   %temp45,          1
-         	     0:      GetelementptrOP 	                  %temp46 	    array2,          6
-         	     0:              StoreOP 	                   (null) 	   %temp46,          6
-         	     0:      GetelementptrOP 	                  %temp47 	    array2,          7
-         	     0:              StoreOP 	                   (null) 	   %temp47,          5
-         	     0:      GetelementptrOP 	                  %temp48 	    array2,          8
-         	     0:              StoreOP 	                   (null) 	   %temp48,          7
-         	     0:      GetelementptrOP 	                  %temp49 	    array2,          9
-         	     0:              StoreOP 	                   (null) 	   %temp49,          8
-         	     0:              ParamOP 	                   param0 	    array2
-         	     0: CallWithReturnValueOP 	                   temp50 	      null
-         	     0:              StoreOP 	                   (null) 	    point4,     temp50
-         	     0:               GotoOP 	          goto mainlabel7 	      null
-	address:0x12e70ad40	mainlabel7:
-         	     0:              LabelOP 	               mainlabel7 	      null
-         	     0:            PhiFuncOp 	                %phi_var5 	size: 0 
-         	     0:               LoadOP 	                   temp51 	    point4
-         	     0:               LoadOP 	                   temp52 	   global1
-         	     0:           LessThanOP 	                   temp53 	    temp51,     temp52
-         	     0:  GotoWithConditionOP 	true:mainlabel9  false:mainlabel8 	    temp53
-	address:0x12e70b1d0	mainlabel9:
-         	     0:              LabelOP 	               mainlabel9 	      null
-         	     0:               LoadOP 	                   temp54 	    point4
-         	     0:      GetelementptrOP 	                  %temp55 	    array2,     temp54
-         	     0:               LoadOP 	                  %temp56 	   %temp55
-         	     0:              StoreOP 	                   (null) 	    point5,    %temp56
-         	     0:               LoadOP 	                   temp57 	    point5
-         	     0:              ParamOP 	                   param0 	    temp57
-         	     0:               CallOP 	                   temp58 	      null
-         	     0:              StoreOP 	                   (null) 	    point5,         10
-         	     0:               LoadOP 	                   temp59 	    point5
-         	     0:              ParamOP 	                   param0 	    temp59
-         	     0:               CallOP 	                   temp60 	      null
-         	     0:               LoadOP 	                   temp61 	    point4
-         	     0:                AddOP 	                   temp62 	    temp61,          1
-         	     0:              StoreOP 	                   (null) 	    point4,     temp62
-         	     0:               GotoOP 	          goto mainlabel7 	      null
-	address:0x12e70b140	mainlabel8:
-         	     0:              LabelOP 	               mainlabel8 	      null
+         	     0:           AllocateOP 	                   array1 	      null
+         	     0:           AllocateOP 	                   point1 	      null
+         	     0:              StoreOP 	                   (null) 	    point1,        233
+         	     0:               LoadOP 	                   temp10 	    point1
+         	     0:      GetelementptrOP 	                   temp11 	    array1,          4
+         	     0:      GetelementptrOP 	                   temp12 	    temp11,          0
+         	     0:              StoreOP 	                   (null) 	    temp12,     temp10
+         	     0:               LoadOP 	                   temp13 	    point1
+         	     0:                AddOP 	                   temp14 	    temp13,        123
+         	     0:      GetelementptrOP 	                   temp15 	    array1,          4
+         	     0:      GetelementptrOP 	                   temp16 	    temp15,          1
+         	     0:              StoreOP 	                   (null) 	    temp16,     temp14
          	     0:             ReturnOP 	                   return 	         0
-	address:0x12e70f7f0	mainendlabel:
+	address:0x159e0d7f0	mainendlabel:
          	     0:              LabelOP 	             mainendlabel 	      null
-         	     0:            FuncEndOP 	          func_label_end2 	      null
+         	     0:            FuncEndOP 	          func_label_end1 	      null
 
 
 begin rename pass and delete alloca,store,load instruction!
 rename pass over
 delete alloca,store,load instruction over
 	labelID	number:               opcode 	                     name 	       use
-	address:0x12e7080f0	mainentry:
+	address:0x159e0b2c0	mainentry:
          	     0:              LabelOP 	                mainentry 	      null
-         	     0:           AllocateOP 	                   array2 	      null
-         	     0:              StoreOP 	                   (null) 	   global1,         10
-         	     0:      GetelementptrOP 	                  %temp40 	    array2,          0
-         	     0:              StoreOP 	                   (null) 	   %temp40,          4
-         	     0:      GetelementptrOP 	                  %temp41 	    array2,          1
-         	     0:              StoreOP 	                   (null) 	   %temp41,          3
-         	     0:      GetelementptrOP 	                  %temp42 	    array2,          2
-         	     0:              StoreOP 	                   (null) 	   %temp42,          9
-         	     0:      GetelementptrOP 	                  %temp43 	    array2,          3
-         	     0:              StoreOP 	                   (null) 	   %temp43,          2
-         	     0:      GetelementptrOP 	                  %temp44 	    array2,          4
-         	     0:              StoreOP 	                   (null) 	   %temp44,          0
-         	     0:      GetelementptrOP 	                  %temp45 	    array2,          5
-         	     0:              StoreOP 	                   (null) 	   %temp45,          1
-         	     0:      GetelementptrOP 	                  %temp46 	    array2,          6
-         	     0:              StoreOP 	                   (null) 	   %temp46,          6
-         	     0:      GetelementptrOP 	                  %temp47 	    array2,          7
-         	     0:              StoreOP 	                   (null) 	   %temp47,          5
-         	     0:      GetelementptrOP 	                  %temp48 	    array2,          8
-         	     0:              StoreOP 	                   (null) 	   %temp48,          7
-         	     0:      GetelementptrOP 	                  %temp49 	    array2,          9
-         	     0:              StoreOP 	                   (null) 	   %temp49,          8
-         	     0:              ParamOP 	                   param0 	    array2
-         	     0: CallWithReturnValueOP 	                   temp50 	      null
-         	     0:               GotoOP 	          goto mainlabel7 	      null
-	address:0x12e70ad40	mainlabel7:
-         	     0:              LabelOP 	               mainlabel7 	      null
-         	     0:            PhiFuncOp 	                %phi_var5 	size: 2 	bblock: mainentry value: temp50, 	bblock: mainlabel9 value: temp62, 
-         	     0:               LoadOP 	                   temp52 	   global1
-         	     0:           LessThanOP 	                   temp53 	 %phi_var5,     temp52
-         	     0:  GotoWithConditionOP 	true:mainlabel9  false:mainlabel8 	    temp53
-	address:0x12e70b1d0	mainlabel9:
-         	     0:              LabelOP 	               mainlabel9 	      null
-         	     0:      GetelementptrOP 	                  %temp55 	    array2,  %phi_var5
-         	     0:               LoadOP 	                  %temp56 	   %temp55
-         	     0:              ParamOP 	                   param0 	   %temp56
-         	     0:               CallOP 	                   temp58 	      null
-         	     0:              ParamOP 	                   param0 	        10
-         	     0:               CallOP 	                   temp60 	      null
-         	     0:                AddOP 	                   temp62 	 %phi_var5,          1
-         	     0:               GotoOP 	          goto mainlabel7 	      null
-	address:0x12e70b140	mainlabel8:
-         	     0:              LabelOP 	               mainlabel8 	      null
+         	     0:           AllocateOP 	                   array1 	      null
+         	     0:      GetelementptrOP 	                   temp11 	    array1,          4
+         	     0:      GetelementptrOP 	                   temp12 	    temp11,          0
+         	     0:              StoreOP 	                   (null) 	    temp12,        233
+         	     0:                AddOP 	                   temp14 	       233,        123
+         	     0:      GetelementptrOP 	                   temp15 	    array1,          4
+         	     0:      GetelementptrOP 	                   temp16 	    temp15,          1
+         	     0:              StoreOP 	                   (null) 	    temp16,     temp14
          	     0:             ReturnOP 	                   return 	         0
-	address:0x12e70f7f0	mainendlabel:
+	address:0x159e0d7f0	mainendlabel:
          	     0:              LabelOP 	             mainendlabel 	      null
-         	     0:            FuncEndOP 	          func_label_end2 	      null
+         	     0:            FuncEndOP 	          func_label_end1 	      null
 
 
 performance is over!!!!!!!
@@ -763,176 +105,59 @@ performance is over!!!!!!!
 
 
 	labelID	number:               opcode 	                     name 	       use
-	address:0x12e7080f0	mainentry:
+	address:0x159e0b2c0	mainentry:
          	     0:              LabelOP 	                mainentry 	      null
-         	     0:           AllocateOP 	                   array2 	      null
-         	     0:              StoreOP 	                   (null) 	   global1,         10
-         	     0:      GetelementptrOP 	                  %temp40 	    array2,          0
-         	     0:              StoreOP 	                   (null) 	   %temp40,          4
-         	     0:      GetelementptrOP 	                  %temp41 	    array2,          1
-         	     0:              StoreOP 	                   (null) 	   %temp41,          3
-         	     0:      GetelementptrOP 	                  %temp42 	    array2,          2
-         	     0:              StoreOP 	                   (null) 	   %temp42,          9
-         	     0:      GetelementptrOP 	                  %temp43 	    array2,          3
-         	     0:              StoreOP 	                   (null) 	   %temp43,          2
-         	     0:      GetelementptrOP 	                  %temp44 	    array2,          4
-         	     0:              StoreOP 	                   (null) 	   %temp44,          0
-         	     0:      GetelementptrOP 	                  %temp45 	    array2,          5
-         	     0:              StoreOP 	                   (null) 	   %temp45,          1
-         	     0:      GetelementptrOP 	                  %temp46 	    array2,          6
-         	     0:              StoreOP 	                   (null) 	   %temp46,          6
-         	     0:      GetelementptrOP 	                  %temp47 	    array2,          7
-         	     0:              StoreOP 	                   (null) 	   %temp47,          5
-         	     0:      GetelementptrOP 	                  %temp48 	    array2,          8
-         	     0:              StoreOP 	                   (null) 	   %temp48,          7
-         	     0:      GetelementptrOP 	                  %temp49 	    array2,          9
-         	     0:              StoreOP 	                   (null) 	   %temp49,          8
-         	     0:              ParamOP 	                   param0 	    array2
-         	     0: CallWithReturnValueOP 	                   temp50 	      null
-         	     0:             AssignOP 	                %phi_var5 	    temp50
-         	     0:               GotoOP 	          goto mainlabel7 	      null
-	address:0x12e70ad40	mainlabel7:
-         	     0:              LabelOP 	               mainlabel7 	      null
-         	     0:               LoadOP 	                   temp52 	   global1
-         	     0:           LessThanOP 	                   temp53 	 %phi_var5,     temp52
-         	     0:  GotoWithConditionOP 	true:mainlabel9  false:mainlabel8 	    temp53
-	address:0x12e70b1d0	mainlabel9:
-         	     0:              LabelOP 	               mainlabel9 	      null
-         	     0:      GetelementptrOP 	                  %temp55 	    array2,  %phi_var5
-         	     0:               LoadOP 	                  %temp56 	   %temp55
-         	     0:              ParamOP 	                   param0 	   %temp56
-         	     0:               CallOP 	                   temp58 	      null
-         	     0:              ParamOP 	                   param0 	        10
-         	     0:               CallOP 	                   temp60 	      null
-         	     0:                AddOP 	                   temp62 	 %phi_var5,          1
-         	     0:             AssignOP 	                %phi_var5 	    temp62
-         	     0:               GotoOP 	          goto mainlabel7 	      null
-	address:0x12e70b140	mainlabel8:
-         	     0:              LabelOP 	               mainlabel8 	      null
+         	     0:           AllocateOP 	                   array1 	      null
+         	     0:      GetelementptrOP 	                   temp11 	    array1,          4
+         	     0:      GetelementptrOP 	                   temp12 	    temp11,          0
+         	     0:              StoreOP 	                   (null) 	    temp12,        233
+         	     0:                AddOP 	                   temp14 	       233,        123
+         	     0:      GetelementptrOP 	                   temp15 	    array1,          4
+         	     0:      GetelementptrOP 	                   temp16 	    temp15,          1
+         	     0:              StoreOP 	                   (null) 	    temp16,     temp14
          	     0:             ReturnOP 	                   return 	         0
-	address:0x12e70f7f0	mainendlabel:
+	address:0x159e0d7f0	mainendlabel:
          	     0:              LabelOP 	             mainendlabel 	      null
-         	     0:            FuncEndOP 	          func_label_end2 	      null
+         	     0:            FuncEndOP 	          func_label_end1 	      null
 
 
-mainentry live def add array2
-mainentry live use add global1
-mainentry live def add %temp40
-mainentry live def add %temp41
-mainentry live def add %temp42
-mainentry live def add %temp43
-mainentry live def add %temp44
-mainentry live def add %temp45
-mainentry live def add %temp46
-mainentry live def add %temp47
-mainentry live def add %temp48
-mainentry live def add %temp49
-mainentry live def add temp50
-mainentry live def add %phi_var5
-mainlabel7 live use add global1
-mainlabel7 live def add temp52
-mainlabel7 live use add %phi_var5
-mainlabel7 live def add temp53
-mainlabel9 live use add array2
-mainlabel9 live use add %phi_var5
-mainlabel9 live def add %temp55
-mainlabel9 live def add %temp56
-mainlabel9 live use add %phi_var5
-mainlabel9 live def add temp62
-mainlabel9 live def add %phi_var5
+mainentry live def add array1
+mainentry live def add temp11
+mainentry live def add temp12
+mainentry live def add temp14
+mainentry live def add temp15
+mainentry live def add temp16
 
 
 
 	labelID	number:               opcode 	                     name 	       use
-	address:0x12e7080f0	mainentry:
+	address:0x159e0b2c0	mainentry:
          	     0:              LabelOP 	                mainentry 	      null
-         	     1:           AllocateOP 	                   array2 	      null
-         	     2:              StoreOP 	                   (null) 	   global1,         10
-         	     3:      GetelementptrOP 	                  %temp40 	    array2,          0
-         	     4:              StoreOP 	                   (null) 	   %temp40,          4
-         	     5:      GetelementptrOP 	                  %temp41 	    array2,          1
-         	     6:              StoreOP 	                   (null) 	   %temp41,          3
-         	     7:      GetelementptrOP 	                  %temp42 	    array2,          2
-         	     8:              StoreOP 	                   (null) 	   %temp42,          9
-         	     9:      GetelementptrOP 	                  %temp43 	    array2,          3
-         	     10:              StoreOP 	                   (null) 	   %temp43,          2
-         	     11:      GetelementptrOP 	                  %temp44 	    array2,          4
-         	     12:              StoreOP 	                   (null) 	   %temp44,          0
-         	     13:      GetelementptrOP 	                  %temp45 	    array2,          5
-         	     14:              StoreOP 	                   (null) 	   %temp45,          1
-         	     15:      GetelementptrOP 	                  %temp46 	    array2,          6
-         	     16:              StoreOP 	                   (null) 	   %temp46,          6
-         	     17:      GetelementptrOP 	                  %temp47 	    array2,          7
-         	     18:              StoreOP 	                   (null) 	   %temp47,          5
-         	     19:      GetelementptrOP 	                  %temp48 	    array2,          8
-         	     20:              StoreOP 	                   (null) 	   %temp48,          7
-         	     21:      GetelementptrOP 	                  %temp49 	    array2,          9
-         	     22:              StoreOP 	                   (null) 	   %temp49,          8
-         	     23:              ParamOP 	                   param0 	    array2
-         	     24: CallWithReturnValueOP 	                   temp50 	      null
-         	     25:             AssignOP 	                %phi_var5 	    temp50
-         	     26:               GotoOP 	          goto mainlabel7 	      null
-	address:0x12e70ad40	mainlabel7:
-         	     27:              LabelOP 	               mainlabel7 	      null
-         	     28:               LoadOP 	                   temp52 	   global1
-         	     29:           LessThanOP 	                   temp53 	 %phi_var5,     temp52
-         	     30:  GotoWithConditionOP 	true:mainlabel9  false:mainlabel8 	    temp53
-	address:0x12e70b1d0	mainlabel9:
-         	     31:              LabelOP 	               mainlabel9 	      null
-         	     32:      GetelementptrOP 	                  %temp55 	    array2,  %phi_var5
-         	     33:               LoadOP 	                  %temp56 	   %temp55
-         	     34:              ParamOP 	                   param0 	   %temp56
-         	     35:               CallOP 	                   temp58 	      null
-         	     36:              ParamOP 	                   param0 	        10
-         	     37:               CallOP 	                   temp60 	      null
-         	     38:                AddOP 	                   temp62 	 %phi_var5,          1
-         	     39:             AssignOP 	                %phi_var5 	    temp62
-         	     40:               GotoOP 	          goto mainlabel7 	      null
-	address:0x12e70b140	mainlabel8:
-         	     41:              LabelOP 	               mainlabel8 	      null
-         	     42:             ReturnOP 	                   return 	         0
-	address:0x12e70f7f0	mainendlabel:
-         	     43:              LabelOP 	             mainendlabel 	      null
-         	     44:            FuncEndOP 	          func_label_end2 	      null
+         	     1:           AllocateOP 	                   array1 	      null
+         	     2:      GetelementptrOP 	                   temp11 	    array1,          4
+         	     3:      GetelementptrOP 	                   temp12 	    temp11,          0
+         	     4:              StoreOP 	                   (null) 	    temp12,        233
+         	     5:                AddOP 	                   temp14 	       233,        123
+         	     6:      GetelementptrOP 	                   temp15 	    array1,          4
+         	     7:      GetelementptrOP 	                   temp16 	    temp15,          1
+         	     8:              StoreOP 	                   (null) 	    temp16,     temp14
+         	     9:             ReturnOP 	                   return 	         0
+	address:0x159e0d7f0	mainendlabel:
+         	     10:              LabelOP 	             mainendlabel 	      null
+         	     11:            FuncEndOP 	          func_label_end1 	      null
 
 
-	val:global1 	begin:0 	end:40 
-	val:array2 	begin:1 	end:40 
-	val:%temp40 	begin:3 	end:4 
-	val:%temp41 	begin:5 	end:6 
-	val:%temp42 	begin:7 	end:8 
-	val:%temp43 	begin:9 	end:10 
-	val:%temp44 	begin:11 	end:12 
-	val:%temp45 	begin:13 	end:14 
-	val:%temp46 	begin:15 	end:16 
-	val:%temp47 	begin:17 	end:18 
-	val:%temp48 	begin:19 	end:20 
-	val:%temp49 	begin:21 	end:22 
-	val:temp50 	begin:24 	end:25 
-	val:%phi_var5 	begin:25 	end:40 
-	val:temp52 	begin:28 	end:29 
-	val:temp53 	begin:29 	end:30 
-	val:%temp55 	begin:32 	end:33 
-	val:%temp56 	begin:33 	end:34 
-	val:temp62 	begin:38 	end:39 
+	val:array1 	begin:1 	end:6 
+	val:temp11 	begin:2 	end:3 
+	val:temp12 	begin:3 	end:4 
+	val:temp14 	begin:5 	end:8 
+	val:temp15 	begin:6 	end:7 
+	val:temp16 	begin:7 	end:8 
 
-	var:%temp40	address:R5
- 	var:%temp41	address:R5
- 	var:%temp42	address:R5
- 	var:%temp43	address:R5
- 	var:%temp44	address:R5
- 	var:%temp45	address:R5
- 	var:%temp46	address:R5
- 	var:%temp47	address:R5
- 	var:%temp48	address:R5
- 	var:%temp49	address:R5
- 	var:%temp55	address:R5
- 	var:%temp56	address:R8
- 	var:global1	address:M
- 	var:%phi_var5	address:R6
- 	var:temp50	address:R5
- 	var:temp52	address:R5
- 	var:temp53	address:R8
- 	var:temp62	address:R5
- 	var:array2	address:R4
+	var:temp11	address:R5
+ 	var:temp12	address:R6
+ 	var:temp14	address:R5
+ 	var:temp15	address:R6
+ 	var:temp16	address:R4
+ 	var:array1	address:R4
  All over!

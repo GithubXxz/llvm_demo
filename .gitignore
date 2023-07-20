@@ -6,6 +6,7 @@ llvm_demo
 my_cases/
 test_cases/
 hidden_cases/
+performance_test/
 
 
 

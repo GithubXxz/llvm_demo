@@ -1,5 +1,6 @@
 #include "Pass.h"
 #include "cds.h"
+#include "container/hash_map.h"
 #include "function.h"
 
 // static const int REGISTER_NUM = 3;
@@ -20,6 +21,8 @@ typedef enum _LOCATION {
   ALLOC_R12,
   MEMORY
 } LOCATION;
+
+extern HashMap *global_array_init_hashmap;
 
 void register_replace(Function *handle_func) {
   HashMap *var_location = handle_func->var_localtion;

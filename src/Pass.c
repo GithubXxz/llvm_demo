@@ -73,7 +73,6 @@ extern HashMap *bblock_to_dom_graph_hashmap;
 
 extern List *global_var_list;
 
-extern HashMap *global_array_init_hashmap;
 
 extern char *tty_path;
 

@@ -172,6 +172,68 @@ char *hidden_cases[] = {
     "./hidden_cases/38_light2d.c",
     "./hidden_cases/39_fp_params.c",
 };
+// --------------------------------------------------
+char *performance_test[] = {
+    "./performance_test/00_bitset1.c",
+    "./performance_test/00_bitset2.c",
+    "./performance_test/00_bitset3.c",
+    "./performance_test/01_mm1.c",
+    "./performance_test/01_mm2.c",
+    "./performance_test/01_mm3.c",
+    "./performance_test/02_mv1.c",
+    "./performance_test/02_mv2.c",
+    "./performance_test/02_mv3.c",
+    "./performance_test/03_sort1.c",
+    "./performance_test/03_sort2.c",
+    "./performance_test/03_sort3.c",
+    "./performance_test/04_spmv1.c",
+    "./performance_test/04_spmv2.c",
+    "./performance_test/04_spmv3.c",
+    "./performance_test/brainfuck-bootstrap.c",
+    "./performance_test/brainfuck-mandelbrot-nerf.c",
+    "./performance_test/brainfuck-pi-nerf.c",
+    "./performance_test/conv0.c",
+    "./performance_test/conv1.c",
+    "./performance_test/conv2.c",
+    "./performance_test/crypto-1.c",
+    "./performance_test/crypto-2.c",
+    "./performance_test/crypto-3.c",
+    "./performance_test/dead-code-elimination-1.c",
+    "./performance_test/dead-code-elimination-2.c",
+    "./performance_test/dead-code-elimination-3.c",
+    "./performance_test/fft0.c",
+    "./performance_test/fft1.c",
+    "./performance_test/fft2.c",
+    "./performance_test/floyd-0.c",
+    "./performance_test/floyd-1.c",
+    "./performance_test/floyd-2.c",
+    "./performance_test/gameoflife-gosper.c",
+    "./performance_test/gameoflife-oscillator.c",
+    "./performance_test/gameoflife-p61glidergun.c",
+    "./performance_test/hoist-1.c",
+    "./performance_test/hoist-2.c",
+    "./performance_test/hoist-3.c",
+    "./performance_test/instruction-combining-1.c",
+    "./performance_test/instruction-combining-2.c",
+    "./performance_test/instruction-combining-3.c",
+    "./performance_test/integer-divide-optimization-1.c",
+    "./performance_test/integer-divide-optimization-2.c",
+    "./performance_test/integer-divide-optimization-3.c",
+    "./performance_test/median0.c",
+    "./performance_test/median1.c",
+    "./performance_test/median2.c",
+    "./performance_test/shuffle0.c",
+    "./performance_test/shuffle1.c",
+    "./performance_test/shuffle2.c",
+    "./performance_test/sl1.c",
+    "./performance_test/sl2.c",
+    "./performance_test/sl3.c",
+    "./performance_test/stencil0.c",
+    "./performance_test/stencil1.c",
+    "./performance_test/transpose0.c",
+    "./performance_test/transpose1.c",
+    "./performance_test/transpose2.c",
+};
 
 // --------------------------------------------------
 int main(int argc, char **argv) {
@@ -197,9 +259,9 @@ int main(int argc, char **argv) {
     choose_case = read_code_from_file(argv[4]);
   } else {
     is_functional_test = false;
-    choose_case = read_code_from_file(test_cases[56]);
+    // choose_case = read_code_from_file(test_cases[95]);
     // choose_case = read_code_from_file(hidden_cases[4]);
-    // choose_case = read_code_from_file("./my_cases/array_init.c");
+    choose_case = read_code_from_file("./my_cases/array_init.c");
   }
   if (choose_case == NULL)
     return 1;
