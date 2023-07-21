@@ -2,8 +2,9 @@
 #define C_CONTAINER_AUXILIARY
 
 #include "cds.h"
+#include "container/list.h"
 
-#define PRINT_OK
+// #define PRINT_OK
 
 #define SEQ(x, y) ((x) && (y) && (!strcmp(x, y)))
 

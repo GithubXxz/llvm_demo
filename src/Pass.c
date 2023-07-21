@@ -2,8 +2,10 @@
 #include "bblock.h"
 #include "c_container_auxiliary.h"
 #include "container/hash_map.h"
+#include "container/list.h"
 #include "optimization.h"
 #include "type.h"
+#include "user.h"
 
 #include <stdarg.h> //变长参数函数所需的头文件
 #include <stdbool.h>
@@ -72,7 +74,6 @@ extern HashSet *bblock_pass_hashset;
 extern HashMap *bblock_to_dom_graph_hashmap;
 
 extern List *global_var_list;
-
 
 extern char *tty_path;
 
@@ -280,7 +281,9 @@ void dom_relation_pass() {
         graph_for_dom_tree->node_set[j]->is_visited = false;
       }
     }
+#ifdef PRINT_OK
     printf("\n");
+#endif
   }
 
 #ifdef PRINT_OK
@@ -350,7 +353,9 @@ void dom_relation_pass() {
         StackPush(dom_tree_stack, cur);
       }
     }
+#ifdef PRINT_OK
     printf("\n");
+#endif
   }
 
 #ifdef PRINT_OK
@@ -746,35 +751,32 @@ void delete_alloca_store_load_ins_pass(ALGraph *self) {
     List *cur_handle = (self->node_set)[ii]->bblock_head->inst_list;
 
     ListSetClean(cur_handle, CommonCleanInstruction);
-    void *element;
+    Instruction *element;
     int i = 0;
-    while (i != ListSize(cur_handle)) {
-      // printf("in %s: %p\n", self->label->name, self->label);
-      ListGetAt(cur_handle, i, &element);
+    ListNode *iter = cur_handle->data->iter_node_;
+    element = iter->element_;
+
+    while (i < ListSize(cur_handle)) {
       switch (((Instruction *)element)->opcode) {
       case StoreOP:
-        if (user_get_operand_use(element, 0)->Val->VTy->TID != ArrayTyID &&
-            user_get_operand_use(element, 0)->Val->IsGlobalVar == 0) {
-          ListRemove(cur_handle, i);
-        } else {
-          i++;
-        }
+        if (user_get_operand_use((User *)element, 0)->Val->VTy->TID !=
+                ArrayTyID &&
+            user_get_operand_use((User *)element, 0)->Val->IsGlobalVar == 0)
+          delete_ins(cur_handle, &iter, &element);
+        else
+          iter_next_ins(&iter, &i, &element);
+
         break;
       case LoadOP:
-        if (user_get_operand_use(element, 0)->Val->VTy->TID != ArrayTyID &&
-            user_get_operand_use(element, 0)->Val->IsGlobalVar == 0) {
-          ListRemove(cur_handle, i);
-        } else {
-          i++;
-        }
-        break;
-      case PhiFuncOp:
-        // memset(user_get_operand_use((User *)self, 1), 0, sizeof(Use));
-        // ((Instruction *)element)->user.num_oprands--;
-        i++;
+        if (user_get_operand_use((User *)element, 0)->Val->VTy->TID !=
+                ArrayTyID &&
+            user_get_operand_use((User *)element, 0)->Val->IsGlobalVar == 0)
+          delete_ins(cur_handle, &iter, &element);
+        else
+          iter_next_ins(&iter, &i, &element);
         break;
       default:
-        i++;
+        iter_next_ins(&iter, &i, &element);
         break;
       }
     }
@@ -782,17 +784,17 @@ void delete_alloca_store_load_ins_pass(ALGraph *self) {
 
   List *cur_handle = (self->node_set)[0]->bblock_head->inst_list;
   ListSetClean(cur_handle, CommonCleanInstruction);
-  void *element;
+  Instruction *element;
   int i = 0;
-  while (i != ListSize(cur_handle)) {
-    // printf("in %s: %p\n", self->label->name, self->label);
-    ListGetAt(cur_handle, i, &element);
+  ListNode *iter = cur_handle->data->iter_node_;
+  element = iter->element_;
+
+  while (i < ListSize(cur_handle)) {
     if (((Instruction *)element)->opcode == AllocateOP &&
-        ((Value *)element)->VTy->TID != ArrayTyID) {
-      ListRemove(cur_handle, i);
-    } else {
-      i++;
-    }
+        ((Value *)element)->VTy->TID != ArrayTyID)
+      delete_ins(cur_handle, &iter, &element);
+    else
+      iter_next_ins(&iter, &i, &element);
   }
 }
 
@@ -883,7 +885,8 @@ void insert_copies_help(HashMap *insert_copies_stack_hashmap,
       phi_assign_ins->name = strdup(cur_pick_pair->dest->name);
       phi_assign_ins->VTy->TID = cur_pick_pair->dest->VTy->TID;
 
-      // Insert a copy operation from map[src] to dest at the end of cur_bblock
+      // Insert a copy operation from map[src] to dest at the end of
+      // cur_bblock
       ListInsert(cur_bblock->bblock_node->bblock_head->inst_list,
                  ListSize(cur_bblock->bblock_node->bblock_head->inst_list) - 1,
                  phi_assign_ins);
@@ -1019,67 +1022,76 @@ void print_bblock_pass(BasicBlock *self) {
   }
 }
 
+void delete_ins(List *self, ListNode **iter, Instruction **element) {
+  ListNode *pred = (*iter)->pred_;
+  ListNode *succ = (*iter)->succ_;
+  pred->succ_ = succ;
+  succ->pred_ = pred;
+  self->data->func_clean_(*element);
+  free(*iter);
+  *iter = succ;
+  *element = (*iter)->element_;
+  self->data->size_--;
+  if (self->data->size_ == 0)
+    self->data->head_ = NULL;
+}
+
+void iter_next_ins(ListNode **iter, int *i, Instruction **element) {
+  *iter = (*iter)->succ_;
+  (*i)++;
+  *element = (*iter)->element_;
+}
+
+static void delete_return_deadcode_pass_help(int i, List *self, ListNode **iter,
+                                             Instruction **element) {
+  while (i < self->data->size_ &&
+         ((*element)->opcode != FuncLabelOP && (*element)->opcode != LabelOP &&
+          (*element)->opcode != FuncEndOP))
+    delete_ins(self, iter, element);
+}
+
 void delete_return_deadcode_pass(List *self) {
-  Instruction *element;
-  ListFirst(self, true);
-  ListSetClean(self, CommonCleanInstruction);
-  unsigned i = 0;
+
   HashSet *reach_label = NULL;
   hashset_init(&reach_label);
-  while (i != ListSize(self)) {
-    ListGetAt(self, i, (void *)&element);
+
+  Instruction *element;
+  ListSetClean(self, CommonCleanInstruction);
+  ListNode *iter = self->data->head_;
+  element = iter->element_;
+  int i = 0;
+
+  while (i < ListSize(self)) {
     switch (((Instruction *)element)->opcode) {
     case GotoOP:
       HashSetAdd(reach_label,
                  ((Value *)element)->pdata->no_condition_goto.goto_location);
-      i++;
-      while (i < ListSize(self) && ListGetAt(self, i, (void *)&element) &&
-             ((element)->opcode != FuncLabelOP &&
-              (element)->opcode != LabelOP && (element)->opcode != FuncEndOP)) {
-        ListRemove(self, i);
-      }
+      iter_next_ins(&iter, &i, &element);
+      delete_return_deadcode_pass_help(i, self, &iter, &element);
       break;
     case GotoWithConditionOP:
       HashSetAdd(reach_label,
                  ((Value *)element)->pdata->condition_goto.true_goto_location);
       HashSetAdd(reach_label,
                  ((Value *)element)->pdata->condition_goto.false_goto_location);
-      i++;
-      while (i < ListSize(self) && ListGetAt(self, i, (void *)&element) &&
-             ((element)->opcode != FuncLabelOP &&
-              (element)->opcode != LabelOP && (element)->opcode != FuncEndOP)) {
-        ListRemove(self, i);
-      }
+      iter_next_ins(&iter, &i, &element);
+      delete_return_deadcode_pass_help(i, self, &iter, &element);
       break;
     case ReturnOP:
-      i++;
-      while (i < ListSize(self) && ListGetAt(self, i, (void *)&element) &&
-             ((element)->opcode != FuncLabelOP &&
-              (element)->opcode != LabelOP && (element)->opcode != FuncEndOP)) {
-        // printf("remove %s\n", ((Value *)element)->name);
-        ListRemove(self, i);
-      }
+      iter_next_ins(&iter, &i, &element);
+      delete_return_deadcode_pass_help(i, self, &iter, &element);
       break;
     case LabelOP:
       if (!HashSetFind(reach_label, (Value *)element) &&
           !strstr(((Value *)element)->name, "entry")) {
-        ListRemove(self, i);
-        bool is_over = false;
-        while (i < ListSize(self) && ListGetAt(self, i, (void *)&element) &&
-               ((element)->opcode != FuncLabelOP &&
-                (element)->opcode != LabelOP &&
-                (element)->opcode != FuncEndOP)) {
-          // printf("remove %s\n", ((Value *)element)->name);
-          ListRemove(self, i);
-          is_over = true;
-        }
-        if (is_over)
-          i--;
+        delete_ins(self, &iter, &element);
+        delete_return_deadcode_pass_help(i, self, &iter, &element);
+      } else {
+        iter_next_ins(&iter, &i, &element);
       }
-      i++;
       break;
     default:
-      i++;
+      iter_next_ins(&iter, &i, &element);
       break;
     }
   }
@@ -1341,7 +1353,7 @@ void bblock_to_dom_graph_pass(Function *self) {
   }
 #endif
 
-  delete_non_used_var_pass(self);
+  // delete_non_used_var_pass(self);
 
   if (!is_functional_test) {
 #ifdef PRINT_OK
@@ -1362,9 +1374,8 @@ void bblock_to_dom_graph_pass(Function *self) {
     // 插入phi函数
     insert_phi_func_pass(self);
 
-    printf("\n");
-
 #ifdef PRINT_OK
+    printf("\n");
     printf_cur_func_ins(self);
     printf("begin rename pass and delete alloca,store,load instruction!\n");
 #endif
@@ -1404,9 +1415,8 @@ void bblock_to_dom_graph_pass(Function *self) {
 #endif
   }
 
-  printf("\n\n\n");
-
 #ifdef PRINT_OK
+  printf("\n\n\n");
   printf_cur_func_ins(self);
 #endif
 

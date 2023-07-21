@@ -36,6 +36,28 @@ void print_bblock_pass(BasicBlock *self);
 void bblock_to_dom_graph_pass(Function *self);
 void print_bblock_pass_temp(BasicBlock *self);
 void delete_alloca_store_load_ins_pass(ALGraph *self);
-void printf_cur_func_ins(Function *self) ;
+void printf_cur_func_ins(Function *self);
+
+void delete_ins(List *self, ListNode **iter, Instruction **element);
+// inline void delete_ins(List *self, ListNode **iter, Instruction **element) {
+//   ListNode *pred = (*iter)->pred_;
+//   ListNode *succ = (*iter)->succ_;
+//   pred->succ_ = succ;
+//   succ->pred_ = pred;
+//   self->data->func_clean_(*element);
+//   free(*iter);
+//   *iter = succ;
+//   *element = (*iter)->element_;
+//   self->data->size_--;
+//   if (self->data->size_ == 0)
+//     self->data->head_ = NULL;
+// }
+
+ void iter_next_ins(ListNode **iter, int *i, Instruction **element);
+// inline void iter_next_ins(ListNode **iter, int *i, Instruction **element) {
+//   *iter = (*iter)->succ_;
+//   (*i)++;
+//   *element = (*iter)->element_;
+// }
 
 #endif

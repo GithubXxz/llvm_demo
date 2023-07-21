@@ -488,19 +488,21 @@ void delete_non_used_var_pass(Function *handle_func) {
   while (!is_over) {
     is_over = true;
     for (int i = 0; i < self_cfg->node_num; i++) {
-      List *cur_handle = (self_cfg->node_set)[i]->bblock_head->inst_list;
-      ListSetClean(cur_handle, CommonCleanInstruction);
+      List *cur_handle_list = (self_cfg->node_set)[i]->bblock_head->inst_list;
+      ListSetClean(cur_handle_list, CommonCleanInstruction);
       Instruction *element;
       int i = 0;
-      while (i != ListSize(cur_handle)) {
-        ListGetAt(cur_handle, i, (void *)&element);
+      ListNode *iter = cur_handle_list->data->head_;
+      element = iter->element_;
+
+      while (i < ListSize(cur_handle_list)) {
         if (element->opcode < RETURN_USED &&
             element->opcode != CallWithReturnValueOP &&
             ((Value *)element)->use_list == NULL) {
-          ListRemove(cur_handle, i);
+          delete_ins(cur_handle_list, &iter, &element);
           is_over = false;
         } else
-          i++;
+          iter_next_ins(&iter, &i, &element);
       }
     }
   }

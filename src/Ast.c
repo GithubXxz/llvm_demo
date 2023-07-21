@@ -1072,17 +1072,13 @@ Value *post_eval(ast *a, Value *left, Value *right) {
         return right;
       } else if (SEQ(a->r->name, "LB")) {
         // oprand the array
-        char temp_str[15];
-        char text[10];
-        sprintf(text, "%d", temp_var_seed);
-        ++temp_var_seed;
-        strcpy(temp_str, "\%temp");
-        strcat(temp_str, text);
+        char *temp_str = name_generate(TEMP_VAR);
         Value *cur_ins =
             (Value *)ins_new_binary_operator_v2(GetelementptrOP, left, right);
         // 将数组的信息拷贝一份
         cur_ins->name = strdup(temp_str);
         cur_ins->VTy->TID = ArrayTyID;
+        // cur_ins->IsGlobalVar = left->IsGlobalVar;
         cur_ins->pdata->array_pdata.array_type =
             left->pdata->array_pdata.array_type;
         // cur_ins->pdata->array_pdata.array_value =
@@ -1453,7 +1449,7 @@ Value *post_eval(ast *a, Value *left, Value *right) {
       have_else = true;
       Value *then_label_ins = NULL;
       StackTop(stack_then_label, (void **)&then_label_ins);
-      char temp_str[30];
+      char temp_str[100];
       strcpy(temp_str, "goto ");
       strcat(temp_str, then_label_ins->name);
 
@@ -1470,7 +1466,7 @@ Value *post_eval(ast *a, Value *left, Value *right) {
       StackTop(stack_while_head_label, (void **)&while_head_label_ins);
       StackPop(stack_while_head_label);
 
-      char temp_str[30];
+      char temp_str[100];
       strcpy(temp_str, "goto ");
       strcat(temp_str, while_head_label_ins->name);
 

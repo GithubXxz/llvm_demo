@@ -1,4 +1,5 @@
 #include <stdarg.h> //变长参数函数所需的头文件
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -257,11 +258,17 @@ int main(int argc, char **argv) {
   } else if (argc == 6) {
     is_functional_test = false;
     choose_case = read_code_from_file(argv[4]);
+  } else if (argc == 2) {
+    is_functional_test = true;
+    choose_case = read_code_from_file(argv[1]);
+  } else if (argc == 3) {
+    is_functional_test = false;
+    choose_case = read_code_from_file(argv[1]);
   } else {
     is_functional_test = false;
-    // choose_case = read_code_from_file(test_cases[95]);
+    choose_case = read_code_from_file(test_cases[77]);
     // choose_case = read_code_from_file(hidden_cases[4]);
-    choose_case = read_code_from_file("./my_cases/array_init.c");
+    // choose_case = read_code_from_file("./my_cases/delete_non_reach_pass.c");
   }
   if (choose_case == NULL)
     return 1;
@@ -281,6 +288,7 @@ int main(int argc, char **argv) {
 
 #ifdef PRINT_OK
   print_ins_pass(ins_list);
+  fflush(stdout);
   printf("\n\n\n\n");
 #endif
 
@@ -311,7 +319,8 @@ int main(int argc, char **argv) {
 #endif
 
   free(tty_path);
-  printf("All over!\n");
+  printf("%s test All over!\n",
+         is_functional_test ? "functional" : "performance");
   return 0;
 }
 
