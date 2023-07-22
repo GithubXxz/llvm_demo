@@ -45,7 +45,16 @@ enum NameSeed {
   POINT
 };
 
-static struct {
+#define N_OP_NUM 12
+static char *NORMAL_OPERATOR[N_OP_NUM] = {
+    "ERROROP", "PLUS",     "MINUS", "MOD",  "STAR",       "DIV",
+    "EQUAL",   "NOTEQUAL", "GREAT", "LESS", "GREATEQUAL", "LESSEQUAL",
+};
+
+#define L_OP_NUM 2
+static char *LOGIC_OPERATOR[L_OP_NUM] = {"AND", "OR"};
+
+struct {
   int nest_levels;
   int array_level;
   int *added;
@@ -84,6 +93,34 @@ static void array_init_assist_func(List *array_list, Value *cur_init_array) {
     array_init_assist.added = NULL;
     free(array_init_assist.array_info);
     array_init_assist.array_info = NULL;
+  }
+}
+
+struct {
+  Stack *and_stack;
+  Stack *or_stack;
+  Value *true_label;
+  Value *false_label;
+  bool is_if_init;
+} logic_goto_assist;
+
+static void logic_goto_assist_func(Value *true_label, Value *false_label) {
+  if (true_label != NULL) {
+    logic_goto_assist.and_stack = StackInit();
+    StackSetClean(logic_goto_assist.and_stack, CleanObject);
+    logic_goto_assist.or_stack = StackInit();
+    StackSetClean(logic_goto_assist.or_stack, CleanObject);
+    logic_goto_assist.true_label = true_label;
+    logic_goto_assist.false_label = false_label;
+    logic_goto_assist.is_if_init = true;
+  } else {
+    StackDeinit(logic_goto_assist.and_stack);
+    StackDeinit(logic_goto_assist.or_stack);
+    logic_goto_assist.true_label = NULL;
+    logic_goto_assist.false_label = NULL;
+    logic_goto_assist.and_stack = NULL;
+    logic_goto_assist.or_stack = NULL;
+    logic_goto_assist.is_if_init = false;
   }
 }
 
@@ -240,6 +277,41 @@ void eval_print(ast *a, int level) {
 
 void pre_eval(ast *a) {
   if (a != NULL) {
+
+    if (SEQ(a->name, "IF")) {
+      // 创建false条件下的label标签
+      char *temp_str = NULL;
+
+      temp_str = name_generate(LABEL);
+      Value *else_label_ins = (Value *)ins_new_no_operator_v2(LabelOP);
+      else_label_ins->name = temp_str;
+      else_label_ins->VTy->TID = LabelTyID;
+      StackPush(stack_else_label, else_label_ins);
+
+      temp_str = name_generate(LABEL);
+      Value *true_label_ins = (Value *)ins_new_no_operator_v2(LabelOP);
+      true_label_ins->name = temp_str;
+      true_label_ins->VTy->TID = LabelTyID;
+
+      logic_goto_assist_func(true_label_ins, else_label_ins);
+    }
+
+    if (a->r && SEQ(a->r->name, "AND")) {
+      char *temp_str = name_generate(LABEL);
+      Value *and_label_ins = (Value *)ins_new_no_operator_v2(LabelOP);
+      and_label_ins->name = temp_str;
+      and_label_ins->VTy->TID = LabelTyID;
+      StackPush(logic_goto_assist.and_stack, and_label_ins);
+    }
+
+    if (a->r && SEQ(a->r->name, "OR")) {
+      char *temp_str = name_generate(LABEL);
+      Value *or_label_ins = (Value *)ins_new_no_operator_v2(LabelOP);
+      or_label_ins->name = temp_str;
+      or_label_ins->VTy->TID = LabelTyID;
+      StackPush(logic_goto_assist.or_stack, or_label_ins);
+    }
+
     if (SEQ(a->name, "FunDec")) {
       // 新建一个符号表用于存放参数
       cur_symboltable = (SymbolTable *)malloc(sizeof(SymbolTable));
@@ -280,11 +352,6 @@ void pre_eval(ast *a) {
     if (SEQ(a->name, "LC")) {
       if (array_init_assist.is_init_array) {
         array_init_assist.nest_levels++;
-        // if (array_init_assist.added[array_init_assist.nest_levels - 1] != 0)
-        // {
-        //   array_init_assist.added[array_init_assist.nest_levels - 1] = 0;
-        //   array_init_assist.added[array_init_assist.nest_levels]++;
-        // }
         array_init_assist.is_empty = true;
       } else {
         cur_symboltable = (SymbolTable *)malloc(sizeof(SymbolTable));
@@ -344,6 +411,7 @@ void pre_eval(ast *a) {
       // 插入while循环头的label
       ListPushBack(ins_list, while_head_label_ins);
     }
+
     if (SEQ(a->name, "assistELSE")) {
       Value *then_label_ins = (Value *)ins_new_no_operator_v2(LabelOP);
 
@@ -511,50 +579,73 @@ void in_eval(ast *a, Value *left) {
     param_seed = 0;
   }
 
+  // assistIF
   if (a->r && SEQ(a->r->name, "assistIF")) {
-    // 创建false条件下的label标签
-    char *temp_str = NULL;
-    temp_str = name_generate(LABEL);
+    Value *true_label_ins = logic_goto_assist.true_label;
+    Value *else_label_ins = logic_goto_assist.false_label;
+    if (left) {
+      Value *goto_condition_ins =
+          (Value *)ins_new_single_operator_v2(GotoWithConditionOP, left);
 
-    Value *else_label_ins = (Value *)ins_new_no_operator_v2(LabelOP);
-    else_label_ins->name = temp_str;
-    else_label_ins->VTy->TID = LabelTyID;
+      char temp_br_label_name[80];
+      strcpy(temp_br_label_name, "true:");
+      strcat(temp_br_label_name, true_label_ins->name);
+      strcat(temp_br_label_name, "  false:");
+      strcat(temp_br_label_name, else_label_ins->name);
 
-    // 将else-label入栈
-    StackPush(stack_else_label, else_label_ins);
+      goto_condition_ins->name = strdup(temp_br_label_name);
+      goto_condition_ins->VTy->TID = GotoTyID;
+      goto_condition_ins->pdata->condition_goto.true_goto_location =
+          true_label_ins;
+      goto_condition_ins->pdata->condition_goto.false_goto_location =
+          else_label_ins;
 
-    temp_str = name_generate(LABEL);
-
-    Value *true_label_ins = (Value *)ins_new_no_operator_v2(LabelOP);
-    // 添加变量的名字
-    true_label_ins->name = temp_str;
-    true_label_ins->VTy->TID = LabelTyID;
-
-    // 创建跳转语句 left是跳转条件
-    Value *goto_condition_ins =
-        (Value *)ins_new_single_operator_v2(GotoWithConditionOP, left);
-
-    char temp_br_label_name[80];
-    strcpy(temp_br_label_name, "true:");
-    strcat(temp_br_label_name, true_label_ins->name);
-    strcat(temp_br_label_name, "  false:");
-    strcat(temp_br_label_name, else_label_ins->name);
-
-    goto_condition_ins->name = strdup(temp_br_label_name);
-    goto_condition_ins->VTy->TID = GotoTyID;
-    goto_condition_ins->pdata->condition_goto.false_goto_location =
-        else_label_ins;
-    goto_condition_ins->pdata->condition_goto.true_goto_location =
-        true_label_ins;
-
-    ListPushBack(ins_list, (void *)goto_condition_ins);
+      ListPushBack(ins_list, goto_condition_ins);
+    }
     ListPushBack(ins_list, true_label_ins);
+    logic_goto_assist_func(NULL, NULL);
+  }
 
-#ifdef PRINT_OK
-    printf("br %s, true: %s  false : %s \n", left->name, true_label_ins->name,
-           else_label_ins->name);
-    printf("%s\n", temp_str);
-#endif
+  if (a->r) {
+    for (int i = 0; i < L_OP_NUM; i++) {
+      if (SEQ(a->r->name, LOGIC_OPERATOR[i])) {
+        if (left != NULL) {
+          Value *goto_condition_ins =
+              (Value *)ins_new_single_operator_v2(GotoWithConditionOP, left);
+          Value *true_label_ins;
+          Value *else_label_ins;
+          if (StackSize(logic_goto_assist.and_stack) == 0)
+            true_label_ins = logic_goto_assist.true_label;
+          else
+            StackTop(logic_goto_assist.and_stack, (void **)&true_label_ins);
+
+          if (StackSize(logic_goto_assist.or_stack) == 0)
+            else_label_ins = logic_goto_assist.false_label;
+          else
+            StackTop(logic_goto_assist.or_stack, (void **)&else_label_ins);
+
+          char temp_br_label_name[80];
+          strcpy(temp_br_label_name, "true:");
+          strcat(temp_br_label_name, true_label_ins->name);
+          strcat(temp_br_label_name, "  false:");
+          strcat(temp_br_label_name, else_label_ins->name);
+
+          goto_condition_ins->name = strdup(temp_br_label_name);
+          goto_condition_ins->VTy->TID = GotoTyID;
+          goto_condition_ins->pdata->condition_goto.true_goto_location =
+              true_label_ins;
+          goto_condition_ins->pdata->condition_goto.false_goto_location =
+              else_label_ins;
+
+          ListPushBack(ins_list, goto_condition_ins);
+        }
+        Instruction *insert_label = NULL;
+        StackTop((Stack *)(*((intptr_t *)&logic_goto_assist + i)),
+                 (void **)&insert_label);
+        StackPop((Stack *)(*((intptr_t *)&logic_goto_assist + i)));
+        ListPushBack(ins_list, insert_label);
+      }
+    }
   }
 
   // args_insert
@@ -681,6 +772,7 @@ Value *post_eval(ast *a, Value *left, Value *right) {
         } else {
           flag = true;
           work_ins = (Value *)ins_new_single_operator_v2(NotOP, right);
+          work_ins->VTy->TID = IntegerTyID;
         }
       }
       if (flag) {
@@ -691,6 +783,7 @@ Value *post_eval(ast *a, Value *left, Value *right) {
         return right;
       }
     }
+
     // 如果要定义数据变量 判断当前定义的数据类型
     // 并且修改 NowVarDecType
     if (SEQ(a->name, "TYPE")) {
@@ -851,16 +944,13 @@ Value *post_eval(ast *a, Value *left, Value *right) {
           // 将内容拷贝
           value_copy(load_ins,
                      load_var_pointer->pdata->allocate_pdata.point_value);
-
-          ListPushBack(ins_list, (void *)load_ins);
-
 #ifdef PRINT_OK
           printf("%s = load %s, %s,align 4\n", load_ins->name,
                  NowVarDecStr[load_ins->VTy->TID < 4 ? load_ins->VTy->TID
                                                      : load_ins->VTy->TID - 4],
                  load_var_pointer->name);
 #endif
-
+          ListPushBack(ins_list, (void *)load_ins);
           return load_ins;
         }
       } else if (SEQ(a->name, "ID") && pre_astnode->r &&
@@ -1000,8 +1090,9 @@ Value *post_eval(ast *a, Value *left, Value *right) {
             if (left->IsConst) {
               if (nowVarDecType != (int)right->VTy->TID - 4) {
                 right->VTy->TID = (int)nowVarDecType + 4;
-                // right->pdata->var_pdata.fVal = right->pdata->var_pdata.fVal;
-                // right->pdata->var_pdata.iVal = right->pdata->var_pdata.iVal;
+                // right->pdata->var_pdata.fVal =
+                // right->pdata->var_pdata.fVal; right->pdata->var_pdata.iVal
+                // = right->pdata->var_pdata.iVal;
               }
               value_free(left->pdata->allocate_pdata.point_value);
               left->pdata->allocate_pdata.point_value = right;
@@ -1051,9 +1142,8 @@ Value *post_eval(ast *a, Value *left, Value *right) {
     // 判断当前节点是否为表达式节点
     if (SEQ(a->name, "Exp")) {
       char *var_name = NULL;
-      if (left) {
+      if (left)
         var_name = left->name;
-      }
 
       if (right == NULL) {
         return left;
@@ -1146,6 +1236,40 @@ Value *post_eval(ast *a, Value *left, Value *right) {
         return cur_ins;
       } else {
 
+        for (int i = 0; i < L_OP_NUM; i++) {
+          if (SEQ(a->r->name, LOGIC_OPERATOR[i])) {
+            Value *goto_condition_ins =
+                (Value *)ins_new_single_operator_v2(GotoWithConditionOP, right);
+            Value *true_label_ins;
+            Value *else_label_ins;
+            if (StackSize(logic_goto_assist.and_stack) == 0)
+              true_label_ins = logic_goto_assist.true_label;
+            else
+              StackTop(logic_goto_assist.and_stack, (void **)&true_label_ins);
+
+            if (StackSize(logic_goto_assist.or_stack) == 0)
+              else_label_ins = logic_goto_assist.false_label;
+            else
+              StackTop(logic_goto_assist.or_stack, (void **)&else_label_ins);
+
+            char temp_br_label_name[80];
+            strcpy(temp_br_label_name, "true:");
+            strcat(temp_br_label_name, true_label_ins->name);
+            strcat(temp_br_label_name, "  false:");
+            strcat(temp_br_label_name, else_label_ins->name);
+
+            goto_condition_ins->name = strdup(temp_br_label_name);
+            goto_condition_ins->VTy->TID = GotoTyID;
+            goto_condition_ins->pdata->condition_goto.true_goto_location =
+                true_label_ins;
+            goto_condition_ins->pdata->condition_goto.false_goto_location =
+                else_label_ins;
+
+            ListPushBack(ins_list, goto_condition_ins);
+            return NULL;
+          }
+        }
+
         if ((left->VTy->TID == ImmediateIntTyID ||
              left->VTy->TID == ImmediateFloatTyID) &&
             (right->VTy->TID == ImmediateIntTyID ||
@@ -1205,16 +1329,6 @@ Value *post_eval(ast *a, Value *left, Value *right) {
                   left->pdata->var_pdata.fVal <= right->pdata->var_pdata.fVal;
               temp->pdata->var_pdata.fVal =
                   left->pdata->var_pdata.fVal <= right->pdata->var_pdata.fVal;
-            } else if (SEQ(a->r->name, "AND")) {
-              temp->pdata->var_pdata.iVal =
-                  left->pdata->var_pdata.fVal && right->pdata->var_pdata.fVal;
-              temp->pdata->var_pdata.fVal =
-                  left->pdata->var_pdata.fVal && right->pdata->var_pdata.fVal;
-            } else if (SEQ(a->r->name, "OR")) {
-              temp->pdata->var_pdata.iVal =
-                  left->pdata->var_pdata.fVal || right->pdata->var_pdata.fVal;
-              temp->pdata->var_pdata.fVal =
-                  left->pdata->var_pdata.fVal || right->pdata->var_pdata.fVal;
             }
             sprintf(buffer, "%f", temp->pdata->var_pdata.fVal);
           } else {
@@ -1272,16 +1386,6 @@ Value *post_eval(ast *a, Value *left, Value *right) {
               temp->pdata->var_pdata.iVal =
                   left->pdata->var_pdata.iVal % right->pdata->var_pdata.iVal;
               temp->pdata->var_pdata.fVal = (float)temp->pdata->var_pdata.iVal;
-            } else if (SEQ(a->r->name, "AND")) {
-              temp->pdata->var_pdata.iVal =
-                  left->pdata->var_pdata.iVal && right->pdata->var_pdata.iVal;
-              temp->pdata->var_pdata.fVal =
-                  left->pdata->var_pdata.iVal && right->pdata->var_pdata.iVal;
-            } else if (SEQ(a->r->name, "OR")) {
-              temp->pdata->var_pdata.iVal =
-                  left->pdata->var_pdata.iVal || right->pdata->var_pdata.iVal;
-              temp->pdata->var_pdata.fVal =
-                  left->pdata->var_pdata.iVal || right->pdata->var_pdata.iVal;
             }
             sprintf(buffer, "%d", temp->pdata->var_pdata.iVal);
           }
@@ -1291,258 +1395,235 @@ Value *post_eval(ast *a, Value *left, Value *right) {
           return temp;
         }
 
-        Value *cur_ins =
-            (Value *)ins_new_binary_operator_v2(DefaultOP, left, right);
-        // 添加变量的名字
-        cur_ins->name = name_generate(TEMP_VAR);
-        cur_ins->VTy->TID = ins_res_type(left, right);
+        for (int i = 1; i < N_OP_NUM; i++) {
+          if (SEQ(a->r->name, NORMAL_OPERATOR[i])) {
+            Value *cur_ins =
+                (Value *)ins_new_binary_operator_v2(DefaultOP, left, right);
+            // 添加变量的名字
+            cur_ins->name = name_generate(TEMP_VAR);
+            cur_ins->VTy->TID = ins_res_type(left, right);
 
-        char *oprand_type =
-            NowVarDecStr[cur_ins->VTy->TID < 4 ? cur_ins->VTy->TID
-                                               : cur_ins->VTy->TID - 4];
-
-        if (SEQ(a->r->name, "PLUS")) {
-          ((Instruction *)cur_ins)->opcode = AddOP;
-        } else if (SEQ(a->r->name, "MINUS")) {
-          ((Instruction *)cur_ins)->opcode = SubOP;
-        } else if (SEQ(a->r->name, "STAR")) {
-          ((Instruction *)cur_ins)->opcode = MulOP;
-        } else if (SEQ(a->r->name, "DIV")) {
-          ((Instruction *)cur_ins)->opcode = DivOP;
-        } else if (SEQ(a->r->name, "EQUAL")) {
-          ((Instruction *)cur_ins)->opcode = EqualOP;
-        } else if (SEQ(a->r->name, "NOTEQUAL")) {
-          ((Instruction *)cur_ins)->opcode = NotEqualOP;
-        } else if (SEQ(a->r->name, "GREAT")) {
-          ((Instruction *)cur_ins)->opcode = GreatThanOP;
-        } else if (SEQ(a->r->name, "LESS")) {
-          ((Instruction *)cur_ins)->opcode = LessThanOP;
-        } else if (SEQ(a->r->name, "GREATEQUAL")) {
-          ((Instruction *)cur_ins)->opcode = GreatEqualOP;
-        } else if (SEQ(a->r->name, "LESSEQUAL")) {
-          ((Instruction *)cur_ins)->opcode = LessEqualOP;
-        } else if (SEQ(a->r->name, "MOD")) {
-          ((Instruction *)cur_ins)->opcode = ModOP;
-        } else if (SEQ(a->r->name, "AND")) {
-          ((Instruction *)cur_ins)->opcode = LogicAndOP;
-        } else if (SEQ(a->r->name, "OR")) {
-          ((Instruction *)cur_ins)->opcode = LogicOrOP;
+            char *oprand_type =
+                NowVarDecStr[cur_ins->VTy->TID < 4 ? cur_ins->VTy->TID
+                                                   : cur_ins->VTy->TID - 4];
+            ((Instruction *)cur_ins)->opcode = i;
+            ListPushBack(ins_list, (void *)cur_ins);
+            return cur_ins;
+          }
         }
 
-        ListPushBack(ins_list, (void *)cur_ins);
-        return cur_ins;
-      }
-    }
-
-    if (SEQ(a->name, "assistFuncCall")) {
-      return right;
-    }
-
-    // 后续遍历到if标识该if管辖的全区域块结束 插入跳转点label
-    if (SEQ(a->name, "IF")) {
-      Instruction *ins_back = NULL;
-      ListGetBack(ins_list, (void **)&ins_back);
-
-      // 当前的if不含else的情况
-      if (!have_else) {
-        // 删除链尾 并且释放链尾ins的内存
-        // ListPopBack(ins_list);
-        // value_free((Value *)ins_back);
-        // free(ins_back);
-
-        Value *else_label_ins = NULL;
-        StackTop(stack_else_label, (void **)&else_label_ins);
-        StackPop(stack_else_label);
-        // 重定向无条件跳转的指向
-        char temp_str[30];
-        strcpy(temp_str, "goto ");
-        strcat(temp_str, ((Value *)else_label_ins)->name);
-        free(((Value *)ins_back)->name);
-        ((Value *)ins_back)->name = strdup(temp_str);
-        ((Value *)ins_back)->pdata->no_condition_goto.goto_location =
-            else_label_ins;
-        ListPushBack(ins_list, (void *)else_label_ins);
-#ifdef PRINT_OK
-        printf("%s\n", else_label_ins->name);
-#endif
-
-        Instruction *then_label_ins = NULL;
-        StackTop(stack_then_label, (void **)&then_label_ins);
-        StackPop(stack_then_label);
-        // 释放label ins的内存
-        // printf("delete the destination %s\n",
-        // then_label_ins->user.res->name);
-        value_free((Value *)then_label_ins);
-        free(then_label_ins);
-        return NULL;
-      } else {
-        have_else = false;
-        Value *then_label_ins = NULL;
-        StackTop(stack_then_label, (void **)&then_label_ins);
-        StackPop(stack_then_label);
-        ListPushBack(ins_list, (void *)then_label_ins);
-#ifdef PRINT_OK
-        printf("%s\n", then_label_ins->name);
-#endif
         return NULL;
       }
-    }
-
-    if (SEQ(a->name, "FunDec")) {
-      StackPop(stack_symbol_table);
-      // 销毁当前的符号表中的哈希表然后销毁符号表
-      HashMapDeinit(cur_symboltable->symbol_map);
-      free(cur_symboltable);
-      cur_symboltable = NULL;
-      // 当前的符号表恢复到上一级的符号表
-      StackTop(stack_symbol_table, (void **)&cur_symboltable);
-
-      char *func_label_end = NULL;
-      func_label_end = name_generate(FUNC_LABEL_END);
-
-      Value *func_end_ins = (Value *)ins_new_no_operator_v2(FuncEndOP);
-      // 添加变量的名字
-      func_end_ins->name = func_label_end;
-      func_end_ins->VTy->TID = FuncEndTyID;
-      // // pdata不需要数据所以释放掉
-      // free(func_end_ins->pdata);
-
-      // 插入
-      ListPushBack(ins_list, (void *)func_end_ins);
-      if (StackSize(stack_while_then_label)) {
-        assert(0);
-      }
-
-#ifdef PRINT_OK
-      printf("%s\n", func_label_end);
-#endif
-    }
-
-    if (SEQ(a->name, "RETURN")) {
-      char temp_str[20];
-
-      if (right == NULL) {
-        right = (Value *)malloc(sizeof(Value));
-        value_init(right);
-        right->VTy->TID = ImmediateIntTyID;
-        right->name = strdup("0");
-        // 为padata里的整数字面量常量赋值
-        right->pdata->var_pdata.iVal = 0;
-        right->pdata->var_pdata.fVal = 0.f;
-      }
-
-      Value *func_return_ins =
-          (Value *)ins_new_single_operator_v2(ReturnOP, right);
-      // 添加变量的名字 类型 和返回值
-      func_return_ins->name = strdup("return");
-      func_return_ins->VTy->TID = ReturnTyID;
-
-      // 插入
-      ListPushBack(ins_list, (void *)func_return_ins);
-
-#ifdef PRINT_OK
-      printf("%s\n", func_return_ins->name);
-#endif
-    }
-
-    if (SEQ(a->name, "ELSE")) {
-      have_else = true;
-      Value *then_label_ins = NULL;
-      StackTop(stack_then_label, (void **)&then_label_ins);
-      char temp_str[100];
-      strcpy(temp_str, "goto ");
-      strcat(temp_str, then_label_ins->name);
-
-      Value *goto_then_ins = (Value *)ins_new_no_operator_v2(GotoOP);
-      goto_then_ins->name = strdup(temp_str);
-      goto_then_ins->VTy->TID = GotoTyID;
-      goto_then_ins->pdata->no_condition_goto.goto_location = then_label_ins;
-
-      ListPushBack(ins_list, (void *)goto_then_ins);
-    }
-
-    if (SEQ(a->name, "WHILE")) {
-      Value *while_head_label_ins = NULL;
-      StackTop(stack_while_head_label, (void **)&while_head_label_ins);
-      StackPop(stack_while_head_label);
-
-      char temp_str[100];
-      strcpy(temp_str, "goto ");
-      strcat(temp_str, while_head_label_ins->name);
-
-      // 跳出while循环
-      Value *goto_out_while_ins = (Value *)ins_new_no_operator_v2(GotoOP);
-      goto_out_while_ins->name = strdup(temp_str);
-      goto_out_while_ins->VTy->TID = GotoTyID;
-      goto_out_while_ins->pdata->no_condition_goto.goto_location =
-          while_head_label_ins;
-
-      ListPushBack(ins_list, (void *)goto_out_while_ins);
-
-      // 跳出while循环后紧接着语句的label
-      Value *while_then_label_ins = NULL;
-      StackTop(stack_while_then_label, (void **)&while_then_label_ins);
-      StackPop(stack_while_then_label);
-      ListPushBack(ins_list, (void *)while_then_label_ins);
-
-#ifdef PRINT_OK
-      printf("%s\n", while_then_label_ins->name);
-#endif
-      return NULL;
-    }
-
-    if (SEQ(a->name, "BREAK")) {
-      Value *goto_break_label_ins = NULL;
-      if (StackSize(stack_while_then_label) == 0) {
-        // 没有地方可以去 报错？
-        return NULL;
-      }
-
-      StackTop(stack_while_then_label, (void **)&goto_break_label_ins);
-
-      char temp_str[40];
-      strcpy(temp_str, "(break)");
-      strcat(temp_str, goto_break_label_ins->name);
-
-      Value *break_ins = (Value *)ins_new_no_operator_v2(GotoOP);
-      // 添加变量的名字 类型 和返回值
-      break_ins->name = strdup(temp_str);
-      break_ins->VTy->TID = GotoTyID;
-      break_ins->pdata->no_condition_goto.goto_location = goto_break_label_ins;
-
-      ListPushBack(ins_list, (void *)break_ins);
-#ifdef PRINT_OK
-      printf("break :br %s \n", goto_break_label_ins->name);
-#endif
-    }
-
-    if (SEQ(a->name, "CONTINUE")) {
-      Value *goto_head_label_ins = NULL;
-      if (StackSize(stack_while_head_label) == 0) {
-        // 没有地方可以去 报错？
-        assert(0);
-        return NULL;
-      }
-
-      StackTop(stack_while_head_label, (void **)&goto_head_label_ins);
-
-      char temp_str[30];
-      strcpy(temp_str, "(continue)br :");
-      strcat(temp_str, goto_head_label_ins->name);
-
-      Value *break_ins = (Value *)ins_new_no_operator_v2(GotoOP);
-      // 添加变量的名字 类型 和返回值
-      break_ins->name = strdup(temp_str);
-      break_ins->VTy->TID = GotoTyID;
-      break_ins->pdata->no_condition_goto.goto_location = goto_head_label_ins;
-
-      ListPushBack(ins_list, (void *)break_ins);
-#ifdef PRINT_OK
-      printf("continue :br %s \n", goto_head_label_ins->name);
-#endif
     }
   }
 
+  if (SEQ(a->name, "assistFuncCall")) {
+    return right;
+  }
+
+  // 后续遍历到if标识该if管辖的全区域块结束 插入跳转点label
+  if (SEQ(a->name, "IF")) {
+    Instruction *ins_back = NULL;
+    ListGetBack(ins_list, (void **)&ins_back);
+
+    // 当前的if不含else的情况
+    if (!have_else) {
+      // 删除链尾 并且释放链尾ins的内存
+      // ListPopBack(ins_list);
+      // value_free((Value *)ins_back);
+      // free(ins_back);
+
+      Value *else_label_ins = NULL;
+      StackTop(stack_else_label, (void **)&else_label_ins);
+      StackPop(stack_else_label);
+      // 重定向无条件跳转的指向
+      char temp_str[30];
+      strcpy(temp_str, "goto ");
+      strcat(temp_str, ((Value *)else_label_ins)->name);
+      free(((Value *)ins_back)->name);
+      ((Value *)ins_back)->name = strdup(temp_str);
+      ((Value *)ins_back)->pdata->no_condition_goto.goto_location =
+          else_label_ins;
+      ListPushBack(ins_list, (void *)else_label_ins);
+#ifdef PRINT_OK
+      printf("%s\n", else_label_ins->name);
+#endif
+
+      Instruction *then_label_ins = NULL;
+      StackTop(stack_then_label, (void **)&then_label_ins);
+      StackPop(stack_then_label);
+      // 释放label ins的内存
+      // printf("delete the destination %s\n",
+      // then_label_ins->user.res->name);
+      value_free((Value *)then_label_ins);
+      free(then_label_ins);
+      return NULL;
+    } else {
+      have_else = false;
+      Value *then_label_ins = NULL;
+      StackTop(stack_then_label, (void **)&then_label_ins);
+      StackPop(stack_then_label);
+      ListPushBack(ins_list, (void *)then_label_ins);
+#ifdef PRINT_OK
+      printf("%s\n", then_label_ins->name);
+#endif
+      return NULL;
+    }
+  }
+
+  if (SEQ(a->name, "FunDec")) {
+    StackPop(stack_symbol_table);
+    // 销毁当前的符号表中的哈希表然后销毁符号表
+    HashMapDeinit(cur_symboltable->symbol_map);
+    free(cur_symboltable);
+    cur_symboltable = NULL;
+    // 当前的符号表恢复到上一级的符号表
+    StackTop(stack_symbol_table, (void **)&cur_symboltable);
+
+    char *func_label_end = NULL;
+    func_label_end = name_generate(FUNC_LABEL_END);
+
+    Value *func_end_ins = (Value *)ins_new_no_operator_v2(FuncEndOP);
+    // 添加变量的名字
+    func_end_ins->name = func_label_end;
+    func_end_ins->VTy->TID = FuncEndTyID;
+    // // pdata不需要数据所以释放掉
+    // free(func_end_ins->pdata);
+
+    // 插入
+    ListPushBack(ins_list, (void *)func_end_ins);
+    if (StackSize(stack_while_then_label)) {
+      assert(0);
+    }
+
+#ifdef PRINT_OK
+    printf("%s\n", func_label_end);
+#endif
+  }
+
+  if (SEQ(a->name, "RETURN")) {
+    char temp_str[20];
+
+    if (right == NULL) {
+      right = (Value *)malloc(sizeof(Value));
+      value_init(right);
+      right->VTy->TID = ImmediateIntTyID;
+      right->name = strdup("0");
+      // 为padata里的整数字面量常量赋值
+      right->pdata->var_pdata.iVal = 0;
+      right->pdata->var_pdata.fVal = 0.f;
+    }
+
+    Value *func_return_ins =
+        (Value *)ins_new_single_operator_v2(ReturnOP, right);
+    // 添加变量的名字 类型 和返回值
+    func_return_ins->name = strdup("return");
+    func_return_ins->VTy->TID = ReturnTyID;
+
+    // 插入
+    ListPushBack(ins_list, (void *)func_return_ins);
+
+#ifdef PRINT_OK
+    printf("%s\n", func_return_ins->name);
+#endif
+  }
+
+  if (SEQ(a->name, "ELSE")) {
+    have_else = true;
+    Value *then_label_ins = NULL;
+    StackTop(stack_then_label, (void **)&then_label_ins);
+    char temp_str[100];
+    strcpy(temp_str, "goto ");
+    strcat(temp_str, then_label_ins->name);
+
+    Value *goto_then_ins = (Value *)ins_new_no_operator_v2(GotoOP);
+    goto_then_ins->name = strdup(temp_str);
+    goto_then_ins->VTy->TID = GotoTyID;
+    goto_then_ins->pdata->no_condition_goto.goto_location = then_label_ins;
+
+    ListPushBack(ins_list, (void *)goto_then_ins);
+  }
+
+  if (SEQ(a->name, "WHILE")) {
+    Value *while_head_label_ins = NULL;
+    StackTop(stack_while_head_label, (void **)&while_head_label_ins);
+    StackPop(stack_while_head_label);
+
+    char temp_str[100];
+    strcpy(temp_str, "goto ");
+    strcat(temp_str, while_head_label_ins->name);
+
+    // 跳出while循环
+    Value *goto_out_while_ins = (Value *)ins_new_no_operator_v2(GotoOP);
+    goto_out_while_ins->name = strdup(temp_str);
+    goto_out_while_ins->VTy->TID = GotoTyID;
+    goto_out_while_ins->pdata->no_condition_goto.goto_location =
+        while_head_label_ins;
+
+    ListPushBack(ins_list, (void *)goto_out_while_ins);
+
+    // 跳出while循环后紧接着语句的label
+    Value *while_then_label_ins = NULL;
+    StackTop(stack_while_then_label, (void **)&while_then_label_ins);
+    StackPop(stack_while_then_label);
+    ListPushBack(ins_list, (void *)while_then_label_ins);
+
+#ifdef PRINT_OK
+    printf("%s\n", while_then_label_ins->name);
+#endif
+    return NULL;
+  }
+
+  if (SEQ(a->name, "BREAK")) {
+    Value *goto_break_label_ins = NULL;
+    if (StackSize(stack_while_then_label) == 0) {
+      // 没有地方可以去 报错？
+      return NULL;
+    }
+
+    StackTop(stack_while_then_label, (void **)&goto_break_label_ins);
+
+    char temp_str[40];
+    strcpy(temp_str, "(break)");
+    strcat(temp_str, goto_break_label_ins->name);
+
+    Value *break_ins = (Value *)ins_new_no_operator_v2(GotoOP);
+    // 添加变量的名字 类型 和返回值
+    break_ins->name = strdup(temp_str);
+    break_ins->VTy->TID = GotoTyID;
+    break_ins->pdata->no_condition_goto.goto_location = goto_break_label_ins;
+
+    ListPushBack(ins_list, (void *)break_ins);
+#ifdef PRINT_OK
+    printf("break :br %s \n", goto_break_label_ins->name);
+#endif
+  }
+
+  if (SEQ(a->name, "CONTINUE")) {
+    Value *goto_head_label_ins = NULL;
+    if (StackSize(stack_while_head_label) == 0) {
+      // 没有地方可以去 报错？
+      assert(0);
+      return NULL;
+    }
+
+    StackTop(stack_while_head_label, (void **)&goto_head_label_ins);
+
+    char temp_str[30];
+    strcpy(temp_str, "(continue)br :");
+    strcat(temp_str, goto_head_label_ins->name);
+
+    Value *break_ins = (Value *)ins_new_no_operator_v2(GotoOP);
+    // 添加变量的名字 类型 和返回值
+    break_ins->name = strdup(temp_str);
+    break_ins->VTy->TID = GotoTyID;
+    break_ins->pdata->no_condition_goto.goto_location = goto_head_label_ins;
+
+    ListPushBack(ins_list, (void *)break_ins);
+#ifdef PRINT_OK
+    printf("continue :br %s \n", goto_head_label_ins->name);
+#endif
+  }
   return NULL;
 }
 

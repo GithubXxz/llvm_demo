@@ -8,7 +8,7 @@
 // 使用邻接矩阵也可以做简单的替代，更简洁 二维数组也可以简单的替代
 typedef struct _HeadNode {
   BasicBlock *bblock_head;
-  // 邻接的边集
+  // 邻接的节点集合边集
   HashMap *edge_list;
   // 他支配的节点集
   HashMap *dom_set;
@@ -53,7 +53,7 @@ void delete_ins(List *self, ListNode **iter, Instruction **element);
 //     self->data->head_ = NULL;
 // }
 
- void iter_next_ins(ListNode **iter, int *i, Instruction **element);
+void iter_next_ins(ListNode **iter, int *i, Instruction **element);
 // inline void iter_next_ins(ListNode **iter, int *i, Instruction **element) {
 //   *iter = (*iter)->succ_;
 //   (*i)++;

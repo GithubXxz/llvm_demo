@@ -1,209 +1,205 @@
-Program (36)
-  ExtDefList (36)
-    ExtDef (36)
-      Specifire (36)
+Program (1)
+  ExtDefList (1)
+    ExtDef (1)
+      Specifire (1)
         TYPE :int 
-      ExtDecList (36)
-        Dec (36)
-          VarDec (36)
-            VarDec (36)
-              VarDec (36)
-                ID :arr_global 
-              LB (36)
-              Exp (36)
-                INTEGER :10 
-            LB (36)
-            Exp (36)
-              INTEGER :20 
-          ASSIGNOP (36)
-          InitList (36)
-            InitList (36)
-              LC (36)
-              InitList (36)
-                Exp (36)
-                  INTEGER :1 
-            COMMA (36)
-            InitList (36)
-              InitList (36)
-                LC (36)
-                InitList (36)
-                  Exp (36)
-                    INTEGER :1 
-                InitList (36)
-                  InitList (36)
-                    Exp (36)
-                      INTEGER :2 
-                  COMMA (36)
-                  InitList (36)
-                    Exp (36)
-                      INTEGER :3 
-              COMMA (36)
-              InitList (36)
-                InitList (36)
-                  LC (36)
-                COMMA (36)
-                InitList (36)
-                  LC (36)
-                  InitList (36)
-                    Exp (36)
-                      INTEGER :211 
-                  InitList (36)
-                    Exp (36)
-                      INTEGER :985 
-    ExtDefList (38)
-      ExtDef (38)
-        Specifire (38)
-          TYPE :int 
-        FunDec (38)
-          ID :main 
-          LP (38)
-          RP (38)
-        Compst (38)
-          LC (38)
-          TACList (39)
-            TAC (39)
-              DefList (39)
-                Def (39)
-                  Specifire (39)
+      FunDec (1)
+        ID :main 
+        LP (1)
+        RP (1)
+      Compst (1)
+        LC (1)
+        TACList (2)
+          TAC (2)
+            DefList (2)
+              Def (2)
+                Specifire (2)
+                  TYPE :int 
+                DecList (2)
+                  Dec (2)
+                    VarDec (2)
+                      ID :a 
+                    ASSIGNOP (2)
+                    Exp (2)
+                      INTEGER :111 
+              DefList (3)
+                Def (3)
+                  Specifire (3)
                     TYPE :int 
-                  DecList (39)
-                    Dec (39)
-                      VarDec (39)
-                        ID :a 
-                      ASSIGNOP (39)
-                      Exp (39)
-                        INTEGER :233 
-                DefList (40)
-                  Def (40)
-                    Specifire (40)
+                  DecList (3)
+                    Dec (3)
+                      VarDec (3)
+                        ID :b 
+                      ASSIGNOP (3)
+                      Exp (3)
+                        INTEGER :222 
+                DefList (4)
+                  Def (4)
+                    Specifire (4)
                       TYPE :int 
-                    DecList (40)
-                      Dec (40)
-                        VarDec (40)
-                          VarDec (40)
-                            VarDec (40)
-                              ID :arr_local 
-                            LB (40)
-                            Exp (40)
-                              INTEGER :5 
-                          LB (40)
-                          Exp (40)
-                            INTEGER :6 
-                        ASSIGNOP (40)
-                        InitList (40)
-                          InitList (40)
-                            LC (40)
-                            InitList (40)
-                              Exp (40)
-                                INTEGER :1 
-                            InitList (40)
-                              InitList (40)
-                                Exp (40)
-                                  INTEGER :2 
-                              COMMA (40)
-                              InitList (40)
-                                InitList (40)
-                                  Exp (40)
-                                    INTEGER :3 
-                                COMMA (40)
-                                InitList (40)
-                                  Exp (40)
-                                    INTEGER :4 
-                          COMMA (40)
-                          InitList (40)
-                            InitList (40)
-                              LC (40)
-                            COMMA (40)
-                            InitList (40)
-                              InitList (40)
-                                Exp (40)
-                                  INTEGER :5 
-                              COMMA (40)
-                              InitList (40)
-                                InitList (40)
-                                  Exp (40)
-                                    INTEGER :6 
-                                COMMA (40)
-                                InitList (40)
-                                  InitList (40)
-                                    Exp (40)
-                                      INTEGER :7 
-                                  COMMA (40)
-                                  InitList (40)
-                                    InitList (40)
-                                      Exp (40)
-                                        INTEGER :8 
-                                    COMMA (40)
-                                    InitList (40)
-                                      InitList (40)
-                                        Exp (40)
-                                          INTEGER :9 
-                                      COMMA (40)
-                                      InitList (41)
-                                        InitList (41)
-                                          Exp (41)
-                                            INTEGER :10 
-                                        COMMA (41)
-                                        InitList (41)
-                                          InitList (41)
-                                            LC (41)
-                                            InitList (41)
-                                              Exp (41)
-                                                INTEGER :211 
-                                            InitList (41)
-                                              Exp (41)
-                                                INTEGER :986 
-                                          COMMA (41)
-                                          InitList (41)
-                                            LC (41)
-                                            InitList (41)
-                                              Exp (41)
-                                                ID :a 
-                                            InitList (41)
-                                              Exp (41)
-                                                Exp (41)
-                                                  ID :a 
-                                                PLUS (41)
-                                                Exp (41)
-                                                  INTEGER :123 
-                  DefList 
-              StmtList (42)
-                Stmt (42)
-                  RETURN (42)
-                  Exp (42)
-                    INTEGER :0 
-                StmtList 
-            TACList 
-          RC (43)
-      ExtDefList 
-global1 = alloca int array,align 4
-
-cur init array name 	global1
-offset:	0 value:	1.000000
-offset:	20 value:	1.000000
-offset:	21 value:	2.000000
-offset:	22 value:	3.000000
-offset:	60 value:	211.000000
-offset:	61 value:	985.000000
-
+                    DecList (4)
+                      Dec (4)
+                        VarDec (4)
+                          ID :c 
+                        ASSIGNOP (4)
+                        Exp (4)
+                          INTEGER :333 
+                  DefList (5)
+                    Def (5)
+                      Specifire (5)
+                        TYPE :int 
+                      DecList (5)
+                        Dec (5)
+                          VarDec (5)
+                            ID :d 
+                          ASSIGNOP (5)
+                          Exp (5)
+                            INTEGER :444 
+                    DefList (6)
+                      Def (6)
+                        Specifire (6)
+                          TYPE :int 
+                        DecList (6)
+                          Dec (6)
+                            VarDec (6)
+                              ID :res 
+                            ASSIGNOP (6)
+                            Exp (6)
+                              INTEGER :0 
+                      DefList 
+            StmtList (8)
+              Stmt (8)
+                IF (8)
+                Exp (8)
+                  ID :a 
+                assistIF 
+                Stmt (8)
+                  Compst (8)
+                    LC (8)
+                    TACList 
+                      TAC 
+                        DefList 
+                        StmtList (9)
+                          Stmt (9)
+                            RETURN (9)
+                            Exp (9)
+                              Exp (9)
+                                Exp (9)
+                                  Exp (9)
+                                    ID :a 
+                                  PLUS (9)
+                                  Exp (9)
+                                    ID :b 
+                                PLUS (9)
+                                Exp (9)
+                                  ID :c 
+                              PLUS (9)
+                              Exp (9)
+                                ID :d 
+                          StmtList 
+                      TACList 
+                    RC (10)
+                assistELSE 
+              StmtList (12)
+                Stmt (12)
+                  IF (12)
+                  Exp (12)
+                    Exp (12)
+                      Exp (12)
+                        Exp (12)
+                          Exp (12)
+                            ID :a 
+                          AND (12)
+                          Exp (12)
+                            ID :b 
+                        AND (12)
+                        Exp (12)
+                          ID :c 
+                      OR (12)
+                      Exp (12)
+                        Exp (12)
+                          ID :c 
+                        AND (12)
+                        Exp (12)
+                          ID :d 
+                    OR (12)
+                    Exp (12)
+                      FLOAT (12)
+                  assistIF 
+                  Stmt (12)
+                    Compst (12)
+                      LC (12)
+                      TACList 
+                        TAC 
+                          DefList 
+                          StmtList (13)
+                            Stmt (13)
+                              Exp (13)
+                                Exp (13)
+                                  ID :res 
+                                ASSIGNOP (13)
+                                Exp (13)
+                                  INTEGER :888 
+                            StmtList 
+                        TACList 
+                      RC (14)
+                  assistELSE 
+                  ELSE (14)
+                  Stmt (14)
+                    Compst (14)
+                      LC (14)
+                      TACList 
+                        TAC 
+                          DefList 
+                          StmtList (15)
+                            Stmt (15)
+                              Exp (15)
+                                Exp (15)
+                                  ID :res 
+                                ASSIGNOP (15)
+                                Exp (15)
+                                  INTEGER :777 
+                            StmtList 
+                        TACList 
+                      RC (16)
+                StmtList (28)
+                  Stmt (28)
+                    RETURN (28)
+                    Exp (28)
+                      ID :res 
+                  StmtList 
+          TACList 
+        RC (29)
+    ExtDefList 
 Func: main
 point1 = alloca int,align 4
-store int 233, point1,align 4
-array1 = alloca int array,align 4
+store int 111, point1,align 4
+point2 = alloca int,align 4
+store int 222, point2,align 4
+point3 = alloca int,align 4
+store int 333, point3,align 4
+point4 = alloca int,align 4
+store int 444, point4,align 4
+point5 = alloca int,align 4
+store int 0, point5,align 4
 temp10 = load int, point1,align 4
-temp13 = load int, point1,align 4
-cur init array name 	array1
-offset:	0 value:	1.000000
-offset:	1 value:	2.000000
-offset:	2 value:	3.000000
-offset:	3 value:	4.000000
-offset:	12 value:	5.000000
-offset:	13 value:	6.000000
-offset:	14 value:	7.000000
-offset:	15 value:	8.000000
-offset:	16 value:	9.000000
-offset:	17 value:	10.000000
-offset:	18 value:	211.000000
-offset:	19 value:	986.000000
+temp11 = load int, point1,align 4
+temp12 = load int, point2,align 4
+temp14 = load int, point3,align 4
+temp16 = load int, point4,align 4
+return
+br mainlabel3 
+mainlabel1
+temp18 = load int, point1,align 4
+temp19 = load int, point2,align 4
+temp20 = load int, point3,align 4
+temp21 = load int, point3,align 4
+temp22 = load int, point4,align 4
+store int 888, point5,align 4
+br mainlabel11 
+mainlabel4
+store int 777, point5,align 4
+mainlabel11
+temp23 = load int, point5,align 4
 return
 func_label_end1

@@ -266,9 +266,9 @@ int main(int argc, char **argv) {
     choose_case = read_code_from_file(argv[1]);
   } else {
     is_functional_test = false;
-    choose_case = read_code_from_file(test_cases[77]);
+    // choose_case = read_code_from_file(test_cases[77]);
     // choose_case = read_code_from_file(hidden_cases[4]);
-    // choose_case = read_code_from_file("./my_cases/delete_non_reach_pass.c");
+    choose_case = read_code_from_file("./my_cases/if_and_or.c");
   }
   if (choose_case == NULL)
     return 1;

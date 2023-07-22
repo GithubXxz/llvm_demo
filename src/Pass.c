@@ -217,11 +217,9 @@ void dom_relation_pass_help(HeadNode *self) {
   self->is_visited = true;
   node_pair *element;
   HashMapFirst(self->edge_list);
-  while ((element = (node_pair *)HashMapNext(self->edge_list)) &&
-         !(element->value)->is_visited) {
-    // printf("cur node %s next node %s\n", self->bblock_head->label->name,
-    //        ((HeadNode *)element)->bblock_head->label->name);
-    dom_relation_pass_help(element->value);
+  while ((element = (node_pair *)HashMapNext(self->edge_list))) {
+    if (!(element->value)->is_visited)
+      dom_relation_pass_help(element->value);
   }
 }
 
@@ -264,17 +262,20 @@ void dom_relation_pass() {
       }
     }
 
+#ifdef PRINT_OK
+    printf("%s dom node is ",
+           graph_for_dom_tree->node_set[i]->bblock_head->label->name);
+#endif
     // 把没有被访问的节点添加到当前节点的支配节点
     for (int j = 0; j < node_num; j++) {
       if (!graph_for_dom_tree->node_set[j]->is_visited) {
-        // printf("%s\n",graph_for_dom_tree->node_set[j]->bblock_head->label->name);
         // 添加支配节点
         HashMapPut(
             graph_for_dom_tree->node_set[i]->dom_set,
             strdup(graph_for_dom_tree->node_set[j]->bblock_head->label->name),
             graph_for_dom_tree->node_set[j]->bblock_head);
 #ifdef PRINT_OK
-        printf("%s,",
+        printf("\t%s,",
                graph_for_dom_tree->node_set[j]->bblock_head->label->name);
 #endif
       } else {

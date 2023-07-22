@@ -1,100 +1,289 @@
-         	     0:           AllocateOP 	                  global1 	      null
          	     0:          FuncLabelOP 	                     main 	      null
          	     0:              LabelOP 	                mainentry 	      null
          	     0:           AllocateOP 	                   point1 	      null
-         	     0:              StoreOP 	                   (null) 	    point1,        233
-         	     0:           AllocateOP 	                   array1 	      null
+         	     0:              StoreOP 	                   (null) 	    point1,        111
+         	     0:           AllocateOP 	                   point2 	      null
+         	     0:              StoreOP 	                   (null) 	    point2,        222
+         	     0:           AllocateOP 	                   point3 	      null
+         	     0:              StoreOP 	                   (null) 	    point3,        333
+         	     0:           AllocateOP 	                   point4 	      null
+         	     0:              StoreOP 	                   (null) 	    point4,        444
+         	     0:           AllocateOP 	                   point5 	      null
+         	     0:              StoreOP 	                   (null) 	    point5,          0
          	     0:               LoadOP 	                   temp10 	    point1
-         	     0:      GetelementptrOP 	                   temp11 	    array1,          4
-         	     0:      GetelementptrOP 	                   temp12 	    temp11,          0
-         	     0:              StoreOP 	                   (null) 	    temp12,     temp10
-         	     0:               LoadOP 	                   temp13 	    point1
-         	     0:                AddOP 	                   temp14 	    temp13,        123
-         	     0:      GetelementptrOP 	                   temp15 	    array1,          4
-         	     0:      GetelementptrOP 	                   temp16 	    temp15,          1
-         	     0:              StoreOP 	                   (null) 	    temp16,     temp14
-         	     0:             ReturnOP 	                   return 	         0
+         	     0:  GotoWithConditionOP 	true:mainlabel2  false:mainlabel1 	    temp10
+         	     0:              LabelOP 	               mainlabel2 	      null
+         	     0:               LoadOP 	                   temp11 	    point1
+         	     0:               LoadOP 	                   temp12 	    point2
+         	     0:                AddOP 	                   temp13 	    temp11,     temp12
+         	     0:               LoadOP 	                   temp14 	    point3
+         	     0:                AddOP 	                   temp15 	    temp13,     temp14
+         	     0:               LoadOP 	                   temp16 	    point4
+         	     0:                AddOP 	                   temp17 	    temp15,     temp16
+         	     0:             ReturnOP 	                   return 	    temp17
+         	     0:               GotoOP 	          goto mainlabel1 	      null
+         	     0:              LabelOP 	               mainlabel1 	      null
+         	     0:               LoadOP 	                   temp18 	    point1
+         	     0:  GotoWithConditionOP 	true:mainlabel9  false:mainlabel7 	    temp18
+         	     0:              LabelOP 	               mainlabel9 	      null
+         	     0:               LoadOP 	                   temp19 	    point2
+         	     0:  GotoWithConditionOP 	true:mainlabel8  false:mainlabel7 	    temp19
+         	     0:              LabelOP 	               mainlabel8 	      null
+         	     0:               LoadOP 	                   temp20 	    point3
+         	     0:  GotoWithConditionOP 	true:mainlabel5  false:mainlabel7 	    temp20
+         	     0:              LabelOP 	               mainlabel7 	      null
+         	     0:               LoadOP 	                   temp21 	    point3
+         	     0:  GotoWithConditionOP 	true:mainlabel10  false:mainlabel6 	    temp21
+         	     0:              LabelOP 	              mainlabel10 	      null
+         	     0:               LoadOP 	                   temp22 	    point4
+         	     0:  GotoWithConditionOP 	true:mainlabel5  false:mainlabel6 	    temp22
+         	     0:              LabelOP 	               mainlabel6 	      null
+         	     0:  GotoWithConditionOP 	true:mainlabel5  false:mainlabel4 	123.300003
+         	     0:              LabelOP 	               mainlabel5 	      null
+         	     0:              StoreOP 	                   (null) 	    point5,        888
+         	     0:               GotoOP 	         goto mainlabel11 	      null
+         	     0:              LabelOP 	               mainlabel4 	      null
+         	     0:              StoreOP 	                   (null) 	    point5,        777
+         	     0:               GotoOP 	         goto mainlabel11 	      null
+         	     0:              LabelOP 	              mainlabel11 	      null
+         	     0:               LoadOP 	                   temp23 	    point5
+         	     0:             ReturnOP 	                   return 	    temp23
          	     0:            FuncEndOP 	          func_label_end1 	      null
 
 
 
 
-         	     0:           AllocateOP 	                  global1 	      null
          	     0:          FuncLabelOP 	                     main 	      null
          	     0:              LabelOP 	                mainentry 	      null
          	     0:           AllocateOP 	                   point1 	      null
-         	     0:              StoreOP 	                   (null) 	    point1,        233
-         	     0:           AllocateOP 	                   array1 	      null
+         	     0:              StoreOP 	                   (null) 	    point1,        111
+         	     0:           AllocateOP 	                   point2 	      null
+         	     0:              StoreOP 	                   (null) 	    point2,        222
+         	     0:           AllocateOP 	                   point3 	      null
+         	     0:              StoreOP 	                   (null) 	    point3,        333
+         	     0:           AllocateOP 	                   point4 	      null
+         	     0:              StoreOP 	                   (null) 	    point4,        444
+         	     0:           AllocateOP 	                   point5 	      null
+         	     0:              StoreOP 	                   (null) 	    point5,          0
          	     0:               LoadOP 	                   temp10 	    point1
-         	     0:      GetelementptrOP 	                   temp11 	    array1,          4
-         	     0:      GetelementptrOP 	                   temp12 	    temp11,          0
-         	     0:              StoreOP 	                   (null) 	    temp12,     temp10
-         	     0:               LoadOP 	                   temp13 	    point1
-         	     0:                AddOP 	                   temp14 	    temp13,        123
-         	     0:      GetelementptrOP 	                   temp15 	    array1,          4
-         	     0:      GetelementptrOP 	                   temp16 	    temp15,          1
-         	     0:              StoreOP 	                   (null) 	    temp16,     temp14
-         	     0:             ReturnOP 	                   return 	         0
+         	     0:  GotoWithConditionOP 	true:mainlabel2  false:mainlabel1 	    temp10
+         	     0:              LabelOP 	               mainlabel2 	      null
+         	     0:               LoadOP 	                   temp11 	    point1
+         	     0:               LoadOP 	                   temp12 	    point2
+         	     0:                AddOP 	                   temp13 	    temp11,     temp12
+         	     0:               LoadOP 	                   temp14 	    point3
+         	     0:                AddOP 	                   temp15 	    temp13,     temp14
+         	     0:               LoadOP 	                   temp16 	    point4
+         	     0:                AddOP 	                   temp17 	    temp15,     temp16
+         	     0:             ReturnOP 	                   return 	    temp17
+         	     0:              LabelOP 	               mainlabel1 	      null
+         	     0:               LoadOP 	                   temp18 	    point1
+         	     0:  GotoWithConditionOP 	true:mainlabel9  false:mainlabel7 	    temp18
+         	     0:              LabelOP 	               mainlabel9 	      null
+         	     0:               LoadOP 	                   temp19 	    point2
+         	     0:  GotoWithConditionOP 	true:mainlabel8  false:mainlabel7 	    temp19
+         	     0:              LabelOP 	               mainlabel8 	      null
+         	     0:               LoadOP 	                   temp20 	    point3
+         	     0:  GotoWithConditionOP 	true:mainlabel5  false:mainlabel7 	    temp20
+         	     0:              LabelOP 	               mainlabel7 	      null
+         	     0:               LoadOP 	                   temp21 	    point3
+         	     0:  GotoWithConditionOP 	true:mainlabel10  false:mainlabel6 	    temp21
+         	     0:              LabelOP 	              mainlabel10 	      null
+         	     0:               LoadOP 	                   temp22 	    point4
+         	     0:  GotoWithConditionOP 	true:mainlabel5  false:mainlabel6 	    temp22
+         	     0:              LabelOP 	               mainlabel6 	      null
+         	     0:  GotoWithConditionOP 	true:mainlabel5  false:mainlabel4 	123.300003
+         	     0:              LabelOP 	               mainlabel5 	      null
+         	     0:              StoreOP 	                   (null) 	    point5,        888
+         	     0:               GotoOP 	         goto mainlabel11 	      null
+         	     0:              LabelOP 	               mainlabel4 	      null
+         	     0:              StoreOP 	                   (null) 	    point5,        777
+         	     0:               GotoOP 	         goto mainlabel11 	      null
+         	     0:              LabelOP 	              mainlabel11 	      null
+         	     0:               LoadOP 	                   temp23 	    point5
+         	     0:             ReturnOP 	                   return 	    temp23
          	     0:            FuncEndOP 	          func_label_end1 	      null
-         	     0:           AllocateOP 	                  global1 	      null
 main
-mainentry edge is mainendlabel 
+mainentry edge is mainlabel1 mainlabel2 
+mainlabel2 edge is mainendlabel 
 mainendlabel edge is 
+mainlabel1 edge is mainlabel7 mainlabel9 
+mainlabel9 edge is mainlabel7 mainlabel8 
+mainlabel8 edge is mainlabel5 mainlabel7 
+mainlabel5 edge is mainlabel11 
+mainlabel11 edge is mainendlabel 
+mainlabel7 edge is mainlabel10 mainlabel6 
+mainlabel10 edge is mainlabel5 mainlabel6 
+mainlabel6 edge is mainlabel4 mainlabel5 
+mainlabel4 edge is mainlabel11 
 performance is begin!!!!!!!
 performance is begin!!!!!!!
 performance is begin!!!!!!!
 performance is begin!!!!!!!
-mainendlabel,
+mainlabel2 dom node is 	mainlabel2,
+mainendlabel dom node is 	mainendlabel,
+mainlabel1 dom node is 	mainlabel1,	mainlabel9,	mainlabel8,	mainlabel5,	mainlabel11,	mainlabel7,	mainlabel10,	mainlabel6,	mainlabel4,
+mainlabel9 dom node is 	mainlabel9,	mainlabel8,
+mainlabel8 dom node is 	mainlabel8,
+mainlabel5 dom node is 	mainlabel5,
+mainlabel11 dom node is 	mainlabel11,
+mainlabel7 dom node is 	mainlabel7,	mainlabel10,	mainlabel6,	mainlabel4,
+mainlabel10 dom node is 	mainlabel10,
+mainlabel6 dom node is 	mainlabel6,	mainlabel4,
+mainlabel4 dom node is 	mainlabel4,
 
 打印每个节点的立即支配节点
+idom(mainlabel2) = mainentry
 idom(mainendlabel) = mainentry
+idom(mainlabel1) = mainentry
+idom(mainlabel9) = mainlabel1
+idom(mainlabel8) = mainlabel9
+idom(mainlabel5) = mainlabel1
+idom(mainlabel11) = mainlabel1
+idom(mainlabel7) = mainlabel1
+idom(mainlabel10) = mainlabel7
+idom(mainlabel6) = mainlabel7
+idom(mainlabel4) = mainlabel6
 
 打印支配树中的层级关系
-mainentry: mainendlabel,
+mainentry: mainlabel2,mainendlabel,mainlabel1,
+mainlabel1: mainlabel9,mainlabel5,mainlabel11,mainlabel7,
+mainlabel7: mainlabel10,mainlabel6,
+mainlabel6: mainlabel4,
+mainlabel4: 
+mainlabel10: 
+mainlabel11: 
+mainlabel5: 
+mainlabel9: mainlabel8,
+mainlabel8: 
 mainendlabel: 
+mainlabel2: 
 
 打印每个基本块的支配边界节点
+cur node mainlabel2's dom frontier is mainendlabel,
 cur node mainendlabel's dom frontier is 
+cur node mainlabel1's dom frontier is mainendlabel,
+cur node mainlabel9's dom frontier is mainlabel5,mainlabel7,
+cur node mainlabel8's dom frontier is mainlabel5,mainlabel7,
+cur node mainlabel5's dom frontier is mainlabel11,
+cur node mainlabel11's dom frontier is mainendlabel,
+cur node mainlabel7's dom frontier is mainlabel11,mainlabel5,
+cur node mainlabel10's dom frontier is mainlabel5,mainlabel6,
+cur node mainlabel6's dom frontier is mainlabel11,mainlabel5,
+cur node mainlabel4's dom frontier is mainlabel11,
 
 	labelID	number:               opcode 	                     name 	       use
-	address:0x159e0b2c0	mainentry:
+	address:0x13460ab50	mainentry:
          	     0:              LabelOP 	                mainentry 	      null
-         	     0:           AllocateOP 	                   array1 	      null
+         	     0:           AllocateOP 	                   point5 	      null
+         	     0:           AllocateOP 	                   point4 	      null
+         	     0:           AllocateOP 	                   point3 	      null
+         	     0:           AllocateOP 	                   point2 	      null
          	     0:           AllocateOP 	                   point1 	      null
-         	     0:              StoreOP 	                   (null) 	    point1,        233
+         	     0:              StoreOP 	                   (null) 	    point1,        111
+         	     0:              StoreOP 	                   (null) 	    point2,        222
+         	     0:              StoreOP 	                   (null) 	    point3,        333
+         	     0:              StoreOP 	                   (null) 	    point4,        444
+         	     0:              StoreOP 	                   (null) 	    point5,          0
          	     0:               LoadOP 	                   temp10 	    point1
-         	     0:      GetelementptrOP 	                   temp11 	    array1,          4
-         	     0:      GetelementptrOP 	                   temp12 	    temp11,          0
-         	     0:              StoreOP 	                   (null) 	    temp12,     temp10
-         	     0:               LoadOP 	                   temp13 	    point1
-         	     0:                AddOP 	                   temp14 	    temp13,        123
-         	     0:      GetelementptrOP 	                   temp15 	    array1,          4
-         	     0:      GetelementptrOP 	                   temp16 	    temp15,          1
-         	     0:              StoreOP 	                   (null) 	    temp16,     temp14
-         	     0:             ReturnOP 	                   return 	         0
-	address:0x159e0d7f0	mainendlabel:
+         	     0:  GotoWithConditionOP 	true:mainlabel2  false:mainlabel1 	    temp10
+	address:0x13460bad0	mainlabel2:
+         	     0:              LabelOP 	               mainlabel2 	      null
+         	     0:               LoadOP 	                   temp11 	    point1
+         	     0:               LoadOP 	                   temp12 	    point2
+         	     0:                AddOP 	                   temp13 	    temp11,     temp12
+         	     0:               LoadOP 	                   temp14 	    point3
+         	     0:                AddOP 	                   temp15 	    temp13,     temp14
+         	     0:               LoadOP 	                   temp16 	    point4
+         	     0:                AddOP 	                   temp17 	    temp15,     temp16
+         	     0:             ReturnOP 	                   return 	    temp17
+	address:0x13460e030	mainendlabel:
          	     0:              LabelOP 	             mainendlabel 	      null
+         	     0:            PhiFuncOp 	                %phi_var1 	size: 0 
          	     0:            FuncEndOP 	          func_label_end1 	      null
+	address:0x13460ba40	mainlabel1:
+         	     0:              LabelOP 	               mainlabel1 	      null
+         	     0:               LoadOP 	                   temp18 	    point1
+         	     0:  GotoWithConditionOP 	true:mainlabel9  false:mainlabel7 	    temp18
+	address:0x13460cab0	mainlabel9:
+         	     0:              LabelOP 	               mainlabel9 	      null
+         	     0:               LoadOP 	                   temp19 	    point2
+         	     0:  GotoWithConditionOP 	true:mainlabel8  false:mainlabel7 	    temp19
+	address:0x13460ca20	mainlabel8:
+         	     0:              LabelOP 	               mainlabel8 	      null
+         	     0:               LoadOP 	                   temp20 	    point3
+         	     0:  GotoWithConditionOP 	true:mainlabel5  false:mainlabel7 	    temp20
+	address:0x13460c5d0	mainlabel5:
+         	     0:              LabelOP 	               mainlabel5 	      null
+         	     0:              StoreOP 	                   (null) 	    point5,        888
+         	     0:               GotoOP 	         goto mainlabel11 	      null
+	address:0x13460c720	mainlabel11:
+         	     0:              LabelOP 	              mainlabel11 	      null
+         	     0:            PhiFuncOp 	                %phi_var2 	size: 0 
+         	     0:               LoadOP 	                   temp23 	    point5
+         	     0:             ReturnOP 	                   return 	    temp23
+	address:0x13460c990	mainlabel7:
+         	     0:              LabelOP 	               mainlabel7 	      null
+         	     0:               LoadOP 	                   temp21 	    point3
+         	     0:  GotoWithConditionOP 	true:mainlabel10  false:mainlabel6 	    temp21
+	address:0x13460d110	mainlabel10:
+         	     0:              LabelOP 	              mainlabel10 	      null
+         	     0:               LoadOP 	                   temp22 	    point4
+         	     0:  GotoWithConditionOP 	true:mainlabel5  false:mainlabel6 	    temp22
+	address:0x13460c900	mainlabel6:
+         	     0:              LabelOP 	               mainlabel6 	      null
+         	     0:  GotoWithConditionOP 	true:mainlabel5  false:mainlabel4 	123.300003
+	address:0x13460bce0	mainlabel4:
+         	     0:              LabelOP 	               mainlabel4 	      null
+         	     0:              StoreOP 	                   (null) 	    point5,        777
+         	     0:               GotoOP 	         goto mainlabel11 	      null
 
 
 begin rename pass and delete alloca,store,load instruction!
 rename pass over
 delete alloca,store,load instruction over
 	labelID	number:               opcode 	                     name 	       use
-	address:0x159e0b2c0	mainentry:
+	address:0x13460ab50	mainentry:
          	     0:              LabelOP 	                mainentry 	      null
-         	     0:           AllocateOP 	                   array1 	      null
-         	     0:      GetelementptrOP 	                   temp11 	    array1,          4
-         	     0:      GetelementptrOP 	                   temp12 	    temp11,          0
-         	     0:              StoreOP 	                   (null) 	    temp12,        233
-         	     0:                AddOP 	                   temp14 	       233,        123
-         	     0:      GetelementptrOP 	                   temp15 	    array1,          4
-         	     0:      GetelementptrOP 	                   temp16 	    temp15,          1
-         	     0:              StoreOP 	                   (null) 	    temp16,     temp14
-         	     0:             ReturnOP 	                   return 	         0
-	address:0x159e0d7f0	mainendlabel:
+         	     0:  GotoWithConditionOP 	true:mainlabel2  false:mainlabel1 	       111
+	address:0x13460bad0	mainlabel2:
+         	     0:              LabelOP 	               mainlabel2 	      null
+         	     0:                AddOP 	                   temp13 	       111,        222
+         	     0:                AddOP 	                   temp15 	    temp13,        333
+         	     0:                AddOP 	                   temp17 	    temp15,        444
+         	     0:             ReturnOP 	                   return 	    temp17
+	address:0x13460e030	mainendlabel:
          	     0:              LabelOP 	             mainendlabel 	      null
+         	     0:            PhiFuncOp 	                %phi_var1 	size: 2 	bblock: mainlabel11 value: %phi_var2, 	bblock: mainlabel2 value: 0, 
          	     0:            FuncEndOP 	          func_label_end1 	      null
+	address:0x13460ba40	mainlabel1:
+         	     0:              LabelOP 	               mainlabel1 	      null
+         	     0:  GotoWithConditionOP 	true:mainlabel9  false:mainlabel7 	       111
+	address:0x13460cab0	mainlabel9:
+         	     0:              LabelOP 	               mainlabel9 	      null
+         	     0:  GotoWithConditionOP 	true:mainlabel8  false:mainlabel7 	       222
+	address:0x13460ca20	mainlabel8:
+         	     0:              LabelOP 	               mainlabel8 	      null
+         	     0:  GotoWithConditionOP 	true:mainlabel5  false:mainlabel7 	       333
+	address:0x13460c5d0	mainlabel5:
+         	     0:              LabelOP 	               mainlabel5 	      null
+         	     0:               GotoOP 	         goto mainlabel11 	      null
+	address:0x13460c720	mainlabel11:
+         	     0:              LabelOP 	              mainlabel11 	      null
+         	     0:            PhiFuncOp 	                %phi_var2 	size: 2 	bblock: mainlabel4 value: 777, 	bblock: mainlabel5 value: 888, 
+         	     0:             ReturnOP 	                   return 	 %phi_var2
+	address:0x13460c990	mainlabel7:
+         	     0:              LabelOP 	               mainlabel7 	      null
+         	     0:  GotoWithConditionOP 	true:mainlabel10  false:mainlabel6 	       333
+	address:0x13460d110	mainlabel10:
+         	     0:              LabelOP 	              mainlabel10 	      null
+         	     0:  GotoWithConditionOP 	true:mainlabel5  false:mainlabel6 	       444
+	address:0x13460c900	mainlabel6:
+         	     0:              LabelOP 	               mainlabel6 	      null
+         	     0:  GotoWithConditionOP 	true:mainlabel5  false:mainlabel4 	123.300003
+	address:0x13460bce0	mainlabel4:
+         	     0:              LabelOP 	               mainlabel4 	      null
+         	     0:               GotoOP 	         goto mainlabel11 	      null
 
 
 performance is over!!!!!!!
@@ -105,59 +294,109 @@ performance is over!!!!!!!
 
 
 	labelID	number:               opcode 	                     name 	       use
-	address:0x159e0b2c0	mainentry:
+	address:0x13460ab50	mainentry:
          	     0:              LabelOP 	                mainentry 	      null
-         	     0:           AllocateOP 	                   array1 	      null
-         	     0:      GetelementptrOP 	                   temp11 	    array1,          4
-         	     0:      GetelementptrOP 	                   temp12 	    temp11,          0
-         	     0:              StoreOP 	                   (null) 	    temp12,        233
-         	     0:                AddOP 	                   temp14 	       233,        123
-         	     0:      GetelementptrOP 	                   temp15 	    array1,          4
-         	     0:      GetelementptrOP 	                   temp16 	    temp15,          1
-         	     0:              StoreOP 	                   (null) 	    temp16,     temp14
-         	     0:             ReturnOP 	                   return 	         0
-	address:0x159e0d7f0	mainendlabel:
+         	     0:  GotoWithConditionOP 	true:mainlabel2  false:mainlabel1 	       111
+	address:0x13460bad0	mainlabel2:
+         	     0:              LabelOP 	               mainlabel2 	      null
+         	     0:                AddOP 	                   temp13 	       111,        222
+         	     0:                AddOP 	                   temp15 	    temp13,        333
+         	     0:                AddOP 	                   temp17 	    temp15,        444
+         	     0:             ReturnOP 	                   return 	    temp17
+	address:0x13460e030	mainendlabel:
          	     0:              LabelOP 	             mainendlabel 	      null
          	     0:            FuncEndOP 	          func_label_end1 	      null
+	address:0x13460ba40	mainlabel1:
+         	     0:              LabelOP 	               mainlabel1 	      null
+         	     0:  GotoWithConditionOP 	true:mainlabel9  false:mainlabel7 	       111
+	address:0x13460cab0	mainlabel9:
+         	     0:              LabelOP 	               mainlabel9 	      null
+         	     0:  GotoWithConditionOP 	true:mainlabel8  false:mainlabel7 	       222
+	address:0x13460ca20	mainlabel8:
+         	     0:              LabelOP 	               mainlabel8 	      null
+         	     0:  GotoWithConditionOP 	true:mainlabel5  false:mainlabel7 	       333
+	address:0x13460c5d0	mainlabel5:
+         	     0:              LabelOP 	               mainlabel5 	      null
+         	     0:             AssignOP 	                %phi_var2 	       888
+         	     0:               GotoOP 	         goto mainlabel11 	      null
+	address:0x13460c720	mainlabel11:
+         	     0:              LabelOP 	              mainlabel11 	      null
+         	     0:             ReturnOP 	                   return 	 %phi_var2
+	address:0x13460c990	mainlabel7:
+         	     0:              LabelOP 	               mainlabel7 	      null
+         	     0:  GotoWithConditionOP 	true:mainlabel10  false:mainlabel6 	       333
+	address:0x13460d110	mainlabel10:
+         	     0:              LabelOP 	              mainlabel10 	      null
+         	     0:  GotoWithConditionOP 	true:mainlabel5  false:mainlabel6 	       444
+	address:0x13460c900	mainlabel6:
+         	     0:              LabelOP 	               mainlabel6 	      null
+         	     0:  GotoWithConditionOP 	true:mainlabel5  false:mainlabel4 	123.300003
+	address:0x13460bce0	mainlabel4:
+         	     0:              LabelOP 	               mainlabel4 	      null
+         	     0:             AssignOP 	                %phi_var2 	       777
+         	     0:               GotoOP 	         goto mainlabel11 	      null
 
 
-mainentry live def add array1
-mainentry live def add temp11
-mainentry live def add temp12
-mainentry live def add temp14
-mainentry live def add temp15
-mainentry live def add temp16
+mainlabel2 live def add temp13
+mainlabel2 live def add temp15
+mainlabel2 live def add temp17
+mainlabel5 live def add %phi_var2
+mainlabel11 live use add %phi_var2
+mainlabel4 live def add %phi_var2
 
 
 
 	labelID	number:               opcode 	                     name 	       use
-	address:0x159e0b2c0	mainentry:
+	address:0x13460ab50	mainentry:
          	     0:              LabelOP 	                mainentry 	      null
-         	     1:           AllocateOP 	                   array1 	      null
-         	     2:      GetelementptrOP 	                   temp11 	    array1,          4
-         	     3:      GetelementptrOP 	                   temp12 	    temp11,          0
-         	     4:              StoreOP 	                   (null) 	    temp12,        233
-         	     5:                AddOP 	                   temp14 	       233,        123
-         	     6:      GetelementptrOP 	                   temp15 	    array1,          4
-         	     7:      GetelementptrOP 	                   temp16 	    temp15,          1
-         	     8:              StoreOP 	                   (null) 	    temp16,     temp14
-         	     9:             ReturnOP 	                   return 	         0
-	address:0x159e0d7f0	mainendlabel:
-         	     10:              LabelOP 	             mainendlabel 	      null
-         	     11:            FuncEndOP 	          func_label_end1 	      null
+         	     1:  GotoWithConditionOP 	true:mainlabel2  false:mainlabel1 	       111
+	address:0x13460bad0	mainlabel2:
+         	     2:              LabelOP 	               mainlabel2 	      null
+         	     3:                AddOP 	                   temp13 	       111,        222
+         	     4:                AddOP 	                   temp15 	    temp13,        333
+         	     5:                AddOP 	                   temp17 	    temp15,        444
+         	     6:             ReturnOP 	                   return 	    temp17
+	address:0x13460e030	mainendlabel:
+         	     7:              LabelOP 	             mainendlabel 	      null
+         	     8:            FuncEndOP 	          func_label_end1 	      null
+	address:0x13460ba40	mainlabel1:
+         	     9:              LabelOP 	               mainlabel1 	      null
+         	     10:  GotoWithConditionOP 	true:mainlabel9  false:mainlabel7 	       111
+	address:0x13460cab0	mainlabel9:
+         	     11:              LabelOP 	               mainlabel9 	      null
+         	     12:  GotoWithConditionOP 	true:mainlabel8  false:mainlabel7 	       222
+	address:0x13460ca20	mainlabel8:
+         	     13:              LabelOP 	               mainlabel8 	      null
+         	     14:  GotoWithConditionOP 	true:mainlabel5  false:mainlabel7 	       333
+	address:0x13460c5d0	mainlabel5:
+         	     15:              LabelOP 	               mainlabel5 	      null
+         	     16:             AssignOP 	                %phi_var2 	       888
+         	     17:               GotoOP 	         goto mainlabel11 	      null
+	address:0x13460c720	mainlabel11:
+         	     18:              LabelOP 	              mainlabel11 	      null
+         	     19:             ReturnOP 	                   return 	 %phi_var2
+	address:0x13460c990	mainlabel7:
+         	     20:              LabelOP 	               mainlabel7 	      null
+         	     21:  GotoWithConditionOP 	true:mainlabel10  false:mainlabel6 	       333
+	address:0x13460d110	mainlabel10:
+         	     22:              LabelOP 	              mainlabel10 	      null
+         	     23:  GotoWithConditionOP 	true:mainlabel5  false:mainlabel6 	       444
+	address:0x13460c900	mainlabel6:
+         	     24:              LabelOP 	               mainlabel6 	      null
+         	     25:  GotoWithConditionOP 	true:mainlabel5  false:mainlabel4 	123.300003
+	address:0x13460bce0	mainlabel4:
+         	     26:              LabelOP 	               mainlabel4 	      null
+         	     27:             AssignOP 	                %phi_var2 	       777
+         	     28:               GotoOP 	         goto mainlabel11 	      null
 
 
-	val:array1 	begin:1 	end:6 
-	val:temp11 	begin:2 	end:3 
-	val:temp12 	begin:3 	end:4 
-	val:temp14 	begin:5 	end:8 
-	val:temp15 	begin:6 	end:7 
-	val:temp16 	begin:7 	end:8 
+	val:temp13 	begin:3 	end:4 
+	val:temp15 	begin:4 	end:5 
+	val:temp17 	begin:5 	end:6 
+	val:%phi_var2 	begin:16 	end:28 
 
-	var:temp11	address:R5
- 	var:temp12	address:R6
- 	var:temp14	address:R5
- 	var:temp15	address:R6
- 	var:temp16	address:R4
- 	var:array1	address:R4
- All over!
+	var:%phi_var2	address:R4
+ 	var:temp13	address:R4
+ 	var:temp15	address:R5
+ 	var:temp17	address:R4
+ performance test All over!
