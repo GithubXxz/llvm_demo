@@ -102,7 +102,7 @@ struct {
   Stack *or_stack;
   Value *true_label;
   Value *false_label;
-  bool is_if_init;
+  // bool is_if_init;
 } logic_goto_assist;
 
 static void logic_goto_assist_func(Value *true_label, Value *false_label) {
@@ -113,7 +113,7 @@ static void logic_goto_assist_func(Value *true_label, Value *false_label) {
     StackSetClean(logic_goto_assist.or_stack, CleanObject);
     logic_goto_assist.true_label = true_label;
     logic_goto_assist.false_label = false_label;
-    logic_goto_assist.is_if_init = true;
+    // logic_goto_assist.is_if_init = true;
   } else {
     StackDeinit(logic_goto_assist.and_stack);
     StackDeinit(logic_goto_assist.or_stack);
@@ -121,7 +121,7 @@ static void logic_goto_assist_func(Value *true_label, Value *false_label) {
     logic_goto_assist.false_label = NULL;
     logic_goto_assist.and_stack = NULL;
     logic_goto_assist.or_stack = NULL;
-    logic_goto_assist.is_if_init = false;
+    // logic_goto_assist.is_if_init = false;
   }
 }
 
@@ -295,6 +295,45 @@ void pre_eval(ast *a) {
       logic_goto_assist_func(true_label_ins, else_label_ins);
     }
 
+    if (SEQ(a->name, "WHILE")) {
+      // 创建while这条语句的label，用于返回循环头
+      char *temp_str = name_generate(LABEL);
+
+      Value *while_head_label_ins = (Value *)ins_new_no_operator_v2(LabelOP);
+      while_head_label_ins->name = strdup(temp_str);
+      while_head_label_ins->VTy->TID = LabelTyID;
+      StackPush(stack_while_head_label, while_head_label_ins);
+
+      char buffer[80];
+      // 创建llvm 模式goto语句
+      Value *goto_label_ins = (Value *)ins_new_no_operator_v2(GotoOP);
+      strcpy(buffer, "goto ");
+      strcat(buffer, while_head_label_ins->name);
+      goto_label_ins->name = buffer;
+      goto_label_ins->VTy->TID = GotoTyID;
+      goto_label_ins->pdata->no_condition_goto.goto_location =
+          while_head_label_ins;
+#ifdef PRINT_OK
+      printf("br %s\n", while_head_label_ins->name);
+      printf("%s\n", while_head_label_ins->name);
+#endif
+      // 插入跳转语句
+      ListPushBack(ins_list, goto_label_ins);
+      // 插入while循环头的label
+      ListPushBack(ins_list, while_head_label_ins);
+
+      Value *while_true_label_ins = (Value *)ins_new_no_operator_v2(LabelOP);
+      while_true_label_ins->name = name_generate(LABEL);
+      while_true_label_ins->VTy->TID = LabelTyID;
+
+      Value *while_false_label_ins = (Value *)ins_new_no_operator_v2(LabelOP);
+      while_false_label_ins->name = name_generate(LABEL);
+      while_false_label_ins->VTy->TID = LabelTyID;
+      StackPush(stack_while_then_label, while_false_label_ins);
+
+      logic_goto_assist_func(while_true_label_ins, while_false_label_ins);
+    }
+
     if (a->r && SEQ(a->r->name, "AND")) {
       char *temp_str = name_generate(LABEL);
       Value *and_label_ins = (Value *)ins_new_no_operator_v2(LabelOP);
@@ -382,33 +421,6 @@ void pre_eval(ast *a) {
     if (SEQ(a->name, "Program") && StackSize(stack_symbol_table) == 0) {
       cur_symboltable = (SymbolTable *)malloc(sizeof(SymbolTable));
       symbol_table_init(cur_symboltable);
-    }
-
-    if (a->r && SEQ(a->r->name, "assistWHILE")) {
-      // 创建while这条语句的label，用于返回循环头
-      char *temp_str = name_generate(LABEL);
-
-      Value *while_head_label_ins = (Value *)ins_new_no_operator_v2(LabelOP);
-      while_head_label_ins->name = strdup(temp_str);
-      while_head_label_ins->VTy->TID = LabelTyID;
-      StackPush(stack_while_head_label, while_head_label_ins);
-
-      // 创建llvm 模式goto语句
-      Value *goto_label_ins = (Value *)ins_new_no_operator_v2(GotoOP);
-      strcpy(temp_str, "goto ");
-      strcat(temp_str, while_head_label_ins->name);
-      goto_label_ins->name = temp_str;
-      goto_label_ins->VTy->TID = GotoTyID;
-      goto_label_ins->pdata->no_condition_goto.goto_location =
-          while_head_label_ins;
-#ifdef PRINT_OK
-      printf("br %s\n", while_head_label_ins->name);
-      printf("%s\n", while_head_label_ins->name);
-#endif
-      // 插入跳转语句
-      ListPushBack(ins_list, goto_label_ins);
-      // 插入while循环头的label
-      ListPushBack(ins_list, while_head_label_ins);
     }
 
     if (SEQ(a->name, "assistELSE")) {
@@ -670,42 +682,36 @@ void in_eval(ast *a, Value *left) {
 
   if (a->r && SEQ(a->r->name, "assistWHILE")) {
 
-    Value *while_false_label_ins = (Value *)ins_new_no_operator_v2(LabelOP);
-    while_false_label_ins->name = name_generate(LABEL);
-    while_false_label_ins->VTy->TID = LabelTyID;
-    // 将 while_then_label入栈
-    StackPush(stack_while_then_label, while_false_label_ins);
+    Value *while_true_label_ins = logic_goto_assist.true_label;
+    Value *while_false_label_ins = logic_goto_assist.false_label;
+    if (left) {
+      // 创建跳转语句
+      Value *goto_condition_ins =
+          (Value *)ins_new_single_operator_v2(GotoWithConditionOP, left);
 
-    Value *while_true_label_ins = (Value *)ins_new_no_operator_v2(LabelOP);
-    // 添加变量的名字
-    while_true_label_ins->name = name_generate(LABEL);
-    while_true_label_ins->VTy->TID = LabelTyID;
+      char temp_br_label_name[100];
+      strcpy(temp_br_label_name, "true:");
+      strcat(temp_br_label_name, while_true_label_ins->name);
+      strcat(temp_br_label_name, "  false:");
+      strcat(temp_br_label_name, while_false_label_ins->name);
 
-    // 创建跳转语句
-    Value *goto_condition_ins =
-        (Value *)ins_new_single_operator_v2(GotoWithConditionOP, left);
+      goto_condition_ins->name = strdup(temp_br_label_name);
+      goto_condition_ins->VTy->TID = GotoTyID;
+      goto_condition_ins->pdata->condition_goto.false_goto_location =
+          while_false_label_ins;
+      goto_condition_ins->pdata->condition_goto.true_goto_location =
+          while_true_label_ins;
 
-    char temp_br_label_name[80];
-    strcpy(temp_br_label_name, "true:");
-    strcat(temp_br_label_name, while_true_label_ins->name);
-    strcat(temp_br_label_name, "  false:");
-    strcat(temp_br_label_name, while_false_label_ins->name);
-
-    goto_condition_ins->name = strdup(temp_br_label_name);
-    goto_condition_ins->VTy->TID = GotoTyID;
-    goto_condition_ins->pdata->condition_goto.false_goto_location =
-        while_false_label_ins;
-    goto_condition_ins->pdata->condition_goto.true_goto_location =
-        while_true_label_ins;
-
-    ListPushBack(ins_list, (void *)goto_condition_ins);
-    ListPushBack(ins_list, while_true_label_ins);
+      ListPushBack(ins_list, (void *)goto_condition_ins);
 
 #ifdef PRINT_OK
-    printf("while br %s, true: %s  false : %s \n", left->name,
-           while_true_label_ins->name, while_false_label_ins->name);
-    printf("%s\n", while_true_label_ins->name);
+      printf("while br %s, true: %s  false : %s \n", left->name,
+             while_true_label_ins->name, while_false_label_ins->name);
+      printf("%s\n", while_true_label_ins->name);
 #endif
+    }
+    ListPushBack(ins_list, while_true_label_ins);
+    logic_goto_assist_func(NULL, NULL);
   }
 }
 
@@ -1584,10 +1590,7 @@ Value *post_eval(ast *a, Value *left, Value *right) {
 
   if (SEQ(a->name, "BREAK")) {
     Value *goto_break_label_ins = NULL;
-    if (StackSize(stack_while_then_label) == 0) {
-      // 没有地方可以去 报错？
-      return NULL;
-    }
+    assert(StackSize(stack_while_then_label) != 0);
 
     StackTop(stack_while_then_label, (void **)&goto_break_label_ins);
 
