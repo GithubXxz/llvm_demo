@@ -3,8 +3,31 @@
 
 #include "cds.h"
 #include "container/list.h"
+#include <sys/time.h>
 
-// #define PRINT_OK
+#define PRINT_OK
+// #define TIMER_TEST
+
+static struct timeval begin, end;
+
+#ifdef TIMER_TEST
+#define TIMER_BEGIN gettimeofday(&begin, 0)
+#else
+#define TIMER_BEGIN
+#endif
+
+#ifdef TIMER_TEST
+#define TIMER_END(log)                                                         \
+  gettimeofday(&end, 0);                                                       \
+  {                                                                            \
+    long seconds = end.tv_sec - begin.tv_sec;                                  \
+    long microseconds = end.tv_usec - begin.tv_usec;                           \
+    double elapsed = seconds + microseconds * 1e-6;                            \
+    printf("%s time: %lf\n", log, elapsed);                                    \
+  }
+#else
+#define TIMER_END(log)
+#endif
 
 #define SEQ(x, y) ((x) && (y) && (!strcmp(x, y)))
 
@@ -20,7 +43,7 @@ int CompareKey(void *lhs, void *rhs);
 
 int CompareKeyAddress(void *lhs, void *rhs);
 
-void CleanHashMapKeyNotFree(void *key);
+void CleanKeyNotFree(void *key);
 
 void CleanHashMapKey(void *key);
 
@@ -41,5 +64,7 @@ void hashset_init_string(HashSet **self);
 void hashmap_init(HashMap **self);
 
 void list_copy(List *dest, List *src);
+
+void treemap_init(TreeMap **self);
 
 #endif

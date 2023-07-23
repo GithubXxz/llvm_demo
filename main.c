@@ -238,7 +238,7 @@ char *performance_test[] = {
 
 // --------------------------------------------------
 int main(int argc, char **argv) {
-  // freopen("/dev/null", "w", stdout);
+  TIMER_BEGIN;
 
 #ifdef PRINT_OK
   printf("hello world\n");
@@ -265,20 +265,17 @@ int main(int argc, char **argv) {
     is_functional_test = false;
     choose_case = read_code_from_file(argv[1]);
   } else {
-    is_functional_test = false;
-    // choose_case = read_code_from_file(test_cases[77]);
+    is_functional_test = true;
+    choose_case = read_code_from_file(test_cases[95]);
+    // choose_case = read_code_from_file(performance_test[1]);
     // choose_case = read_code_from_file(hidden_cases[4]);
-    choose_case = read_code_from_file("./my_cases/if_and_or.c");
+    // choose_case = read_code_from_file("./my_cases/mini_float.c");
   }
   if (choose_case == NULL)
     return 1;
 
-#ifdef PRINT_OK
-  freopen("./output/printf_ast.txt", "w", stdout);
-#endif
-
-#define PARSER
   parser(choose_case);
+  TIMER_END("parser over!");
 
 #ifdef PRINT_OK
   freopen(tty_path, "w", stdout);
@@ -292,19 +289,23 @@ int main(int argc, char **argv) {
   printf("\n\n\n\n");
 #endif
 
+#define PARSER
 #ifdef PARSER
-
+  TIMER_BEGIN;
   delete_return_deadcode_pass(ins_list);
+  TIMER_END("delete_return_deadcode_pass over!");
 
 #ifdef PRINT_OK
   print_ins_pass(ins_list);
 #endif
 
+  TIMER_BEGIN;
   ins_toBBlock_pass(ins_list);
+  TIMER_END("ins_toBBlock_pass over!");
 
-#ifdef PRINT_OK
-  print_ins_pass(global_var_list);
-#endif
+  // #ifdef PRINT_OK
+  //   print_ins_pass(global_var_list);
+  // #endif
 
   ListFirst(global_func_list, false);
   void *element;

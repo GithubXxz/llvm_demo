@@ -26,6 +26,7 @@ extern List *ins_list;
 extern HashMap *func_hashMap;
 extern SymbolTable *cur_symboltable;
 extern HashMap *global_array_init_hashmap;
+extern HashMap *constant_single_value_hashmap;
 
 void CleanObject(void *element);
 
@@ -243,7 +244,6 @@ ast *newast(char *name, int num, ...) // 抽象语法树建立
 }
 
 void eval_print(ast *a, int level) {
-#ifdef PRINT_OK
   if (a != NULL) {
     for (int i = 0; i < level; ++i) // 孩子结点相对父节点缩进2个空格
       printf("  ");
@@ -272,7 +272,6 @@ void eval_print(ast *a, int level) {
     eval_print(a->l, level + 1); // 遍历左子树
     eval_print(a->r, level);     // 遍历右子树
   }
-#endif
 }
 
 void pre_eval(ast *a) {
@@ -493,17 +492,20 @@ void in_eval(ast *a, Value *left) {
     } else {
       Value *outside_array = array_init_assist.cur_init_array;
       for (int i = array_init_assist.array_level - 1; i >= 0; i--) {
-
-        Value *cur = (Value *)malloc(sizeof(Value));
-        value_init(cur);
-        cur->VTy->TID = ImmediateIntTyID;
-        char text[50];
-        sprintf(text, "%d", array_init_assist.added[i]);
-        // 添加变量的名字
-        cur->name = strdup(text);
-        // 为padata里的浮点数字面量常量赋值
-        cur->pdata->var_pdata.iVal = array_init_assist.added[i];
-        cur->pdata->var_pdata.fVal = (float)array_init_assist.added[i];
+        Value *cur;
+        char buffer[50];
+        sprintf(buffer, "%d", array_init_assist.added[i]);
+        if (HashMapContain(constant_single_value_hashmap, buffer)) {
+          cur = HashMapGet(constant_single_value_hashmap, buffer);
+        } else {
+          cur = (Value *)malloc(sizeof(Value));
+          value_init(cur);
+          cur->VTy->TID = ImmediateIntTyID;
+          cur->name = strdup(buffer);
+          cur->pdata->var_pdata.iVal = array_init_assist.added[i];
+          cur->pdata->var_pdata.fVal = (float)array_init_assist.added[i];
+          HashMapPut(constant_single_value_hashmap, strdup(buffer), cur);
+        }
 
         // oprand the array
         char *temp_str = name_generate(TEMP_VAR);
@@ -745,10 +747,18 @@ Value *post_eval(ast *a, Value *left, Value *right) {
           } else {
             sprintf(buffer, "-%s", right->name);
           }
-          right->pdata->var_pdata.iVal = -right->pdata->var_pdata.iVal;
-          right->pdata->var_pdata.fVal = -right->pdata->var_pdata.fVal;
-          free(right->name);
-          right->name = strdup(buffer);
+          if (HashMapContain(constant_single_value_hashmap, buffer)) {
+            work_ins = HashMapGet(constant_single_value_hashmap, buffer);
+          } else {
+            work_ins = (Value *)malloc(sizeof(Value));
+            value_init(work_ins);
+            work_ins->VTy->TID = right->VTy->TID;
+            work_ins->name = strdup(buffer);
+            work_ins->pdata->var_pdata.iVal = -right->pdata->var_pdata.iVal;
+            work_ins->pdata->var_pdata.fVal = -right->pdata->var_pdata.fVal;
+            HashMapPut(constant_single_value_hashmap, strdup(buffer), work_ins);
+          }
+          return work_ins;
         } else {
           flag = true;
           work_ins = (Value *)ins_new_single_operator_v2(NegativeOP, right);
@@ -756,19 +766,11 @@ Value *post_eval(ast *a, Value *left, Value *right) {
       } else if (SEQ(a->name, "NOT")) {
         if (right->VTy->TID == ImmediateIntTyID ||
             right->VTy->TID == ImmediateFloatTyID) {
-          char buffer[30];
-          if (right->pdata->var_pdata.iVal != 0) {
-            right->pdata->var_pdata.iVal = 0;
-            right->pdata->var_pdata.fVal = 0.f;
-            sprintf(buffer, "%d", 0);
-          } else {
-            right->pdata->var_pdata.iVal = 1;
-            right->pdata->var_pdata.fVal = 1.f;
-            sprintf(buffer, "%d", 1);
-          }
-          right->VTy->TID = ImmediateIntTyID;
-          free(right->name);
-          right->name = strdup(buffer);
+          if (right->pdata->var_pdata.fVal != 0.0f)
+            work_ins = HashMapGet(constant_single_value_hashmap, "0");
+          else
+            work_ins = HashMapGet(constant_single_value_hashmap, "1");
+          return work_ins;
         } else {
           flag = true;
           work_ins = (Value *)ins_new_single_operator_v2(NotOP, right);
@@ -779,8 +781,7 @@ Value *post_eval(ast *a, Value *left, Value *right) {
         work_ins->name = name_generate(TEMP_VAR);
         work_ins->VTy->TID = right->VTy->TID;
         ListPushBack(ins_list, work_ins);
-        right = work_ins;
-        return right;
+        return work_ins;
       }
     }
 
@@ -930,12 +931,7 @@ Value *post_eval(ast *a, Value *left, Value *right) {
         if (load_var_pointer->VTy->TID == ArrayTyID) {
           return load_var_pointer;
         } else if (load_var_pointer->IsConst) {
-          Value *temp = malloc(sizeof(Value));
-          value_init(temp);
-          value_copy(temp, load_var_pointer->pdata->allocate_pdata.point_value);
-          temp->name =
-              strdup(load_var_pointer->pdata->allocate_pdata.point_value->name);
-          return temp;
+          return load_var_pointer->pdata->allocate_pdata.point_value;
         } else {
           // load instruction
           Value *load_ins =
@@ -972,28 +968,40 @@ Value *post_eval(ast *a, Value *left, Value *right) {
         };
         return assign_var_pointer;
       } else if (SEQ(a->name, "INTEGER")) {
-        Value *cur = (Value *)malloc(sizeof(Value));
-        value_init(cur);
-        cur->VTy->TID = ImmediateIntTyID;
+        Value *cur = NULL;
         char text[20];
         sprintf(text, "%d", a->intgr);
-        // 添加变量的名字
-        cur->name = strdup(text);
-        // 为padata里的整数字面量常量赋值
-        cur->pdata->var_pdata.iVal = a->intgr;
-        cur->pdata->var_pdata.fVal = (float)a->intgr;
+        if (HashMapContain(constant_single_value_hashmap, text)) {
+          cur = HashMapGet(constant_single_value_hashmap, text);
+        } else {
+          cur = (Value *)malloc(sizeof(Value));
+          value_init(cur);
+          cur->VTy->TID = ImmediateIntTyID;
+          // 添加变量的名字
+          cur->name = strdup(text);
+          // 为padata里的整数字面量常量赋值
+          cur->pdata->var_pdata.iVal = a->intgr;
+          cur->pdata->var_pdata.fVal = (float)a->intgr;
+          HashMapPut(constant_single_value_hashmap, strdup(text), cur);
+        }
         return cur;
       } else if (SEQ(a->name, "FLOAT")) {
-        Value *cur = (Value *)malloc(sizeof(Value));
-        value_init(cur);
-        cur->VTy->TID = ImmediateFloatTyID;
-        char text[50];
+        Value *cur = NULL;
+        char text[20];
         sprintf(text, "%f", a->flt);
-        // 添加变量的名字
-        cur->name = strdup(text);
-        // 为padata里的浮点数字面量常量赋值
-        cur->pdata->var_pdata.iVal = (int)a->flt;
-        cur->pdata->var_pdata.fVal = a->flt;
+        if (HashMapContain(constant_single_value_hashmap, text)) {
+          cur = HashMapGet(constant_single_value_hashmap, text);
+        } else {
+          cur = (Value *)malloc(sizeof(Value));
+          value_init(cur);
+          cur->VTy->TID = ImmediateFloatTyID;
+          // 添加变量的名字
+          cur->name = strdup(text);
+          // 为padata里的整数字面量常量赋值
+          cur->pdata->var_pdata.iVal = (int)a->flt;
+          cur->pdata->var_pdata.fVal = a->flt;
+          HashMapPut(constant_single_value_hashmap, strdup(text), cur);
+        }
         return cur;
       }
       // 加减乘除的情况
@@ -1088,14 +1096,44 @@ Value *post_eval(ast *a, Value *left, Value *right) {
           if (a->r && SEQ(a->r->name, "ASSIGNOP")) {
             // 把right存给left left是赋值号左边操作数的地址
             if (left->IsConst) {
-              if (nowVarDecType != (int)right->VTy->TID - 4) {
-                right->VTy->TID = (int)nowVarDecType + 4;
-                // right->pdata->var_pdata.fVal =
-                // right->pdata->var_pdata.fVal; right->pdata->var_pdata.iVal
-                // = right->pdata->var_pdata.iVal;
+              if (right->VTy->TID == IntegerTyID ||
+                  right->VTy->TID == FloatTyID) {
+                value_free(left->pdata->allocate_pdata.point_value);
+                left->pdata->allocate_pdata.point_value = right;
+              } else {
+                Value *cur = NULL;
+                if (nowVarDecType != (int)right->VTy->TID - 4) {
+                  char buffer[30];
+                  if (nowVarDecType == NowInt) {
+                    sprintf(buffer, "%d", (int)right->pdata->var_pdata.fVal);
+                  } else {
+                    sprintf(buffer, "%f", (float)right->pdata->var_pdata.iVal);
+                  }
+                  if (HashMapContain(constant_single_value_hashmap, buffer)) {
+                    cur = HashMapGet(constant_single_value_hashmap, buffer);
+                  } else {
+                    cur = (Value *)malloc(sizeof(Value));
+                    value_init(cur);
+                    cur->VTy->TID = (int)nowVarDecType + 4;
+                    cur->name = strdup(buffer);
+                    if (nowVarDecType == NowInt) {
+                      cur->pdata->var_pdata.iVal =
+                          (int)right->pdata->var_pdata.fVal;
+                      cur->pdata->var_pdata.fVal = cur->pdata->var_pdata.iVal;
+                    } else {
+                      cur->pdata->var_pdata.fVal =
+                          (float)right->pdata->var_pdata.iVal;
+                      cur->pdata->var_pdata.iVal = cur->pdata->var_pdata.fVal;
+                    }
+                    HashMapPut(constant_single_value_hashmap, strdup(buffer),
+                               cur);
+                  }
+                } else
+                  cur = right;
+
+                value_free(left->pdata->allocate_pdata.point_value);
+                left->pdata->allocate_pdata.point_value = cur;
               }
-              value_free(left->pdata->allocate_pdata.point_value);
-              left->pdata->allocate_pdata.point_value = right;
             } else {
               Value *store_ins =
                   (Value *)ins_new_binary_operator_v2(StoreOP, left, right);
@@ -1186,24 +1224,6 @@ Value *post_eval(ast *a, Value *left, Value *right) {
             cur_ins->pdata->array_pdata.total_member / (intptr_t)element;
         ListPushBack(ins_list, cur_ins);
 
-        // char para_buffer[100];
-        // memset(para_buffer, 0, sizeof(para_buffer));
-        // ListFirst(left->pdata->array_pdata.list_para, false);
-        // while (ListNext(left->pdata->array_pdata.list_para, &element)) {
-        //   char text[10];
-        //   sprintf(text, "[%lu x ", (uintptr_t)element);
-        //   strcat(para_buffer, text);
-        // }
-        // strcat(para_buffer, "i32");
-        // for (int ii = 0; ii < ListSize(left->pdata->array_pdata.list_para);
-        //      ii++) {
-        //   strcat(para_buffer, "]");
-        // }
-        // printf("%s = getelementptr inbounds %s, %s"
-        //        " * %s, i32 0, i32 %s, !dbg !24\n",
-        //        cur_ins->name, para_buffer, para_buffer, left->name,
-        //        right->name);
-
         if (ListSize(cur_ins->pdata->array_pdata.list_para) == 0 &&
             (pre_astnode->r ? strcmp(pre_astnode->r->name, "ASSIGNOP")
                             : true)) {
@@ -1274,125 +1294,120 @@ Value *post_eval(ast *a, Value *left, Value *right) {
              left->VTy->TID == ImmediateFloatTyID) &&
             (right->VTy->TID == ImmediateIntTyID ||
              right->VTy->TID == ImmediateFloatTyID)) {
-          Value *temp = malloc(sizeof(Value));
-          value_init(temp);
-          temp->VTy->TID = imm_res_type(left, right);
+          Value *cur;
+
+          TypeID cur_res_typeid = imm_res_type(left, right);
           char buffer[30];
-          if (temp->VTy->TID == ImmediateFloatTyID) {
+          float const_float_value = 0.0f;
+          int const_int_value = 0;
+          if (cur_res_typeid == ImmediateFloatTyID) {
             if (SEQ(a->r->name, "PLUS")) {
-              temp->pdata->var_pdata.iVal =
+              const_float_value =
                   left->pdata->var_pdata.fVal + right->pdata->var_pdata.fVal;
-              temp->pdata->var_pdata.fVal =
-                  left->pdata->var_pdata.fVal + right->pdata->var_pdata.fVal;
+              sprintf(buffer, "%f", const_float_value);
             } else if (SEQ(a->r->name, "MINUS")) {
-              temp->pdata->var_pdata.iVal =
+              const_float_value =
                   left->pdata->var_pdata.fVal - right->pdata->var_pdata.fVal;
-              temp->pdata->var_pdata.fVal =
-                  left->pdata->var_pdata.fVal - right->pdata->var_pdata.fVal;
+              sprintf(buffer, "%f", const_float_value);
             } else if (SEQ(a->r->name, "STAR")) {
-              temp->pdata->var_pdata.iVal =
+              const_float_value =
                   left->pdata->var_pdata.fVal * right->pdata->var_pdata.fVal;
-              temp->pdata->var_pdata.fVal =
-                  left->pdata->var_pdata.fVal * right->pdata->var_pdata.fVal;
+              sprintf(buffer, "%f", const_float_value);
             } else if (SEQ(a->r->name, "DIV")) {
-              temp->pdata->var_pdata.iVal =
+              const_float_value =
                   left->pdata->var_pdata.fVal / right->pdata->var_pdata.fVal;
-              temp->pdata->var_pdata.fVal =
-                  left->pdata->var_pdata.fVal / right->pdata->var_pdata.fVal;
+              sprintf(buffer, "%f", const_float_value);
             } else if (SEQ(a->r->name, "EQUAL")) {
-              temp->pdata->var_pdata.iVal =
+              const_float_value =
                   left->pdata->var_pdata.fVal == right->pdata->var_pdata.fVal;
-              temp->pdata->var_pdata.fVal =
-                  left->pdata->var_pdata.fVal == right->pdata->var_pdata.fVal;
+              sprintf(buffer, "%d", (int)const_float_value);
             } else if (SEQ(a->r->name, "NOTEQUAL")) {
-              temp->pdata->var_pdata.iVal =
+              const_float_value =
                   left->pdata->var_pdata.fVal != right->pdata->var_pdata.fVal;
-              temp->pdata->var_pdata.fVal =
-                  left->pdata->var_pdata.fVal != right->pdata->var_pdata.fVal;
+              sprintf(buffer, "%d", (int)const_float_value);
             } else if (SEQ(a->r->name, "GREAT")) {
-              temp->pdata->var_pdata.iVal =
+              const_float_value =
                   left->pdata->var_pdata.fVal > right->pdata->var_pdata.fVal;
-              temp->pdata->var_pdata.fVal =
-                  left->pdata->var_pdata.fVal > right->pdata->var_pdata.fVal;
+              sprintf(buffer, "%d", (int)const_float_value);
             } else if (SEQ(a->r->name, "LESS")) {
-              temp->pdata->var_pdata.iVal =
+              const_float_value =
                   left->pdata->var_pdata.fVal < right->pdata->var_pdata.fVal;
-              temp->pdata->var_pdata.fVal =
-                  left->pdata->var_pdata.fVal < right->pdata->var_pdata.fVal;
+              sprintf(buffer, "%d", (int)const_float_value);
             } else if (SEQ(a->r->name, "GREATEQUAL")) {
-              temp->pdata->var_pdata.iVal =
-                  left->pdata->var_pdata.iVal >= right->pdata->var_pdata.fVal;
-              temp->pdata->var_pdata.fVal =
+              const_float_value =
                   left->pdata->var_pdata.fVal >= right->pdata->var_pdata.fVal;
+              sprintf(buffer, "%d", (int)const_float_value);
             } else if (SEQ(a->r->name, "LESSEQUAL")) {
-              temp->pdata->var_pdata.iVal =
+              const_float_value =
                   left->pdata->var_pdata.fVal <= right->pdata->var_pdata.fVal;
-              temp->pdata->var_pdata.fVal =
-                  left->pdata->var_pdata.fVal <= right->pdata->var_pdata.fVal;
+              sprintf(buffer, "%d", (int)const_float_value);
             }
-            sprintf(buffer, "%f", temp->pdata->var_pdata.fVal);
+            if (HashMapContain(constant_single_value_hashmap, buffer))
+              cur = HashMapGet(constant_single_value_hashmap, buffer);
+            else {
+              cur = (Value *)malloc(sizeof(Value));
+              value_init(cur);
+              cur->VTy->TID = ImmediateFloatTyID;
+              cur->name = strdup(buffer);
+              cur->pdata->var_pdata.iVal = (int)const_float_value;
+              cur->pdata->var_pdata.fVal = const_float_value;
+              HashMapPut(constant_single_value_hashmap, strdup(buffer), cur);
+            }
           } else {
             if (SEQ(a->r->name, "PLUS")) {
-              temp->pdata->var_pdata.iVal =
-                  left->pdata->var_pdata.iVal + right->pdata->var_pdata.iVal;
-              temp->pdata->var_pdata.fVal =
-                  left->pdata->var_pdata.iVal + right->pdata->var_pdata.iVal;
+              const_int_value =
+                  left->pdata->var_pdata.iVal + right->pdata->var_pdata.fVal;
+              sprintf(buffer, "%d", const_int_value);
             } else if (SEQ(a->r->name, "MINUS")) {
-              temp->pdata->var_pdata.iVal =
-                  left->pdata->var_pdata.iVal - right->pdata->var_pdata.iVal;
-              temp->pdata->var_pdata.fVal =
-                  left->pdata->var_pdata.iVal - right->pdata->var_pdata.iVal;
+              const_int_value =
+                  left->pdata->var_pdata.iVal - right->pdata->var_pdata.fVal;
+              sprintf(buffer, "%d", const_int_value);
             } else if (SEQ(a->r->name, "STAR")) {
-              temp->pdata->var_pdata.iVal =
-                  left->pdata->var_pdata.iVal * right->pdata->var_pdata.iVal;
-              temp->pdata->var_pdata.fVal =
-                  left->pdata->var_pdata.iVal * right->pdata->var_pdata.iVal;
+              const_int_value =
+                  left->pdata->var_pdata.iVal * right->pdata->var_pdata.fVal;
+              sprintf(buffer, "%d", const_int_value);
             } else if (SEQ(a->r->name, "DIV")) {
-              temp->pdata->var_pdata.iVal =
-                  left->pdata->var_pdata.iVal / right->pdata->var_pdata.iVal;
-              temp->pdata->var_pdata.fVal = (float)left->pdata->var_pdata.iVal /
-                                            right->pdata->var_pdata.iVal;
+              const_int_value =
+                  left->pdata->var_pdata.iVal / right->pdata->var_pdata.fVal;
+              sprintf(buffer, "%d", const_int_value);
             } else if (SEQ(a->r->name, "EQUAL")) {
-              temp->pdata->var_pdata.iVal =
-                  left->pdata->var_pdata.iVal == right->pdata->var_pdata.iVal;
-              temp->pdata->var_pdata.fVal =
-                  left->pdata->var_pdata.iVal == right->pdata->var_pdata.iVal;
+              const_int_value =
+                  left->pdata->var_pdata.iVal == right->pdata->var_pdata.fVal;
+              sprintf(buffer, "%d", const_int_value);
             } else if (SEQ(a->r->name, "NOTEQUAL")) {
-              temp->pdata->var_pdata.iVal =
-                  left->pdata->var_pdata.iVal != right->pdata->var_pdata.iVal;
-              temp->pdata->var_pdata.fVal =
-                  left->pdata->var_pdata.iVal != right->pdata->var_pdata.iVal;
+              const_int_value =
+                  left->pdata->var_pdata.iVal != right->pdata->var_pdata.fVal;
+              sprintf(buffer, "%d", const_int_value);
             } else if (SEQ(a->r->name, "GREAT")) {
-              temp->pdata->var_pdata.iVal =
-                  left->pdata->var_pdata.iVal > right->pdata->var_pdata.iVal;
-              temp->pdata->var_pdata.fVal =
-                  left->pdata->var_pdata.iVal > right->pdata->var_pdata.iVal;
+              const_int_value =
+                  left->pdata->var_pdata.iVal > right->pdata->var_pdata.fVal;
+              sprintf(buffer, "%d", const_int_value);
             } else if (SEQ(a->r->name, "LESS")) {
-              temp->pdata->var_pdata.iVal =
-                  left->pdata->var_pdata.iVal < right->pdata->var_pdata.iVal;
-              temp->pdata->var_pdata.fVal =
-                  left->pdata->var_pdata.iVal < right->pdata->var_pdata.iVal;
+              const_int_value =
+                  left->pdata->var_pdata.iVal < right->pdata->var_pdata.fVal;
+              sprintf(buffer, "%d", const_int_value);
             } else if (SEQ(a->r->name, "GREATEQUAL")) {
-              temp->pdata->var_pdata.iVal =
-                  left->pdata->var_pdata.iVal >= right->pdata->var_pdata.iVal;
-              temp->pdata->var_pdata.fVal =
-                  left->pdata->var_pdata.iVal >= right->pdata->var_pdata.iVal;
+              const_int_value =
+                  left->pdata->var_pdata.iVal >= right->pdata->var_pdata.fVal;
+              sprintf(buffer, "%d", const_int_value);
             } else if (SEQ(a->r->name, "LESSEQUAL")) {
-              temp->pdata->var_pdata.iVal =
-                  left->pdata->var_pdata.iVal <= right->pdata->var_pdata.iVal;
-              temp->pdata->var_pdata.fVal =
-                  left->pdata->var_pdata.iVal <= right->pdata->var_pdata.iVal;
-            } else if (SEQ(a->r->name, "MOD")) {
-              temp->pdata->var_pdata.iVal =
-                  left->pdata->var_pdata.iVal % right->pdata->var_pdata.iVal;
-              temp->pdata->var_pdata.fVal = (float)temp->pdata->var_pdata.iVal;
+              const_int_value =
+                  left->pdata->var_pdata.iVal <= right->pdata->var_pdata.fVal;
+              sprintf(buffer, "%d", const_int_value);
             }
-            sprintf(buffer, "%d", temp->pdata->var_pdata.iVal);
+            if (HashMapContain(constant_single_value_hashmap, buffer))
+              cur = HashMapGet(constant_single_value_hashmap, buffer);
+            else {
+              cur = (Value *)malloc(sizeof(Value));
+              value_init(cur);
+              cur->VTy->TID = ImmediateIntTyID;
+              cur->name = strdup(buffer);
+              cur->pdata->var_pdata.iVal = const_int_value;
+              cur->pdata->var_pdata.fVal = (float)const_int_value;
+              HashMapPut(constant_single_value_hashmap, strdup(buffer), cur);
+            }
           }
-          value_free(left);
-          value_free(right);
-          temp->name = strdup(buffer);
-          return temp;
+          return cur;
         }
 
         for (int i = 1; i < N_OP_NUM; i++) {
@@ -1504,15 +1519,8 @@ Value *post_eval(ast *a, Value *left, Value *right) {
   if (SEQ(a->name, "RETURN")) {
     char temp_str[20];
 
-    if (right == NULL) {
-      right = (Value *)malloc(sizeof(Value));
-      value_init(right);
-      right->VTy->TID = ImmediateIntTyID;
-      right->name = strdup("0");
-      // 为padata里的整数字面量常量赋值
-      right->pdata->var_pdata.iVal = 0;
-      right->pdata->var_pdata.fVal = 0.f;
-    }
+    if (right == NULL)
+      right = HashMapGet(constant_single_value_hashmap, "0");
 
     Value *func_return_ins =
         (Value *)ins_new_single_operator_v2(ReturnOP, right);

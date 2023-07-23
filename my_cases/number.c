@@ -1,9 +1,9 @@
+#include <stdio.h>
 int main() {
-  int a = 011;
-  int b = 0xaa;
-  int d = 123e4;
-  float c = 1.234e5;
-  int m = a + b;
-  int n = c + d;
-  return m + n;
+  char buffer[30];
+  float const_float_value = 3.3 > 3.3;
+  float zero_float = 0;
+  sprintf(buffer, "%f", zero_float);
+  printf("%s", buffer);
+  return 0;
 }

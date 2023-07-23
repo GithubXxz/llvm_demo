@@ -1,6 +1,9 @@
 #include "optimization.h"
+#include "c_container_auxiliary.h"
 #include "container/hash_map.h"
+#include "container/hash_set.h"
 #include "container/list.h"
+#include "container/tree_map.h"
 #include <string.h>
 
 typedef struct _live_interval {
@@ -13,6 +16,16 @@ typedef struct _var_live_interval {
   List *this_var_discrete_live_interval;
   live_interval *this_var_total_live_interval;
 } var_live_interval;
+
+typedef struct _live_interval_pair {
+  char *key;
+  var_live_interval *value;
+} live_interval_pair;
+
+typedef struct _live_sorted_interval_pair {
+  var_live_interval *key;
+  void *value;
+} live_sorted_interval_pair;
 
 typedef struct _node_pair {
   char *key;
@@ -176,6 +189,7 @@ static var_live_interval *is_list_contain_item(List *self, char *item) {
 }
 
 void calculate_live_interval(ALGraph *self_cfg, Function *self_func) {
+  TIMER_BEGIN;
   unsigned ins_id_seed = 0;
   // 对所有的指令进行编号
   for (int i = 0; i < self_cfg->node_num; i++) {
@@ -185,22 +199,27 @@ void calculate_live_interval(ALGraph *self_cfg, Function *self_func) {
                     (void **)&element))
       element->ins_id = ins_id_seed++;
   }
+  TIMER_END("increment number for instruction");
 
 #ifdef PRINT_OK
   printf_cur_func_ins(self_func);
 #endif
 
+  TIMER_BEGIN;
+  HashMap *all_var_live_interval;
+  hashmap_init(&all_var_live_interval);
   for (int i = self_cfg->node_num - 1; i >= 0; i--) {
     HashSetFirst((self_cfg->node_set)[i]->bblock_head->live_out);
-    char *live_out_var = NULL;
+    char *live_out_var_name = NULL;
     // iter the live_out_var of cur bblock
-    while ((live_out_var = HashSetNext(
+    while ((live_out_var_name = HashSetNext(
                 (self_cfg->node_set)[i]->bblock_head->live_out)) != NULL) {
       // 当前live_out取出的变量是否已经存在在链条中了
       var_live_interval *cur_var_live_interval = NULL;
 
-      if ((cur_var_live_interval = is_list_contain_item(
-               self_func->all_var_live_interval, live_out_var)) != NULL) {
+      if (HashMapContain(all_var_live_interval, live_out_var_name)) {
+        cur_var_live_interval =
+            HashMapGet(all_var_live_interval, live_out_var_name);
         // 存在的情况 先取出
         // 判断当前位置时候与取出的首活跃区间相邻来判断是新建还是延长
         live_interval *cur_var_front_live_interval = NULL;
@@ -228,7 +247,7 @@ void calculate_live_interval(ALGraph *self_cfg, Function *self_func) {
       } else {
         cur_var_live_interval =
             (var_live_interval *)malloc(sizeof(var_live_interval));
-        cur_var_live_interval->self = strdup(live_out_var);
+        cur_var_live_interval->self = strdup(live_out_var_name);
         cur_var_live_interval->this_var_discrete_live_interval = ListInit();
         cur_var_live_interval->this_var_total_live_interval =
             (live_interval *)malloc(sizeof(live_interval));
@@ -243,7 +262,8 @@ void calculate_live_interval(ALGraph *self_cfg, Function *self_func) {
             ListSize(((self_cfg->node_set)[i]->bblock_head->inst_list)) - 1;
         ListPushFront(cur_var_live_interval->this_var_discrete_live_interval,
                       add_live_interval);
-        ListPushBack(self_func->all_var_live_interval, cur_var_live_interval);
+        HashMapPut(all_var_live_interval, strdup(live_out_var_name),
+                   cur_var_live_interval);
       }
     }
 
@@ -253,10 +273,9 @@ void calculate_live_interval(ALGraph *self_cfg, Function *self_func) {
                            (void **)&element)) {
       if (element->opcode < NULL_USED) {
         if (((Instruction *)element)->opcode < RETURN_USED) {
-          var_live_interval *cur_var_live_interval = NULL;
-          cur_var_live_interval = is_list_contain_item(
-              self_func->all_var_live_interval, ((Value *)element)->name);
-          if (cur_var_live_interval != NULL) {
+          if (HashMapContain(all_var_live_interval, ((Value *)element)->name)) {
+            var_live_interval *cur_var_live_interval =
+                HashMapGet(all_var_live_interval, ((Value *)element)->name);
             // 截断
             live_interval *cur_var_front_live_interval = NULL;
             ListGetFront(cur_var_live_interval->this_var_discrete_live_interval,
@@ -269,11 +288,11 @@ void calculate_live_interval(ALGraph *self_cfg, Function *self_func) {
           // 当前live_out取出的变量是否已经存在在链条中了
           var_live_interval *cur_var_live_interval = NULL;
           Value *cur_handle = user_get_operand_use((User *)element, j)->Val;
-          if ((cur_var_live_interval =
-                   is_list_contain_item(self_func->all_var_live_interval,
-                                        cur_handle->name)) != NULL) {
+          if (HashMapContain(all_var_live_interval, cur_handle->name)) {
             // 存在的情况 先取出
             // 判断当前位置时候与取出的首活跃区间相邻来判断是新建还是延长
+            cur_var_live_interval =
+                HashMapGet(all_var_live_interval, cur_handle->name);
             live_interval *cur_var_front_live_interval = NULL;
             ListGetFront(cur_var_live_interval->this_var_discrete_live_interval,
                          (void **)&cur_var_front_live_interval);
@@ -309,58 +328,44 @@ void calculate_live_interval(ALGraph *self_cfg, Function *self_func) {
             ListPushFront(
                 cur_var_live_interval->this_var_discrete_live_interval,
                 add_live_interval);
-            ListPushBack(self_func->all_var_live_interval,
-                         cur_var_live_interval);
+            HashMapPut(all_var_live_interval,
+                       strdup(cur_var_live_interval->self),
+                       cur_var_live_interval);
           }
         }
       }
     }
   }
+  TIMER_END("increment number for instruction");
 
-  var_live_interval *element;
-  ListFirst(self_func->all_var_live_interval, false);
-  while (ListNext(self_func->all_var_live_interval, (void **)&element)) {
+  live_interval_pair *element;
+  HashMapFirst(all_var_live_interval);
+  while ((element = (live_interval_pair *)HashMapNext(all_var_live_interval)) !=
+         NULL) {
     live_interval *total_live_interval = NULL;
-    ListGetFront(element->this_var_discrete_live_interval,
+    ListGetFront(element->value->this_var_discrete_live_interval,
                  (void **)&total_live_interval);
-    element->this_var_total_live_interval->begin = total_live_interval->begin;
-    ListGetBack(element->this_var_discrete_live_interval,
+    element->value->this_var_total_live_interval->begin =
+        total_live_interval->begin;
+    ListGetBack(element->value->this_var_discrete_live_interval,
                 (void **)&total_live_interval);
-    element->this_var_total_live_interval->end = total_live_interval->end;
-  }
-
-  // sort the list
-  int num_of_var_live_interval = ListSize(self_func->all_var_live_interval);
-  for (int i = 0; i < num_of_var_live_interval; i++) {
-    var_live_interval *cur_index_var_live_interval = NULL;
-    ListGetAt(self_func->all_var_live_interval, i,
-              (void **)&cur_index_var_live_interval);
-    for (int j = i + 1; j < num_of_var_live_interval; j++) {
-      var_live_interval *cur_iter_var_live_interval = NULL;
-      ListGetAt(self_func->all_var_live_interval, j,
-                (void **)&cur_iter_var_live_interval);
-      if (cur_index_var_live_interval->this_var_total_live_interval->begin >=
-          cur_iter_var_live_interval->this_var_total_live_interval->begin) {
-        ListSetAt(self_func->all_var_live_interval, i,
-                  cur_iter_var_live_interval);
-        ListSetAt(self_func->all_var_live_interval, j,
-                  cur_index_var_live_interval);
-        cur_index_var_live_interval = cur_iter_var_live_interval;
-      }
-    }
+    element->value->this_var_total_live_interval->end =
+        total_live_interval->end;
+    TreeMapPut(self_func->all_var_live_interval, element->value, NULL);
   }
 }
 
 void line_scan_register_allocation(Function *handle_func) {
   ALGraph *self_cfg = handle_func->self_cfg;
   HashMap *var_location = handle_func->var_localtion;
-  var_live_interval *element;
-  ListFirst(handle_func->all_var_live_interval, false);
+  live_sorted_interval_pair *element;
 #ifdef PRINT_OK
-  while (ListNext(handle_func->all_var_live_interval, (void **)&element)) {
-    printf("\tval:%s \tbegin:%d \tend:%d \n", element->self,
-           element->this_var_total_live_interval->begin,
-           element->this_var_total_live_interval->end);
+  TreeMapFirst(handle_func->all_var_live_interval);
+  while ((element = (live_sorted_interval_pair *)TreeMapNext(
+              handle_func->all_var_live_interval)) != NULL) {
+    printf("\tval:%s \tbegin:%d \tend:%d \n", element->key->self,
+           element->key->this_var_total_live_interval->begin,
+           element->key->this_var_total_live_interval->end);
   }
 #endif
 
@@ -372,12 +377,12 @@ void line_scan_register_allocation(Function *handle_func) {
     register_situation[i] = false;
   }
 
-  if (ListSize(handle_func->all_var_live_interval) == 0) {
+  TreeMapFirst(handle_func->all_var_live_interval);
+  if (TreeMapSize(handle_func->all_var_live_interval) == 0) {
     return;
   }
 
-  var_live_interval *cur_handle = NULL;
-  ListFirst(handle_func->all_var_live_interval, false);
+  TreeMapFirst(handle_func->all_var_live_interval);
 
   // ListNext(handle_func->all_var_live_interval, (void **)&cur_handle);
   // if (cur_handle == NULL)
@@ -387,7 +392,12 @@ void line_scan_register_allocation(Function *handle_func) {
   // // printf("hashmap put %s\n", cur_handle->self);
   // ListPushBack(active, cur_handle);
 
-  while (ListNext(handle_func->all_var_live_interval, (void **)&cur_handle)) {
+  live_sorted_interval_pair *cur_handle_help;
+  var_live_interval *cur_handle;
+  TreeMapFirst(handle_func->all_var_live_interval);
+  while ((cur_handle_help = (live_sorted_interval_pair *)TreeMapNext(
+              handle_func->all_var_live_interval)) != NULL) {
+    cur_handle = cur_handle_help->key;
     if (strstr(cur_handle->self, "global") ||
         strstr(cur_handle->self, "point")) {
       HashMapPut(var_location, strdup(cur_handle->self),
@@ -473,9 +483,9 @@ void line_scan_register_allocation(Function *handle_func) {
   Pair *ptr_pair;
   HashMapFirst(var_location);
   if (HashMapSize(var_location) !=
-      ListSize(handle_func->all_var_live_interval)) {
+      TreeMapSize(handle_func->all_var_live_interval)) {
     printf("need to allocate register size is %d\n",
-           ListSize(handle_func->all_var_live_interval));
+           TreeMapSize(handle_func->all_var_live_interval));
     printf("indeed allocate register size is %d\n", HashMapSize(var_location));
     assert(0);
   };

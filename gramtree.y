@@ -42,9 +42,10 @@ OptTag  Tag VarDec  FunDec VarList ParamDec Compst StmtList Stmt DefList Def Dec
 Program:|ExtDefList {
     $$=newast("Program",1,$1);
     
-    #ifdef PRINT_OK
+#ifdef PRINT_OK
+    freopen("./output/printf_ast.txt", "w", stdout);
     eval_print($$,0);    
-    #endif
+#endif
     fflush(stdout);
 
     eval($$);

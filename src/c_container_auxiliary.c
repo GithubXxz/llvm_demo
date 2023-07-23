@@ -1,7 +1,10 @@
 #include "c_container_auxiliary.h"
 #include "container/list.h"
+#include "container/tree_map.h"
 #include "instruction.h"
+#include "type.h"
 #include "value.h"
+#include <string.h>
 
 Stack *stack_ast_pre = NULL;
 
@@ -40,6 +43,8 @@ HashMap *bblock_to_dom_graph_hashmap = NULL;
 
 HashMap *global_array_init_hashmap = NULL;
 
+HashMap *constant_single_value_hashmap = NULL;
+
 // 出栈/链表删除 伴随运行的函数 我真他妈 心态崩了 学艺不精
 void CleanObject(void *element) {}
 
@@ -63,7 +68,7 @@ int CompareKeyAddress(void *lhs, void *rhs) {
 
 void CleanHashMapKey(void *key) { free(key); }
 
-void CleanHashMapKeyNotFree(void *key) {}
+void CleanKeyNotFree(void *key) {}
 
 void CleanHashSetKey(void *key) {}
 
@@ -91,6 +96,36 @@ void hashmap_init(HashMap **self) {
   HashMapSetCompare(*self, CompareKey);
   HashMapSetCleanKey(*self, CleanHashMapKey);
   HashMapSetCleanValue(*self, CleanValue);
+}
+
+typedef struct _live_interval {
+  unsigned begin;
+  unsigned end;
+} live_interval;
+
+typedef struct _var_live_interval {
+  char *self;
+  List *this_var_discrete_live_interval;
+  live_interval *this_var_total_live_interval;
+} var_live_interval;
+
+int CompareTreeMapKey(void *left, void *right) {
+  var_live_interval *l = left;
+  var_live_interval *r = right;
+  if (l->this_var_total_live_interval->begin ==
+      r->this_var_total_live_interval->begin) {
+    return strcmp(l->self, r->self);
+  } else {
+    return l->this_var_total_live_interval->begin -
+           r->this_var_total_live_interval->begin;
+  }
+}
+
+void treemap_init(TreeMap **self) {
+  *self = TreeMapInit();
+  TreeMapSetCompare(*self, CompareTreeMapKey);
+  TreeMapSetCleanKey(*self, CleanKeyNotFree);
+  TreeMapSetCleanKey(*self, CleanValue);
 }
 
 void hashmap_init_address(HashMap **self) {
@@ -187,6 +222,33 @@ void AllInit() {
   system_func_init();
 
   hashmap_init(&bblock_hashmap);
+
+  hashmap_init(&constant_single_value_hashmap);
+  {
+    Value *cur = (Value *)malloc(sizeof(Value));
+    value_init(cur);
+    cur->VTy->TID = ImmediateIntTyID;
+    cur->name = strdup("0");
+    cur->pdata->var_pdata.iVal = 0;
+    cur->pdata->var_pdata.fVal = 0.0f;
+    HashMapPut(constant_single_value_hashmap, strdup("0"), cur);
+
+    cur = (Value *)malloc(sizeof(Value));
+    value_init(cur);
+    cur->VTy->TID = ImmediateFloatTyID;
+    cur->name = strdup("0.000000");
+    cur->pdata->var_pdata.iVal = 0;
+    cur->pdata->var_pdata.fVal = 0.0f;
+    HashMapPut(constant_single_value_hashmap, strdup("0.000000"), cur);
+
+    cur = (Value *)malloc(sizeof(Value));
+    value_init(cur);
+    cur->VTy->TID = ImmediateIntTyID;
+    cur->name = strdup("1");
+    cur->pdata->var_pdata.iVal = 1;
+    cur->pdata->var_pdata.fVal = 1.0f;
+    HashMapPut(constant_single_value_hashmap, strdup("1"), cur);
+  }
 
   hashmap_init(&bblock_to_dom_graph_hashmap);
 

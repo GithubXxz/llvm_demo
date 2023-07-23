@@ -69,6 +69,8 @@ extern List *global_func_list;
 
 extern HashMap *bblock_hashmap;
 
+extern HashMap *constant_single_value_hashmap;
+
 extern HashSet *bblock_pass_hashset;
 
 extern HashMap *bblock_to_dom_graph_hashmap;
@@ -647,16 +649,10 @@ void rename_pass_help_new(HashMap *rename_var_stack_hashmap,
                                   ->pdata->phi_func_pdata.phi_pointer->name),
                    (void *)&cur_insert);
         } else {
-          cur_insert = (Value *)malloc(sizeof(Value));
-          value_init(cur_insert);
-          cur_insert->VTy->TID =
-              (((Value *)neighbor_bblock_ins)->VTy->TID == IntegerTyID
-                   ? ImmediateIntTyID
-                   : ImmediateFloatTyID);
-          cur_insert->name = strdup("undefined");
-          // 为padata里的整数字面量常量赋值
-          cur_insert->pdata->var_pdata.iVal = 0;
-          cur_insert->pdata->var_pdata.fVal = 0.f;
+          if (((Value *)neighbor_bblock_ins)->VTy->TID == IntegerTyID)
+            cur_insert = HashMapGet(constant_single_value_hashmap, "0");
+          else
+            cur_insert = HashMapGet(constant_single_value_hashmap, "0.000000");
         }
         HashMapPut(
             ((Value *)neighbor_bblock_ins)->pdata->phi_func_pdata.phi_value,
@@ -1249,21 +1245,14 @@ void ins_toBBlock_pass(List *self) {
 
         case LabelOP:
           num_of_block++;
-          // printf(" %s ins is printed\n",
-          //        op_string[((Instruction *)element)->opcode]);
           if (pre_op != GotoOP && pre_op != ReturnOP &&
               pre_op != GotoWithConditionOP) {
-            // printf("%s is cur label %s is next label \n",
-            //        cur_bblock->label->name, ((User
-            //        *)element)->res->name);
             cur_bblock->true_bblock = name_get_bblock(((Value *)element)->name);
             ListPushBack(
                 name_get_bblock(((Value *)element)->name)->father_bblock_list,
                 cur_bblock);
           }
           cur_bblock = name_get_bblock(((Value *)element)->name);
-          // printf("\taddress:%p", cur_bblock->label);
-          // printf("\t%s:\n", cur_bblock->label->name);
 
           ListPushBack(cur_bblock->inst_list, element);
           break;
@@ -1318,6 +1307,7 @@ void ins_toBBlock_pass(List *self) {
 }
 
 void bblock_to_dom_graph_pass(Function *self) {
+  TIMER_BEGIN;
   int num_of_block = self->num_of_block;
   // // 设置支配树对应图的邻接表头
   // hashset_init(&(graph_head_set));
@@ -1339,6 +1329,7 @@ void bblock_to_dom_graph_pass(Function *self) {
   bblock_to_dom_graph_dfs_pass(init_headnode, 0);
   HashMapDeinit(bblock_to_dom_graph_hashmap);
   hashmap_init(&bblock_to_dom_graph_hashmap);
+  TIMER_END("block_to_dom_graph_dfs_pass over!");
 
 #ifdef PRINT_OK
   for (int i = 0; i < num_of_block; i++) {
@@ -1421,11 +1412,17 @@ void bblock_to_dom_graph_pass(Function *self) {
   printf_cur_func_ins(self);
 #endif
 
+  TIMER_BEGIN;
   calculate_live_use_def_by_graph(graph_for_dom_tree);
+  TIMER_END("calculate_live_use_def_by_graph over!");
 
+  TIMER_BEGIN;
   calculate_live_in_out(graph_for_dom_tree);
+  TIMER_END("calculate_live_in_out over!");
 
+  TIMER_BEGIN;
   calculate_live_interval(graph_for_dom_tree, self);
+  TIMER_END("calculate_live_interval over!");
 
   line_scan_register_allocation(self);
 }
