@@ -598,7 +598,7 @@ void in_eval(ast *a, Value *left) {
     ListFirst(param_type_list, false);
     void *element;
     int i = 0;
-    while (ListNext(param_type_list, element))
+    while (ListNext(param_type_list, &element))
       cur_construction_func->pdata->symtab_func_pdata.param_type_lists[i++] =
           (TypeID)(intptr_t)element;
     ListDeinit(param_type_list);
@@ -1061,7 +1061,7 @@ Value *post_eval(ast *a, Value *left, Value *right) {
         Value *func_param_ins;
         param_seed = func_label->pdata->symtab_func_pdata.param_num;
 
-        for (int i = func_label->pdata->symtab_func_pdata.param_num; i >= 0;
+        for (int i = func_label->pdata->symtab_func_pdata.param_num - 1; i >= 0;
              i--) {
           StackTop(stack_param, (void **)&func_param_ins);
           StackPop(stack_param);

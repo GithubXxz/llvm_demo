@@ -148,19 +148,20 @@ typedef struct sys_fun_info {
   char *func_name;
   TypeID return_type;
   int param_num;
+  TypeID param_type[2];
 } sys_func_info;
 
 void system_func_init() {
   sys_func_info sysy[20] = {{"getint", IntegerTyID, 0},
                             {"getch", IntegerTyID, 0},
-                            {"getarray", IntegerTyID, 1},
+                            {"getarray", IntegerTyID, 1, ArrayTyID},
                             {"getfloat", FloatTyID, 0},
-                            {"getfarray", IntegerTyID, 1},
-                            {"putint", VoidTyID, 1},
-                            {"putch", VoidTyID, 1},
-                            {"putarray", VoidTyID, 2},
-                            {"putfloat", VoidTyID, 1},
-                            {"putfarray", VoidTyID, 2},
+                            {"getfarray", IntegerTyID, 1, ArrayTyID},
+                            {"putint", VoidTyID, 1, IntegerTyID},
+                            {"putch", VoidTyID, 1, IntegerTyID},
+                            {"putarray", VoidTyID, 2, IntegerTyID, ArrayTyID},
+                            {"putfloat", VoidTyID, 1, FloatTyID},
+                            {"putfarray", VoidTyID, 2, IntegerTyID, ArrayTyID},
                             {NULL, VoidTyID, 0}};
   for (int i = 0;; i++) {
     if (sysy[i].func_name == NULL)
@@ -171,6 +172,13 @@ void system_func_init() {
     func_label_ins->VTy->TID = FuncLabelTyID;
     func_label_ins->pdata->symtab_func_pdata.return_type = sysy[i].return_type;
     func_label_ins->pdata->symtab_func_pdata.param_num = sysy[i].param_num;
+
+    func_label_ins->pdata->symtab_func_pdata.param_type_lists =
+        malloc(sizeof(TypeID) * sysy[i].param_num);
+    for (int j = 0; j < sysy[i].param_num; j++) {
+      func_label_ins->pdata->symtab_func_pdata.param_type_lists[j] =
+          sysy[i].param_type[j];
+    }
 
     // 将函数的<name,label>插入函数表
     char *sys_func_name = strdup(sysy[i].func_name);
