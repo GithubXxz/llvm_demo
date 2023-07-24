@@ -266,7 +266,7 @@ int main(int argc, char **argv) {
     choose_case = read_code_from_file(argv[1]);
   } else {
     is_functional_test = true;
-    choose_case = read_code_from_file(test_cases[94]);
+    choose_case = read_code_from_file(test_cases[98]);
     // choose_case = read_code_from_file(performance_test[1]);
     // choose_case = read_code_from_file(hidden_cases[4]);
     // choose_case = read_code_from_file("./my_cases/while_cases.c");

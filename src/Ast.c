@@ -136,6 +136,7 @@ static int global_seed = 1;     // 用于表示全局变量
 static int param_seed = 0;      // 用于标识函数参数的个数
 static int total_array_member = 1;
 static List *array_list = NULL;
+static List *param_type_list = NULL;
 static Value *cur_construction_func;
 static char *cur_handle_func = NULL;
 
@@ -309,7 +310,7 @@ void pre_eval(ast *a) {
       Value *goto_label_ins = (Value *)ins_new_no_operator_v2(GotoOP);
       strcpy(buffer, "goto ");
       strcat(buffer, while_head_label_ins->name);
-      goto_label_ins->name = buffer;
+      goto_label_ins->name = strdup(buffer);
       goto_label_ins->VTy->TID = GotoTyID;
       goto_label_ins->pdata->no_condition_goto.goto_location =
           while_head_label_ins;
@@ -360,6 +361,8 @@ void pre_eval(ast *a) {
       func_label_ins->name = strdup(a->l->idtype);
       func_label_ins->VTy->TID = FuncLabelTyID;
       func_label_ins->pdata->symtab_func_pdata.return_type = (int)nowVarDecType;
+      param_type_list = ListInit();
+      ListSetClean(param_type_list, CleanObject);
       cur_construction_func = func_label_ins;
 
       // 插入
@@ -465,6 +468,7 @@ void in_eval(ast *a, Value *left) {
       value_init(cur_var);
       // 添加变量类型
       cur_var->VTy->TID = (int)nowVarDecType;
+      ListPushBack(param_type_list, (void *)(intptr_t)cur_var->VTy->TID);
       // 添加变量的名字
       cur_var->name = name_generate(PARAM);
       // 返回指针
@@ -481,6 +485,7 @@ void in_eval(ast *a, Value *left) {
       ListPushBack(ins_list, store_ins);
       return;
     } else {
+      ListPushBack(param_type_list, (void *)(intptr_t)ArrayTyID);
       free(left->name);
       // 添加变量的名字
       left->name = name_generate(PARAM);
@@ -588,6 +593,17 @@ void in_eval(ast *a, Value *left) {
 
   if (SEQ(a->name, "FunDec")) {
     cur_construction_func->pdata->symtab_func_pdata.param_num = param_seed;
+    cur_construction_func->pdata->symtab_func_pdata.param_type_lists =
+        malloc(sizeof(TypeID) * param_seed);
+    ListFirst(param_type_list, false);
+    void *element;
+    int i = 0;
+    while (ListNext(param_type_list, element))
+      cur_construction_func->pdata->symtab_func_pdata.param_type_lists[i++] =
+          (TypeID)(intptr_t)element;
+    ListDeinit(param_type_list);
+    param_type_list = NULL;
+
     cur_construction_func = NULL;
     // 将参数的个数清零
     param_seed = 0;
@@ -668,7 +684,6 @@ void in_eval(ast *a, Value *left) {
 
     // 添加变量的名字 类型 和返回值
     func_param_ins->VTy->TID = ParamTyID;
-    // func_param_ins->pdata->param_pdata.param_value = left;
 
     StackPush(stack_param, (void *)func_param_ins);
 
@@ -1043,14 +1058,16 @@ Value *post_eval(ast *a, Value *left, Value *right) {
         char *temp_str = name_generate(TEMP_VAR);
         HashMapPut(func_hashMap, strdup(temp_str), func_label);
 
-        void *func_param_ins;
+        Value *func_param_ins;
         param_seed = func_label->pdata->symtab_func_pdata.param_num;
 
-        for (int i = 0; i < func_label->pdata->symtab_func_pdata.param_num;
-             i++) {
-          StackTop(stack_param, &func_param_ins);
+        for (int i = func_label->pdata->symtab_func_pdata.param_num; i >= 0;
+             i--) {
+          StackTop(stack_param, (void **)&func_param_ins);
           StackPop(stack_param);
-          ((Value *)func_param_ins)->name = name_generate(PARAM_CONVERT);
+          func_param_ins->name = name_generate(PARAM_CONVERT);
+          func_param_ins->pdata->param_pdata.param_type =
+              func_label->pdata->symtab_func_pdata.param_type_lists[i];
 
           // 插入
           ListPushBack(ins_list, (void *)func_param_ins);

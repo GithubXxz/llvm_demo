@@ -58,16 +58,16 @@ union _PData {
   } var_pdata;
 
   struct {
-    TypeID return_type; // 返回类型
-    // Type param_type_lists[10];  // 参数的类型数组
-    int param_num; // 传入参数的个数
+    TypeID return_type;       // 返回类型
+    TypeID *param_type_lists; // 参数的类型数组
+    int param_num;            // 传入参数的个数
   } symtab_func_pdata;
   struct {
     char *name;
   } func_call_pdata;
 
   struct {
-    Value *param_value; // 函数参数
+    TypeID param_type; // 返回类型
   } param_pdata;
 
   struct {
