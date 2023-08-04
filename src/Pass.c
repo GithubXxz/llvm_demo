@@ -955,20 +955,19 @@ void replace_phi_nodes(dom_tree *cur_bblock) {
 }
 
 // delete phi func
-void remove_bblock_phi_func_pass(ALGraph *self_cfg) {
-  for (int i = 0; i < self_cfg->node_num; i++) {
-    int iter_num = 0;
-    Instruction *element = NULL;
-
-    ListFirst((self_cfg->node_set)[i]->bblock_head->inst_list, false);
-    ListSetClean((self_cfg->node_set)[i]->bblock_head->inst_list, CleanObject);
-    while (ListNext((self_cfg->node_set)[i]->bblock_head->inst_list,
-                    (void **)&element)) {
-      if (((Instruction *)element)->opcode == PhiFuncOp) {
-        ListRemove((self_cfg->node_set)[i]->bblock_head->inst_list, iter_num);
-        continue;
-      }
-      iter_num++;
+void remove_bblock_phi_func_pass(ALGraph *self) {
+  for (int i = 0; i < self->node_num; i++) {
+    List *cur_handle = (self->node_set)[i]->bblock_head->inst_list;
+    ListSetClean(cur_handle, CleanObject);
+    Instruction *element;
+    int i = 0;
+    ListNode *iter = cur_handle->data->iter_node_;
+    element = iter->element_;
+    while (i < ListSize(cur_handle)) {
+      if (((Instruction *)element)->opcode == PhiFuncOp)
+        delete_ins(cur_handle, &iter, &element);
+      else
+        iter_next_ins(&iter, &i, &element);
     }
   }
 }

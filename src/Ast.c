@@ -498,8 +498,11 @@ void in_eval(ast *a, Value *left) {
         left->VTy->TID == ImmediateFloatTyID) {
       int cur_init_total_offset = array_init_assist.added[0];
       for (int i = 1; i < array_init_assist.array_level; i++) {
-        cur_init_total_offset +=
-            array_init_assist.added[i] * array_init_assist.array_info[i - 1];
+        int temp = array_init_assist.added[i];
+        for (int j = i - 1; j >= 0; j--) {
+          temp *= array_init_assist.array_info[j];
+        }
+        cur_init_total_offset += temp;
       }
       global_array_init_item *cur_init_offset =
           malloc(sizeof(global_array_init_item));
@@ -604,7 +607,6 @@ void in_eval(ast *a, Value *left) {
     ListDeinit(param_type_list);
     param_type_list = NULL;
 
-    cur_construction_func = NULL;
     // 将参数的个数清零
     param_seed = 0;
   }
@@ -744,11 +746,31 @@ Value *post_eval(ast *a, Value *left, Value *right) {
             array_init_assist.added[i] = 0;
           }
         }
-        if (!is_all_zero)
-          array_init_assist.added[ensure_zero]++;
 
-        if (array_init_assist.is_empty)
+        if (!is_all_zero || array_init_assist.is_empty) {
           array_init_assist.added[ensure_zero]++;
+          for (int i = ensure_zero; i < array_init_assist.array_level; i++) {
+            if (array_init_assist.added[i] == array_init_assist.array_info[i]) {
+              array_init_assist.added[i] = 0;
+              array_init_assist.added[i + 1]++;
+            } else {
+              break;
+            }
+          }
+        }
+
+        // if (array_init_assist.is_empty) {
+        //   array_init_assist.added[ensure_zero]++;
+        //   for (int i = ensure_zero; i < array_init_assist.array_level; i++) {
+        //     if (array_init_assist.added[i] ==
+        //     array_init_assist.array_info[i]) {
+        //       array_init_assist.added[i] = 0;
+        //       array_init_assist.added[i + 1]++;
+        //     } else {
+        //       break;
+        //     }
+        //   }
+        // }
 
         return NULL;
       }
@@ -1379,45 +1401,50 @@ Value *post_eval(ast *a, Value *left, Value *right) {
           } else {
             if (SEQ(a->r->name, "PLUS")) {
               const_int_value =
-                  left->pdata->var_pdata.iVal + right->pdata->var_pdata.fVal;
+                  left->pdata->var_pdata.iVal + right->pdata->var_pdata.iVal;
               sprintf(buffer, "%d", const_int_value);
             } else if (SEQ(a->r->name, "MINUS")) {
               const_int_value =
-                  left->pdata->var_pdata.iVal - right->pdata->var_pdata.fVal;
+                  left->pdata->var_pdata.iVal - right->pdata->var_pdata.iVal;
               sprintf(buffer, "%d", const_int_value);
             } else if (SEQ(a->r->name, "STAR")) {
               const_int_value =
-                  left->pdata->var_pdata.iVal * right->pdata->var_pdata.fVal;
+                  left->pdata->var_pdata.iVal * right->pdata->var_pdata.iVal;
               sprintf(buffer, "%d", const_int_value);
             } else if (SEQ(a->r->name, "DIV")) {
               const_int_value =
-                  left->pdata->var_pdata.iVal / right->pdata->var_pdata.fVal;
+                  left->pdata->var_pdata.iVal / right->pdata->var_pdata.iVal;
               sprintf(buffer, "%d", const_int_value);
             } else if (SEQ(a->r->name, "EQUAL")) {
               const_int_value =
-                  left->pdata->var_pdata.iVal == right->pdata->var_pdata.fVal;
+                  left->pdata->var_pdata.iVal == right->pdata->var_pdata.iVal;
               sprintf(buffer, "%d", const_int_value);
             } else if (SEQ(a->r->name, "NOTEQUAL")) {
               const_int_value =
-                  left->pdata->var_pdata.iVal != right->pdata->var_pdata.fVal;
+                  left->pdata->var_pdata.iVal != right->pdata->var_pdata.iVal;
               sprintf(buffer, "%d", const_int_value);
             } else if (SEQ(a->r->name, "GREAT")) {
               const_int_value =
-                  left->pdata->var_pdata.iVal > right->pdata->var_pdata.fVal;
+                  left->pdata->var_pdata.iVal > right->pdata->var_pdata.iVal;
               sprintf(buffer, "%d", const_int_value);
             } else if (SEQ(a->r->name, "LESS")) {
               const_int_value =
-                  left->pdata->var_pdata.iVal < right->pdata->var_pdata.fVal;
+                  left->pdata->var_pdata.iVal < right->pdata->var_pdata.iVal;
               sprintf(buffer, "%d", const_int_value);
             } else if (SEQ(a->r->name, "GREATEQUAL")) {
               const_int_value =
-                  left->pdata->var_pdata.iVal >= right->pdata->var_pdata.fVal;
+                  left->pdata->var_pdata.iVal >= right->pdata->var_pdata.iVal;
               sprintf(buffer, "%d", const_int_value);
             } else if (SEQ(a->r->name, "LESSEQUAL")) {
               const_int_value =
-                  left->pdata->var_pdata.iVal <= right->pdata->var_pdata.fVal;
+                  left->pdata->var_pdata.iVal <= right->pdata->var_pdata.iVal;
+              sprintf(buffer, "%d", const_int_value);
+            } else if (SEQ(a->r->name, "MOD")) {
+              const_int_value =
+                  left->pdata->var_pdata.iVal % right->pdata->var_pdata.iVal;
               sprintf(buffer, "%d", const_int_value);
             }
+
             if (HashMapContain(constant_single_value_hashmap, buffer))
               cur = HashMapGet(constant_single_value_hashmap, buffer);
             else {
@@ -1435,11 +1462,58 @@ Value *post_eval(ast *a, Value *left, Value *right) {
 
         for (int i = 1; i < N_OP_NUM; i++) {
           if (SEQ(a->r->name, NORMAL_OPERATOR[i])) {
+
+            if (left->VTy->TID == FloatTyID &&
+                right->VTy->TID == ImmediateIntTyID) {
+              char buffer[30];
+              sprintf(buffer, "%f", (float)right->pdata->var_pdata.iVal);
+              if (HashMapContain(constant_single_value_hashmap, buffer)) {
+                right = HashMapGet(constant_single_value_hashmap, buffer);
+              } else {
+                Value *cur = (Value *)malloc(sizeof(Value));
+                value_init(cur);
+                cur->VTy->TID = ImmediateFloatTyID;
+                cur->name = strdup(buffer);
+                cur->pdata->var_pdata.iVal = right->pdata->var_pdata.iVal;
+                cur->pdata->var_pdata.fVal =
+                    (float)right->pdata->var_pdata.iVal;
+                HashMapPut(constant_single_value_hashmap, strdup(buffer), cur);
+                right = cur;
+              }
+            }
+
+            if (left->VTy->TID == ImmediateIntTyID &&
+                right->VTy->TID == FloatTyID) {
+              char buffer[30];
+              sprintf(buffer, "%f", (float)left->pdata->var_pdata.iVal);
+              if (HashMapContain(constant_single_value_hashmap, buffer)) {
+                left = HashMapGet(constant_single_value_hashmap, buffer);
+              } else {
+                Value *cur = (Value *)malloc(sizeof(Value));
+                value_init(cur);
+                cur->VTy->TID = ImmediateFloatTyID;
+                cur->name = strdup(buffer);
+                cur->pdata->var_pdata.iVal = left->pdata->var_pdata.iVal;
+                cur->pdata->var_pdata.fVal = (float)left->pdata->var_pdata.iVal;
+                HashMapPut(constant_single_value_hashmap, strdup(buffer), cur);
+                left = cur;
+              }
+            }
+
+            TypeID res_typeid;
+            if (i >= 6)
+              res_typeid = IntegerTyID;
+            else
+              res_typeid = ins_res_type(left, right);
+
             Value *cur_ins =
                 (Value *)ins_new_binary_operator_v2(DefaultOP, left, right);
             // 添加变量的名字
             cur_ins->name = name_generate(TEMP_VAR);
-            cur_ins->VTy->TID = ins_res_type(left, right);
+            if (i >= 6)
+              cur_ins->VTy->TID = res_typeid;
+            else
+              cur_ins->VTy->TID = res_typeid;
 
             char *oprand_type =
                 NowVarDecStr[cur_ins->VTy->TID < 4 ? cur_ins->VTy->TID
@@ -1510,6 +1584,7 @@ Value *post_eval(ast *a, Value *left, Value *right) {
   }
 
   if (SEQ(a->name, "FunDec")) {
+    cur_construction_func = NULL;
     StackPop(stack_symbol_table);
     // 销毁当前的符号表中的哈希表然后销毁符号表
     HashMapDeinit(cur_symboltable->symbol_map);
@@ -1540,16 +1615,17 @@ Value *post_eval(ast *a, Value *left, Value *right) {
   }
 
   if (SEQ(a->name, "RETURN")) {
-    char temp_str[20];
+    Value *func_return_ins = NULL;
 
     if (right == NULL)
-      right = HashMapGet(constant_single_value_hashmap, "0");
+      func_return_ins = (Value *)ins_new_no_operator_v2(ReturnOP);
+    else
+      func_return_ins = (Value *)ins_new_single_operator_v2(ReturnOP, right);
 
-    Value *func_return_ins =
-        (Value *)ins_new_single_operator_v2(ReturnOP, right);
-    // 添加变量的名字 类型 和返回值
     func_return_ins->name = strdup("return");
     func_return_ins->VTy->TID = ReturnTyID;
+    func_return_ins->pdata->return_pdata.return_type =
+        cur_construction_func->pdata->symtab_func_pdata.return_type;
 
     // 插入
     ListPushBack(ins_list, (void *)func_return_ins);

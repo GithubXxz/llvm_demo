@@ -162,6 +162,8 @@ void system_func_init() {
                             {"putarray", VoidTyID, 2, IntegerTyID, ArrayTyID},
                             {"putfloat", VoidTyID, 1, FloatTyID},
                             {"putfarray", VoidTyID, 2, IntegerTyID, ArrayTyID},
+                            {"_sysy_starttime", VoidTyID, 1, IntegerTyID},
+                            {"_sysy_stoptime", VoidTyID, 1, IntegerTyID},
                             {NULL, VoidTyID, 0}};
   for (int i = 0;; i++) {
     if (sysy[i].func_name == NULL)

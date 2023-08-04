@@ -1,4 +1,3 @@
-
 int MAX(int a, int b)
 {
     if (a == b)
