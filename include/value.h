@@ -97,9 +97,9 @@ union _PData {
   } param_init_pdata;
 
   struct {
+    // 判断是否为最外级别数组
+    Value *top_array;
     TypeID array_type;
-    // 指针
-    Value *array_value;
     // 链表 各层数组的元素个数
     List *list_para;
     // 成员数量
@@ -108,6 +108,9 @@ union _PData {
     int step_long;
     // 记录局部的数组的赋值和引用的信息
     // HashMap *local_array_hashmap;
+
+    //用于判断数据是否为局部数组
+    int is_local_array;
   } array_pdata;
 };
 

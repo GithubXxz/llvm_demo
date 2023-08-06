@@ -1,5 +1,6 @@
 #include "c_container_auxiliary.h"
 #include "container/list.h"
+#include "container/stack.h"
 #include "container/tree_map.h"
 #include "instruction.h"
 #include "type.h"
@@ -44,6 +45,8 @@ HashMap *bblock_to_dom_graph_hashmap = NULL;
 HashMap *global_array_init_hashmap = NULL;
 
 HashMap *constant_single_value_hashmap = NULL;
+
+Stack *array_get = NULL;
 
 // 出栈/链表删除 伴随运行的函数 我真他妈 心态崩了 学艺不精
 void CleanObject(void *element) {}
@@ -192,6 +195,9 @@ void AllInit() {
   // 初始化指令链表
   ins_list = ListInit();
   ListSetClean(ins_list, CleanObject);
+
+  array_get = StackInit();
+  StackSetClean(array_get, CleanObject);
 
   // 初始化全局变量链条
   global_var_list = ListInit();

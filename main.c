@@ -226,7 +226,7 @@ char *performance_test[] = {
     "./performance_test/shuffle0.c",
     "./performance_test/shuffle1.c",
     "./performance_test/shuffle2.c",
-    "./performance_test/sl1.c",
+    "./performance_test/sl1.c", // 51
     "./performance_test/sl2.c",
     "./performance_test/sl3.c",
     "./performance_test/stencil0.c",
@@ -262,14 +262,15 @@ int main(int argc, char **argv) {
     is_functional_test = true;
     choose_case = read_code_from_file(argv[1]);
   } else if (argc == 3) {
-    is_functional_test = true;
+    is_functional_test = false;
     choose_case = read_code_from_file(argv[1]);
   } else {
     is_functional_test = false;
+    // is_functional_test = true;
     // choose_case = read_code_from_file(test_cases[51]);
-    // choose_case = read_code_from_file(performance_test[0]);
-    // choose_case = read_code_from_file(hidden_cases[4]);
-    choose_case = read_code_from_file("./my_cases/macro_replace.c");
+    choose_case = read_code_from_file(performance_test[51]);
+    // choose_case = read_code_from_file(hidden_cases[35]);
+    // choose_case = read_code_from_file("./my_cases/array_init.c");
   }
   if (choose_case == NULL)
     return 1;
@@ -325,7 +326,7 @@ int main(int argc, char **argv) {
   return 0;
 }
 
-#define MAX_LINE_LENGTH 1000
+#define MAX_LINE_LENGTH 1024
 char *read_code_from_file(const char *file_path) {
   puts(file_path);
   FILE *fd = fopen(file_path, "r");

@@ -13,6 +13,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/_types/_va_list.h>
 
 extern Stack *stack_ast_pre;
 extern Stack *stack_symbol_table;
@@ -27,6 +28,7 @@ extern HashMap *func_hashMap;
 extern SymbolTable *cur_symboltable;
 extern HashMap *global_array_init_hashmap;
 extern HashMap *constant_single_value_hashmap;
+extern Stack *array_get;
 
 void CleanObject(void *element);
 
@@ -65,6 +67,9 @@ struct {
   bool is_empty;
   List *offset_list;
 } array_init_assist;
+
+#define ARRAY_DEREFERENCE 0
+static bool assist_is_local_array = true;
 
 static void array_init_assist_func(List *array_list, Value *cur_init_array) {
   if (array_list != NULL) {
@@ -355,6 +360,7 @@ void pre_eval(ast *a) {
       // 新建一个符号表用于存放参数
       cur_symboltable = (SymbolTable *)malloc(sizeof(SymbolTable));
       symbol_table_init(cur_symboltable);
+      assist_is_local_array = true;
 
       Value *func_label_ins = (Value *)ins_new_no_operator_v2(FuncLabelOP);
       // 添加变量的名字
@@ -489,6 +495,8 @@ void in_eval(ast *a, Value *left) {
       free(left->name);
       // 添加变量的名字
       left->name = name_generate(PARAM);
+      // //参数不能作为局部数组?
+      // left->pdata->array_pdata.is_local_array = 0;
       return;
     }
   }
@@ -537,6 +545,9 @@ void in_eval(ast *a, Value *left) {
         cur_ins->pdata->array_pdata.array_type =
             outside_array->pdata->array_pdata.array_type;
         cur_ins->pdata->array_pdata.list_para = ListInit();
+        cur_ins->pdata->array_pdata.is_local_array = ARRAY_DEREFERENCE;
+        Value *top_array = outside_array->pdata->array_pdata.top_array;
+        cur_ins->pdata->array_pdata.top_array = top_array;
         ListSetClean(cur_ins->pdata->array_pdata.list_para, CleanObject);
         list_copy(cur_ins->pdata->array_pdata.list_para,
                   outside_array->pdata->array_pdata.list_para);
@@ -551,9 +562,18 @@ void in_eval(ast *a, Value *left) {
         outside_array = cur_ins;
       }
 
+      Value *assign_var = left;
+      if (outside_array->pdata->array_pdata.array_type != left->VTy->TID &&
+          outside_array->pdata->array_pdata.array_type != left->VTy->TID - 4) {
+        assign_var = (Value *)ins_new_single_operator_v2(AssignOP, left);
+        assign_var->VTy->TID = outside_array->pdata->array_pdata.array_type;
+        assign_var->name = name_generate(TEMP_VAR);
+        ListPushBack(ins_list, (void *)assign_var);
+      }
+
       // store ready
-      Value *store_ins =
-          (Value *)ins_new_binary_operator_v2(StoreOP, outside_array, left);
+      Value *store_ins = (Value *)ins_new_binary_operator_v2(
+          StoreOP, outside_array, assign_var);
       ListPushBack(ins_list, (void *)store_ins);
     }
 
@@ -587,6 +607,8 @@ void in_eval(ast *a, Value *left) {
         left->pdata->array_pdata.list_para = array_list;
         left->pdata->array_pdata.total_member = total_array_member;
         left->pdata->array_pdata.array_type = (int)nowVarDecType;
+        left->pdata->array_pdata.is_local_array = 2;
+        left->pdata->array_pdata.top_array = left;
         // hashmap_init(&left->pdata->array_pdata.local_array_hashmap);
         total_array_member = 1;
         array_list = NULL;
@@ -683,6 +705,22 @@ void in_eval(ast *a, Value *left) {
   // args_insert
   if (a->r && SEQ(a->r->name, "assistArgs")) {
     Value *func_param_ins = (Value *)ins_new_single_operator_v2(ParamOP, left);
+
+    if (left->VTy->TID == ArrayTyID) {
+      Stack *assist_array_get_stack = StackInit();
+      StackSetClean(assist_array_get_stack, CleanObject);
+      void *element = NULL;
+      while (StackTop(array_get, &element)) {
+        StackPop(array_get);
+        if (element == (void *)1)
+          break;
+        StackPush(assist_array_get_stack, element);
+      }
+      while (StackTop(assist_array_get_stack, &element)) {
+        StackPop(assist_array_get_stack);
+        ListPushBack(ins_list, (void *)element);
+      }
+    }
 
     // 添加变量的名字 类型 和返回值
     func_param_ins->VTy->TID = ParamTyID;
@@ -972,6 +1010,11 @@ Value *post_eval(ast *a, Value *left, Value *right) {
           assert(pre_symboltable || load_var_pointer);
         };
         if (load_var_pointer->VTy->TID == ArrayTyID) {
+          if (load_var_pointer->IsGlobalVar && assist_is_local_array) {
+            load_var_pointer->pdata->array_pdata.is_local_array -= 1;
+            assist_is_local_array = false;
+          }
+
           return load_var_pointer;
         } else if (load_var_pointer->IsConst) {
           return load_var_pointer->pdata->allocate_pdata.point_value;
@@ -1087,6 +1130,10 @@ Value *post_eval(ast *a, Value *left, Value *right) {
              i--) {
           StackTop(stack_param, (void **)&func_param_ins);
           StackPop(stack_param);
+          if (func_param_ins->VTy->TID == ArrayTyID) {
+            func_param_ins->pdata->array_pdata.top_array->pdata->array_pdata
+                .is_local_array = 0;
+          }
           func_param_ins->name = name_generate(PARAM_CONVERT);
           func_param_ins->pdata->param_pdata.param_type =
               func_label->pdata->symtab_func_pdata.param_type_lists[i];
@@ -1180,14 +1227,28 @@ Value *post_eval(ast *a, Value *left, Value *right) {
                 left->pdata->allocate_pdata.point_value = cur;
               }
             } else {
-              Value *store_ins =
-                  (Value *)ins_new_binary_operator_v2(StoreOP, left, right);
+              Value *assign_var = right;
+              if (left->pdata->allocate_pdata.point_value->VTy->TID !=
+                      right->VTy->TID &&
+                  left->pdata->allocate_pdata.point_value->VTy->TID !=
+                      right->VTy->TID - 4) {
+                assign_var =
+                    (Value *)ins_new_single_operator_v2(AssignOP, right);
+                assign_var->VTy->TID =
+                    left->pdata->allocate_pdata.point_value->VTy->TID;
+                assign_var->name = name_generate(TEMP_VAR);
+                ListPushBack(ins_list, (void *)assign_var);
+              }
+
+              Value *store_ins = (Value *)ins_new_binary_operator_v2(
+                  StoreOP, left, assign_var);
               ListPushBack(ins_list, (void *)store_ins);
 #ifdef PRINT_OK
               printf("store %s %s, %s,align 4\n",
-                     NowVarDecStr[right->VTy->TID < 4 ? right->VTy->TID
-                                                      : right->VTy->TID - 4],
-                     right->name, var_name);
+                     NowVarDecStr[assign_var->VTy->TID < 4
+                                      ? assign_var->VTy->TID
+                                      : assign_var->VTy->TID - 4],
+                     assign_var->name, var_name);
 #endif
             }
             return NULL;
@@ -1231,9 +1292,43 @@ Value *post_eval(ast *a, Value *left, Value *right) {
       if (right == NULL) {
         return left;
       } else if (SEQ(a->r->name, "ASSIGNOP")) {
+        Value *assign_var = right;
+
+        if (left->VTy->TID == PointerTyID &&
+                left->pdata->allocate_pdata.point_value->VTy->TID !=
+                    right->VTy->TID &&
+                left->pdata->allocate_pdata.point_value->VTy->TID !=
+                    right->VTy->TID - 4 ||
+            left->VTy->TID == ArrayTyID &&
+                left->pdata->array_pdata.array_type != right->VTy->TID &&
+                left->pdata->array_pdata.array_type != right->VTy->TID - 4) {
+          assign_var = (Value *)ins_new_single_operator_v2(AssignOP, right);
+          assign_var->VTy->TID =
+              left->pdata->allocate_pdata.point_value->VTy->TID;
+          assign_var->name = name_generate(TEMP_VAR);
+          ListPushBack(ins_list, (void *)assign_var);
+        }
+
         // assign_var_pointer是赋值号左边操作数的地址
         Instruction *store_ins =
-            ins_new_binary_operator_v2(StoreOP, left, right);
+            ins_new_binary_operator_v2(StoreOP, left, assign_var);
+
+        if (left->VTy->TID == ArrayTyID) {
+          Stack *assist_array_get_stack = StackInit();
+          StackSetClean(assist_array_get_stack, CleanObject);
+          void *element = NULL;
+          while (StackTop(array_get, &element)) {
+            StackPop(array_get);
+            if (element == (void *)1)
+              break;
+            StackPush(assist_array_get_stack, element);
+          }
+          while (StackTop(assist_array_get_stack, &element)) {
+            StackPop(assist_array_get_stack);
+            ListPushBack(ins_list, (void *)element);
+          }
+        }
+
         ListPushBack(ins_list, (void *)store_ins);
 #ifdef PRINT_OK
         printf("store %s %s, %s,align 4\n",
@@ -1244,6 +1339,9 @@ Value *post_eval(ast *a, Value *left, Value *right) {
         // TODO 返回值是什么有待考虑
         return right;
       } else if (SEQ(a->r->name, "LB")) {
+        if (left->pdata->array_pdata.top_array == left)
+          StackPush(array_get, (void *)(intptr_t)1);
+
         // oprand the array
         char *temp_str = name_generate(TEMP_VAR);
         Value *cur_ins =
@@ -1254,6 +1352,9 @@ Value *post_eval(ast *a, Value *left, Value *right) {
         // cur_ins->IsGlobalVar = left->IsGlobalVar;
         cur_ins->pdata->array_pdata.array_type =
             left->pdata->array_pdata.array_type;
+        cur_ins->pdata->array_pdata.is_local_array = ARRAY_DEREFERENCE;
+        cur_ins->pdata->array_pdata.top_array =
+            left->pdata->array_pdata.top_array;
         // cur_ins->pdata->array_pdata.array_value =
         //     left->pdata->array_pdata.array_value;
         cur_ins->pdata->array_pdata.list_para = ListInit();
@@ -1267,36 +1368,50 @@ Value *post_eval(ast *a, Value *left, Value *right) {
         ListPopFront(cur_ins->pdata->array_pdata.list_para);
         cur_ins->pdata->array_pdata.step_long =
             cur_ins->pdata->array_pdata.total_member / (intptr_t)element;
-        ListPushBack(ins_list, cur_ins);
 
-        if (ListSize(cur_ins->pdata->array_pdata.list_para) == 0 &&
-            (pre_astnode->r ? strcmp(pre_astnode->r->name, "ASSIGNOP")
-                            : true)) {
-          // 链表为空 代表数组退化为普通的指针
-          // 如果不是对数组里面的成员赋值则要把内容load出来使用
-          char temp_str[15];
-          char text[10];
-          sprintf(text, "%d", temp_var_seed);
-          ++temp_var_seed;
-          strcpy(temp_str, "\%temp");
-          strcat(temp_str, text);
-          // cur_ins->VTy->TID = PointerTyID;
-          // 内容与指针所指向的pdata完全一样 名字不一样 占用的内存地址也不一样
-          Value *load_ins =
-              (Value *)ins_new_single_operator_v2(LoadOP, cur_ins);
-          load_ins->name = strdup(temp_str);
-          load_ins->VTy->TID = left->pdata->array_pdata.array_type;
+        StackPush(array_get, cur_ins);
+        // ListPushBack(ins_list, cur_ins);
 
-          ListPushBack(ins_list, (void *)load_ins);
+        if (ListSize(cur_ins->pdata->array_pdata.list_para) == 0) {
+          if (pre_astnode->r ? strcmp(pre_astnode->r->name, "ASSIGNOP")
+                             : true) {
+            // 链表为空 代表数组退化为普通的指针
+            // 如果不是对数组里面的成员赋值则要把内容load出来使用
+            char *temp_str = name_generate(TEMP_VAR);
+            // cur_ins->VTy->TID = PointerTyID;
+            // 内容与指针所指向的pdata完全一样 名字不一样
+            // 占用的内存地址也不一样
+            Value *load_ins =
+                (Value *)ins_new_single_operator_v2(LoadOP, cur_ins);
+            load_ins->name = strdup(temp_str);
+            load_ins->VTy->TID = left->pdata->array_pdata.array_type;
+
+            Stack *assist_array_get_stack = StackInit();
+            StackSetClean(assist_array_get_stack, CleanObject);
+            void *element = NULL;
+            while (StackTop(array_get, &element)) {
+              StackPop(array_get);
+              if (element == (void *)1)
+                break;
+              StackPush(assist_array_get_stack, element);
+            }
+            while (StackTop(assist_array_get_stack, &element)) {
+              StackPop(assist_array_get_stack);
+              ListPushBack(ins_list, (void *)element);
+            }
+
+            ListPushBack(ins_list, (void *)load_ins);
 
 #ifdef PRINT_OK
-          printf("%s = load %s, %s,align 4\n", temp_str,
-                 NowVarDecStr[load_ins->VTy->TID < 4 ? load_ins->VTy->TID
-                                                     : load_ins->VTy->TID - 4],
-                 cur_ins->name);
+            printf(
+                "%s = load %s, %s,align 4\n", temp_str,
+                NowVarDecStr[load_ins->VTy->TID < 4 ? load_ins->VTy->TID
+                                                    : load_ins->VTy->TID - 4],
+                cur_ins->name);
 #endif
 
-          return load_ins;
+            return load_ins;
+          }
         }
         return cur_ins;
       } else {
@@ -1515,10 +1630,7 @@ Value *post_eval(ast *a, Value *left, Value *right) {
             else
               cur_ins->VTy->TID = res_typeid;
 
-            char *oprand_type =
-                NowVarDecStr[cur_ins->VTy->TID < 4 ? cur_ins->VTy->TID
-                                                   : cur_ins->VTy->TID - 4];
-            ((Instruction *)cur_ins)->opcode = i;
+            ((Instruction *)cur_ins)->opcode = (TAC_OP)i;
             ListPushBack(ins_list, (void *)cur_ins);
             return cur_ins;
           }
