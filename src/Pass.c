@@ -1032,10 +1032,11 @@ void delete_ins(List *self, ListNode **iter, Instruction **element) {
     self->data->head_ = NULL;
 }
 
-void iter_next_ins(ListNode **iter, int *i, Instruction **element) {
+Instruction *iter_next_ins(ListNode **iter, int *i, Instruction **element) {
   *iter = (*iter)->succ_;
   (*i)++;
   *element = (*iter)->element_;
+  return (Instruction *)element;
 }
 
 static void delete_return_deadcode_pass_help(int i, List *self, ListNode **iter,
@@ -1094,6 +1095,7 @@ void delete_return_deadcode_pass(List *self) {
   ListSetClean(self, CleanObject);
 }
 
+extern HashMap *assist_is_local_val;
 void ins_toBBlock_pass(List *self) {
   // 用来记录当前的正在处理的bblock
   BasicBlock *cur_bblock = NULL;
@@ -1104,11 +1106,46 @@ void ins_toBBlock_pass(List *self) {
   ListFirst(self, false);
   // 迭代下标
 
+  HashMap *local_global = NULL;
+  hashmap_init(&local_global);
+
   while (ListNext(self, &element)) {
-    while (((Instruction *)element)->opcode != FuncLabelOP) {
-      ListPushBack(global_var_list, element);
-      ListNext(self, &element);
+
+    if (!is_functional_test) {
+      while (((Instruction *)element)->opcode != FuncLabelOP) {
+        Value *test_global;
+        if (((Instruction *)element)->opcode == AllocateOP &&
+            HashMapContain(assist_is_local_val, ((Value *)element)->name) &&
+            ((test_global = HashMapGet(assist_is_local_val,
+                                       ((Value *)element)->name)) != NULL)) {
+          List *namer;
+          if (HashMapContain(local_global, test_global->name)) {
+            namer = HashMapGet(local_global, test_global->name);
+          } else {
+            namer = ListInit();
+            ListSetClean(namer, CleanObject);
+            HashMapPut(local_global, test_global->name, namer);
+          }
+          ((Value *)element)->IsGlobalVar = 0;
+          ListPushBack(namer, element);
+          ListNext(self, &element);
+          while (((Instruction *)element)->opcode != FuncLabelOP &&
+                 ((Instruction *)element)->opcode != AllocateOP) {
+            ListPushBack(namer, element);
+            ListNext(self, &element);
+          }
+        } else {
+          ListPushBack(global_var_list, element);
+          ListNext(self, &element);
+        }
+      }
+    } else {
+      while (((Instruction *)element)->opcode != FuncLabelOP) {
+        ListPushBack(global_var_list, element);
+        ListNext(self, &element);
+      }
     }
+
     // 初始包含入口基本块和结束基本块
     int num_of_block = 2;
     //  进入一个函数
@@ -1152,6 +1189,16 @@ void ins_toBBlock_pass(List *self) {
       // 设置当前的函数的入口基本块
       cur_func->entry_bblock = cur_bblock;
       ListPushBack(cur_bblock->inst_list, element);
+
+      if (!is_functional_test) {
+        if (HashMapContain(local_global, cur_func->label->name)) {
+          List *namer = HashMapGet(local_global, cur_func->label->name);
+          ListFirst(namer, false);
+          void *cao = NULL;
+          while (ListNext(namer, &cao))
+            ListPushBack(cur_bblock->inst_list, cao);
+        }
+      }
 
       while (ListNext(self, &element)) {
         TAC_OP cur_ins_opcode = ((Instruction *)element)->opcode;

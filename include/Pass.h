@@ -54,7 +54,7 @@ void delete_ins(List *self, ListNode **iter, Instruction **element);
 //     self->data->head_ = NULL;
 // }
 
-void iter_next_ins(ListNode **iter, int *i, Instruction **element);
+Instruction *iter_next_ins(ListNode **iter, int *i, Instruction **element);
 // inline void iter_next_ins(ListNode **iter, int *i, Instruction **element) {
 //   *iter = (*iter)->succ_;
 //   (*i)++;

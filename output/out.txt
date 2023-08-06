@@ -1,148 +1,514 @@
+         	     0:          FuncLabelOP 	                     func 	      null
+         	     0:              LabelOP 	                funcentry 	      null
+         	     0:           AllocateOP 	                   point1 	      null
+         	     0:              StoreOP 	                   (null) 	    point1,     param0
+         	     0:           AllocateOP 	                   param1 	      null
+         	     0:           AllocateOP 	                   point2 	      null
+         	     0:              StoreOP 	                   (null) 	    point2,     param2
+         	     0:           AllocateOP 	                   param3 	      null
+         	     0:           AllocateOP 	                   point3 	      null
+         	     0:              StoreOP 	                   (null) 	    point3,     param4
+         	     0:           AllocateOP 	                   point4 	      null
+         	     0:              StoreOP 	                   (null) 	    point4,     param5
+         	     0:           AllocateOP 	                   param6 	      null
+         	     0:           AllocateOP 	                   point5 	      null
+         	     0:              StoreOP 	                   (null) 	    point5,     param7
+         	     0:           AllocateOP 	                   point6 	      null
+         	     0:              StoreOP 	                   (null) 	    point6,     param8
+         	     0:           AllocateOP 	                   point7 	      null
+         	     0:              StoreOP 	                   (null) 	    point7,          0
+         	     0:               GotoOP 	          goto funclabel1 	      null
+         	     0:              LabelOP 	               funclabel1 	      null
+         	     0:               LoadOP 	                   temp10 	    point7
+         	     0:           LessThanOP 	                   temp11 	    temp10,         10
+         	     0:  GotoWithConditionOP 	true:funclabel2  false:funclabel3 	    temp11
+         	     0:              LabelOP 	               funclabel2 	      null
+         	     0:               LoadOP 	                   temp12 	    point1
+         	     0:               LoadOP 	                   temp14 	    point7
+         	     0:      GetelementptrOP 	                   temp13 	    param1,     temp12
+         	     0:      GetelementptrOP 	                   temp15 	    temp13,     temp14
+         	     0:               LoadOP 	                   temp16 	    temp15
+         	     0:              ParamOP 	                   param0 	    temp16
+         	     0:               CallOP 	                   temp17 	      null
+         	     0:               LoadOP 	                   temp18 	    point7
+         	     0:                AddOP 	                   temp19 	    temp18,          1
+         	     0:              StoreOP 	                   (null) 	    point7,     temp19
+         	     0:               GotoOP 	          goto funclabel1 	      null
+         	     0:              LabelOP 	               funclabel3 	      null
+         	     0:              ParamOP 	                   param0 	        10
+         	     0:               CallOP 	                   temp20 	      null
+         	     0:               LoadOP 	                   temp21 	    point2
+         	     0:      GetelementptrOP 	                   temp22 	    param3,     temp21
+         	     0:               LoadOP 	                   temp23 	    temp22
+         	     0:              ParamOP 	                   param0 	    temp23
+         	     0:               CallOP 	                   temp24 	      null
+         	     0:              ParamOP 	                   param0 	        10
+         	     0:               CallOP 	                   temp25 	      null
+         	     0:               GotoOP 	          goto funclabel4 	      null
+         	     0:              LabelOP 	               funclabel4 	      null
+         	     0:               LoadOP 	                   temp26 	    point6
+         	     0:           LessThanOP 	                   temp27 	    temp26,         10
+         	     0:  GotoWithConditionOP 	true:funclabel5  false:funclabel6 	    temp27
+         	     0:              LabelOP 	               funclabel5 	      null
+         	     0:               LoadOP 	                   temp28 	    point6
+         	     0:               LoadOP 	                   temp30 	    point5
+         	     0:                MulOP 	                   temp31 	    temp30,     128875
+         	     0:                ModOP 	                   temp32 	    temp31,       3724
+         	     0:      GetelementptrOP 	                   temp29 	    param6,     temp28
+         	     0:              StoreOP 	                   (null) 	    temp29,     temp32
+         	     0:               LoadOP 	                   temp33 	    point6
+         	     0:                AddOP 	                   temp34 	    temp33,          1
+         	     0:              StoreOP 	                   (null) 	    point6,     temp34
+         	     0:               LoadOP 	                   temp35 	    point5
+         	     0:                AddOP 	                   temp36 	    temp35,          7
+         	     0:              StoreOP 	                   (null) 	    point5,     temp36
+         	     0:               GotoOP 	          goto funclabel4 	      null
+         	     0:              LabelOP 	               funclabel6 	      null
+         	     0:               LoadOP 	                   temp37 	    point3
+         	     0:               LoadOP 	                   temp38 	    point4
+         	     0:                AddOP 	                   temp39 	    temp37,     temp38
+         	     0:             ReturnOP 	                   return 	    temp39
+         	     0:            FuncEndOP 	          func_label_end1 	      null
          	     0:          FuncLabelOP 	                     main 	      null
          	     0:              LabelOP 	                mainentry 	      null
-         	     0:           AllocateOP 	                   point1 	      null
-         	     0: CallWithReturnValueOP 	                   temp10 	      null
-         	     0:              StoreOP 	                   (null) 	    point1,     temp10
-         	     0:              ParamOP 	                   param0 	         3
-         	     0:               CallOP 	                   temp11 	      null
-         	     0:           AllocateOP 	                   point2 	      null
-         	     0:           AllocateOP 	                   point3 	      null
-         	     0:               GotoOP 	          goto mainlabel1 	      null
-         	     0:              LabelOP 	               mainlabel1 	      null
-         	     0:               LoadOP 	                   temp12 	    point1
-         	     0:          GreatThanOP 	                   temp13 	    temp12,          0
-         	     0:  GotoWithConditionOP 	true:mainlabel2  false:mainlabel3 	    temp13
-         	     0:              LabelOP 	               mainlabel2 	      null
-         	     0:               LoadOP 	                   temp14 	    point1
-         	     0:                SubOP 	                   temp15 	    temp14,          1
-         	     0:              StoreOP 	                   (null) 	    point1,     temp15
-         	     0:               GotoOP 	          goto mainlabel1 	      null
-         	     0:              LabelOP 	               mainlabel3 	      null
-         	     0:              ParamOP 	                   param0 	         8
-         	     0:               CallOP 	                   temp16 	      null
+         	     0:           AllocateOP 	                   array4 	      null
+         	     0:           AllocateOP 	                   array5 	      null
+         	     0:      GetelementptrOP 	                   temp40 	    array4,         17
+         	     0:      GetelementptrOP 	                   temp41 	    temp40,          1
+         	     0:              StoreOP 	                   (null) 	    temp41,          6
+         	     0:      GetelementptrOP 	                   temp42 	    array4,         17
+         	     0:      GetelementptrOP 	                   temp43 	    temp42,          3
+         	     0:              StoreOP 	                   (null) 	    temp43,          7
+         	     0:      GetelementptrOP 	                   temp44 	    array4,         17
+         	     0:      GetelementptrOP 	                   temp45 	    temp44,          4
+         	     0:              StoreOP 	                   (null) 	    temp45,          4
+         	     0:      GetelementptrOP 	                   temp46 	    array4,         17
+         	     0:      GetelementptrOP 	                   temp47 	    temp46,          7
+         	     0:              StoreOP 	                   (null) 	    temp47,          9
+         	     0:      GetelementptrOP 	                   temp48 	    array4,         17
+         	     0:      GetelementptrOP 	                   temp49 	    temp48,         11
+         	     0:              StoreOP 	                   (null) 	    temp49,         11
+         	     0:      GetelementptrOP 	                   temp50 	    array5,          6
+         	     0:      GetelementptrOP 	                   temp51 	    temp50,          1
+         	     0:              StoreOP 	                   (null) 	    temp51,          1
+         	     0:      GetelementptrOP 	                   temp52 	    array5,          6
+         	     0:      GetelementptrOP 	                   temp53 	    temp52,          2
+         	     0:              StoreOP 	                   (null) 	    temp53,          2
+         	     0:      GetelementptrOP 	                   temp54 	    array5,          6
+         	     0:      GetelementptrOP 	                   temp55 	    temp54,          3
+         	     0:              StoreOP 	                   (null) 	    temp55,          3
+         	     0:      GetelementptrOP 	                   temp56 	    array5,          6
+         	     0:      GetelementptrOP 	                   temp57 	    temp56,          9
+         	     0:              StoreOP 	                   (null) 	    temp57,          9
+         	     0:           AllocateOP 	                   point8 	      null
+         	     0:      GetelementptrOP 	                   temp58 	    array4,         17
+         	     0:      GetelementptrOP 	                   temp59 	    temp58,          1
+         	     0:               LoadOP 	                   temp60 	    temp59
+         	     0:      GetelementptrOP 	                   temp61 	    array4,         17
+         	     0:      GetelementptrOP 	                   temp62 	    temp61,          3
+         	     0:               LoadOP 	                   temp63 	    temp62
+         	     0:      GetelementptrOP 	                   temp64 	    array4,         17
+         	     0:      GetelementptrOP 	                   temp65 	    array5,          6
+         	     0:      GetelementptrOP 	                   temp66 	    temp65,          3
+         	     0:               LoadOP 	                   temp67 	    temp66
+         	     0:      GetelementptrOP 	                   temp68 	    array5,          6
+         	     0:      GetelementptrOP 	                   temp69 	    temp68,          0
+         	     0:               LoadOP 	                   temp70 	    temp69
+         	     0:      GetelementptrOP 	                   temp71 	    array5,          6
+         	     0:      GetelementptrOP 	                   temp72 	    array5,         34
+         	     0:      GetelementptrOP 	                   temp73 	    temp72,          4
+         	     0:               LoadOP 	                   temp74 	    temp73
+         	     0:      GetelementptrOP 	                   temp75 	    array5,         51
+         	     0:      GetelementptrOP 	                   temp76 	    temp75,         18
+         	     0:               LoadOP 	                   temp77 	    temp76
+         	     0:              ParamOP 	                   param8 	    temp77
+         	     0:              ParamOP 	                   param7 	    temp74
+         	     0:              ParamOP 	                   param6 	    temp71
+         	     0:              ParamOP 	                   param5 	    temp70
+         	     0:              ParamOP 	                   param4 	    temp67
+         	     0:              ParamOP 	                   param3 	    temp64
+         	     0:              ParamOP 	                   param2 	    temp63
+         	     0:              ParamOP 	                   param1 	    array5
+         	     0:              ParamOP 	                   param0 	    temp60
+         	     0: CallWithReturnValueOP 	                   temp78 	      null
+         	     0:                MulOP 	                   temp79 	    temp78,          3
+         	     0:              StoreOP 	                   (null) 	    point8,     temp79
+         	     0:               GotoOP 	          goto mainlabel7 	      null
+         	     0:              LabelOP 	               mainlabel7 	      null
+         	     0:               LoadOP 	                   temp80 	    point8
+         	     0:         GreatEqualOP 	                   temp81 	    temp80,          0
+         	     0:  GotoWithConditionOP 	true:mainlabel8  false:mainlabel9 	    temp81
+         	     0:              LabelOP 	               mainlabel8 	      null
+         	     0:               LoadOP 	                   temp83 	    point8
+         	     0:      GetelementptrOP 	                   temp82 	    array5,          6
+         	     0:      GetelementptrOP 	                   temp84 	    temp82,     temp83
+         	     0:               LoadOP 	                   temp85 	    temp84
+         	     0:              ParamOP 	                   param0 	    temp85
+         	     0:               CallOP 	                   temp86 	      null
+         	     0:              ParamOP 	                   param0 	        32
+         	     0:               CallOP 	                   temp87 	      null
+         	     0:               LoadOP 	                   temp88 	    point8
+         	     0:                SubOP 	                   temp89 	    temp88,          1
+         	     0:              StoreOP 	                   (null) 	    point8,     temp89
+         	     0:               GotoOP 	          goto mainlabel7 	      null
+         	     0:              LabelOP 	               mainlabel9 	      null
+         	     0:              ParamOP 	                   param0 	        10
+         	     0:               CallOP 	                   temp90 	      null
          	     0:             ReturnOP 	                   return 	         0
+         	     0:            FuncEndOP 	          func_label_end2 	      null
+
+
+
+
+         	     0:          FuncLabelOP 	                     func 	      null
+         	     0:              LabelOP 	                funcentry 	      null
+         	     0:           AllocateOP 	                   point1 	      null
+         	     0:              StoreOP 	                   (null) 	    point1,     param0
+         	     0:           AllocateOP 	                   param1 	      null
+         	     0:           AllocateOP 	                   point2 	      null
+         	     0:              StoreOP 	                   (null) 	    point2,     param2
+         	     0:           AllocateOP 	                   param3 	      null
+         	     0:           AllocateOP 	                   point3 	      null
+         	     0:              StoreOP 	                   (null) 	    point3,     param4
+         	     0:           AllocateOP 	                   point4 	      null
+         	     0:              StoreOP 	                   (null) 	    point4,     param5
+         	     0:           AllocateOP 	                   param6 	      null
+         	     0:           AllocateOP 	                   point5 	      null
+         	     0:              StoreOP 	                   (null) 	    point5,     param7
+         	     0:           AllocateOP 	                   point6 	      null
+         	     0:              StoreOP 	                   (null) 	    point6,     param8
+         	     0:           AllocateOP 	                   point7 	      null
+         	     0:              StoreOP 	                   (null) 	    point7,          0
+         	     0:               GotoOP 	          goto funclabel1 	      null
+         	     0:              LabelOP 	               funclabel1 	      null
+         	     0:               LoadOP 	                   temp10 	    point7
+         	     0:           LessThanOP 	                   temp11 	    temp10,         10
+         	     0:  GotoWithConditionOP 	true:funclabel2  false:funclabel3 	    temp11
+         	     0:              LabelOP 	               funclabel2 	      null
+         	     0:               LoadOP 	                   temp12 	    point1
+         	     0:               LoadOP 	                   temp14 	    point7
+         	     0:      GetelementptrOP 	                   temp13 	    param1,     temp12
+         	     0:      GetelementptrOP 	                   temp15 	    temp13,     temp14
+         	     0:               LoadOP 	                   temp16 	    temp15
+         	     0:              ParamOP 	                   param0 	    temp16
+         	     0:               CallOP 	                   temp17 	      null
+         	     0:               LoadOP 	                   temp18 	    point7
+         	     0:                AddOP 	                   temp19 	    temp18,          1
+         	     0:              StoreOP 	                   (null) 	    point7,     temp19
+         	     0:               GotoOP 	          goto funclabel1 	      null
+         	     0:              LabelOP 	               funclabel3 	      null
+         	     0:              ParamOP 	                   param0 	        10
+         	     0:               CallOP 	                   temp20 	      null
+         	     0:               LoadOP 	                   temp21 	    point2
+         	     0:      GetelementptrOP 	                   temp22 	    param3,     temp21
+         	     0:               LoadOP 	                   temp23 	    temp22
+         	     0:              ParamOP 	                   param0 	    temp23
+         	     0:               CallOP 	                   temp24 	      null
+         	     0:              ParamOP 	                   param0 	        10
+         	     0:               CallOP 	                   temp25 	      null
+         	     0:               GotoOP 	          goto funclabel4 	      null
+         	     0:              LabelOP 	               funclabel4 	      null
+         	     0:               LoadOP 	                   temp26 	    point6
+         	     0:           LessThanOP 	                   temp27 	    temp26,         10
+         	     0:  GotoWithConditionOP 	true:funclabel5  false:funclabel6 	    temp27
+         	     0:              LabelOP 	               funclabel5 	      null
+         	     0:               LoadOP 	                   temp28 	    point6
+         	     0:               LoadOP 	                   temp30 	    point5
+         	     0:                MulOP 	                   temp31 	    temp30,     128875
+         	     0:                ModOP 	                   temp32 	    temp31,       3724
+         	     0:      GetelementptrOP 	                   temp29 	    param6,     temp28
+         	     0:              StoreOP 	                   (null) 	    temp29,     temp32
+         	     0:               LoadOP 	                   temp33 	    point6
+         	     0:                AddOP 	                   temp34 	    temp33,          1
+         	     0:              StoreOP 	                   (null) 	    point6,     temp34
+         	     0:               LoadOP 	                   temp35 	    point5
+         	     0:                AddOP 	                   temp36 	    temp35,          7
+         	     0:              StoreOP 	                   (null) 	    point5,     temp36
+         	     0:               GotoOP 	          goto funclabel4 	      null
+         	     0:              LabelOP 	               funclabel6 	      null
+         	     0:               LoadOP 	                   temp37 	    point3
+         	     0:               LoadOP 	                   temp38 	    point4
+         	     0:                AddOP 	                   temp39 	    temp37,     temp38
+         	     0:             ReturnOP 	                   return 	    temp39
          	     0:            FuncEndOP 	          func_label_end1 	      null
-
-
-
-
          	     0:          FuncLabelOP 	                     main 	      null
          	     0:              LabelOP 	                mainentry 	      null
-         	     0:           AllocateOP 	                   point1 	      null
-         	     0: CallWithReturnValueOP 	                   temp10 	      null
-         	     0:              StoreOP 	                   (null) 	    point1,     temp10
-         	     0:              ParamOP 	                   param0 	         3
-         	     0:               CallOP 	                   temp11 	      null
-         	     0:           AllocateOP 	                   point2 	      null
-         	     0:           AllocateOP 	                   point3 	      null
-         	     0:               GotoOP 	          goto mainlabel1 	      null
-         	     0:              LabelOP 	               mainlabel1 	      null
-         	     0:               LoadOP 	                   temp12 	    point1
-         	     0:          GreatThanOP 	                   temp13 	    temp12,          0
-         	     0:  GotoWithConditionOP 	true:mainlabel2  false:mainlabel3 	    temp13
-         	     0:              LabelOP 	               mainlabel2 	      null
-         	     0:               LoadOP 	                   temp14 	    point1
-         	     0:                SubOP 	                   temp15 	    temp14,          1
-         	     0:              StoreOP 	                   (null) 	    point1,     temp15
-         	     0:               GotoOP 	          goto mainlabel1 	      null
-         	     0:              LabelOP 	               mainlabel3 	      null
-         	     0:              ParamOP 	                   param0 	         8
-         	     0:               CallOP 	                   temp16 	      null
+         	     0:           AllocateOP 	                   array4 	      null
+         	     0:           AllocateOP 	                   array5 	      null
+         	     0:      GetelementptrOP 	                   temp40 	    array4,         17
+         	     0:      GetelementptrOP 	                   temp41 	    temp40,          1
+         	     0:              StoreOP 	                   (null) 	    temp41,          6
+         	     0:      GetelementptrOP 	                   temp42 	    array4,         17
+         	     0:      GetelementptrOP 	                   temp43 	    temp42,          3
+         	     0:              StoreOP 	                   (null) 	    temp43,          7
+         	     0:      GetelementptrOP 	                   temp44 	    array4,         17
+         	     0:      GetelementptrOP 	                   temp45 	    temp44,          4
+         	     0:              StoreOP 	                   (null) 	    temp45,          4
+         	     0:      GetelementptrOP 	                   temp46 	    array4,         17
+         	     0:      GetelementptrOP 	                   temp47 	    temp46,          7
+         	     0:              StoreOP 	                   (null) 	    temp47,          9
+         	     0:      GetelementptrOP 	                   temp48 	    array4,         17
+         	     0:      GetelementptrOP 	                   temp49 	    temp48,         11
+         	     0:              StoreOP 	                   (null) 	    temp49,         11
+         	     0:      GetelementptrOP 	                   temp50 	    array5,          6
+         	     0:      GetelementptrOP 	                   temp51 	    temp50,          1
+         	     0:              StoreOP 	                   (null) 	    temp51,          1
+         	     0:      GetelementptrOP 	                   temp52 	    array5,          6
+         	     0:      GetelementptrOP 	                   temp53 	    temp52,          2
+         	     0:              StoreOP 	                   (null) 	    temp53,          2
+         	     0:      GetelementptrOP 	                   temp54 	    array5,          6
+         	     0:      GetelementptrOP 	                   temp55 	    temp54,          3
+         	     0:              StoreOP 	                   (null) 	    temp55,          3
+         	     0:      GetelementptrOP 	                   temp56 	    array5,          6
+         	     0:      GetelementptrOP 	                   temp57 	    temp56,          9
+         	     0:              StoreOP 	                   (null) 	    temp57,          9
+         	     0:           AllocateOP 	                   point8 	      null
+         	     0:      GetelementptrOP 	                   temp58 	    array4,         17
+         	     0:      GetelementptrOP 	                   temp59 	    temp58,          1
+         	     0:               LoadOP 	                   temp60 	    temp59
+         	     0:      GetelementptrOP 	                   temp61 	    array4,         17
+         	     0:      GetelementptrOP 	                   temp62 	    temp61,          3
+         	     0:               LoadOP 	                   temp63 	    temp62
+         	     0:      GetelementptrOP 	                   temp64 	    array4,         17
+         	     0:      GetelementptrOP 	                   temp65 	    array5,          6
+         	     0:      GetelementptrOP 	                   temp66 	    temp65,          3
+         	     0:               LoadOP 	                   temp67 	    temp66
+         	     0:      GetelementptrOP 	                   temp68 	    array5,          6
+         	     0:      GetelementptrOP 	                   temp69 	    temp68,          0
+         	     0:               LoadOP 	                   temp70 	    temp69
+         	     0:      GetelementptrOP 	                   temp71 	    array5,          6
+         	     0:      GetelementptrOP 	                   temp72 	    array5,         34
+         	     0:      GetelementptrOP 	                   temp73 	    temp72,          4
+         	     0:               LoadOP 	                   temp74 	    temp73
+         	     0:      GetelementptrOP 	                   temp75 	    array5,         51
+         	     0:      GetelementptrOP 	                   temp76 	    temp75,         18
+         	     0:               LoadOP 	                   temp77 	    temp76
+         	     0:              ParamOP 	                   param8 	    temp77
+         	     0:              ParamOP 	                   param7 	    temp74
+         	     0:              ParamOP 	                   param6 	    temp71
+         	     0:              ParamOP 	                   param5 	    temp70
+         	     0:              ParamOP 	                   param4 	    temp67
+         	     0:              ParamOP 	                   param3 	    temp64
+         	     0:              ParamOP 	                   param2 	    temp63
+         	     0:              ParamOP 	                   param1 	    array5
+         	     0:              ParamOP 	                   param0 	    temp60
+         	     0: CallWithReturnValueOP 	                   temp78 	      null
+         	     0:                MulOP 	                   temp79 	    temp78,          3
+         	     0:              StoreOP 	                   (null) 	    point8,     temp79
+         	     0:               GotoOP 	          goto mainlabel7 	      null
+         	     0:              LabelOP 	               mainlabel7 	      null
+         	     0:               LoadOP 	                   temp80 	    point8
+         	     0:         GreatEqualOP 	                   temp81 	    temp80,          0
+         	     0:  GotoWithConditionOP 	true:mainlabel8  false:mainlabel9 	    temp81
+         	     0:              LabelOP 	               mainlabel8 	      null
+         	     0:               LoadOP 	                   temp83 	    point8
+         	     0:      GetelementptrOP 	                   temp82 	    array5,          6
+         	     0:      GetelementptrOP 	                   temp84 	    temp82,     temp83
+         	     0:               LoadOP 	                   temp85 	    temp84
+         	     0:              ParamOP 	                   param0 	    temp85
+         	     0:               CallOP 	                   temp86 	      null
+         	     0:              ParamOP 	                   param0 	        32
+         	     0:               CallOP 	                   temp87 	      null
+         	     0:               LoadOP 	                   temp88 	    point8
+         	     0:                SubOP 	                   temp89 	    temp88,          1
+         	     0:              StoreOP 	                   (null) 	    point8,     temp89
+         	     0:               GotoOP 	          goto mainlabel7 	      null
+         	     0:              LabelOP 	               mainlabel9 	      null
+         	     0:              ParamOP 	                   param0 	        10
+         	     0:               CallOP 	                   temp90 	      null
          	     0:             ReturnOP 	                   return 	         0
-         	     0:            FuncEndOP 	          func_label_end1 	      null
-main
-mainentry edge is mainlabel1 
-mainlabel1 edge is mainlabel2 mainlabel3 
-mainlabel2 edge is mainlabel1 
-mainlabel3 edge is mainendlabel 
-mainendlabel edge is 
+         	     0:            FuncEndOP 	          func_label_end2 	      null
+func
+funcentry edge is funclabel1 
+funclabel1 edge is funclabel2 funclabel3 
+funclabel2 edge is funclabel1 
+funclabel3 edge is funclabel4 
+funclabel4 edge is funclabel5 funclabel6 
+funclabel5 edge is funclabel4 
+funclabel6 edge is funcendlabel 
+funcendlabel edge is 
 performance is begin!!!!!!!
 performance is begin!!!!!!!
 performance is begin!!!!!!!
 performance is begin!!!!!!!
-mainlabel1 dom node is 	mainlabel1,	mainlabel2,	mainlabel3,	mainendlabel,
-mainlabel2 dom node is 	mainlabel2,
-mainlabel3 dom node is 	mainlabel3,	mainendlabel,
-mainendlabel dom node is 	mainendlabel,
+funclabel1 dom node is 	funclabel1,	funclabel2,	funclabel3,	funclabel4,	funclabel5,	funclabel6,	funcendlabel,
+funclabel2 dom node is 	funclabel2,
+funclabel3 dom node is 	funclabel3,	funclabel4,	funclabel5,	funclabel6,	funcendlabel,
+funclabel4 dom node is 	funclabel4,	funclabel5,	funclabel6,	funcendlabel,
+funclabel5 dom node is 	funclabel5,
+funclabel6 dom node is 	funclabel6,	funcendlabel,
+funcendlabel dom node is 	funcendlabel,
 
 打印每个节点的立即支配节点
-idom(mainlabel1) = mainentry
-idom(mainlabel2) = mainlabel1
-idom(mainlabel3) = mainlabel1
-idom(mainendlabel) = mainlabel3
+idom(funclabel1) = funcentry
+idom(funclabel2) = funclabel1
+idom(funclabel3) = funclabel1
+idom(funclabel4) = funclabel3
+idom(funclabel5) = funclabel4
+idom(funclabel6) = funclabel4
+idom(funcendlabel) = funclabel6
 
 打印支配树中的层级关系
-mainentry: mainlabel1,
-mainlabel1: mainlabel2,mainlabel3,
-mainlabel3: mainendlabel,
-mainendlabel: 
-mainlabel2: 
+funcentry: funclabel1,
+funclabel1: funclabel2,funclabel3,
+funclabel3: funclabel4,
+funclabel4: funclabel5,funclabel6,
+funclabel6: funcendlabel,
+funcendlabel: 
+funclabel5: 
+funclabel2: 
 
 打印每个基本块的支配边界节点
-cur node mainlabel1's dom frontier is mainlabel1,
-cur node mainlabel2's dom frontier is mainlabel1,
-cur node mainlabel3's dom frontier is 
-cur node mainendlabel's dom frontier is 
+cur node funclabel1's dom frontier is funclabel1,
+cur node funclabel2's dom frontier is funclabel1,
+cur node funclabel3's dom frontier is 
+cur node funclabel4's dom frontier is funclabel4,
+cur node funclabel5's dom frontier is funclabel4,
+cur node funclabel6's dom frontier is 
+cur node funcendlabel's dom frontier is 
 
 	labelID	number:               opcode 	                     name 	       use
-	address:0x100109a00	mainentry:
-         	     0:              LabelOP 	                mainentry 	      null
+	address:0x14c6124d0	funcentry:
+         	     0:              LabelOP 	                funcentry 	      null
+         	     0:           AllocateOP 	                   point7 	      null
+         	     0:           AllocateOP 	                   point6 	      null
+         	     0:           AllocateOP 	                   point5 	      null
+         	     0:           AllocateOP 	                   param6 	      null
+         	     0:           AllocateOP 	                   point4 	      null
          	     0:           AllocateOP 	                   point3 	      null
+         	     0:           AllocateOP 	                   param3 	      null
          	     0:           AllocateOP 	                   point2 	      null
+         	     0:           AllocateOP 	                   param1 	      null
          	     0:           AllocateOP 	                   point1 	      null
-         	     0: CallWithReturnValueOP 	                   temp10 	      null
-         	     0:              StoreOP 	                   (null) 	    point1,     temp10
-         	     0:              ParamOP 	                   param0 	         3
-         	     0:               CallOP 	                   temp11 	      null
-         	     0:               GotoOP 	          goto mainlabel1 	      null
-	address:0x10010a3c0	mainlabel1:
-         	     0:              LabelOP 	               mainlabel1 	      null
+         	     0:              StoreOP 	                   (null) 	    point1,     param0
+         	     0:              StoreOP 	                   (null) 	    point2,     param2
+         	     0:              StoreOP 	                   (null) 	    point3,     param4
+         	     0:              StoreOP 	                   (null) 	    point4,     param5
+         	     0:              StoreOP 	                   (null) 	    point5,     param7
+         	     0:              StoreOP 	                   (null) 	    point6,     param8
+         	     0:              StoreOP 	                   (null) 	    point7,          0
+         	     0:               GotoOP 	          goto funclabel1 	      null
+	address:0x14c614180	funclabel1:
+         	     0:              LabelOP 	               funclabel1 	      null
          	     0:            PhiFuncOp 	                %phi_var1 	size: 0 
+         	     0:               LoadOP 	                   temp10 	    point7
+         	     0:           LessThanOP 	                   temp11 	    temp10,         10
+         	     0:  GotoWithConditionOP 	true:funclabel2  false:funclabel3 	    temp11
+	address:0x14c6142c0	funclabel2:
+         	     0:              LabelOP 	               funclabel2 	      null
          	     0:               LoadOP 	                   temp12 	    point1
-         	     0:          GreatThanOP 	                   temp13 	    temp12,          0
-         	     0:  GotoWithConditionOP 	true:mainlabel2  false:mainlabel3 	    temp13
-	address:0x10010a520	mainlabel2:
-         	     0:              LabelOP 	               mainlabel2 	      null
-         	     0:               LoadOP 	                   temp14 	    point1
-         	     0:                SubOP 	                   temp15 	    temp14,          1
-         	     0:              StoreOP 	                   (null) 	    point1,     temp15
-         	     0:               GotoOP 	          goto mainlabel1 	      null
-	address:0x10010a5b0	mainlabel3:
-         	     0:              LabelOP 	               mainlabel3 	      null
-         	     0:              ParamOP 	                   param0 	         8
-         	     0:               CallOP 	                   temp16 	      null
-         	     0:             ReturnOP 	                   return 	         0
-	address:0x10010b550	mainendlabel:
-         	     0:              LabelOP 	             mainendlabel 	      null
+         	     0:               LoadOP 	                   temp14 	    point7
+         	     0:      GetelementptrOP 	                   temp13 	    param1,     temp12
+         	     0:      GetelementptrOP 	                   temp15 	    temp13,     temp14
+         	     0:               LoadOP 	                   temp16 	    temp15
+         	     0:              ParamOP 	                   param0 	    temp16
+         	     0:               CallOP 	                   temp17 	      null
+         	     0:               LoadOP 	                   temp18 	    point7
+         	     0:                AddOP 	                   temp19 	    temp18,          1
+         	     0:              StoreOP 	                   (null) 	    point7,     temp19
+         	     0:               GotoOP 	          goto funclabel1 	      null
+	address:0x14c614350	funclabel3:
+         	     0:              LabelOP 	               funclabel3 	      null
+         	     0:              ParamOP 	                   param0 	        10
+         	     0:               CallOP 	                   temp20 	      null
+         	     0:               LoadOP 	                   temp21 	    point2
+         	     0:      GetelementptrOP 	                   temp22 	    param3,     temp21
+         	     0:               LoadOP 	                   temp23 	    temp22
+         	     0:              ParamOP 	                   param0 	    temp23
+         	     0:               CallOP 	                   temp24 	      null
+         	     0:              ParamOP 	                   param0 	        10
+         	     0:               CallOP 	                   temp25 	      null
+         	     0:               GotoOP 	          goto funclabel4 	      null
+	address:0x14c616070	funclabel4:
+         	     0:              LabelOP 	               funclabel4 	      null
+         	     0:            PhiFuncOp 	                %phi_var3 	size: 0 
+         	     0:            PhiFuncOp 	                %phi_var2 	size: 0 
+         	     0:               LoadOP 	                   temp26 	    point6
+         	     0:           LessThanOP 	                   temp27 	    temp26,         10
+         	     0:  GotoWithConditionOP 	true:funclabel5  false:funclabel6 	    temp27
+	address:0x14c6161f0	funclabel5:
+         	     0:              LabelOP 	               funclabel5 	      null
+         	     0:               LoadOP 	                   temp28 	    point6
+         	     0:               LoadOP 	                   temp30 	    point5
+         	     0:                MulOP 	                   temp31 	    temp30,     128875
+         	     0:                ModOP 	                   temp32 	    temp31,       3724
+         	     0:      GetelementptrOP 	                   temp29 	    param6,     temp28
+         	     0:              StoreOP 	                   (null) 	    temp29,     temp32
+         	     0:               LoadOP 	                   temp33 	    point6
+         	     0:                AddOP 	                   temp34 	    temp33,          1
+         	     0:              StoreOP 	                   (null) 	    point6,     temp34
+         	     0:               LoadOP 	                   temp35 	    point5
+         	     0:                AddOP 	                   temp36 	    temp35,          7
+         	     0:              StoreOP 	                   (null) 	    point5,     temp36
+         	     0:               GotoOP 	          goto funclabel4 	      null
+	address:0x14c616290	funclabel6:
+         	     0:              LabelOP 	               funclabel6 	      null
+         	     0:               LoadOP 	                   temp37 	    point3
+         	     0:               LoadOP 	                   temp38 	    point4
+         	     0:                AddOP 	                   temp39 	    temp37,     temp38
+         	     0:             ReturnOP 	                   return 	    temp39
+	address:0x14c621530	funcendlabel:
+         	     0:              LabelOP 	             funcendlabel 	      null
          	     0:            FuncEndOP 	          func_label_end1 	      null
 
 
 begin rename pass and delete alloca,store,load instruction!
 rename pass over
 delete alloca,store,load instruction over
+super log!!!!!!!!!!!!!!!!!
 	labelID	number:               opcode 	                     name 	       use
-	address:0x100109a00	mainentry:
-         	     0:              LabelOP 	                mainentry 	      null
-         	     0: CallWithReturnValueOP 	                   temp10 	      null
-         	     0:              ParamOP 	                   param0 	         3
-         	     0:               CallOP 	                   temp11 	      null
-         	     0:               GotoOP 	          goto mainlabel1 	      null
-	address:0x10010a3c0	mainlabel1:
-         	     0:              LabelOP 	               mainlabel1 	      null
-         	     0:            PhiFuncOp 	                %phi_var1 	size: 2 	bblock: mainentry value: temp10, 	bblock: mainlabel2 value: temp15, 
-         	     0:          GreatThanOP 	                   temp13 	 %phi_var1,          0
-         	     0:  GotoWithConditionOP 	true:mainlabel2  false:mainlabel3 	    temp13
-	address:0x10010a520	mainlabel2:
-         	     0:              LabelOP 	               mainlabel2 	      null
-         	     0:                SubOP 	                   temp15 	 %phi_var1,          1
-         	     0:               GotoOP 	          goto mainlabel1 	      null
-	address:0x10010a5b0	mainlabel3:
-         	     0:              LabelOP 	               mainlabel3 	      null
-         	     0:              ParamOP 	                   param0 	         8
-         	     0:               CallOP 	                   temp16 	      null
-         	     0:             ReturnOP 	                   return 	         0
-	address:0x10010b550	mainendlabel:
-         	     0:              LabelOP 	             mainendlabel 	      null
+	address:0x14c6124d0	funcentry:
+         	     0:              LabelOP 	                funcentry 	      null
+         	     0:           AllocateOP 	                   param6 	      null
+         	     0:           AllocateOP 	                   param3 	      null
+         	     0:           AllocateOP 	                   param1 	      null
+         	     0:               GotoOP 	          goto funclabel1 	      null
+	address:0x14c614180	funclabel1:
+         	     0:              LabelOP 	               funclabel1 	      null
+         	     0:            PhiFuncOp 	                %phi_var1 	size: 2 	bblock: funcentry value: 0, 	bblock: funclabel2 value: temp19, 
+         	     0:           LessThanOP 	                   temp11 	 %phi_var1,         10
+         	     0:  GotoWithConditionOP 	true:funclabel2  false:funclabel3 	    temp11
+	address:0x14c6142c0	funclabel2:
+         	     0:              LabelOP 	               funclabel2 	      null
+         	     0:      GetelementptrOP 	                   temp13 	    param1,     param0
+         	     0:      GetelementptrOP 	                   temp15 	    temp13,  %phi_var1
+         	     0:               LoadOP 	                   temp16 	    temp15
+         	     0:              ParamOP 	                   param0 	    temp16
+         	     0:               CallOP 	                   temp17 	      null
+         	     0:                AddOP 	                   temp19 	 %phi_var1,          1
+         	     0:               GotoOP 	          goto funclabel1 	      null
+	address:0x14c614350	funclabel3:
+         	     0:              LabelOP 	               funclabel3 	      null
+         	     0:              ParamOP 	                   param0 	        10
+         	     0:               CallOP 	                   temp20 	      null
+         	     0:      GetelementptrOP 	                   temp22 	    param3,     param2
+         	     0:               LoadOP 	                   temp23 	    temp22
+         	     0:              ParamOP 	                   param0 	    temp23
+         	     0:               CallOP 	                   temp24 	      null
+         	     0:              ParamOP 	                   param0 	        10
+         	     0:               CallOP 	                   temp25 	      null
+         	     0:               GotoOP 	          goto funclabel4 	      null
+	address:0x14c616070	funclabel4:
+         	     0:              LabelOP 	               funclabel4 	      null
+         	     0:            PhiFuncOp 	                %phi_var3 	size: 2 	bblock: funclabel3 value: param7, 	bblock: funclabel5 value: temp36, 
+         	     0:            PhiFuncOp 	                %phi_var2 	size: 2 	bblock: funclabel3 value: param8, 	bblock: funclabel5 value: temp34, 
+         	     0:           LessThanOP 	                   temp27 	 %phi_var2,         10
+         	     0:  GotoWithConditionOP 	true:funclabel5  false:funclabel6 	    temp27
+	address:0x14c6161f0	funclabel5:
+         	     0:              LabelOP 	               funclabel5 	      null
+         	     0:                MulOP 	                   temp31 	 %phi_var3,     128875
+         	     0:                ModOP 	                   temp32 	    temp31,       3724
+         	     0:      GetelementptrOP 	                   temp29 	    param6,  %phi_var2
+         	     0:              StoreOP 	                   (null) 	    temp29,     temp32
+         	     0:                AddOP 	                   temp34 	 %phi_var2,          1
+         	     0:                AddOP 	                   temp36 	 %phi_var3,          7
+         	     0:               GotoOP 	          goto funclabel4 	      null
+	address:0x14c616290	funclabel6:
+         	     0:              LabelOP 	               funclabel6 	      null
+         	     0:                AddOP 	                   temp39 	    param4,     param5
+         	     0:             ReturnOP 	                   return 	    temp39
+	address:0x14c621530	funcendlabel:
+         	     0:              LabelOP 	             funcendlabel 	      null
          	     0:            FuncEndOP 	          func_label_end1 	      null
 
 
@@ -154,76 +520,729 @@ performance is over!!!!!!!
 
 
 	labelID	number:               opcode 	                     name 	       use
-	address:0x100109a00	mainentry:
-         	     0:              LabelOP 	                mainentry 	      null
-         	     0: CallWithReturnValueOP 	                   temp10 	      null
-         	     0:              ParamOP 	                   param0 	         3
-         	     0:               CallOP 	                   temp11 	      null
-         	     0:             AssignOP 	                %phi_var1 	    temp10
-         	     0:               GotoOP 	          goto mainlabel1 	      null
-	address:0x10010a3c0	mainlabel1:
-         	     0:              LabelOP 	               mainlabel1 	      null
-         	     0:          GreatThanOP 	                   temp13 	 %phi_var1,          0
-         	     0:  GotoWithConditionOP 	true:mainlabel2  false:mainlabel3 	    temp13
-	address:0x10010a520	mainlabel2:
-         	     0:              LabelOP 	               mainlabel2 	      null
-         	     0:                SubOP 	                   temp15 	 %phi_var1,          1
-         	     0:             AssignOP 	                %phi_var1 	    temp15
-         	     0:               GotoOP 	          goto mainlabel1 	      null
-	address:0x10010a5b0	mainlabel3:
-         	     0:              LabelOP 	               mainlabel3 	      null
-         	     0:              ParamOP 	                   param0 	         8
-         	     0:               CallOP 	                   temp16 	      null
-         	     0:             ReturnOP 	                   return 	         0
-	address:0x10010b550	mainendlabel:
-         	     0:              LabelOP 	             mainendlabel 	      null
+	address:0x14c6124d0	funcentry:
+         	     0:              LabelOP 	                funcentry 	      null
+         	     0:           AllocateOP 	                   param6 	      null
+         	     0:           AllocateOP 	                   param3 	      null
+         	     0:           AllocateOP 	                   param1 	      null
+         	     0:             AssignOP 	                %phi_var1 	         0
+         	     0:               GotoOP 	          goto funclabel1 	      null
+	address:0x14c614180	funclabel1:
+         	     0:              LabelOP 	               funclabel1 	      null
+         	     0:           LessThanOP 	                   temp11 	 %phi_var1,         10
+         	     0:  GotoWithConditionOP 	true:funclabel2  false:funclabel3 	    temp11
+	address:0x14c6142c0	funclabel2:
+         	     0:              LabelOP 	               funclabel2 	      null
+         	     0:      GetelementptrOP 	                   temp13 	    param1,     param0
+         	     0:      GetelementptrOP 	                   temp15 	    temp13,  %phi_var1
+         	     0:               LoadOP 	                   temp16 	    temp15
+         	     0:              ParamOP 	                   param0 	    temp16
+         	     0:               CallOP 	                   temp17 	      null
+         	     0:                AddOP 	                   temp19 	 %phi_var1,          1
+         	     0:             AssignOP 	                %phi_var1 	    temp19
+         	     0:               GotoOP 	          goto funclabel1 	      null
+	address:0x14c614350	funclabel3:
+         	     0:              LabelOP 	               funclabel3 	      null
+         	     0:              ParamOP 	                   param0 	        10
+         	     0:               CallOP 	                   temp20 	      null
+         	     0:      GetelementptrOP 	                   temp22 	    param3,     param2
+         	     0:               LoadOP 	                   temp23 	    temp22
+         	     0:              ParamOP 	                   param0 	    temp23
+         	     0:               CallOP 	                   temp24 	      null
+         	     0:              ParamOP 	                   param0 	        10
+         	     0:               CallOP 	                   temp25 	      null
+         	     0:             AssignOP 	                %phi_var2 	    param8
+         	     0:             AssignOP 	                %phi_var3 	    param7
+         	     0:               GotoOP 	          goto funclabel4 	      null
+	address:0x14c616070	funclabel4:
+         	     0:              LabelOP 	               funclabel4 	      null
+         	     0:           LessThanOP 	                   temp27 	 %phi_var2,         10
+         	     0:  GotoWithConditionOP 	true:funclabel5  false:funclabel6 	    temp27
+	address:0x14c6161f0	funclabel5:
+         	     0:              LabelOP 	               funclabel5 	      null
+         	     0:                MulOP 	                   temp31 	 %phi_var3,     128875
+         	     0:                ModOP 	                   temp32 	    temp31,       3724
+         	     0:      GetelementptrOP 	                   temp29 	    param6,  %phi_var2
+         	     0:              StoreOP 	                   (null) 	    temp29,     temp32
+         	     0:                AddOP 	                   temp34 	 %phi_var2,          1
+         	     0:                AddOP 	                   temp36 	 %phi_var3,          7
+         	     0:             AssignOP 	                %phi_var2 	    temp34
+         	     0:             AssignOP 	                %phi_var3 	    temp36
+         	     0:               GotoOP 	          goto funclabel4 	      null
+	address:0x14c616290	funclabel6:
+         	     0:              LabelOP 	               funclabel6 	      null
+         	     0:                AddOP 	                   temp39 	    param4,     param5
+         	     0:             ReturnOP 	                   return 	    temp39
+	address:0x14c621530	funcendlabel:
+         	     0:              LabelOP 	             funcendlabel 	      null
          	     0:            FuncEndOP 	          func_label_end1 	      null
 
 
-mainentry live def add temp10
-mainentry live def add %phi_var1
-mainlabel1 live use add %phi_var1
-mainlabel1 live def add temp13
-mainlabel2 live use add %phi_var1
-mainlabel2 live def add temp15
-mainlabel2 live def add %phi_var1
+funcentry live def add param6
+funcentry live def add param3
+funcentry live def add param1
+funcentry live def add %phi_var1
+funclabel1 live use add %phi_var1
+funclabel1 live def add temp11
+funclabel2 live use add param1
+funclabel2 live use add param0
+funclabel2 live def add temp13
+funclabel2 live use add %phi_var1
+funclabel2 live def add temp15
+funclabel2 live def add temp16
+funclabel2 live use add %phi_var1
+funclabel2 live def add temp19
+funclabel2 live def add %phi_var1
+funclabel3 live use add param3
+funclabel3 live use add param2
+funclabel3 live def add temp22
+funclabel3 live def add temp23
+funclabel3 live use add param8
+funclabel3 live def add %phi_var2
+funclabel3 live use add param7
+funclabel3 live def add %phi_var3
+funclabel4 live use add %phi_var2
+funclabel4 live def add temp27
+funclabel5 live use add %phi_var3
+funclabel5 live def add temp31
+funclabel5 live def add temp32
+funclabel5 live use add param6
+funclabel5 live use add %phi_var2
+funclabel5 live def add temp29
+funclabel5 live use add %phi_var2
+funclabel5 live def add temp34
+funclabel5 live use add %phi_var3
+funclabel5 live def add temp36
+funclabel5 live def add %phi_var2
+funclabel5 live def add %phi_var3
+funclabel6 live use add param4
+funclabel6 live use add param5
+funclabel6 live def add temp39
 
 
 
 	labelID	number:               opcode 	                     name 	       use
-	address:0x100109a00	mainentry:
+	address:0x14c6124d0	funcentry:
+         	     0:              LabelOP 	                funcentry 	      null
+         	     1:           AllocateOP 	                   param6 	      null
+         	     2:           AllocateOP 	                   param3 	      null
+         	     3:           AllocateOP 	                   param1 	      null
+         	     4:             AssignOP 	                %phi_var1 	         0
+         	     5:               GotoOP 	          goto funclabel1 	      null
+	address:0x14c614180	funclabel1:
+         	     6:              LabelOP 	               funclabel1 	      null
+         	     7:           LessThanOP 	                   temp11 	 %phi_var1,         10
+         	     8:  GotoWithConditionOP 	true:funclabel2  false:funclabel3 	    temp11
+	address:0x14c6142c0	funclabel2:
+         	     9:              LabelOP 	               funclabel2 	      null
+         	     10:      GetelementptrOP 	                   temp13 	    param1,     param0
+         	     11:      GetelementptrOP 	                   temp15 	    temp13,  %phi_var1
+         	     12:               LoadOP 	                   temp16 	    temp15
+         	     13:              ParamOP 	                   param0 	    temp16
+         	     14:               CallOP 	                   temp17 	      null
+         	     15:                AddOP 	                   temp19 	 %phi_var1,          1
+         	     16:             AssignOP 	                %phi_var1 	    temp19
+         	     17:               GotoOP 	          goto funclabel1 	      null
+	address:0x14c614350	funclabel3:
+         	     18:              LabelOP 	               funclabel3 	      null
+         	     19:              ParamOP 	                   param0 	        10
+         	     20:               CallOP 	                   temp20 	      null
+         	     21:      GetelementptrOP 	                   temp22 	    param3,     param2
+         	     22:               LoadOP 	                   temp23 	    temp22
+         	     23:              ParamOP 	                   param0 	    temp23
+         	     24:               CallOP 	                   temp24 	      null
+         	     25:              ParamOP 	                   param0 	        10
+         	     26:               CallOP 	                   temp25 	      null
+         	     27:             AssignOP 	                %phi_var2 	    param8
+         	     28:             AssignOP 	                %phi_var3 	    param7
+         	     29:               GotoOP 	          goto funclabel4 	      null
+	address:0x14c616070	funclabel4:
+         	     30:              LabelOP 	               funclabel4 	      null
+         	     31:           LessThanOP 	                   temp27 	 %phi_var2,         10
+         	     32:  GotoWithConditionOP 	true:funclabel5  false:funclabel6 	    temp27
+	address:0x14c6161f0	funclabel5:
+         	     33:              LabelOP 	               funclabel5 	      null
+         	     34:                MulOP 	                   temp31 	 %phi_var3,     128875
+         	     35:                ModOP 	                   temp32 	    temp31,       3724
+         	     36:      GetelementptrOP 	                   temp29 	    param6,  %phi_var2
+         	     37:              StoreOP 	                   (null) 	    temp29,     temp32
+         	     38:                AddOP 	                   temp34 	 %phi_var2,          1
+         	     39:                AddOP 	                   temp36 	 %phi_var3,          7
+         	     40:             AssignOP 	                %phi_var2 	    temp34
+         	     41:             AssignOP 	                %phi_var3 	    temp36
+         	     42:               GotoOP 	          goto funclabel4 	      null
+	address:0x14c616290	funclabel6:
+         	     43:              LabelOP 	               funclabel6 	      null
+         	     44:                AddOP 	                   temp39 	    param4,     param5
+         	     45:             ReturnOP 	                   return 	    temp39
+	address:0x14c621530	funcendlabel:
+         	     46:              LabelOP 	             funcendlabel 	      null
+         	     47:            FuncEndOP 	          func_label_end1 	      null
+
+
+	val:param0 	begin:0 	end:17 
+	val:param2 	begin:0 	end:21 
+	val:param4 	begin:0 	end:44 
+	val:param5 	begin:0 	end:44 
+	val:param7 	begin:0 	end:28 
+	val:param8 	begin:0 	end:27 
+	val:param6 	begin:1 	end:42 
+	val:param3 	begin:2 	end:21 
+	val:param1 	begin:3 	end:17 
+	val:%phi_var1 	begin:4 	end:17 
+	val:temp11 	begin:7 	end:8 
+	val:temp13 	begin:10 	end:11 
+	val:temp15 	begin:11 	end:12 
+	val:temp16 	begin:12 	end:13 
+	val:temp19 	begin:15 	end:16 
+	val:temp22 	begin:21 	end:22 
+	val:temp23 	begin:22 	end:23 
+	val:%phi_var2 	begin:27 	end:42 
+	val:%phi_var3 	begin:28 	end:42 
+	val:temp27 	begin:31 	end:32 
+	val:temp31 	begin:34 	end:35 
+	val:temp32 	begin:35 	end:37 
+	val:temp29 	begin:36 	end:37 
+	val:temp34 	begin:38 	end:40 
+	val:temp36 	begin:39 	end:41 
+	val:temp39 	begin:44 	end:45 
+
+	var:%phi_var1	address:R6
+ 	var:%phi_var2	address:R4
+ 	var:%phi_var3	address:R5
+ 	var:temp11	address:R11
+ 	var:temp13	address:R11
+ 	var:temp15	address:R9
+ 	var:temp16	address:R11
+ 	var:temp19	address:R9
+ 	var:temp22	address:R4
+ 	var:temp23	address:R5
+ 	var:temp27	address:R6
+ 	var:temp29	address:R6
+ 	var:temp31	address:R6
+ 	var:temp32	address:R8
+ 	var:temp34	address:R6
+ 	var:temp36	address:R8
+ 	var:temp39	address:R4
+ 	var:param0	address:R4
+ 	var:param1	address:R8
+ 	var:param2	address:R5
+ 	var:param3	address:R12
+ 	var:param4	address:M
+ 	var:param5	address:M
+ 	var:param6	address:M
+ 	var:param7	address:M
+ 	var:param8	address:R10
+ main
+mainentry edge is mainlabel7 
+mainlabel7 edge is mainlabel8 mainlabel9 
+mainlabel8 edge is mainlabel7 
+mainlabel9 edge is mainendlabel 
+mainendlabel edge is 
+performance is begin!!!!!!!
+performance is begin!!!!!!!
+performance is begin!!!!!!!
+performance is begin!!!!!!!
+mainlabel7 dom node is 	mainlabel7,	mainlabel8,	mainlabel9,	mainendlabel,
+mainlabel8 dom node is 	mainlabel8,
+mainlabel9 dom node is 	mainlabel9,	mainendlabel,
+mainendlabel dom node is 	mainendlabel,
+
+打印每个节点的立即支配节点
+idom(mainlabel7) = mainentry
+idom(mainlabel8) = mainlabel7
+idom(mainlabel9) = mainlabel7
+idom(mainendlabel) = mainlabel9
+
+打印支配树中的层级关系
+mainentry: mainlabel7,
+mainlabel7: mainlabel8,mainlabel9,
+mainlabel9: mainendlabel,
+mainendlabel: 
+mainlabel8: 
+
+打印每个基本块的支配边界节点
+cur node mainlabel7's dom frontier is mainlabel7,
+cur node mainlabel8's dom frontier is mainlabel7,
+cur node mainlabel9's dom frontier is 
+cur node mainendlabel's dom frontier is 
+
+	labelID	number:               opcode 	                     name 	       use
+	address:0x14c617b70	mainentry:
          	     0:              LabelOP 	                mainentry 	      null
-         	     1: CallWithReturnValueOP 	                   temp10 	      null
-         	     2:              ParamOP 	                   param0 	         3
-         	     3:               CallOP 	                   temp11 	      null
-         	     4:             AssignOP 	                %phi_var1 	    temp10
-         	     5:               GotoOP 	          goto mainlabel1 	      null
-	address:0x10010a3c0	mainlabel1:
-         	     6:              LabelOP 	               mainlabel1 	      null
-         	     7:          GreatThanOP 	                   temp13 	 %phi_var1,          0
-         	     8:  GotoWithConditionOP 	true:mainlabel2  false:mainlabel3 	    temp13
-	address:0x10010a520	mainlabel2:
-         	     9:              LabelOP 	               mainlabel2 	      null
-         	     10:                SubOP 	                   temp15 	 %phi_var1,          1
-         	     11:             AssignOP 	                %phi_var1 	    temp15
-         	     12:               GotoOP 	          goto mainlabel1 	      null
-	address:0x10010a5b0	mainlabel3:
-         	     13:              LabelOP 	               mainlabel3 	      null
-         	     14:              ParamOP 	                   param0 	         8
-         	     15:               CallOP 	                   temp16 	      null
-         	     16:             ReturnOP 	                   return 	         0
-	address:0x10010b550	mainendlabel:
-         	     17:              LabelOP 	             mainendlabel 	      null
-         	     18:            FuncEndOP 	          func_label_end1 	      null
+         	     0:           AllocateOP 	                   point8 	      null
+         	     0:           AllocateOP 	                   array5 	      null
+         	     0:           AllocateOP 	                   array4 	      null
+         	     0:      GetelementptrOP 	                   temp40 	    array4,         17
+         	     0:      GetelementptrOP 	                   temp41 	    temp40,          1
+         	     0:              StoreOP 	                   (null) 	    temp41,          6
+         	     0:      GetelementptrOP 	                   temp42 	    array4,         17
+         	     0:      GetelementptrOP 	                   temp43 	    temp42,          3
+         	     0:              StoreOP 	                   (null) 	    temp43,          7
+         	     0:      GetelementptrOP 	                   temp44 	    array4,         17
+         	     0:      GetelementptrOP 	                   temp45 	    temp44,          4
+         	     0:              StoreOP 	                   (null) 	    temp45,          4
+         	     0:      GetelementptrOP 	                   temp46 	    array4,         17
+         	     0:      GetelementptrOP 	                   temp47 	    temp46,          7
+         	     0:              StoreOP 	                   (null) 	    temp47,          9
+         	     0:      GetelementptrOP 	                   temp48 	    array4,         17
+         	     0:      GetelementptrOP 	                   temp49 	    temp48,         11
+         	     0:              StoreOP 	                   (null) 	    temp49,         11
+         	     0:      GetelementptrOP 	                   temp50 	    array5,          6
+         	     0:      GetelementptrOP 	                   temp51 	    temp50,          1
+         	     0:              StoreOP 	                   (null) 	    temp51,          1
+         	     0:      GetelementptrOP 	                   temp52 	    array5,          6
+         	     0:      GetelementptrOP 	                   temp53 	    temp52,          2
+         	     0:              StoreOP 	                   (null) 	    temp53,          2
+         	     0:      GetelementptrOP 	                   temp54 	    array5,          6
+         	     0:      GetelementptrOP 	                   temp55 	    temp54,          3
+         	     0:              StoreOP 	                   (null) 	    temp55,          3
+         	     0:      GetelementptrOP 	                   temp56 	    array5,          6
+         	     0:      GetelementptrOP 	                   temp57 	    temp56,          9
+         	     0:              StoreOP 	                   (null) 	    temp57,          9
+         	     0:      GetelementptrOP 	                   temp58 	    array4,         17
+         	     0:      GetelementptrOP 	                   temp59 	    temp58,          1
+         	     0:               LoadOP 	                   temp60 	    temp59
+         	     0:      GetelementptrOP 	                   temp61 	    array4,         17
+         	     0:      GetelementptrOP 	                   temp62 	    temp61,          3
+         	     0:               LoadOP 	                   temp63 	    temp62
+         	     0:      GetelementptrOP 	                   temp64 	    array4,         17
+         	     0:      GetelementptrOP 	                   temp65 	    array5,          6
+         	     0:      GetelementptrOP 	                   temp66 	    temp65,          3
+         	     0:               LoadOP 	                   temp67 	    temp66
+         	     0:      GetelementptrOP 	                   temp68 	    array5,          6
+         	     0:      GetelementptrOP 	                   temp69 	    temp68,          0
+         	     0:               LoadOP 	                   temp70 	    temp69
+         	     0:      GetelementptrOP 	                   temp71 	    array5,          6
+         	     0:      GetelementptrOP 	                   temp72 	    array5,         34
+         	     0:      GetelementptrOP 	                   temp73 	    temp72,          4
+         	     0:               LoadOP 	                   temp74 	    temp73
+         	     0:      GetelementptrOP 	                   temp75 	    array5,         51
+         	     0:      GetelementptrOP 	                   temp76 	    temp75,         18
+         	     0:               LoadOP 	                   temp77 	    temp76
+         	     0:              ParamOP 	                   param8 	    temp77
+         	     0:              ParamOP 	                   param7 	    temp74
+         	     0:              ParamOP 	                   param6 	    temp71
+         	     0:              ParamOP 	                   param5 	    temp70
+         	     0:              ParamOP 	                   param4 	    temp67
+         	     0:              ParamOP 	                   param3 	    temp64
+         	     0:              ParamOP 	                   param2 	    temp63
+         	     0:              ParamOP 	                   param1 	    array5
+         	     0:              ParamOP 	                   param0 	    temp60
+         	     0: CallWithReturnValueOP 	                   temp78 	      null
+         	     0:                MulOP 	                   temp79 	    temp78,          3
+         	     0:              StoreOP 	                   (null) 	    point8,     temp79
+         	     0:               GotoOP 	          goto mainlabel7 	      null
+	address:0x14c61f9e0	mainlabel7:
+         	     0:              LabelOP 	               mainlabel7 	      null
+         	     0:            PhiFuncOp 	                %phi_var4 	size: 0 
+         	     0:               LoadOP 	                   temp80 	    point8
+         	     0:         GreatEqualOP 	                   temp81 	    temp80,          0
+         	     0:  GotoWithConditionOP 	true:mainlabel8  false:mainlabel9 	    temp81
+	address:0x14c61fb60	mainlabel8:
+         	     0:              LabelOP 	               mainlabel8 	      null
+         	     0:               LoadOP 	                   temp83 	    point8
+         	     0:      GetelementptrOP 	                   temp82 	    array5,          6
+         	     0:      GetelementptrOP 	                   temp84 	    temp82,     temp83
+         	     0:               LoadOP 	                   temp85 	    temp84
+         	     0:              ParamOP 	                   param0 	    temp85
+         	     0:               CallOP 	                   temp86 	      null
+         	     0:              ParamOP 	                   param0 	        32
+         	     0:               CallOP 	                   temp87 	      null
+         	     0:               LoadOP 	                   temp88 	    point8
+         	     0:                SubOP 	                   temp89 	    temp88,          1
+         	     0:              StoreOP 	                   (null) 	    point8,     temp89
+         	     0:               GotoOP 	          goto mainlabel7 	      null
+	address:0x14c61fc00	mainlabel9:
+         	     0:              LabelOP 	               mainlabel9 	      null
+         	     0:              ParamOP 	                   param0 	        10
+         	     0:               CallOP 	                   temp90 	      null
+         	     0:             ReturnOP 	                   return 	         0
+	address:0x14c624350	mainendlabel:
+         	     0:              LabelOP 	             mainendlabel 	      null
+         	     0:            FuncEndOP 	          func_label_end2 	      null
 
 
-	val:temp10 	begin:1 	end:4 
-	val:%phi_var1 	begin:4 	end:12 
-	val:temp13 	begin:7 	end:8 
-	val:temp15 	begin:10 	end:11 
+begin rename pass and delete alloca,store,load instruction!
+rename pass over
+delete alloca,store,load instruction over
+super log!!!!!!!!!!!!!!!!!
+	labelID	number:               opcode 	                     name 	       use
+	address:0x14c617b70	mainentry:
+         	     0:              LabelOP 	                mainentry 	      null
+         	     0:           AllocateOP 	                   array5 	      null
+         	     0:           AllocateOP 	                   array4 	      null
+         	     0:      GetelementptrOP 	                   temp40 	    array4,         17
+         	     0:      GetelementptrOP 	                   temp41 	    temp40,          1
+         	     0:              StoreOP 	                   (null) 	    temp41,          6
+         	     0:      GetelementptrOP 	                   temp42 	    array4,         17
+         	     0:      GetelementptrOP 	                   temp43 	    temp42,          3
+         	     0:              StoreOP 	                   (null) 	    temp43,          7
+         	     0:      GetelementptrOP 	                   temp44 	    array4,         17
+         	     0:      GetelementptrOP 	                   temp45 	    temp44,          4
+         	     0:              StoreOP 	                   (null) 	    temp45,          4
+         	     0:      GetelementptrOP 	                   temp46 	    array4,         17
+         	     0:      GetelementptrOP 	                   temp47 	    temp46,          7
+         	     0:              StoreOP 	                   (null) 	    temp47,          9
+         	     0:      GetelementptrOP 	                   temp48 	    array4,         17
+         	     0:      GetelementptrOP 	                   temp49 	    temp48,         11
+         	     0:              StoreOP 	                   (null) 	    temp49,         11
+         	     0:      GetelementptrOP 	                   temp50 	    array5,          6
+         	     0:      GetelementptrOP 	                   temp51 	    temp50,          1
+         	     0:              StoreOP 	                   (null) 	    temp51,          1
+         	     0:      GetelementptrOP 	                   temp52 	    array5,          6
+         	     0:      GetelementptrOP 	                   temp53 	    temp52,          2
+         	     0:              StoreOP 	                   (null) 	    temp53,          2
+         	     0:      GetelementptrOP 	                   temp54 	    array5,          6
+         	     0:      GetelementptrOP 	                   temp55 	    temp54,          3
+         	     0:              StoreOP 	                   (null) 	    temp55,          3
+         	     0:      GetelementptrOP 	                   temp56 	    array5,          6
+         	     0:      GetelementptrOP 	                   temp57 	    temp56,          9
+         	     0:              StoreOP 	                   (null) 	    temp57,          9
+         	     0:      GetelementptrOP 	                   temp64 	    array4,         17
+         	     0:      GetelementptrOP 	                   temp68 	    array5,          6
+         	     0:      GetelementptrOP 	                   temp69 	    temp68,          0
+         	     0:               LoadOP 	                   temp70 	    temp69
+         	     0:      GetelementptrOP 	                   temp71 	    array5,          6
+         	     0:      GetelementptrOP 	                   temp72 	    array5,         34
+         	     0:      GetelementptrOP 	                   temp73 	    temp72,          4
+         	     0:               LoadOP 	                   temp74 	    temp73
+         	     0:      GetelementptrOP 	                   temp75 	    array5,         51
+         	     0:      GetelementptrOP 	                   temp76 	    temp75,         18
+         	     0:               LoadOP 	                   temp77 	    temp76
+         	     0:              ParamOP 	                   param8 	    temp77
+         	     0:              ParamOP 	                   param7 	    temp74
+         	     0:              ParamOP 	                   param6 	    temp71
+         	     0:              ParamOP 	                   param5 	    temp70
+         	     0:              ParamOP 	                   param4 	         3
+         	     0:              ParamOP 	                   param3 	    temp64
+         	     0:              ParamOP 	                   param2 	         7
+         	     0:              ParamOP 	                   param1 	    array5
+         	     0:              ParamOP 	                   param0 	         6
+         	     0: CallWithReturnValueOP 	                   temp78 	      null
+         	     0:                MulOP 	                   temp79 	    temp78,          3
+         	     0:               GotoOP 	          goto mainlabel7 	      null
+	address:0x14c61f9e0	mainlabel7:
+         	     0:              LabelOP 	               mainlabel7 	      null
+         	     0:            PhiFuncOp 	                %phi_var4 	size: 2 	bblock: mainentry value: temp79, 	bblock: mainlabel8 value: temp89, 
+         	     0:         GreatEqualOP 	                   temp81 	 %phi_var4,          0
+         	     0:  GotoWithConditionOP 	true:mainlabel8  false:mainlabel9 	    temp81
+	address:0x14c61fb60	mainlabel8:
+         	     0:              LabelOP 	               mainlabel8 	      null
+         	     0:      GetelementptrOP 	                   temp82 	    array5,          6
+         	     0:      GetelementptrOP 	                   temp84 	    temp82,  %phi_var4
+         	     0:               LoadOP 	                   temp85 	    temp84
+         	     0:              ParamOP 	                   param0 	    temp85
+         	     0:               CallOP 	                   temp86 	      null
+         	     0:              ParamOP 	                   param0 	        32
+         	     0:               CallOP 	                   temp87 	      null
+         	     0:                SubOP 	                   temp89 	 %phi_var4,          1
+         	     0:               GotoOP 	          goto mainlabel7 	      null
+	address:0x14c61fc00	mainlabel9:
+         	     0:              LabelOP 	               mainlabel9 	      null
+         	     0:              ParamOP 	                   param0 	        10
+         	     0:               CallOP 	                   temp90 	      null
+         	     0:             ReturnOP 	                   return 	         0
+	address:0x14c624350	mainendlabel:
+         	     0:              LabelOP 	             mainendlabel 	      null
+         	     0:            FuncEndOP 	          func_label_end2 	      null
 
-	var:%phi_var1	address:R5
- 	var:temp10	address:R4
- 	var:temp13	address:R4
- 	var:temp15	address:R4
+
+performance is over!!!!!!!
+performance is over!!!!!!!
+performance is over!!!!!!!
+performance is over!!!!!!!
+
+
+
+	labelID	number:               opcode 	                     name 	       use
+	address:0x14c617b70	mainentry:
+         	     0:              LabelOP 	                mainentry 	      null
+         	     0:           AllocateOP 	                   array5 	      null
+         	     0:           AllocateOP 	                   array4 	      null
+         	     0:      GetelementptrOP 	                   temp40 	    array4,         17
+         	     0:      GetelementptrOP 	                   temp41 	    temp40,          1
+         	     0:              StoreOP 	                   (null) 	    temp41,          6
+         	     0:      GetelementptrOP 	                   temp42 	    array4,         17
+         	     0:      GetelementptrOP 	                   temp43 	    temp42,          3
+         	     0:              StoreOP 	                   (null) 	    temp43,          7
+         	     0:      GetelementptrOP 	                   temp44 	    array4,         17
+         	     0:      GetelementptrOP 	                   temp45 	    temp44,          4
+         	     0:              StoreOP 	                   (null) 	    temp45,          4
+         	     0:      GetelementptrOP 	                   temp46 	    array4,         17
+         	     0:      GetelementptrOP 	                   temp47 	    temp46,          7
+         	     0:              StoreOP 	                   (null) 	    temp47,          9
+         	     0:      GetelementptrOP 	                   temp48 	    array4,         17
+         	     0:      GetelementptrOP 	                   temp49 	    temp48,         11
+         	     0:              StoreOP 	                   (null) 	    temp49,         11
+         	     0:      GetelementptrOP 	                   temp50 	    array5,          6
+         	     0:      GetelementptrOP 	                   temp51 	    temp50,          1
+         	     0:              StoreOP 	                   (null) 	    temp51,          1
+         	     0:      GetelementptrOP 	                   temp52 	    array5,          6
+         	     0:      GetelementptrOP 	                   temp53 	    temp52,          2
+         	     0:              StoreOP 	                   (null) 	    temp53,          2
+         	     0:      GetelementptrOP 	                   temp54 	    array5,          6
+         	     0:      GetelementptrOP 	                   temp55 	    temp54,          3
+         	     0:              StoreOP 	                   (null) 	    temp55,          3
+         	     0:      GetelementptrOP 	                   temp56 	    array5,          6
+         	     0:      GetelementptrOP 	                   temp57 	    temp56,          9
+         	     0:              StoreOP 	                   (null) 	    temp57,          9
+         	     0:      GetelementptrOP 	                   temp64 	    array4,         17
+         	     0:      GetelementptrOP 	                   temp68 	    array5,          6
+         	     0:      GetelementptrOP 	                   temp69 	    temp68,          0
+         	     0:               LoadOP 	                   temp70 	    temp69
+         	     0:      GetelementptrOP 	                   temp71 	    array5,          6
+         	     0:      GetelementptrOP 	                   temp72 	    array5,         34
+         	     0:      GetelementptrOP 	                   temp73 	    temp72,          4
+         	     0:               LoadOP 	                   temp74 	    temp73
+         	     0:      GetelementptrOP 	                   temp75 	    array5,         51
+         	     0:      GetelementptrOP 	                   temp76 	    temp75,         18
+         	     0:               LoadOP 	                   temp77 	    temp76
+         	     0:              ParamOP 	                   param8 	    temp77
+         	     0:              ParamOP 	                   param7 	    temp74
+         	     0:              ParamOP 	                   param6 	    temp71
+         	     0:              ParamOP 	                   param5 	    temp70
+         	     0:              ParamOP 	                   param4 	         3
+         	     0:              ParamOP 	                   param3 	    temp64
+         	     0:              ParamOP 	                   param2 	         7
+         	     0:              ParamOP 	                   param1 	    array5
+         	     0:              ParamOP 	                   param0 	         6
+         	     0: CallWithReturnValueOP 	                   temp78 	      null
+         	     0:                MulOP 	                   temp79 	    temp78,          3
+         	     0:             AssignOP 	                %phi_var4 	    temp79
+         	     0:               GotoOP 	          goto mainlabel7 	      null
+	address:0x14c61f9e0	mainlabel7:
+         	     0:              LabelOP 	               mainlabel7 	      null
+         	     0:         GreatEqualOP 	                   temp81 	 %phi_var4,          0
+         	     0:  GotoWithConditionOP 	true:mainlabel8  false:mainlabel9 	    temp81
+	address:0x14c61fb60	mainlabel8:
+         	     0:              LabelOP 	               mainlabel8 	      null
+         	     0:      GetelementptrOP 	                   temp82 	    array5,          6
+         	     0:      GetelementptrOP 	                   temp84 	    temp82,  %phi_var4
+         	     0:               LoadOP 	                   temp85 	    temp84
+         	     0:              ParamOP 	                   param0 	    temp85
+         	     0:               CallOP 	                   temp86 	      null
+         	     0:              ParamOP 	                   param0 	        32
+         	     0:               CallOP 	                   temp87 	      null
+         	     0:                SubOP 	                   temp89 	 %phi_var4,          1
+         	     0:             AssignOP 	                %phi_var4 	    temp89
+         	     0:               GotoOP 	          goto mainlabel7 	      null
+	address:0x14c61fc00	mainlabel9:
+         	     0:              LabelOP 	               mainlabel9 	      null
+         	     0:              ParamOP 	                   param0 	        10
+         	     0:               CallOP 	                   temp90 	      null
+         	     0:             ReturnOP 	                   return 	         0
+	address:0x14c624350	mainendlabel:
+         	     0:              LabelOP 	             mainendlabel 	      null
+         	     0:            FuncEndOP 	          func_label_end2 	      null
+
+
+mainentry live def add array5
+mainentry live def add array4
+mainentry live def add temp40
+mainentry live def add temp41
+mainentry live def add temp42
+mainentry live def add temp43
+mainentry live def add temp44
+mainentry live def add temp45
+mainentry live def add temp46
+mainentry live def add temp47
+mainentry live def add temp48
+mainentry live def add temp49
+mainentry live def add temp50
+mainentry live def add temp51
+mainentry live def add temp52
+mainentry live def add temp53
+mainentry live def add temp54
+mainentry live def add temp55
+mainentry live def add temp56
+mainentry live def add temp57
+mainentry live def add temp64
+mainentry live def add temp68
+mainentry live def add temp69
+mainentry live def add temp70
+mainentry live def add temp71
+mainentry live def add temp72
+mainentry live def add temp73
+mainentry live def add temp74
+mainentry live def add temp75
+mainentry live def add temp76
+mainentry live def add temp77
+mainentry live def add temp78
+mainentry live def add temp79
+mainentry live def add %phi_var4
+mainlabel7 live use add %phi_var4
+mainlabel7 live def add temp81
+mainlabel8 live use add array5
+mainlabel8 live def add temp82
+mainlabel8 live use add %phi_var4
+mainlabel8 live def add temp84
+mainlabel8 live def add temp85
+mainlabel8 live use add %phi_var4
+mainlabel8 live def add temp89
+mainlabel8 live def add %phi_var4
+
+
+
+	labelID	number:               opcode 	                     name 	       use
+	address:0x14c617b70	mainentry:
+         	     0:              LabelOP 	                mainentry 	      null
+         	     1:           AllocateOP 	                   array5 	      null
+         	     2:           AllocateOP 	                   array4 	      null
+         	     3:      GetelementptrOP 	                   temp40 	    array4,         17
+         	     4:      GetelementptrOP 	                   temp41 	    temp40,          1
+         	     5:              StoreOP 	                   (null) 	    temp41,          6
+         	     6:      GetelementptrOP 	                   temp42 	    array4,         17
+         	     7:      GetelementptrOP 	                   temp43 	    temp42,          3
+         	     8:              StoreOP 	                   (null) 	    temp43,          7
+         	     9:      GetelementptrOP 	                   temp44 	    array4,         17
+         	     10:      GetelementptrOP 	                   temp45 	    temp44,          4
+         	     11:              StoreOP 	                   (null) 	    temp45,          4
+         	     12:      GetelementptrOP 	                   temp46 	    array4,         17
+         	     13:      GetelementptrOP 	                   temp47 	    temp46,          7
+         	     14:              StoreOP 	                   (null) 	    temp47,          9
+         	     15:      GetelementptrOP 	                   temp48 	    array4,         17
+         	     16:      GetelementptrOP 	                   temp49 	    temp48,         11
+         	     17:              StoreOP 	                   (null) 	    temp49,         11
+         	     18:      GetelementptrOP 	                   temp50 	    array5,          6
+         	     19:      GetelementptrOP 	                   temp51 	    temp50,          1
+         	     20:              StoreOP 	                   (null) 	    temp51,          1
+         	     21:      GetelementptrOP 	                   temp52 	    array5,          6
+         	     22:      GetelementptrOP 	                   temp53 	    temp52,          2
+         	     23:              StoreOP 	                   (null) 	    temp53,          2
+         	     24:      GetelementptrOP 	                   temp54 	    array5,          6
+         	     25:      GetelementptrOP 	                   temp55 	    temp54,          3
+         	     26:              StoreOP 	                   (null) 	    temp55,          3
+         	     27:      GetelementptrOP 	                   temp56 	    array5,          6
+         	     28:      GetelementptrOP 	                   temp57 	    temp56,          9
+         	     29:              StoreOP 	                   (null) 	    temp57,          9
+         	     30:      GetelementptrOP 	                   temp64 	    array4,         17
+         	     31:      GetelementptrOP 	                   temp68 	    array5,          6
+         	     32:      GetelementptrOP 	                   temp69 	    temp68,          0
+         	     33:               LoadOP 	                   temp70 	    temp69
+         	     34:      GetelementptrOP 	                   temp71 	    array5,          6
+         	     35:      GetelementptrOP 	                   temp72 	    array5,         34
+         	     36:      GetelementptrOP 	                   temp73 	    temp72,          4
+         	     37:               LoadOP 	                   temp74 	    temp73
+         	     38:      GetelementptrOP 	                   temp75 	    array5,         51
+         	     39:      GetelementptrOP 	                   temp76 	    temp75,         18
+         	     40:               LoadOP 	                   temp77 	    temp76
+         	     41:              ParamOP 	                   param8 	    temp77
+         	     42:              ParamOP 	                   param7 	    temp74
+         	     43:              ParamOP 	                   param6 	    temp71
+         	     44:              ParamOP 	                   param5 	    temp70
+         	     45:              ParamOP 	                   param4 	         3
+         	     46:              ParamOP 	                   param3 	    temp64
+         	     47:              ParamOP 	                   param2 	         7
+         	     48:              ParamOP 	                   param1 	    array5
+         	     49:              ParamOP 	                   param0 	         6
+         	     50: CallWithReturnValueOP 	                   temp78 	      null
+         	     51:                MulOP 	                   temp79 	    temp78,          3
+         	     52:             AssignOP 	                %phi_var4 	    temp79
+         	     53:               GotoOP 	          goto mainlabel7 	      null
+	address:0x14c61f9e0	mainlabel7:
+         	     54:              LabelOP 	               mainlabel7 	      null
+         	     55:         GreatEqualOP 	                   temp81 	 %phi_var4,          0
+         	     56:  GotoWithConditionOP 	true:mainlabel8  false:mainlabel9 	    temp81
+	address:0x14c61fb60	mainlabel8:
+         	     57:              LabelOP 	               mainlabel8 	      null
+         	     58:      GetelementptrOP 	                   temp82 	    array5,          6
+         	     59:      GetelementptrOP 	                   temp84 	    temp82,  %phi_var4
+         	     60:               LoadOP 	                   temp85 	    temp84
+         	     61:              ParamOP 	                   param0 	    temp85
+         	     62:               CallOP 	                   temp86 	      null
+         	     63:              ParamOP 	                   param0 	        32
+         	     64:               CallOP 	                   temp87 	      null
+         	     65:                SubOP 	                   temp89 	 %phi_var4,          1
+         	     66:             AssignOP 	                %phi_var4 	    temp89
+         	     67:               GotoOP 	          goto mainlabel7 	      null
+	address:0x14c61fc00	mainlabel9:
+         	     68:              LabelOP 	               mainlabel9 	      null
+         	     69:              ParamOP 	                   param0 	        10
+         	     70:               CallOP 	                   temp90 	      null
+         	     71:             ReturnOP 	                   return 	         0
+	address:0x14c624350	mainendlabel:
+         	     72:              LabelOP 	             mainendlabel 	      null
+         	     73:            FuncEndOP 	          func_label_end2 	      null
+
+
+	val:array5 	begin:1 	end:67 
+	val:array4 	begin:2 	end:30 
+	val:temp40 	begin:3 	end:4 
+	val:temp41 	begin:4 	end:5 
+	val:temp42 	begin:6 	end:7 
+	val:temp43 	begin:7 	end:8 
+	val:temp44 	begin:9 	end:10 
+	val:temp45 	begin:10 	end:11 
+	val:temp46 	begin:12 	end:13 
+	val:temp47 	begin:13 	end:14 
+	val:temp48 	begin:15 	end:16 
+	val:temp49 	begin:16 	end:17 
+	val:temp50 	begin:18 	end:19 
+	val:temp51 	begin:19 	end:20 
+	val:temp52 	begin:21 	end:22 
+	val:temp53 	begin:22 	end:23 
+	val:temp54 	begin:24 	end:25 
+	val:temp55 	begin:25 	end:26 
+	val:temp56 	begin:27 	end:28 
+	val:temp57 	begin:28 	end:29 
+	val:temp64 	begin:30 	end:46 
+	val:temp68 	begin:31 	end:32 
+	val:temp69 	begin:32 	end:33 
+	val:temp70 	begin:33 	end:44 
+	val:temp71 	begin:34 	end:43 
+	val:temp72 	begin:35 	end:36 
+	val:temp73 	begin:36 	end:37 
+	val:temp74 	begin:37 	end:42 
+	val:temp75 	begin:38 	end:39 
+	val:temp76 	begin:39 	end:40 
+	val:temp77 	begin:40 	end:41 
+	val:temp78 	begin:50 	end:51 
+	val:temp79 	begin:51 	end:52 
+	val:%phi_var4 	begin:52 	end:67 
+	val:temp81 	begin:55 	end:56 
+	val:temp82 	begin:58 	end:59 
+	val:temp84 	begin:59 	end:60 
+	val:temp85 	begin:60 	end:61 
+	val:temp89 	begin:65 	end:66 
+
+	var:%phi_var4	address:R5
+ 	var:temp40	address:R6
+ 	var:temp41	address:R8
+ 	var:temp42	address:R6
+ 	var:temp43	address:R8
+ 	var:temp44	address:R6
+ 	var:temp45	address:R8
+ 	var:temp46	address:R6
+ 	var:temp47	address:R8
+ 	var:temp48	address:R6
+ 	var:temp49	address:R8
+ 	var:temp50	address:R6
+ 	var:temp51	address:R8
+ 	var:temp52	address:R6
+ 	var:temp53	address:R8
+ 	var:temp54	address:R6
+ 	var:temp55	address:R8
+ 	var:temp56	address:R6
+ 	var:temp57	address:R8
+ 	var:temp64	address:R6
+ 	var:temp68	address:R5
+ 	var:temp69	address:R8
+ 	var:temp70	address:R5
+ 	var:temp71	address:R8
+ 	var:temp72	address:R9
+ 	var:temp73	address:R10
+ 	var:temp74	address:R9
+ 	var:temp75	address:R10
+ 	var:temp76	address:R11
+ 	var:temp77	address:R10
+ 	var:temp78	address:R5
+ 	var:temp79	address:R6
+ 	var:temp81	address:R6
+ 	var:temp82	address:R6
+ 	var:temp84	address:R8
+ 	var:temp85	address:R6
+ 	var:temp89	address:R6
+ 	var:array4	address:R5
+ 	var:array5	address:R4
  performance test All over!

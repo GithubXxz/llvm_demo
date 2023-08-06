@@ -562,13 +562,18 @@ void array_replace_optimization(Function *handle_func) {
         Value *temp = user_get_operand_use((User *)element, 1)->Val;
         int total_offset = temp->pdata->var_pdata.iVal *
                            cur_handle_array->pdata->array_pdata.step_long;
+        Value *top_value = cur_handle_array;
 
         if (ListSize(((Value *)element)->pdata->array_pdata.list_para) != 0) {
           iter_next_ins(&iter, &i, &element);
           while (i < ListSize(cur_handle_list)) {
             if (element->opcode == GetelementptrOP &&
-                user_get_operand_use((User *)element, 1)
-                        ->Parent->value.VTy->TID == ImmediateIntTyID) {
+
+                user_get_operand_use((User *)element, 0)
+                        ->Val->pdata->array_pdata.top_array == top_value &&
+
+                user_get_operand_use((User *)element, 1)->Val->VTy->TID ==
+                    ImmediateIntTyID) {
               Value *cur_handle_array =
                   user_get_operand_use((User *)element, 0)->Val;
               Value *temp = user_get_operand_use((User *)element, 1)->Val;
@@ -624,8 +629,7 @@ void array_replace_optimization(Function *handle_func) {
   }
 }
 
-void ImmediateNumCalculate(Function *handle_func) {
-
+void delete_non_used_block(Function *handle_func) {
   ALGraph *self_cfg = handle_func->self_cfg;
 
   // List *entry_block_list = (self_cfg->node_set)[0]->bblock_head->inst_list;
@@ -639,12 +643,29 @@ void ImmediateNumCalculate(Function *handle_func) {
     element = iter->element_;
 
     while (i < ListSize(cur_handle_list)) {
-      if (element->opcode < RETURN_USED &&
-          element->opcode != CallWithReturnValueOP &&
-          ((Value *)element)->use_list == NULL) {
+      if (element->opcode == LabelOP &&
+          iter_next_ins(&iter, &i, &element)->opcode == GotoOP) {
         delete_ins(cur_handle_list, &iter, &element);
       } else
         iter_next_ins(&iter, &i, &element);
+    }
+  }
+}
+
+void ImmediateNumCalculate(Function *handle_func) {
+  ALGraph *self_cfg = handle_func->self_cfg;
+
+  // List *entry_block_list = (self_cfg->node_set)[0]->bblock_head->inst_list;
+
+  for (int ii = 0; ii < self_cfg->node_num; ii++) {
+    List *cur_handle_list = (self_cfg->node_set)[ii]->bblock_head->inst_list;
+    ListSetClean(cur_handle_list, CommonCleanInstruction);
+    Instruction *element;
+    int i = 0;
+    ListNode *iter = cur_handle_list->data->head_;
+    element = iter->element_;
+
+    while (i < ListSize(cur_handle_list)) {
     }
   }
 }

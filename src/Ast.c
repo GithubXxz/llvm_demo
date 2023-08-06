@@ -29,6 +29,7 @@ extern SymbolTable *cur_symboltable;
 extern HashMap *global_array_init_hashmap;
 extern HashMap *constant_single_value_hashmap;
 extern Stack *array_get;
+extern bool is_functional_test;
 
 void CleanObject(void *element);
 
@@ -69,7 +70,7 @@ struct {
 } array_init_assist;
 
 #define ARRAY_DEREFERENCE 0
-static bool assist_is_local_array = true;
+extern HashMap *assist_is_local_val;
 
 static void array_init_assist_func(List *array_list, Value *cur_init_array) {
   if (array_list != NULL) {
@@ -142,7 +143,7 @@ static int param_seed = 0;      // 用于标识函数参数的个数
 static int total_array_member = 1;
 static List *array_list = NULL;
 static List *param_type_list = NULL;
-static Value *cur_construction_func;
+static Value *cur_construction_func = NULL;
 static char *cur_handle_func = NULL;
 
 char *name_generate(enum NameSeed cur_handle) {
@@ -360,7 +361,6 @@ void pre_eval(ast *a) {
       // 新建一个符号表用于存放参数
       cur_symboltable = (SymbolTable *)malloc(sizeof(SymbolTable));
       symbol_table_init(cur_symboltable);
-      assist_is_local_array = true;
 
       Value *func_label_ins = (Value *)ins_new_no_operator_v2(FuncLabelOP);
       // 添加变量的名字
@@ -1009,12 +1009,25 @@ Value *post_eval(ast *a, Value *left, Value *right) {
           pre_symboltable = pre_symboltable->father;
           assert(pre_symboltable || load_var_pointer);
         };
-        if (load_var_pointer->VTy->TID == ArrayTyID) {
-          if (load_var_pointer->IsGlobalVar && assist_is_local_array) {
-            load_var_pointer->pdata->array_pdata.is_local_array -= 1;
-            assist_is_local_array = false;
-          }
 
+        if (!is_functional_test) {
+          if (load_var_pointer->IsGlobalVar && !load_var_pointer->IsConst &&
+              cur_construction_func) {
+            if (!HashMapContain(assist_is_local_val, load_var_pointer->name)) {
+              HashMapPut(assist_is_local_val, strdup(load_var_pointer->name),
+                         cur_construction_func);
+            } else {
+              Value *cur_func =
+                  HashMapGet(assist_is_local_val, load_var_pointer->name);
+              if (cur_func != cur_construction_func) {
+                HashMapPut(assist_is_local_val, strdup(load_var_pointer->name),
+                           NULL);
+              }
+            }
+          }
+        }
+
+        if (load_var_pointer->VTy->TID == ArrayTyID) {
           return load_var_pointer;
         } else if (load_var_pointer->IsConst) {
           return load_var_pointer->pdata->allocate_pdata.point_value;
@@ -1052,6 +1065,25 @@ Value *post_eval(ast *a, Value *left, Value *right) {
           pre_symboltable = pre_symboltable->father;
           assert(pre_symboltable || assign_var_pointer);
         };
+
+        if (!is_functional_test) {
+          if (assign_var_pointer->IsGlobalVar && !assign_var_pointer->IsConst &&
+              cur_construction_func) {
+            if (!HashMapContain(assist_is_local_val,
+                                assign_var_pointer->name)) {
+              HashMapPut(assist_is_local_val, strdup(assign_var_pointer->name),
+                         cur_construction_func);
+            } else {
+              Value *cur_func =
+                  HashMapGet(assist_is_local_val, assign_var_pointer->name);
+              if (cur_func != cur_construction_func) {
+                HashMapPut(assist_is_local_val,
+                           strdup(assign_var_pointer->name), NULL);
+              }
+            }
+          }
+        }
+
         return assign_var_pointer;
       } else if (SEQ(a->name, "INTEGER")) {
         Value *cur = NULL;

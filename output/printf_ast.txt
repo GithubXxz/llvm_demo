@@ -1,120 +1,772 @@
-Program (1)
-  ExtDefList (1)
-    ExtDef (1)
-      Specifire (1)
+Program (2)
+  ExtDefList (2)
+    ExtDef (2)
+      Specifire (2)
         TYPE :int 
-      FunDec (1)
-        ID :main 
-        LP (1)
-        RP (1)
-      Compst (1)
-        LC (1)
-        TACList (2)
-          TAC (2)
-            DefList (2)
-              Def (2)
+      FunDec (2)
+        ID :func 
+        LP (2)
+        VarList (2)
+          ParamDec (2)
+            Specifire (2)
+              TYPE :int 
+            VarDec (2)
+              ID :a 
+          VarList (2)
+            ParamDec (2)
+              Specifire (2)
+                TYPE :int 
+              VarDec (2)
+                VarDec (2)
+                  VarDec (2)
+                    ID :b 
+                  LB (2)
+                LB (2)
+                Exp (2)
+                  INTEGER :59 
+            VarList (2)
+              ParamDec (2)
                 Specifire (2)
                   TYPE :int 
-                DecList (2)
-                  Dec (2)
-                    VarDec (2)
-                      ID :n 
-                    ASSIGNOP (2)
-                    Exp 
-                      assistFuncCall 
-                      ID :getint 
-              DefList 
-            StmtList 
-              Stmt 
-                Exp 
-                  assistFuncCall 
-                  ID :_sysy_starttime 
-                  Args (3)
-                    Exp (3)
-                      INTEGER :3 
-                    assistArgs 
-              StmtList 
-          TACList (4)
-            TAC (4)
-              DefList (4)
-                Def (4)
-                  Specifire (4)
+                VarDec (2)
+                  ID :c 
+              VarList (2)
+                ParamDec (2)
+                  Specifire (2)
                     TYPE :int 
-                  DecList (4)
-                    Dec (4)
-                      VarDec (4)
-                        ID :x 
-                    DecList (4)
-                      Dec (4)
-                        VarDec (4)
-                          ID :y 
-                DefList 
-              StmtList (5)
-                Stmt (5)
-                  WHILE (5)
-                  Exp (5)
-                    Exp (5)
-                      ID :n 
-                    GREAT (5)
-                    Exp (5)
+                  VarDec (2)
+                    VarDec (2)
+                      ID :d 
+                    LB (2)
+                VarList (2)
+                  ParamDec (2)
+                    Specifire (2)
+                      TYPE :int 
+                    VarDec (2)
+                      ID :e 
+                  VarList (2)
+                    ParamDec (2)
+                      Specifire (2)
+                        TYPE :int 
+                      VarDec (2)
+                        ID :f 
+                    VarList (2)
+                      ParamDec (2)
+                        Specifire (2)
+                          TYPE :int 
+                        VarDec (2)
+                          VarDec (2)
+                            ID :g 
+                          LB (2)
+                      VarList (2)
+                        ParamDec (2)
+                          Specifire (2)
+                            TYPE :int 
+                          VarDec (2)
+                            ID :h 
+                        VarList (2)
+                          ParamDec (2)
+                            Specifire (2)
+                              TYPE :int 
+                            VarDec (2)
+                              ID :i 
+        RP (2)
+      Compst (3)
+        LC (3)
+        TACList (4)
+          TAC (4)
+            DefList (4)
+              Def (4)
+                Specifire (4)
+                  TYPE :int 
+                DecList (4)
+                  Dec (4)
+                    VarDec (4)
+                      ID :index 
+                    ASSIGNOP (4)
+                    Exp (4)
                       INTEGER :0 
-                  assistWHILE 
-                  Stmt (5)
-                    Compst (5)
-                      LC (5)
-                      TACList 
-                        TAC 
-                          DefList 
-                          StmtList (6)
-                            Stmt (6)
-                              Exp (6)
-                                Exp (6)
-                                  ID :n 
-                                ASSIGNOP (6)
+              DefList 
+            StmtList (5)
+              Stmt (5)
+                WHILE (5)
+                Exp (5)
+                  Exp (5)
+                    ID :index 
+                  LESS (5)
+                  Exp (5)
+                    INTEGER :10 
+                assistWHILE 
+                Stmt (5)
+                  Compst (5)
+                    LC (5)
+                    TACList 
+                      TAC 
+                        DefList 
+                        StmtList 
+                          Stmt 
+                            Exp 
+                              assistFuncCall 
+                              ID :putint 
+                              Args (6)
                                 Exp (6)
                                   Exp (6)
-                                    ID :n 
-                                  MINUS (6)
+                                    Exp (6)
+                                      ID :b 
+                                    LB (6)
+                                    Exp (6)
+                                      ID :a 
+                                    RB (6)
+                                  LB (6)
                                   Exp (6)
+                                    ID :index 
+                                  RB (6)
+                                assistArgs 
+                          StmtList (7)
+                            Stmt (7)
+                              Exp (7)
+                                Exp (7)
+                                  ID :index 
+                                ASSIGNOP (7)
+                                Exp (7)
+                                  Exp (7)
+                                    ID :index 
+                                  PLUS (7)
+                                  Exp (7)
                                     INTEGER :1 
                             StmtList 
-                        TACList 
-                      RC (7)
+                      TACList 
+                    RC (8)
+              StmtList 
+                Stmt 
+                  Exp 
+                    assistFuncCall 
+                    ID :putch 
+                    Args (9)
+                      Exp (9)
+                        INTEGER :10 
+                      assistArgs 
                 StmtList 
                   Stmt 
                     Exp 
                       assistFuncCall 
-                      ID :_sysy_stoptime 
-                      Args (8)
-                        Exp (8)
-                          INTEGER :8 
+                      ID :putint 
+                      Args (11)
+                        Exp (11)
+                          Exp (11)
+                            ID :d 
+                          LB (11)
+                          Exp (11)
+                            ID :c 
+                          RB (11)
                         assistArgs 
-                  StmtList (9)
-                    Stmt (9)
-                      RETURN (9)
-                      Exp (9)
-                        INTEGER :0 
+                  StmtList 
+                    Stmt 
+                      Exp 
+                        assistFuncCall 
+                        ID :putch 
+                        Args (12)
+                          Exp (12)
+                            INTEGER :10 
+                          assistArgs 
+                    StmtList (14)
+                      Stmt (14)
+                        WHILE (14)
+                        Exp (14)
+                          Exp (14)
+                            ID :i 
+                          LESS (14)
+                          Exp (14)
+                            INTEGER :10 
+                        assistWHILE 
+                        Stmt (14)
+                          Compst (14)
+                            LC (14)
+                            TACList 
+                              TAC 
+                                DefList 
+                                StmtList (15)
+                                  Stmt (15)
+                                    Exp (15)
+                                      Exp (15)
+                                        Exp (15)
+                                          ID :g 
+                                        LB (15)
+                                        Exp (15)
+                                          ID :i 
+                                        RB (15)
+                                      ASSIGNOP (15)
+                                      Exp (15)
+                                        Exp (15)
+                                          Exp (15)
+                                            ID :h 
+                                          STAR (15)
+                                          Exp (15)
+                                            INTEGER :128875 
+                                        MOD (15)
+                                        Exp (15)
+                                          INTEGER :3724 
+                                  StmtList (16)
+                                    Stmt (16)
+                                      Exp (16)
+                                        Exp (16)
+                                          ID :i 
+                                        ASSIGNOP (16)
+                                        Exp (16)
+                                          Exp (16)
+                                            ID :i 
+                                          PLUS (16)
+                                          Exp (16)
+                                            INTEGER :1 
+                                    StmtList (17)
+                                      Stmt (17)
+                                        Exp (17)
+                                          Exp (17)
+                                            ID :h 
+                                          ASSIGNOP (17)
+                                          Exp (17)
+                                            Exp (17)
+                                              ID :h 
+                                            PLUS (17)
+                                            Exp (17)
+                                              INTEGER :7 
+                                      StmtList 
+                              TACList 
+                            RC (18)
+                      StmtList (20)
+                        Stmt (20)
+                          RETURN (20)
+                          Exp (20)
+                            Exp (20)
+                              ID :e 
+                            PLUS (20)
+                            Exp (20)
+                              ID :f 
+                        StmtList 
+          TACList 
+        RC (21)
+    ExtDefList (23)
+      ExtDef (23)
+        Specifire (23)
+          TYPE :int 
+        FunDec (23)
+          ID :main 
+          LP (23)
+          RP (23)
+        Compst (24)
+          LC (24)
+          TACList (25)
+            TAC (25)
+              DefList (25)
+                Def (25)
+                  Specifire (25)
+                    TYPE :int 
+                  DecList (25)
+                    Dec (25)
+                      VarDec (25)
+                        VarDec (25)
+                          VarDec (25)
+                            ID :a 
+                          LB (25)
+                          Exp (25)
+                            INTEGER :61 
+                        LB (25)
+                        Exp (25)
+                          INTEGER :67 
+                      ASSIGNOP (25)
+                      InitList 
+                DefList (26)
+                  Def (26)
+                    Specifire (26)
+                      TYPE :int 
+                    DecList (26)
+                      Dec (26)
+                        VarDec (26)
+                          VarDec (26)
+                            VarDec (26)
+                              ID :b 
+                            LB (26)
+                            Exp (26)
+                              INTEGER :53 
+                          LB (26)
+                          Exp (26)
+                            INTEGER :59 
+                        ASSIGNOP (26)
+                        InitList 
+                  DefList 
+              StmtList (28)
+                Stmt (28)
+                  Exp (28)
+                    Exp (28)
+                      Exp (28)
+                        Exp (28)
+                          ID :a 
+                        LB (28)
+                        Exp (28)
+                          INTEGER :17 
+                        RB (28)
+                      LB (28)
+                      Exp (28)
+                        INTEGER :1 
+                      RB (28)
+                    ASSIGNOP (28)
+                    Exp (28)
+                      INTEGER :6 
+                StmtList (29)
+                  Stmt (29)
+                    Exp (29)
+                      Exp (29)
+                        Exp (29)
+                          Exp (29)
+                            ID :a 
+                          LB (29)
+                          Exp (29)
+                            INTEGER :17 
+                          RB (29)
+                        LB (29)
+                        Exp (29)
+                          INTEGER :3 
+                        RB (29)
+                      ASSIGNOP (29)
+                      Exp (29)
+                        INTEGER :7 
+                  StmtList (30)
+                    Stmt (30)
+                      Exp (30)
+                        Exp (30)
+                          Exp (30)
+                            Exp (30)
+                              ID :a 
+                            LB (30)
+                            Exp (30)
+                              INTEGER :17 
+                            RB (30)
+                          LB (30)
+                          Exp (30)
+                            INTEGER :4 
+                          RB (30)
+                        ASSIGNOP (30)
+                        Exp (30)
+                          INTEGER :4 
+                    StmtList (31)
+                      Stmt (31)
+                        Exp (31)
+                          Exp (31)
+                            Exp (31)
+                              Exp (31)
+                                ID :a 
+                              LB (31)
+                              Exp (31)
+                                INTEGER :17 
+                              RB (31)
+                            LB (31)
+                            Exp (31)
+                              INTEGER :7 
+                            RB (31)
+                          ASSIGNOP (31)
+                          Exp (31)
+                            INTEGER :9 
+                      StmtList (32)
+                        Stmt (32)
+                          Exp (32)
+                            Exp (32)
+                              Exp (32)
+                                Exp (32)
+                                  ID :a 
+                                LB (32)
+                                Exp (32)
+                                  INTEGER :17 
+                                RB (32)
+                              LB (32)
+                              Exp (32)
+                                INTEGER :11 
+                              RB (32)
+                            ASSIGNOP (32)
+                            Exp (32)
+                              INTEGER :11 
+                        StmtList (34)
+                          Stmt (34)
+                            Exp (34)
+                              Exp (34)
+                                Exp (34)
+                                  Exp (34)
+                                    ID :b 
+                                  LB (34)
+                                  Exp (34)
+                                    INTEGER :6 
+                                  RB (34)
+                                LB (34)
+                                Exp (34)
+                                  INTEGER :1 
+                                RB (34)
+                              ASSIGNOP (34)
+                              Exp (34)
+                                INTEGER :1 
+                          StmtList (35)
+                            Stmt (35)
+                              Exp (35)
+                                Exp (35)
+                                  Exp (35)
+                                    Exp (35)
+                                      ID :b 
+                                    LB (35)
+                                    Exp (35)
+                                      INTEGER :6 
+                                    RB (35)
+                                  LB (35)
+                                  Exp (35)
+                                    INTEGER :2 
+                                  RB (35)
+                                ASSIGNOP (35)
+                                Exp (35)
+                                  INTEGER :2 
+                            StmtList (36)
+                              Stmt (36)
+                                Exp (36)
+                                  Exp (36)
+                                    Exp (36)
+                                      Exp (36)
+                                        ID :b 
+                                      LB (36)
+                                      Exp (36)
+                                        INTEGER :6 
+                                      RB (36)
+                                    LB (36)
+                                    Exp (36)
+                                      INTEGER :3 
+                                    RB (36)
+                                  ASSIGNOP (36)
+                                  Exp (36)
+                                    INTEGER :3 
+                              StmtList (37)
+                                Stmt (37)
+                                  Exp (37)
+                                    Exp (37)
+                                      Exp (37)
+                                        Exp (37)
+                                          ID :b 
+                                        LB (37)
+                                        Exp (37)
+                                          INTEGER :6 
+                                        RB (37)
+                                      LB (37)
+                                      Exp (37)
+                                        INTEGER :9 
+                                      RB (37)
+                                    ASSIGNOP (37)
+                                    Exp (37)
+                                      INTEGER :9 
+                                StmtList 
+            TACList (39)
+              TAC (39)
+                DefList (39)
+                  Def (39)
+                    Specifire (39)
+                      TYPE :int 
+                    DecList (39)
+                      Dec (39)
+                        VarDec (39)
+                          ID :ret 
+                  DefList 
+                StmtList (40)
+                  Stmt (40)
+                    Exp (40)
+                      Exp (40)
+                        ID :ret 
+                      ASSIGNOP (40)
+                      Exp 
+                        Exp 
+                          assistFuncCall 
+                          ID :func 
+                          Args (40)
+                            Exp (40)
+                              Exp (40)
+                                Exp (40)
+                                  ID :a 
+                                LB (40)
+                                Exp (40)
+                                  INTEGER :17 
+                                RB (40)
+                              LB (40)
+                              Exp (40)
+                                INTEGER :1 
+                              RB (40)
+                            assistArgs 
+                            Args (40)
+                              Exp (40)
+                                ID :b 
+                              assistArgs 
+                              Args (40)
+                                Exp (40)
+                                  Exp (40)
+                                    Exp (40)
+                                      ID :a 
+                                    LB (40)
+                                    Exp (40)
+                                      INTEGER :17 
+                                    RB (40)
+                                  LB (40)
+                                  Exp (40)
+                                    INTEGER :3 
+                                  RB (40)
+                                assistArgs 
+                                Args (40)
+                                  Exp (40)
+                                    Exp (40)
+                                      ID :a 
+                                    LB (40)
+                                    Exp (40)
+                                      INTEGER :17 
+                                    RB (40)
+                                  assistArgs 
+                                  Args (40)
+                                    Exp (40)
+                                      Exp (40)
+                                        Exp (40)
+                                          ID :b 
+                                        LB (40)
+                                        Exp (40)
+                                          INTEGER :6 
+                                        RB (40)
+                                      LB (40)
+                                      Exp (40)
+                                        INTEGER :3 
+                                      RB (40)
+                                    assistArgs 
+                                    Args (40)
+                                      Exp (40)
+                                        Exp (40)
+                                          Exp (40)
+                                            ID :b 
+                                          LB (40)
+                                          Exp (40)
+                                            INTEGER :6 
+                                          RB (40)
+                                        LB (40)
+                                        Exp (40)
+                                          INTEGER :0 
+                                        RB (40)
+                                      assistArgs 
+                                      Args (40)
+                                        Exp (40)
+                                          Exp (40)
+                                            ID :b 
+                                          LB (40)
+                                          Exp (40)
+                                            INTEGER :6 
+                                          RB (40)
+                                        assistArgs 
+                                        Args (40)
+                                          Exp (40)
+                                            Exp (40)
+                                              Exp (40)
+                                                ID :b 
+                                              LB (40)
+                                              Exp (40)
+                                                INTEGER :34 
+                                              RB (40)
+                                            LB (40)
+                                            Exp (40)
+                                              INTEGER :4 
+                                            RB (40)
+                                          assistArgs 
+                                          Args (40)
+                                            Exp (40)
+                                              Exp (40)
+                                                Exp (40)
+                                                  ID :b 
+                                                LB (40)
+                                                Exp (40)
+                                                  INTEGER :51 
+                                                RB (40)
+                                              LB (40)
+                                              Exp (40)
+                                                INTEGER :18 
+                                              RB (40)
+                                            assistArgs 
+                        STAR (40)
+                        Exp (40)
+                          INTEGER :3 
+                  StmtList (42)
+                    Stmt (42)
+                      WHILE (42)
+                      Exp (42)
+                        Exp (42)
+                          ID :ret 
+                        GREATEQUAL (42)
+                        Exp (42)
+                          INTEGER :0 
+                      assistWHILE 
+                      Stmt (42)
+                        Compst (42)
+                          LC (42)
+                          TACList 
+                            TAC 
+                              DefList 
+                              StmtList 
+                                Stmt 
+                                  Exp 
+                                    assistFuncCall 
+                                    ID :putint 
+                                    Args (43)
+                                      Exp (43)
+                                        Exp (43)
+                                          Exp (43)
+                                            ID :b 
+                                          LB (43)
+                                          Exp (43)
+                                            INTEGER :6 
+                                          RB (43)
+                                        LB (43)
+                                        Exp (43)
+                                          ID :ret 
+                                        RB (43)
+                                      assistArgs 
+                                StmtList 
+                                  Stmt 
+                                    Exp 
+                                      assistFuncCall 
+                                      ID :putch 
+                                      Args (43)
+                                        Exp (43)
+                                          INTEGER :32 
+                                        assistArgs 
+                                  StmtList (44)
+                                    Stmt (44)
+                                      Exp (44)
+                                        Exp (44)
+                                          ID :ret 
+                                        ASSIGNOP (44)
+                                        Exp (44)
+                                          Exp (44)
+                                            ID :ret 
+                                          MINUS (44)
+                                          Exp (44)
+                                            INTEGER :1 
+                                    StmtList 
+                            TACList 
+                          RC (45)
                     StmtList 
-            TACList 
-        RC (10)
-    ExtDefList 
-Func: main
+                      Stmt 
+                        Exp 
+                          assistFuncCall 
+                          ID :putch 
+                          Args (46)
+                            Exp (46)
+                              INTEGER :10 
+                            assistArgs 
+                      StmtList (47)
+                        Stmt (47)
+                          RETURN (47)
+                          Exp (47)
+                            INTEGER :0 
+                        StmtList 
+              TACList 
+          RC (48)
+      ExtDefList 
+Func: func
 point1 = alloca int,align 4
-new instruction call func getint and goto getint with return value 
-store int temp10, point1,align 4
-(null) 3 insert
-new instruction call func _sysy_starttime and goto _sysy_starttime without return value 
+store int param0, point1,align 4
+array1 = alloca int array,align 4
 point2 = alloca int,align 4
+store int param2, point2,align 4
+array2 = alloca int array,align 4
 point3 = alloca int,align 4
-br mainlabel1
-mainlabel1
+store int param4, point3,align 4
+point4 = alloca int,align 4
+store int param5, point4,align 4
+array3 = alloca int array,align 4
+point5 = alloca int,align 4
+store int param7, point5,align 4
+point6 = alloca int,align 4
+store int param8, point6,align 4
+point7 = alloca int,align 4
+store int 0, point7,align 4
+br funclabel1
+funclabel1
+temp10 = load int, point7,align 4
+while br temp11, true: funclabel2  false : funclabel3 
+funclabel2
 temp12 = load int, point1,align 4
-while br temp13, true: mainlabel2  false : mainlabel3 
-mainlabel2
-temp14 = load int, point1,align 4
-store int temp15, point1,align 4
-mainlabel3
-(null) 8 insert
-new instruction call func _sysy_stoptime and goto _sysy_stoptime without return value 
+temp14 = load int, point7,align 4
+temp16 = load int, temp15,align 4
+(null) temp16 insert
+new instruction call func putint and goto putint without return value 
+temp18 = load int, point7,align 4
+store int temp19, point7,align 4
+funclabel3
+(null) 10 insert
+new instruction call func putch and goto putch without return value 
+temp21 = load int, point2,align 4
+temp23 = load int, temp22,align 4
+(null) temp23 insert
+new instruction call func putint and goto putint without return value 
+(null) 10 insert
+new instruction call func putch and goto putch without return value 
+br funclabel4
+funclabel4
+temp26 = load int, point6,align 4
+while br temp27, true: funclabel5  false : funclabel6 
+funclabel5
+temp28 = load int, point6,align 4
+temp30 = load int, point5,align 4
+store int temp32, temp29,align 4
+temp33 = load int, point6,align 4
+store int temp34, point6,align 4
+temp35 = load int, point5,align 4
+store int temp36, point5,align 4
+funclabel6
+temp37 = load int, point3,align 4
+temp38 = load int, point4,align 4
 return
 func_label_end1
+Func: main
+array4 = alloca int array,align 4
+cur init array name 	array4
+array5 = alloca int array,align 4
+cur init array name 	array5
+store int 6, temp41,align 4
+store int 7, temp43,align 4
+store int 4, temp45,align 4
+store int 9, temp47,align 4
+store int 11, temp49,align 4
+store int 1, temp51,align 4
+store int 2, temp53,align 4
+store int 3, temp55,align 4
+store int 9, temp57,align 4
+point8 = alloca int,align 4
+temp60 = load int, temp59,align 4
+(null) temp60 insert
+(null) array5 insert
+temp63 = load int, temp62,align 4
+(null) temp63 insert
+(null) temp64 insert
+temp67 = load int, temp66,align 4
+(null) temp67 insert
+temp70 = load int, temp69,align 4
+(null) temp70 insert
+(null) temp71 insert
+temp74 = load int, temp73,align 4
+(null) temp74 insert
+temp77 = load int, temp76,align 4
+(null) temp77 insert
+new instruction call func func and goto func with return value 
+store int temp79, point8,align 4
+br mainlabel7
+mainlabel7
+temp80 = load int, point8,align 4
+while br temp81, true: mainlabel8  false : mainlabel9 
+mainlabel8
+temp83 = load int, point8,align 4
+temp85 = load int, temp84,align 4
+(null) temp85 insert
+new instruction call func putint and goto putint without return value 
+(null) 32 insert
+new instruction call func putch and goto putch without return value 
+temp88 = load int, point8,align 4
+store int temp89, point8,align 4
+mainlabel9
+(null) 10 insert
+new instruction call func putch and goto putch without return value 
+return
+func_label_end2

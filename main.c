@@ -217,7 +217,7 @@ char *performance_test[] = {
     "./performance_test/instruction-combining-1.c",
     "./performance_test/instruction-combining-2.c",
     "./performance_test/instruction-combining-3.c",
-    "./performance_test/integer-divide-optimization-1.c",
+    "./performance_test/integer-divide-optimization-1.c", // 42
     "./performance_test/integer-divide-optimization-2.c",
     "./performance_test/integer-divide-optimization-3.c",
     "./performance_test/median0.c",
@@ -235,6 +235,7 @@ char *performance_test[] = {
     "./performance_test/transpose1.c",
     "./performance_test/transpose2.c",
 };
+// 178
 
 // --------------------------------------------------
 int main(int argc, char **argv) {
@@ -267,10 +268,10 @@ int main(int argc, char **argv) {
   } else {
     is_functional_test = false;
     // is_functional_test = true;
-    // choose_case = read_code_from_file(test_cases[51]);
-    choose_case = read_code_from_file(performance_test[51]);
+    choose_case = read_code_from_file(test_cases[88]);
+    // choose_case = read_code_from_file(performance_test[42]);
     // choose_case = read_code_from_file(hidden_cases[35]);
-    // choose_case = read_code_from_file("./my_cases/array_init.c");
+    // choose_case = read_code_from_file("./my_cases/array_optimization.c");
   }
   if (choose_case == NULL)
     return 1;

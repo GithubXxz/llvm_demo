@@ -46,6 +46,8 @@ HashMap *global_array_init_hashmap = NULL;
 
 HashMap *constant_single_value_hashmap = NULL;
 
+HashMap *assist_is_local_val = NULL;
+
 Stack *array_get = NULL;
 
 // 出栈/链表删除 伴随运行的函数 我真他妈 心态崩了 学艺不精
@@ -271,4 +273,6 @@ void AllInit() {
   hashmap_init(&global_array_init_hashmap);
 
   hashset_init(&bblock_pass_hashset);
+
+  hashmap_init(&assist_is_local_val);
 }
