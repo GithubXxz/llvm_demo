@@ -51,8 +51,8 @@ struct _BasicBlock;
 typedef struct _Instruction {
   User user;
   TAC_OP opcode; // 操作吗
-  struct _BasicBlock *Parent;
   unsigned ins_id;
+  struct _HeadNode *ins_subordinate_block;
 } Instruction;
 
 Instruction *ins_new(int op_num, Value *self);

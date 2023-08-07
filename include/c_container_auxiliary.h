@@ -5,7 +5,8 @@
 #include "container/list.h"
 #include <sys/time.h>
 
-#define PRINT_OK
+#define OPT_PRINT
+// #define PRINT_OK
 // #define TIMER_TEST
 
 static struct timeval begin, end;

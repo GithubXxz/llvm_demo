@@ -8,6 +8,7 @@ test_cases/
 hidden_cases/
 performance_test/
 all_test.py
+opt/
 
 
 

@@ -20,6 +20,7 @@ typedef struct _HeadNode {
   List *pre_node_list;
   // 是否被访问过
   bool is_visited;
+  int dom_depth;
 } HeadNode; // 定义头结点
 
 // 邻接表表示法的图

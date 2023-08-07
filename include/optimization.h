@@ -8,6 +8,7 @@ void calculate_live_interval(ALGraph *self_cfg, Function *self_func);
 void line_scan_register_allocation(Function *self_func);
 
 void delete_non_used_var_pass(Function *self);
+void immediate_num_calculate(Function *handle_func);
 void array_replace_optimization(Function *handle_func);
 
 #endif

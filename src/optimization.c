@@ -1,4 +1,5 @@
 #include "optimization.h"
+#include "Pass.h"
 #include "c_container_auxiliary.h"
 #include "container/hash_map.h"
 #include "container/hash_set.h"
@@ -11,6 +12,8 @@
 #include <stdio.h>
 #include <string.h>
 #include <sys/_types/_intptr_t.h>
+
+extern HashMap *constant_single_value_hashmap;
 
 typedef struct _live_interval {
   unsigned begin;
@@ -652,10 +655,8 @@ void delete_non_used_block(Function *handle_func) {
   }
 }
 
-void ImmediateNumCalculate(Function *handle_func) {
+void immediate_num_calculate(Function *handle_func) {
   ALGraph *self_cfg = handle_func->self_cfg;
-
-  // List *entry_block_list = (self_cfg->node_set)[0]->bblock_head->inst_list;
 
   for (int ii = 0; ii < self_cfg->node_num; ii++) {
     List *cur_handle_list = (self_cfg->node_set)[ii]->bblock_head->inst_list;
@@ -666,6 +667,244 @@ void ImmediateNumCalculate(Function *handle_func) {
     element = iter->element_;
 
     while (i < ListSize(cur_handle_list)) {
+      if (element->user.num_oprands == 2) {
+        Value *oprand01 = user_get_operand_use((User *)element, 0)->Val;
+        Value *oprand02 = user_get_operand_use((User *)element, 1)->Val;
+        if ((oprand01->VTy->TID == ImmediateIntTyID ||
+             oprand01->VTy->TID == ImmediateFloatTyID) &&
+            (oprand02->VTy->TID == ImmediateIntTyID ||
+             oprand02->VTy->TID == ImmediateFloatTyID)) {
+
+          Value *cur;
+          TypeID cur_res_typeid = imm_res_type(oprand01, oprand02);
+          char buffer[30];
+          float const_float_value = 0.0f;
+          int const_int_value = 0;
+
+          if (cur_res_typeid == ImmediateFloatTyID) {
+            switch (((Instruction *)element)->opcode) {
+            case AddOP:
+              const_float_value = oprand01->pdata->var_pdata.fVal +
+                                  oprand02->pdata->var_pdata.fVal;
+              sprintf(buffer, "%f", const_float_value);
+              break;
+            case SubOP:
+              const_float_value = oprand01->pdata->var_pdata.fVal -
+                                  oprand02->pdata->var_pdata.fVal;
+              sprintf(buffer, "%f", const_float_value);
+              break;
+            case MulOP:
+              const_float_value = oprand01->pdata->var_pdata.fVal *
+                                  oprand02->pdata->var_pdata.fVal;
+              sprintf(buffer, "%f", const_float_value);
+              break;
+            case DivOP:
+              const_float_value = oprand01->pdata->var_pdata.fVal /
+                                  oprand02->pdata->var_pdata.fVal;
+              sprintf(buffer, "%f", const_float_value);
+              break;
+
+            case EqualOP:
+              const_float_value = oprand01->pdata->var_pdata.fVal ==
+                                  oprand02->pdata->var_pdata.fVal;
+              sprintf(buffer, "%d", (int)const_float_value);
+              break;
+
+            case NotEqualOP:
+              const_float_value = oprand01->pdata->var_pdata.fVal !=
+                                  oprand02->pdata->var_pdata.fVal;
+              sprintf(buffer, "%d", (int)const_float_value);
+              break;
+
+            case GreatThanOP:
+              const_float_value = oprand01->pdata->var_pdata.fVal >
+                                  oprand02->pdata->var_pdata.fVal;
+              sprintf(buffer, "%d", (int)const_float_value);
+              break;
+
+            case LessThanOP:
+              const_float_value = oprand01->pdata->var_pdata.fVal <
+                                  oprand02->pdata->var_pdata.fVal;
+              sprintf(buffer, "%d", (int)const_float_value);
+              break;
+
+            case GreatEqualOP:
+              const_float_value = oprand01->pdata->var_pdata.fVal >=
+                                  oprand02->pdata->var_pdata.fVal;
+              sprintf(buffer, "%d", (int)const_float_value);
+              break;
+
+            case LessEqualOP:
+              const_float_value = oprand01->pdata->var_pdata.fVal <=
+                                  oprand02->pdata->var_pdata.fVal;
+              sprintf(buffer, "%d", (int)const_float_value);
+              break;
+            default:
+              break;
+            }
+            if (HashMapContain(constant_single_value_hashmap, buffer))
+              cur = HashMapGet(constant_single_value_hashmap, buffer);
+            else {
+              cur = (Value *)malloc(sizeof(Value));
+              value_init(cur);
+              cur->VTy->TID = ImmediateFloatTyID;
+              cur->name = strdup(buffer);
+              cur->pdata->var_pdata.iVal = (int)const_float_value;
+              cur->pdata->var_pdata.fVal = const_float_value;
+              HashMapPut(constant_single_value_hashmap, strdup(buffer), cur);
+            }
+          } else {
+            switch (((Instruction *)element)->opcode) {
+            case AddOP:
+              const_int_value = oprand01->pdata->var_pdata.iVal +
+                                oprand02->pdata->var_pdata.iVal;
+              sprintf(buffer, "%d", const_int_value);
+              break;
+            case SubOP:
+              const_int_value = oprand01->pdata->var_pdata.iVal -
+                                oprand02->pdata->var_pdata.iVal;
+              sprintf(buffer, "%d", const_int_value);
+              break;
+            case MulOP:
+              const_int_value = oprand01->pdata->var_pdata.iVal *
+                                oprand02->pdata->var_pdata.iVal;
+              sprintf(buffer, "%d", const_int_value);
+              break;
+            case DivOP:
+              const_int_value = oprand01->pdata->var_pdata.iVal /
+                                oprand02->pdata->var_pdata.iVal;
+              sprintf(buffer, "%d", const_int_value);
+              break;
+
+            case EqualOP:
+              const_int_value = oprand01->pdata->var_pdata.iVal ==
+                                oprand02->pdata->var_pdata.iVal;
+              sprintf(buffer, "%d", (int)const_int_value);
+              break;
+
+            case NotEqualOP:
+              const_int_value = oprand01->pdata->var_pdata.iVal !=
+                                oprand02->pdata->var_pdata.iVal;
+              sprintf(buffer, "%d", (int)const_int_value);
+              break;
+
+            case GreatThanOP:
+              const_int_value = oprand01->pdata->var_pdata.iVal >
+                                oprand02->pdata->var_pdata.iVal;
+              sprintf(buffer, "%d", (int)const_int_value);
+              break;
+
+            case LessThanOP:
+              const_int_value = oprand01->pdata->var_pdata.iVal <
+                                oprand02->pdata->var_pdata.iVal;
+              sprintf(buffer, "%d", (int)const_int_value);
+              break;
+
+            case GreatEqualOP:
+              const_int_value = oprand01->pdata->var_pdata.iVal >=
+                                oprand02->pdata->var_pdata.iVal;
+              sprintf(buffer, "%d", (int)const_int_value);
+              break;
+
+            case LessEqualOP:
+              const_int_value = oprand01->pdata->var_pdata.iVal <=
+                                oprand02->pdata->var_pdata.iVal;
+              sprintf(buffer, "%d", (int)const_int_value);
+              break;
+            default:
+              break;
+            }
+            if (HashMapContain(constant_single_value_hashmap, buffer))
+              cur = HashMapGet(constant_single_value_hashmap, buffer);
+            else {
+              cur = (Value *)malloc(sizeof(Value));
+              value_init(cur);
+              cur->VTy->TID = ImmediateIntTyID;
+              cur->name = strdup(buffer);
+              cur->pdata->var_pdata.iVal = const_int_value;
+              cur->pdata->var_pdata.fVal = (float)const_int_value;
+              HashMapPut(constant_single_value_hashmap, strdup(buffer), cur);
+            }
+          }
+          replace_use_other_by_self(cur, (Value *)element);
+          delete_ins(cur_handle_list, &iter, &element);
+        } else {
+          iter_next_ins(&iter, &i, &element);
+        }
+      } else if (element->user.num_oprands == 1 &&
+                 element->opcode == AssignOP) {
+        Value *oprand01 = user_get_operand_use((User *)element, 0)->Val;
+        if (oprand01->VTy->TID == ImmediateIntTyID ||
+            oprand01->VTy->TID == ImmediateFloatTyID) {
+          Value *cur = NULL;
+          char buffer[30];
+          float const_value = 0.f;
+          if (((Value *)element)->VTy->TID == FloatTyID) {
+            const_value = oprand01->pdata->var_pdata.iVal;
+            sprintf(buffer, "%f", const_value);
+          } else {
+            const_value = oprand01->pdata->var_pdata.fVal;
+            sprintf(buffer, "%d", (int)const_value);
+          }
+          if (HashMapContain(constant_single_value_hashmap, buffer))
+            cur = HashMapGet(constant_single_value_hashmap, buffer);
+          else {
+            cur = (Value *)malloc(sizeof(Value));
+            value_init(cur);
+            cur->VTy->TID = ((Value *)element)->VTy->TID + 4;
+            cur->name = strdup(buffer);
+            cur->pdata->var_pdata.iVal = const_value;
+            cur->pdata->var_pdata.fVal = const_value;
+            HashMapPut(constant_single_value_hashmap, strdup(buffer), cur);
+          }
+          replace_use_other_by_self(cur, (Value *)element);
+          delete_ins(cur_handle_list, &iter, &element);
+        } else {
+          iter_next_ins(&iter, &i, &element);
+        }
+      } else {
+        iter_next_ins(&iter, &i, &element);
+      }
+    }
+  }
+}
+
+void gcm(Function *handle_func) {
+  ALGraph *self_cfg = handle_func->self_cfg;
+  HashMap *ins_subordinate_block;
+  hashmap_init(&ins_subordinate_block);
+  HeadNode *root_headnode = (self_cfg->node_set)[0];
+
+  for (int ii = 0; ii < self_cfg->node_num; ii++) {
+    HeadNode *cur_handle_headnode = (self_cfg->node_set)[ii];
+    List *cur_handle_list = cur_handle_headnode->bblock_head->inst_list;
+    ListFirst(cur_handle_list, false);
+    Instruction *element;
+    while (ListNext(cur_handle_list, (void **)&element))
+      element->ins_subordinate_block = cur_handle_headnode;
+  }
+
+  for (int ii = 0; ii < self_cfg->node_num; ii++) {
+    List *cur_handle_list = (self_cfg->node_set)[ii]->bblock_head->inst_list;
+    ListSetClean(cur_handle_list, CommonCleanInstruction);
+    Instruction *element;
+    int i = 0;
+    ListNode *iter = cur_handle_list->data->head_;
+    element = iter->element_;
+
+    while (i < ListSize(cur_handle_list)) {
+      for (int ii = 0; ii < self_cfg->node_num; ii++) {
+        List *cur_handle_list =
+            (self_cfg->node_set)[ii]->bblock_head->inst_list;
+        ListSetClean(cur_handle_list, CommonCleanInstruction);
+        Instruction *element;
+        int i = 0;
+        ListNode *iter = cur_handle_list->data->head_;
+        element = iter->element_;
+
+        while (i < ListSize(cur_handle_list)) {
+        }
+      }
     }
   }
 }

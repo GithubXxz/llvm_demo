@@ -333,8 +333,8 @@ void dom_relation_pass() {
   StackPush(dom_tree_stack, dom_tree_root);
 
   while (StackSize(dom_tree_stack) != 0) {
-    void *element;
-    StackTop(dom_tree_stack, &element);
+    dom_tree *element;
+    StackTop(dom_tree_stack, (void *)&element);
     StackPop(dom_tree_stack);
 // 打印树中每一层的信息
 #ifdef PRINT_OK
@@ -343,13 +343,13 @@ void dom_relation_pass() {
 #endif
 
     for (int i = 1; i < node_num; i++) {
-      if (graph_for_dom_tree->node_set[i]->idom_node ==
-          ((dom_tree *)element)->bblock_node) {
+      if (graph_for_dom_tree->node_set[i]->idom_node == element->bblock_node) {
         dom_tree *cur = (dom_tree *)malloc(sizeof(dom_tree));
         cur->bblock_node = graph_for_dom_tree->node_set[i];
 #ifdef PRINT_OK
         printf("%s,", cur->bblock_node->bblock_head->label->name);
 #endif
+        cur->bblock_node->dom_depth = element->bblock_node->dom_depth + 1;
         cur->child = ListInit();
         ListSetClean(cur->child, CleanObject);
         ListPushBack(((dom_tree *)element)->child, cur);
@@ -1401,6 +1401,7 @@ void bblock_to_dom_graph_pass(Function *self) {
   dom_tree_root = (dom_tree *)malloc(sizeof(dom_tree));
   dom_tree_root->bblock_node = init_headnode;
   dom_tree_root->child = ListInit();
+  dom_tree_root->bblock_node->dom_depth = 0;
   ListSetClean(dom_tree_root->child, CleanObject);
 
   // 建立支配关系的函数
@@ -1433,13 +1434,19 @@ void bblock_to_dom_graph_pass(Function *self) {
   bblock_pass_hashset = NULL;
   hashset_init(&(bblock_pass_hashset));
 
+#ifdef OPT_PRINT
+  printf("before optimization log!!!!!!!!!!!!!!!!!\n");
+  printf_cur_func_ins(self);
+#endif
+
   // optimizization
   if (!is_functional_test) {
-    array_replace_optimization(self);
     delete_non_used_var_pass(self);
+    array_replace_optimization(self);
+    immediate_num_calculate(self);
   }
 
-#ifdef PRINT_OK
+#ifdef OPT_PRINT
   printf("super log!!!!!!!!!!!!!!!!!\n");
   printf_cur_func_ins(self);
 #endif

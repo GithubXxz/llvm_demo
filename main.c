@@ -199,7 +199,7 @@ char *performance_test[] = {
     "./performance_test/crypto-1.c",
     "./performance_test/crypto-2.c",
     "./performance_test/crypto-3.c",
-    "./performance_test/dead-code-elimination-1.c",
+    "./performance_test/dead-code-elimination-1.c", // 24
     "./performance_test/dead-code-elimination-2.c",
     "./performance_test/dead-code-elimination-3.c",
     "./performance_test/fft0.c",
@@ -268,10 +268,11 @@ int main(int argc, char **argv) {
   } else {
     is_functional_test = false;
     // is_functional_test = true;
-    choose_case = read_code_from_file(test_cases[88]);
-    // choose_case = read_code_from_file(performance_test[42]);
+    // choose_case = read_code_from_file(test_cases[87]);
+    // choose_case = read_code_from_file(performance_test[0]);
     // choose_case = read_code_from_file(hidden_cases[35]);
     // choose_case = read_code_from_file("./my_cases/array_optimization.c");
+    choose_case = read_code_from_file("./opt/loop1.c");
   }
   if (choose_case == NULL)
     return 1;
@@ -279,7 +280,7 @@ int main(int argc, char **argv) {
   parser(choose_case);
   TIMER_END("parser over!");
 
-#ifdef PRINT_OK
+#ifdef OPT_PRINT
   freopen(tty_path, "w", stdout);
   freopen("./output/out.txt", "w", stdout);
   setvbuf(stdout, NULL, _IOLBF, BUFSIZ);
