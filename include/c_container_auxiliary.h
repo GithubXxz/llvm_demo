@@ -6,7 +6,7 @@
 #include <sys/time.h>
 
 #define OPT_PRINT
-// #define PRINT_OK
+#define PRINT_OK
 // #define TIMER_TEST
 
 static struct timeval begin, end;

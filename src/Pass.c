@@ -808,14 +808,25 @@ void printf_cur_func_ins(Function *self) {
   hashset_init(&(bblock_pass_hashset));
 }
 
+unsigned HashKeyAddressCopyPair(void *key) {
+  return HashDjb2(((copy_pair *)key)->src->name);
+}
+
+void hashset_init_copy_pair(HashSet **self) {
+  *self = HashSetInit();
+  HashSetSetHash(*self, HashKeyAddressCopyPair);
+  HashSetSetCompare(*self, CompareKeyAddress);
+  HashSetSetCleanKey(*self, CleanHashSetKey);
+}
+
 void insert_copies_help(HashMap *insert_copies_stack_hashmap,
                         HashMap *num_of_var_def, dom_tree *cur_bblock) {
   // Pass One:Initialize the data structures
   HashSet *copy_set = NULL;
-  hashset_init(&copy_set);
+  hashset_init_copy_pair(&copy_set);
 
   HashSet *worklist = NULL;
-  hashset_init(&worklist);
+  hashset_init_copy_pair(&worklist);
 
   // 伪代码中的map
   HashMap *var_replace_hashmap = NULL;
@@ -856,6 +867,7 @@ void insert_copies_help(HashMap *insert_copies_stack_hashmap,
       }
     }
   }
+
   copy_pair *cur_dest_used = NULL;
   HashSetFirst(copy_set);
   while ((cur_dest_used = HashSetNext(copy_set)) != NULL) {
@@ -1008,7 +1020,7 @@ void print_ins_pass(List *self) {
 
 void print_bblock_pass(BasicBlock *self) {
   if (self != NULL && HashSetFind(bblock_pass_hashset, self) == false) {
-    printf("\taddress:%p", self->label);
+    // printf("\taddress:%p", self->label);
     printf("\t%s:\n", self->label->name);
     HashSetAdd(bblock_pass_hashset, self);
     print_ins_pass(self->inst_list);
@@ -1096,6 +1108,7 @@ void delete_return_deadcode_pass(List *self) {
 }
 
 extern HashMap *assist_is_local_val;
+extern bool global_optimization;
 void ins_toBBlock_pass(List *self) {
   // 用来记录当前的正在处理的bblock
   BasicBlock *cur_bblock = NULL;
@@ -1111,7 +1124,7 @@ void ins_toBBlock_pass(List *self) {
 
   while (ListNext(self, &element)) {
 
-    if (!is_functional_test) {
+    if (global_optimization) {
       while (((Instruction *)element)->opcode != FuncLabelOP) {
         Value *test_global;
         if (((Instruction *)element)->opcode == AllocateOP &&
@@ -1190,7 +1203,7 @@ void ins_toBBlock_pass(List *self) {
       cur_func->entry_bblock = cur_bblock;
       ListPushBack(cur_bblock->inst_list, element);
 
-      if (!is_functional_test) {
+      if (global_optimization) {
         if (HashMapContain(local_global, cur_func->label->name)) {
           List *namer = HashMapGet(local_global, cur_func->label->name);
           ListFirst(namer, false);
@@ -1391,12 +1404,6 @@ void bblock_to_dom_graph_pass(Function *self) {
   }
 #endif
 
-#ifdef PRINT_OK
-  printf("performance is begin!!!!!!!\n");
-  printf("performance is begin!!!!!!!\n");
-  printf("performance is begin!!!!!!!\n");
-  printf("performance is begin!!!!!!!\n");
-#endif
   // 初始化dom_tree树根
   dom_tree_root = (dom_tree *)malloc(sizeof(dom_tree));
   dom_tree_root->bblock_node = init_headnode;
@@ -1439,11 +1446,23 @@ void bblock_to_dom_graph_pass(Function *self) {
   printf_cur_func_ins(self);
 #endif
 
+  delete_non_used_var_pass(self);
   // optimizization
   if (!is_functional_test) {
-    delete_non_used_var_pass(self);
+#ifdef PRINT_OK
+    printf("performance is begin!!!!!!!\n");
+    printf("performance is begin!!!!!!!\n");
+    printf("performance is begin!!!!!!!\n");
+    printf("performance is begin!!!!!!!\n");
+#endif
     array_replace_optimization(self);
     immediate_num_calculate(self);
+#ifdef PRINT_OK
+    printf("performance is over!!!!!!!\n");
+    printf("performance is over!!!!!!!\n");
+    printf("performance is over!!!!!!!\n");
+    printf("performance is over!!!!!!!\n");
+#endif
   }
 
 #ifdef OPT_PRINT
@@ -1454,12 +1473,6 @@ void bblock_to_dom_graph_pass(Function *self) {
   replace_phi_nodes(dom_tree_root);
 
   remove_bblock_phi_func_pass(graph_for_dom_tree);
-#ifdef PRINT_OK
-  printf("performance is over!!!!!!!\n");
-  printf("performance is over!!!!!!!\n");
-  printf("performance is over!!!!!!!\n");
-  printf("performance is over!!!!!!!\n");
-#endif
 
 #ifdef PRINT_OK
   printf("\n\n\n");

@@ -30,6 +30,7 @@ extern HashMap *global_array_init_hashmap;
 extern HashMap *constant_single_value_hashmap;
 extern Stack *array_get;
 extern bool is_functional_test;
+extern bool global_optimization;
 
 void CleanObject(void *element);
 
@@ -1010,7 +1011,7 @@ Value *post_eval(ast *a, Value *left, Value *right) {
           assert(pre_symboltable || load_var_pointer);
         };
 
-        if (!is_functional_test) {
+        if (global_optimization) {
           if (load_var_pointer->IsGlobalVar && !load_var_pointer->IsConst &&
               cur_construction_func) {
             if (!HashMapContain(assist_is_local_val, load_var_pointer->name)) {
@@ -1066,7 +1067,7 @@ Value *post_eval(ast *a, Value *left, Value *right) {
           assert(pre_symboltable || assign_var_pointer);
         };
 
-        if (!is_functional_test) {
+        if (global_optimization) {
           if (assign_var_pointer->IsGlobalVar && !assign_var_pointer->IsConst &&
               cur_construction_func) {
             if (!HashMapContain(assist_is_local_val,
