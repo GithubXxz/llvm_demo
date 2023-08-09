@@ -117,7 +117,8 @@ union _PData {
 // 用于全局数组初始化后 后端memory copy
 typedef struct {
   int offset;
-  float value;
+  float fval;
+  int ival;
 } global_array_init_item;
 
 // 局部数组 且未被函数当作参数传递 的表

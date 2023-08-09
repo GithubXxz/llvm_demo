@@ -267,11 +267,11 @@ int main(int argc, char **argv) {
     is_functional_test = false;
     choose_case = read_code_from_file(argv[1]);
   } else {
-    is_functional_test = true;
+    is_functional_test = false;
     // is_functional_test = true;
-    choose_case = read_code_from_file(test_cases[75]);
-    // choose_case = read_code_from_file(performance_test[0]);
-    // choose_case = read_code_from_file(hidden_cases[35]);
+    // choose_case = read_code_from_file(test_cases[75]);
+    choose_case = read_code_from_file(performance_test[0]);
+    // choose_case = read_code_from_file(hidden_cases[38]);
     // choose_case = read_code_from_file("./my_cases/array_optimization.c");
     // choose_case = read_code_from_file("./opt/loop1.c");
   }
@@ -329,7 +329,7 @@ int main(int argc, char **argv) {
   return 0;
 }
 
-#define MAX_LINE_LENGTH 1024
+#define MAX_LINE_LENGTH 10240
 char *read_code_from_file(const char *file_path) {
   puts(file_path);
   FILE *fd = fopen(file_path, "r");

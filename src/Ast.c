@@ -515,8 +515,10 @@ void in_eval(ast *a, Value *left) {
       }
       global_array_init_item *cur_init_offset =
           malloc(sizeof(global_array_init_item));
+
       cur_init_offset->offset = cur_init_total_offset;
-      cur_init_offset->value = left->pdata->var_pdata.fVal;
+      cur_init_offset->ival = left->pdata->var_pdata.iVal;
+      cur_init_offset->fval = left->pdata->var_pdata.fVal;
       ListPushBack(array_init_assist.offset_list, cur_init_offset);
     } else {
       Value *outside_array = array_init_assist.cur_init_array;
@@ -1100,7 +1102,7 @@ Value *post_eval(ast *a, Value *left, Value *right) {
           cur->name = strdup(text);
           // 为padata里的整数字面量常量赋值
           cur->pdata->var_pdata.iVal = a->intgr;
-          cur->pdata->var_pdata.fVal = (float)a->intgr;
+          cur->pdata->var_pdata.fVal = (float)(a->intgr);
           HashMapPut(constant_single_value_hashmap, strdup(text), cur);
         }
         return cur;
@@ -1117,7 +1119,7 @@ Value *post_eval(ast *a, Value *left, Value *right) {
           // 添加变量的名字
           cur->name = strdup(text);
           // 为padata里的整数字面量常量赋值
-          cur->pdata->var_pdata.iVal = (int)a->flt;
+          cur->pdata->var_pdata.iVal = (int)(a->flt);
           cur->pdata->var_pdata.fVal = a->flt;
           HashMapPut(constant_single_value_hashmap, strdup(text), cur);
         }
@@ -1300,13 +1302,14 @@ Value *post_eval(ast *a, Value *left, Value *right) {
           }
         } else if (a->r && SEQ(a->r->name, "ASSIGNOP")) {
 #ifdef PRINT_OK
+#endif
           ListFirst(array_init_assist.offset_list, false);
           global_array_init_item *element;
           printf("cur init array name \t%s\n", left->name);
           while (ListNext(array_init_assist.offset_list, (void *)&element)) {
-            printf("offset:\t%d value:\t%f\n", element->offset, element->value);
+            printf("offset:\t%d ival:\t%d fval:\t%f\n", element->offset,
+                   element->ival, element->fval);
           }
-#endif
 
           HashMapPut(global_array_init_hashmap, strdup(left->name),
                      array_init_assist.offset_list);

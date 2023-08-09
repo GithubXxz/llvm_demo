@@ -1,1386 +1,219 @@
-         	     0:           AllocateOP 	                  global1 	      null
-         	     0:           AllocateOP 	                  global2 	      null
-         	     0:           AllocateOP 	                  global3 	      null
-         	     0:           AllocateOP 	                  global4 	      null
-         	     0:           AllocateOP 	                  global5 	      null
-         	     0:           AllocateOP 	                  global6 	      null
-         	     0:          FuncLabelOP 	                      dfs 	      null
-         	     0:              LabelOP 	                 dfsentry 	      null
-         	     0:           AllocateOP 	                   point1 	      null
-         	     0:              StoreOP 	                   (null) 	    point1,     param0
-         	     0:           AllocateOP 	                   point2 	      null
-         	     0:              StoreOP 	                   (null) 	    point2,     param1
-         	     0:           AllocateOP 	                   point3 	      null
-         	     0:              StoreOP 	                   (null) 	    point3,     param2
-         	     0:               LoadOP 	                   temp10 	    point1
-         	     0:               LoadOP 	                   temp11 	    point2
-         	     0:              EqualOP 	                   temp12 	    temp10,     temp11
-         	     0:  GotoWithConditionOP 	true:dfslabel2  false:dfslabel1 	    temp12
-         	     0:              LabelOP 	                dfslabel2 	      null
-         	     0:               LoadOP 	                   temp13 	    point3
-         	     0:             ReturnOP 	                   return 	    temp13
-         	     0:               GotoOP 	           goto dfslabel1 	      null
-         	     0:              LabelOP 	                dfslabel1 	      null
-         	     0:               LoadOP 	                   temp14 	    point1
-         	     0:      GetelementptrOP 	                   temp15 	   global6,     temp14
-         	     0:              StoreOP 	                   (null) 	    temp15,          1
-         	     0:           AllocateOP 	                   point4 	      null
-         	     0:              StoreOP 	                   (null) 	    point4,          0
-         	     0:               GotoOP 	           goto dfslabel4 	      null
-         	     0:              LabelOP 	                dfslabel4 	      null
-         	     0:               LoadOP 	                   temp16 	    point4
-         	     0:               LoadOP 	                   temp17 	    point1
-         	     0:      GetelementptrOP 	                   temp18 	   global2,     temp17
-         	     0:               LoadOP 	                   temp19 	    temp18
-         	     0:           LessThanOP 	                   temp20 	    temp16,     temp19
-         	     0:  GotoWithConditionOP 	true:dfslabel5  false:dfslabel6 	    temp20
-         	     0:              LabelOP 	                dfslabel5 	      null
-         	     0:               LoadOP 	                   temp21 	    point1
-         	     0:               LoadOP 	                   temp23 	    point4
-         	     0:      GetelementptrOP 	                   temp22 	   global3,     temp21
-         	     0:      GetelementptrOP 	                   temp24 	    temp22,     temp23
-         	     0:               LoadOP 	                   temp25 	    temp24
-         	     0:      GetelementptrOP 	                   temp26 	   global6,     temp25
-         	     0:               LoadOP 	                   temp27 	    temp26
-         	     0:  GotoWithConditionOP 	true:dfslabel8  false:dfslabel7 	    temp27
-         	     0:              LabelOP 	                dfslabel8 	      null
-         	     0:               LoadOP 	                   temp28 	    point4
-         	     0:                AddOP 	                   temp29 	    temp28,          1
-         	     0:              StoreOP 	                   (null) 	    point4,     temp29
-         	     0:               GotoOP 	  (continue)br :dfslabel4 	      null
-         	     0:               GotoOP 	           goto dfslabel7 	      null
-         	     0:              LabelOP 	                dfslabel7 	      null
-         	     0:               LoadOP 	                   temp30 	    point1
-         	     0:               LoadOP 	                   temp32 	    point4
-         	     0:      GetelementptrOP 	                   temp31 	   global4,     temp30
-         	     0:      GetelementptrOP 	                   temp33 	    temp31,     temp32
-         	     0:               LoadOP 	                   temp34 	    temp33
-         	     0:          LessEqualOP 	                   temp35 	    temp34,          0
-         	     0:  GotoWithConditionOP 	true:dfslabel11  false:dfslabel10 	    temp35
-         	     0:              LabelOP 	               dfslabel11 	      null
-         	     0:               LoadOP 	                   temp36 	    point4
-         	     0:                AddOP 	                   temp37 	    temp36,          1
-         	     0:              StoreOP 	                   (null) 	    point4,     temp37
-         	     0:               GotoOP 	  (continue)br :dfslabel4 	      null
-         	     0:               GotoOP 	          goto dfslabel10 	      null
-         	     0:              LabelOP 	               dfslabel10 	      null
-         	     0:           AllocateOP 	                   point5 	      null
-         	     0:               LoadOP 	                   temp38 	    point3
-         	     0:               LoadOP 	                   temp39 	    point1
-         	     0:               LoadOP 	                   temp41 	    point4
-         	     0:      GetelementptrOP 	                   temp40 	   global4,     temp39
-         	     0:      GetelementptrOP 	                   temp42 	    temp40,     temp41
-         	     0:               LoadOP 	                   temp43 	    temp42
-         	     0:           LessThanOP 	                   temp44 	    temp38,     temp43
-         	     0:  GotoWithConditionOP 	true:dfslabel14  false:dfslabel13 	    temp44
-         	     0:              LabelOP 	               dfslabel14 	      null
-         	     0:               LoadOP 	                   temp45 	    point3
-         	     0:              StoreOP 	                   (null) 	    point5,     temp45
-         	     0:               GotoOP 	          goto dfslabel15 	      null
-         	     0:              LabelOP 	               dfslabel13 	      null
-         	     0:               LoadOP 	                   temp46 	    point1
-         	     0:               LoadOP 	                   temp48 	    point4
-         	     0:      GetelementptrOP 	                   temp47 	   global4,     temp46
-         	     0:      GetelementptrOP 	                   temp49 	    temp47,     temp48
-         	     0:               LoadOP 	                   temp50 	    temp49
-         	     0:              StoreOP 	                   (null) 	    point5,     temp50
-         	     0:               GotoOP 	          goto dfslabel15 	      null
-         	     0:              LabelOP 	               dfslabel15 	      null
-         	     0:           AllocateOP 	                   point6 	      null
-         	     0:               LoadOP 	                   temp51 	    point1
-         	     0:               LoadOP 	                   temp53 	    point4
-         	     0:      GetelementptrOP 	                   temp52 	   global3,     temp51
-         	     0:      GetelementptrOP 	                   temp54 	    temp52,     temp53
-         	     0:               LoadOP 	                   temp55 	    temp54
-         	     0:               LoadOP 	                   temp56 	    point2
-         	     0:               LoadOP 	                   temp57 	    point5
-         	     0:              ParamOP 	                   param2 	    temp57
-         	     0:              ParamOP 	                   param1 	    temp56
-         	     0:              ParamOP 	                   param0 	    temp55
-         	     0: CallWithReturnValueOP 	                   temp58 	      null
-         	     0:              StoreOP 	                   (null) 	    point6,     temp58
-         	     0:               LoadOP 	                   temp59 	    point6
-         	     0:          GreatThanOP 	                   temp60 	    temp59,          0
-         	     0:  GotoWithConditionOP 	true:dfslabel17  false:dfslabel16 	    temp60
-         	     0:              LabelOP 	               dfslabel17 	      null
-         	     0:               LoadOP 	                   temp61 	    point1
-         	     0:               LoadOP 	                   temp63 	    point4
-         	     0:               LoadOP 	                   temp65 	    point1
-         	     0:               LoadOP 	                   temp67 	    point4
-         	     0:      GetelementptrOP 	                   temp66 	   global4,     temp65
-         	     0:      GetelementptrOP 	                   temp68 	    temp66,     temp67
-         	     0:               LoadOP 	                   temp69 	    temp68
-         	     0:               LoadOP 	                   temp70 	    point6
-         	     0:                SubOP 	                   temp71 	    temp69,     temp70
-         	     0:      GetelementptrOP 	                   temp62 	   global4,     temp61
-         	     0:      GetelementptrOP 	                   temp64 	    temp62,     temp63
-         	     0:              StoreOP 	                   (null) 	    temp64,     temp71
-         	     0:               LoadOP 	                   temp72 	    point1
-         	     0:               LoadOP 	                   temp74 	    point4
-         	     0:      GetelementptrOP 	                   temp73 	   global3,     temp72
-         	     0:      GetelementptrOP 	                   temp75 	    temp73,     temp74
-         	     0:               LoadOP 	                   temp76 	    temp75
-         	     0:               LoadOP 	                   temp78 	    point1
-         	     0:               LoadOP 	                   temp80 	    point4
-         	     0:      GetelementptrOP 	                   temp79 	   global5,     temp78
-         	     0:      GetelementptrOP 	                   temp81 	    temp79,     temp80
-         	     0:               LoadOP 	                   temp82 	    temp81
-         	     0:               LoadOP 	                   temp84 	    point1
-         	     0:               LoadOP 	                   temp86 	    point4
-         	     0:      GetelementptrOP 	                   temp85 	   global3,     temp84
-         	     0:      GetelementptrOP 	                   temp87 	    temp85,     temp86
-         	     0:               LoadOP 	                   temp88 	    temp87
-         	     0:               LoadOP 	                   temp90 	    point1
-         	     0:               LoadOP 	                   temp92 	    point4
-         	     0:      GetelementptrOP 	                   temp91 	   global5,     temp90
-         	     0:      GetelementptrOP 	                   temp93 	    temp91,     temp92
-         	     0:               LoadOP 	                   temp94 	    temp93
-         	     0:      GetelementptrOP 	                   temp89 	   global4,     temp88
-         	     0:      GetelementptrOP 	                   temp95 	    temp89,     temp94
-         	     0:               LoadOP 	                   temp96 	    temp95
-         	     0:               LoadOP 	                   temp97 	    point6
-         	     0:                AddOP 	                   temp98 	    temp96,     temp97
-         	     0:      GetelementptrOP 	                   temp77 	   global4,     temp76
-         	     0:      GetelementptrOP 	                   temp83 	    temp77,     temp82
-         	     0:              StoreOP 	                   (null) 	    temp83,     temp98
-         	     0:               LoadOP 	                   temp99 	    point6
-         	     0:             ReturnOP 	                   return 	    temp99
-         	     0:               GotoOP 	          goto dfslabel16 	      null
-         	     0:              LabelOP 	               dfslabel16 	      null
-         	     0:               LoadOP 	                  temp100 	    point4
-         	     0:                AddOP 	                  temp101 	   temp100,          1
-         	     0:              StoreOP 	                   (null) 	    point4,    temp101
-         	     0:               GotoOP 	           goto dfslabel4 	      null
-         	     0:              LabelOP 	                dfslabel6 	      null
-         	     0:             ReturnOP 	                   return 	         0
-         	     0:            FuncEndOP 	          func_label_end1 	      null
-
-
-
-
-         	     0:           AllocateOP 	                  global1 	      null
-         	     0:           AllocateOP 	                  global2 	      null
-         	     0:           AllocateOP 	                  global3 	      null
-         	     0:           AllocateOP 	                  global4 	      null
-         	     0:           AllocateOP 	                  global5 	      null
-         	     0:           AllocateOP 	                  global6 	      null
-         	     0:          FuncLabelOP 	                      dfs 	      null
-         	     0:              LabelOP 	                 dfsentry 	      null
-         	     0:           AllocateOP 	                   point1 	      null
-         	     0:              StoreOP 	                   (null) 	    point1,     param0
-         	     0:           AllocateOP 	                   point2 	      null
-         	     0:              StoreOP 	                   (null) 	    point2,     param1
-         	     0:           AllocateOP 	                   point3 	      null
-         	     0:              StoreOP 	                   (null) 	    point3,     param2
-         	     0:               LoadOP 	                   temp10 	    point1
-         	     0:               LoadOP 	                   temp11 	    point2
-         	     0:              EqualOP 	                   temp12 	    temp10,     temp11
-         	     0:  GotoWithConditionOP 	true:dfslabel2  false:dfslabel1 	    temp12
-         	     0:              LabelOP 	                dfslabel2 	      null
-         	     0:               LoadOP 	                   temp13 	    point3
-         	     0:             ReturnOP 	                   return 	    temp13
-         	     0:              LabelOP 	                dfslabel1 	      null
-         	     0:               LoadOP 	                   temp14 	    point1
-         	     0:      GetelementptrOP 	                   temp15 	   global6,     temp14
-         	     0:              StoreOP 	                   (null) 	    temp15,          1
-         	     0:           AllocateOP 	                   point4 	      null
-         	     0:              StoreOP 	                   (null) 	    point4,          0
-         	     0:               GotoOP 	           goto dfslabel4 	      null
-         	     0:              LabelOP 	                dfslabel4 	      null
-         	     0:               LoadOP 	                   temp16 	    point4
-         	     0:               LoadOP 	                   temp17 	    point1
-         	     0:      GetelementptrOP 	                   temp18 	   global2,     temp17
-         	     0:               LoadOP 	                   temp19 	    temp18
-         	     0:           LessThanOP 	                   temp20 	    temp16,     temp19
-         	     0:  GotoWithConditionOP 	true:dfslabel5  false:dfslabel6 	    temp20
-         	     0:              LabelOP 	                dfslabel5 	      null
-         	     0:               LoadOP 	                   temp21 	    point1
-         	     0:               LoadOP 	                   temp23 	    point4
-         	     0:      GetelementptrOP 	                   temp22 	   global3,     temp21
-         	     0:      GetelementptrOP 	                   temp24 	    temp22,     temp23
-         	     0:               LoadOP 	                   temp25 	    temp24
-         	     0:      GetelementptrOP 	                   temp26 	   global6,     temp25
-         	     0:               LoadOP 	                   temp27 	    temp26
-         	     0:  GotoWithConditionOP 	true:dfslabel8  false:dfslabel7 	    temp27
-         	     0:              LabelOP 	                dfslabel8 	      null
-         	     0:               LoadOP 	                   temp28 	    point4
-         	     0:                AddOP 	                   temp29 	    temp28,          1
-         	     0:              StoreOP 	                   (null) 	    point4,     temp29
-         	     0:               GotoOP 	  (continue)br :dfslabel4 	      null
-         	     0:              LabelOP 	                dfslabel7 	      null
-         	     0:               LoadOP 	                   temp30 	    point1
-         	     0:               LoadOP 	                   temp32 	    point4
-         	     0:      GetelementptrOP 	                   temp31 	   global4,     temp30
-         	     0:      GetelementptrOP 	                   temp33 	    temp31,     temp32
-         	     0:               LoadOP 	                   temp34 	    temp33
-         	     0:          LessEqualOP 	                   temp35 	    temp34,          0
-         	     0:  GotoWithConditionOP 	true:dfslabel11  false:dfslabel10 	    temp35
-         	     0:              LabelOP 	               dfslabel11 	      null
-         	     0:               LoadOP 	                   temp36 	    point4
-         	     0:                AddOP 	                   temp37 	    temp36,          1
-         	     0:              StoreOP 	                   (null) 	    point4,     temp37
-         	     0:               GotoOP 	  (continue)br :dfslabel4 	      null
-         	     0:              LabelOP 	               dfslabel10 	      null
-         	     0:           AllocateOP 	                   point5 	      null
-         	     0:               LoadOP 	                   temp38 	    point3
-         	     0:               LoadOP 	                   temp39 	    point1
-         	     0:               LoadOP 	                   temp41 	    point4
-         	     0:      GetelementptrOP 	                   temp40 	   global4,     temp39
-         	     0:      GetelementptrOP 	                   temp42 	    temp40,     temp41
-         	     0:               LoadOP 	                   temp43 	    temp42
-         	     0:           LessThanOP 	                   temp44 	    temp38,     temp43
-         	     0:  GotoWithConditionOP 	true:dfslabel14  false:dfslabel13 	    temp44
-         	     0:              LabelOP 	               dfslabel14 	      null
-         	     0:               LoadOP 	                   temp45 	    point3
-         	     0:              StoreOP 	                   (null) 	    point5,     temp45
-         	     0:               GotoOP 	          goto dfslabel15 	      null
-         	     0:              LabelOP 	               dfslabel13 	      null
-         	     0:               LoadOP 	                   temp46 	    point1
-         	     0:               LoadOP 	                   temp48 	    point4
-         	     0:      GetelementptrOP 	                   temp47 	   global4,     temp46
-         	     0:      GetelementptrOP 	                   temp49 	    temp47,     temp48
-         	     0:               LoadOP 	                   temp50 	    temp49
-         	     0:              StoreOP 	                   (null) 	    point5,     temp50
-         	     0:               GotoOP 	          goto dfslabel15 	      null
-         	     0:              LabelOP 	               dfslabel15 	      null
-         	     0:           AllocateOP 	                   point6 	      null
-         	     0:               LoadOP 	                   temp51 	    point1
-         	     0:               LoadOP 	                   temp53 	    point4
-         	     0:      GetelementptrOP 	                   temp52 	   global3,     temp51
-         	     0:      GetelementptrOP 	                   temp54 	    temp52,     temp53
-         	     0:               LoadOP 	                   temp55 	    temp54
-         	     0:               LoadOP 	                   temp56 	    point2
-         	     0:               LoadOP 	                   temp57 	    point5
-         	     0:              ParamOP 	                   param2 	    temp57
-         	     0:              ParamOP 	                   param1 	    temp56
-         	     0:              ParamOP 	                   param0 	    temp55
-         	     0: CallWithReturnValueOP 	                   temp58 	      null
-         	     0:              StoreOP 	                   (null) 	    point6,     temp58
-         	     0:               LoadOP 	                   temp59 	    point6
-         	     0:          GreatThanOP 	                   temp60 	    temp59,          0
-         	     0:  GotoWithConditionOP 	true:dfslabel17  false:dfslabel16 	    temp60
-         	     0:              LabelOP 	               dfslabel17 	      null
-         	     0:               LoadOP 	                   temp61 	    point1
-         	     0:               LoadOP 	                   temp63 	    point4
-         	     0:               LoadOP 	                   temp65 	    point1
-         	     0:               LoadOP 	                   temp67 	    point4
-         	     0:      GetelementptrOP 	                   temp66 	   global4,     temp65
-         	     0:      GetelementptrOP 	                   temp68 	    temp66,     temp67
-         	     0:               LoadOP 	                   temp69 	    temp68
-         	     0:               LoadOP 	                   temp70 	    point6
-         	     0:                SubOP 	                   temp71 	    temp69,     temp70
-         	     0:      GetelementptrOP 	                   temp62 	   global4,     temp61
-         	     0:      GetelementptrOP 	                   temp64 	    temp62,     temp63
-         	     0:              StoreOP 	                   (null) 	    temp64,     temp71
-         	     0:               LoadOP 	                   temp72 	    point1
-         	     0:               LoadOP 	                   temp74 	    point4
-         	     0:      GetelementptrOP 	                   temp73 	   global3,     temp72
-         	     0:      GetelementptrOP 	                   temp75 	    temp73,     temp74
-         	     0:               LoadOP 	                   temp76 	    temp75
-         	     0:               LoadOP 	                   temp78 	    point1
-         	     0:               LoadOP 	                   temp80 	    point4
-         	     0:      GetelementptrOP 	                   temp79 	   global5,     temp78
-         	     0:      GetelementptrOP 	                   temp81 	    temp79,     temp80
-         	     0:               LoadOP 	                   temp82 	    temp81
-         	     0:               LoadOP 	                   temp84 	    point1
-         	     0:               LoadOP 	                   temp86 	    point4
-         	     0:      GetelementptrOP 	                   temp85 	   global3,     temp84
-         	     0:      GetelementptrOP 	                   temp87 	    temp85,     temp86
-         	     0:               LoadOP 	                   temp88 	    temp87
-         	     0:               LoadOP 	                   temp90 	    point1
-         	     0:               LoadOP 	                   temp92 	    point4
-         	     0:      GetelementptrOP 	                   temp91 	   global5,     temp90
-         	     0:      GetelementptrOP 	                   temp93 	    temp91,     temp92
-         	     0:               LoadOP 	                   temp94 	    temp93
-         	     0:      GetelementptrOP 	                   temp89 	   global4,     temp88
-         	     0:      GetelementptrOP 	                   temp95 	    temp89,     temp94
-         	     0:               LoadOP 	                   temp96 	    temp95
-         	     0:               LoadOP 	                   temp97 	    point6
-         	     0:                AddOP 	                   temp98 	    temp96,     temp97
-         	     0:      GetelementptrOP 	                   temp77 	   global4,     temp76
-         	     0:      GetelementptrOP 	                   temp83 	    temp77,     temp82
-         	     0:              StoreOP 	                   (null) 	    temp83,     temp98
-         	     0:               LoadOP 	                   temp99 	    point6
-         	     0:             ReturnOP 	                   return 	    temp99
-         	     0:              LabelOP 	               dfslabel16 	      null
-         	     0:               LoadOP 	                  temp100 	    point4
-         	     0:                AddOP 	                  temp101 	   temp100,          1
-         	     0:              StoreOP 	                   (null) 	    point4,    temp101
-         	     0:               GotoOP 	           goto dfslabel4 	      null
-         	     0:              LabelOP 	                dfslabel6 	      null
-         	     0:             ReturnOP 	                   return 	         0
-         	     0:            FuncEndOP 	          func_label_end1 	      null
-dfs
-dfsentry edge is dfslabel1 dfslabel2 
-dfslabel2 edge is dfsendlabel 
-dfsendlabel edge is 
-dfslabel1 edge is dfslabel4 
-dfslabel4 edge is dfslabel5 dfslabel6 
-dfslabel5 edge is dfslabel7 dfslabel8 
-dfslabel8 edge is dfslabel4 
-dfslabel7 edge is dfslabel10 dfslabel11 
-dfslabel11 edge is dfslabel4 
-dfslabel10 edge is dfslabel13 dfslabel14 
-dfslabel14 edge is dfslabel15 
-dfslabel15 edge is dfslabel16 dfslabel17 
-dfslabel17 edge is dfsendlabel 
-dfslabel16 edge is dfslabel4 
-dfslabel13 edge is dfslabel15 
-dfslabel6 edge is dfsendlabel 
-performance is begin!!!!!!!
-performance is begin!!!!!!!
-performance is begin!!!!!!!
-performance is begin!!!!!!!
-dfslabel2 dom node is 	dfslabel2,
-dfsendlabel dom node is 	dfsendlabel,
-dfslabel1 dom node is 	dfslabel1,	dfslabel4,	dfslabel5,	dfslabel8,	dfslabel7,	dfslabel11,	dfslabel10,	dfslabel14,	dfslabel15,	dfslabel17,	dfslabel16,	dfslabel13,	dfslabel6,
-dfslabel4 dom node is 	dfslabel4,	dfslabel5,	dfslabel8,	dfslabel7,	dfslabel11,	dfslabel10,	dfslabel14,	dfslabel15,	dfslabel17,	dfslabel16,	dfslabel13,	dfslabel6,
-dfslabel5 dom node is 	dfslabel5,	dfslabel8,	dfslabel7,	dfslabel11,	dfslabel10,	dfslabel14,	dfslabel15,	dfslabel17,	dfslabel16,	dfslabel13,
-dfslabel8 dom node is 	dfslabel8,
-dfslabel7 dom node is 	dfslabel7,	dfslabel11,	dfslabel10,	dfslabel14,	dfslabel15,	dfslabel17,	dfslabel16,	dfslabel13,
-dfslabel11 dom node is 	dfslabel11,
-dfslabel10 dom node is 	dfslabel10,	dfslabel14,	dfslabel15,	dfslabel17,	dfslabel16,	dfslabel13,
-dfslabel14 dom node is 	dfslabel14,
-dfslabel15 dom node is 	dfslabel15,	dfslabel17,	dfslabel16,
-dfslabel17 dom node is 	dfslabel17,
-dfslabel16 dom node is 	dfslabel16,
-dfslabel13 dom node is 	dfslabel13,
-dfslabel6 dom node is 	dfslabel6,
-
-打印每个节点的立即支配节点
-idom(dfslabel2) = dfsentry
-idom(dfsendlabel) = dfsentry
-idom(dfslabel1) = dfsentry
-idom(dfslabel4) = dfslabel1
-idom(dfslabel5) = dfslabel4
-idom(dfslabel8) = dfslabel5
-idom(dfslabel7) = dfslabel5
-idom(dfslabel11) = dfslabel7
-idom(dfslabel10) = dfslabel7
-idom(dfslabel14) = dfslabel10
-idom(dfslabel15) = dfslabel10
-idom(dfslabel17) = dfslabel15
-idom(dfslabel16) = dfslabel15
-idom(dfslabel13) = dfslabel10
-idom(dfslabel6) = dfslabel4
-
-打印支配树中的层级关系
-dfsentry: dfslabel2,dfsendlabel,dfslabel1,
-dfslabel1: dfslabel4,
-dfslabel4: dfslabel5,dfslabel6,
-dfslabel6: 
-dfslabel5: dfslabel8,dfslabel7,
-dfslabel7: dfslabel11,dfslabel10,
-dfslabel10: dfslabel14,dfslabel15,dfslabel13,
-dfslabel13: 
-dfslabel15: dfslabel17,dfslabel16,
-dfslabel16: 
-dfslabel17: 
-dfslabel14: 
-dfslabel11: 
-dfslabel8: 
-dfsendlabel: 
-dfslabel2: 
-
-打印每个基本块的支配边界节点
-cur node dfslabel2's dom frontier is dfsendlabel,
-cur node dfsendlabel's dom frontier is 
-cur node dfslabel1's dom frontier is dfsendlabel,
-cur node dfslabel4's dom frontier is dfslabel4,dfsendlabel,
-cur node dfslabel5's dom frontier is dfslabel4,dfsendlabel,
-cur node dfslabel8's dom frontier is dfslabel4,
-cur node dfslabel7's dom frontier is dfslabel4,dfsendlabel,
-cur node dfslabel11's dom frontier is dfslabel4,
-cur node dfslabel10's dom frontier is dfslabel4,dfsendlabel,
-cur node dfslabel14's dom frontier is dfslabel15,
-cur node dfslabel15's dom frontier is dfslabel4,dfsendlabel,
-cur node dfslabel17's dom frontier is dfsendlabel,
-cur node dfslabel16's dom frontier is dfslabel4,
-cur node dfslabel13's dom frontier is dfslabel15,
-cur node dfslabel6's dom frontier is dfsendlabel,
-
+super log!!!!!!!!!!!!!!!!!
 	labelID	number:               opcode 	                     name 	       use
-	dfsentry:
-         	     0:              LabelOP 	                 dfsentry 	      null
-         	     0:           AllocateOP 	                   point6 	      null
-         	     0:           AllocateOP 	                   point5 	      null
-         	     0:           AllocateOP 	                   point4 	      null
-         	     0:           AllocateOP 	                   point3 	      null
-         	     0:           AllocateOP 	                   point2 	      null
-         	     0:           AllocateOP 	                   point1 	      null
-         	     0:              StoreOP 	                   (null) 	    point1,     param0
-         	     0:              StoreOP 	                   (null) 	    point2,     param1
-         	     0:              StoreOP 	                   (null) 	    point3,     param2
-         	     0:               LoadOP 	                   temp10 	    point1
-         	     0:               LoadOP 	                   temp11 	    point2
-         	     0:              EqualOP 	                   temp12 	    temp10,     temp11
-         	     0:  GotoWithConditionOP 	true:dfslabel2  false:dfslabel1 	    temp12
-	dfslabel2:
-         	     0:              LabelOP 	                dfslabel2 	      null
-         	     0:               LoadOP 	                   temp13 	    point3
-         	     0:             ReturnOP 	                   return 	    temp13
-	dfsendlabel:
-         	     0:              LabelOP 	              dfsendlabel 	      null
-         	     0:            PhiFuncOp 	                %phi_var7 	size: 0 
-         	     0:            PhiFuncOp 	                %phi_var4 	size: 0 
-         	     0:            PhiFuncOp 	                %phi_var2 	size: 0 
+	setentry:
+         	     0:              LabelOP 	                 setentry 	      null
+         	     0:           AllocateOP 	                   array2 	      null
+         	     0:           AllocateOP 	                   param0 	      null
+         	     0:      GetelementptrOP 	                   temp10 	    array2,          0
+         	     0:              StoreOP 	                   (null) 	    temp10,          1
+         	     0:      GetelementptrOP 	                   temp11 	    array2,          1
+         	     0:              StoreOP 	                   (null) 	    temp11,          2
+         	     0:      GetelementptrOP 	                   temp15 	    array2,          2
+         	     0:              StoreOP 	                   (null) 	    temp15,          4
+         	     0:      GetelementptrOP 	                   temp19 	    array2,          3
+         	     0:              StoreOP 	                   (null) 	    temp19,          8
+         	     0:      GetelementptrOP 	                   temp23 	    array2,          4
+         	     0:              StoreOP 	                   (null) 	    temp23,         16
+         	     0:      GetelementptrOP 	                   temp27 	    array2,          5
+         	     0:              StoreOP 	                   (null) 	    temp27,         32
+         	     0:      GetelementptrOP 	                   temp31 	    array2,          6
+         	     0:              StoreOP 	                   (null) 	    temp31,         64
+         	     0:      GetelementptrOP 	                   temp35 	    array2,          7
+         	     0:              StoreOP 	                   (null) 	    temp35,        128
+         	     0:      GetelementptrOP 	                   temp39 	    array2,          8
+         	     0:              StoreOP 	                   (null) 	    temp39,        256
+         	     0:      GetelementptrOP 	                   temp43 	    array2,          9
+         	     0:              StoreOP 	                   (null) 	    temp43,        512
+         	     0:      GetelementptrOP 	                   temp47 	    array2,         10
+         	     0:              StoreOP 	                   (null) 	    temp47,       1024
+         	     0:               GotoOP 	           goto setlabel1 	      null
+	setlabel1:
+         	     0:              LabelOP 	                setlabel1 	      null
+         	     0:            PhiFuncOp 	                %phi_var7 	size: 2 	bblock: setlabel2 value: temp54, 	bblock: setentry value: 10, 
+         	     0:           LessThanOP 	                   temp52 	 %phi_var7,         30
+         	     0:  GotoWithConditionOP 	true:setlabel2  false:setlabel3 	    temp52
+	setlabel2:
+         	     0:              LabelOP 	                setlabel2 	      null
+         	     0:                AddOP 	                   temp54 	 %phi_var7,          1
+         	     0:                SubOP 	                   temp58 	    temp54,          1
+         	     0:      GetelementptrOP 	                   temp59 	    array2,     temp58
+         	     0:               LoadOP 	                   temp60 	    temp59
+         	     0:                MulOP 	                   temp61 	    temp60,          2
+         	     0:      GetelementptrOP 	                   temp56 	    array2,     temp54
+         	     0:              StoreOP 	                   (null) 	    temp56,     temp61
+         	     0:               GotoOP 	           goto setlabel1 	      null
+	setlabel3:
+         	     0:              LabelOP 	                setlabel3 	      null
+         	     0:                DivOP 	                   temp63 	    param1,         30
+         	     0:         GreatEqualOP 	                   temp64 	    temp63,      10000
+         	     0:  GotoWithConditionOP 	true:setlabel5  false:setlabel4 	    temp64
+	setlabel5:
+         	     0:              LabelOP 	                setlabel5 	      null
+         	     0:             ReturnOP 	                   return 	         0
+	setendlabel:
+         	     0:              LabelOP 	              setendlabel 	      null
          	     0:            FuncEndOP 	          func_label_end1 	      null
-	dfslabel1:
-         	     0:              LabelOP 	                dfslabel1 	      null
-         	     0:               LoadOP 	                   temp14 	    point1
-         	     0:      GetelementptrOP 	                   temp15 	   global6,     temp14
-         	     0:              StoreOP 	                   (null) 	    temp15,          1
-         	     0:              StoreOP 	                   (null) 	    point4,          0
-         	     0:               GotoOP 	           goto dfslabel4 	      null
-	dfslabel4:
-         	     0:              LabelOP 	                dfslabel4 	      null
-         	     0:            PhiFuncOp 	                %phi_var6 	size: 0 
-         	     0:            PhiFuncOp 	                %phi_var3 	size: 0 
-         	     0:            PhiFuncOp 	                %phi_var1 	size: 0 
-         	     0:               LoadOP 	                   temp16 	    point4
-         	     0:               LoadOP 	                   temp17 	    point1
-         	     0:      GetelementptrOP 	                   temp18 	   global2,     temp17
-         	     0:               LoadOP 	                   temp19 	    temp18
-         	     0:           LessThanOP 	                   temp20 	    temp16,     temp19
-         	     0:  GotoWithConditionOP 	true:dfslabel5  false:dfslabel6 	    temp20
-	dfslabel5:
-         	     0:              LabelOP 	                dfslabel5 	      null
-         	     0:               LoadOP 	                   temp21 	    point1
-         	     0:               LoadOP 	                   temp23 	    point4
-         	     0:      GetelementptrOP 	                   temp22 	   global3,     temp21
-         	     0:      GetelementptrOP 	                   temp24 	    temp22,     temp23
-         	     0:               LoadOP 	                   temp25 	    temp24
-         	     0:      GetelementptrOP 	                   temp26 	   global6,     temp25
-         	     0:               LoadOP 	                   temp27 	    temp26
-         	     0:  GotoWithConditionOP 	true:dfslabel8  false:dfslabel7 	    temp27
-	dfslabel8:
-         	     0:              LabelOP 	                dfslabel8 	      null
-         	     0:               LoadOP 	                   temp28 	    point4
-         	     0:                AddOP 	                   temp29 	    temp28,          1
-         	     0:              StoreOP 	                   (null) 	    point4,     temp29
-         	     0:               GotoOP 	  (continue)br :dfslabel4 	      null
-	dfslabel7:
-         	     0:              LabelOP 	                dfslabel7 	      null
-         	     0:               LoadOP 	                   temp30 	    point1
-         	     0:               LoadOP 	                   temp32 	    point4
-         	     0:      GetelementptrOP 	                   temp31 	   global4,     temp30
-         	     0:      GetelementptrOP 	                   temp33 	    temp31,     temp32
-         	     0:               LoadOP 	                   temp34 	    temp33
-         	     0:          LessEqualOP 	                   temp35 	    temp34,          0
-         	     0:  GotoWithConditionOP 	true:dfslabel11  false:dfslabel10 	    temp35
-	dfslabel11:
-         	     0:              LabelOP 	               dfslabel11 	      null
-         	     0:               LoadOP 	                   temp36 	    point4
-         	     0:                AddOP 	                   temp37 	    temp36,          1
-         	     0:              StoreOP 	                   (null) 	    point4,     temp37
-         	     0:               GotoOP 	  (continue)br :dfslabel4 	      null
-	dfslabel10:
-         	     0:              LabelOP 	               dfslabel10 	      null
-         	     0:               LoadOP 	                   temp38 	    point3
-         	     0:               LoadOP 	                   temp39 	    point1
-         	     0:               LoadOP 	                   temp41 	    point4
-         	     0:      GetelementptrOP 	                   temp40 	   global4,     temp39
-         	     0:      GetelementptrOP 	                   temp42 	    temp40,     temp41
-         	     0:               LoadOP 	                   temp43 	    temp42
-         	     0:           LessThanOP 	                   temp44 	    temp38,     temp43
-         	     0:  GotoWithConditionOP 	true:dfslabel14  false:dfslabel13 	    temp44
-	dfslabel14:
-         	     0:              LabelOP 	               dfslabel14 	      null
-         	     0:               LoadOP 	                   temp45 	    point3
-         	     0:              StoreOP 	                   (null) 	    point5,     temp45
-         	     0:               GotoOP 	          goto dfslabel15 	      null
-	dfslabel15:
-         	     0:              LabelOP 	               dfslabel15 	      null
-         	     0:            PhiFuncOp 	                %phi_var5 	size: 0 
-         	     0:               LoadOP 	                   temp51 	    point1
-         	     0:               LoadOP 	                   temp53 	    point4
-         	     0:      GetelementptrOP 	                   temp52 	   global3,     temp51
-         	     0:      GetelementptrOP 	                   temp54 	    temp52,     temp53
-         	     0:               LoadOP 	                   temp55 	    temp54
-         	     0:               LoadOP 	                   temp56 	    point2
-         	     0:               LoadOP 	                   temp57 	    point5
-         	     0:              ParamOP 	                   param2 	    temp57
-         	     0:              ParamOP 	                   param1 	    temp56
-         	     0:              ParamOP 	                   param0 	    temp55
-         	     0: CallWithReturnValueOP 	                   temp58 	      null
-         	     0:              StoreOP 	                   (null) 	    point6,     temp58
-         	     0:               LoadOP 	                   temp59 	    point6
-         	     0:          GreatThanOP 	                   temp60 	    temp59,          0
-         	     0:  GotoWithConditionOP 	true:dfslabel17  false:dfslabel16 	    temp60
-	dfslabel17:
-         	     0:              LabelOP 	               dfslabel17 	      null
-         	     0:               LoadOP 	                   temp61 	    point1
-         	     0:               LoadOP 	                   temp63 	    point4
-         	     0:               LoadOP 	                   temp65 	    point1
-         	     0:               LoadOP 	                   temp67 	    point4
-         	     0:      GetelementptrOP 	                   temp66 	   global4,     temp65
-         	     0:      GetelementptrOP 	                   temp68 	    temp66,     temp67
-         	     0:               LoadOP 	                   temp69 	    temp68
-         	     0:               LoadOP 	                   temp70 	    point6
-         	     0:                SubOP 	                   temp71 	    temp69,     temp70
-         	     0:      GetelementptrOP 	                   temp62 	   global4,     temp61
-         	     0:      GetelementptrOP 	                   temp64 	    temp62,     temp63
-         	     0:              StoreOP 	                   (null) 	    temp64,     temp71
-         	     0:               LoadOP 	                   temp72 	    point1
-         	     0:               LoadOP 	                   temp74 	    point4
-         	     0:      GetelementptrOP 	                   temp73 	   global3,     temp72
-         	     0:      GetelementptrOP 	                   temp75 	    temp73,     temp74
-         	     0:               LoadOP 	                   temp76 	    temp75
-         	     0:               LoadOP 	                   temp78 	    point1
-         	     0:               LoadOP 	                   temp80 	    point4
-         	     0:      GetelementptrOP 	                   temp79 	   global5,     temp78
-         	     0:      GetelementptrOP 	                   temp81 	    temp79,     temp80
-         	     0:               LoadOP 	                   temp82 	    temp81
-         	     0:               LoadOP 	                   temp84 	    point1
-         	     0:               LoadOP 	                   temp86 	    point4
-         	     0:      GetelementptrOP 	                   temp85 	   global3,     temp84
-         	     0:      GetelementptrOP 	                   temp87 	    temp85,     temp86
-         	     0:               LoadOP 	                   temp88 	    temp87
-         	     0:               LoadOP 	                   temp90 	    point1
-         	     0:               LoadOP 	                   temp92 	    point4
-         	     0:      GetelementptrOP 	                   temp91 	   global5,     temp90
-         	     0:      GetelementptrOP 	                   temp93 	    temp91,     temp92
-         	     0:               LoadOP 	                   temp94 	    temp93
-         	     0:      GetelementptrOP 	                   temp89 	   global4,     temp88
-         	     0:      GetelementptrOP 	                   temp95 	    temp89,     temp94
-         	     0:               LoadOP 	                   temp96 	    temp95
-         	     0:               LoadOP 	                   temp97 	    point6
-         	     0:                AddOP 	                   temp98 	    temp96,     temp97
-         	     0:      GetelementptrOP 	                   temp77 	   global4,     temp76
-         	     0:      GetelementptrOP 	                   temp83 	    temp77,     temp82
-         	     0:              StoreOP 	                   (null) 	    temp83,     temp98
-         	     0:               LoadOP 	                   temp99 	    point6
-         	     0:             ReturnOP 	                   return 	    temp99
-	dfslabel16:
-         	     0:              LabelOP 	               dfslabel16 	      null
-         	     0:               LoadOP 	                  temp100 	    point4
-         	     0:                AddOP 	                  temp101 	   temp100,          1
-         	     0:              StoreOP 	                   (null) 	    point4,    temp101
-         	     0:               GotoOP 	           goto dfslabel4 	      null
-	dfslabel13:
-         	     0:              LabelOP 	               dfslabel13 	      null
-         	     0:               LoadOP 	                   temp46 	    point1
-         	     0:               LoadOP 	                   temp48 	    point4
-         	     0:      GetelementptrOP 	                   temp47 	   global4,     temp46
-         	     0:      GetelementptrOP 	                   temp49 	    temp47,     temp48
-         	     0:               LoadOP 	                   temp50 	    temp49
-         	     0:              StoreOP 	                   (null) 	    point5,     temp50
-         	     0:               GotoOP 	          goto dfslabel15 	      null
-	dfslabel6:
-         	     0:              LabelOP 	                dfslabel6 	      null
+	setlabel4:
+         	     0:              LabelOP 	                setlabel4 	      null
+         	     0:                DivOP 	                   temp66 	    param1,         30
+         	     0:      GetelementptrOP 	                   temp67 	    param0,     temp66
+         	     0:               LoadOP 	                   temp68 	    temp67
+         	     0:                ModOP 	                   temp70 	    param1,         30
+         	     0:      GetelementptrOP 	                   temp71 	    array2,     temp70
+         	     0:               LoadOP 	                   temp72 	    temp71
+         	     0:                DivOP 	                   temp73 	    temp68,     temp72
+         	     0:                ModOP 	                   temp74 	    temp73,          2
+         	     0:           NotEqualOP 	                   temp76 	    temp74,     param2
+         	     0:  GotoWithConditionOP 	true:setlabel8  false:setlabel7 	    temp76
+	setlabel8:
+         	     0:              LabelOP 	                setlabel8 	      null
+         	     0:                DivOP 	                   temp78 	    param1,         30
+         	     0:      GetelementptrOP 	                   temp79 	    param0,     temp78
+         	     0:               LoadOP 	                   temp80 	    temp79
+         	     0:                ModOP 	                   temp82 	    param1,         30
+         	     0:      GetelementptrOP 	                   temp83 	    array2,     temp82
+         	     0:               LoadOP 	                   temp84 	    temp83
+         	     0:                DivOP 	                   temp85 	    temp80,     temp84
+         	     0:                ModOP 	                   temp86 	    temp85,          2
+         	     0:              EqualOP 	                   temp87 	    temp86,          0
+         	     0:  GotoWithConditionOP 	true:setlabel10  false:setlabel9 	    temp87
+	setlabel10:
+         	     0:              LabelOP 	               setlabel10 	      null
+         	     0:              EqualOP 	                   temp89 	    param2,          1
+         	     0:  GotoWithConditionOP 	true:setlabel12  false:setlabel11 	    temp89
+	setlabel12:
+         	     0:              LabelOP 	               setlabel12 	      null
+         	     0:                ModOP 	                   temp91 	    param1,         30
+         	     0:      GetelementptrOP 	                   temp92 	    array2,     temp91
+         	     0:               LoadOP 	                   temp93 	    temp92
+         	     0:               GotoOP 	          goto setlabel11 	      null
+	setlabel11:
+         	     0:              LabelOP 	               setlabel11 	      null
+         	     0:            PhiFuncOp 	                %phi_var3 	size: 2 	bblock: setlabel10 value: 0, 	bblock: setlabel12 value: temp93, 
+         	     0:               GotoOP 	           goto setlabel9 	      null
+	setlabel9:
+         	     0:              LabelOP 	                setlabel9 	      null
+         	     0:            PhiFuncOp 	                %phi_var2 	size: 2 	bblock: setlabel8 value: 0, 	bblock: setlabel11 value: %phi_var3, 
+         	     0:                DivOP 	                   temp95 	    param1,         30
+         	     0:      GetelementptrOP 	                   temp96 	    param0,     temp95
+         	     0:               LoadOP 	                   temp97 	    temp96
+         	     0:                ModOP 	                   temp99 	    param1,         30
+         	     0:      GetelementptrOP 	                  temp100 	    array2,     temp99
+         	     0:               LoadOP 	                  temp101 	   temp100
+         	     0:                DivOP 	                  temp102 	    temp97,    temp101
+         	     0:                ModOP 	                  temp103 	   temp102,          2
+         	     0:              EqualOP 	                  temp104 	   temp103,          1
+         	     0:  GotoWithConditionOP 	true:setlabel16  false:setlabel15 	   temp104
+	setlabel16:
+         	     0:              LabelOP 	               setlabel16 	      null
+         	     0:              EqualOP 	                  temp106 	    param2,          0
+         	     0:  GotoWithConditionOP 	true:setlabel18  false:setlabel17 	   temp106
+	setlabel18:
+         	     0:              LabelOP 	               setlabel18 	      null
+         	     0:                ModOP 	                  temp109 	    param1,         30
+         	     0:      GetelementptrOP 	                  temp110 	    array2,    temp109
+         	     0:               LoadOP 	                  temp111 	   temp110
+         	     0:                SubOP 	                  temp112 	 %phi_var2,    temp111
+         	     0:               GotoOP 	          goto setlabel17 	      null
+	setlabel17:
+         	     0:              LabelOP 	               setlabel17 	      null
+         	     0:            PhiFuncOp 	                %phi_var5 	size: 2 	bblock: setlabel16 value: %phi_var2, 	bblock: setlabel18 value: temp112, 
+         	     0:               GotoOP 	          goto setlabel15 	      null
+	setlabel15:
+         	     0:              LabelOP 	               setlabel15 	      null
+         	     0:            PhiFuncOp 	                %phi_var4 	size: 2 	bblock: setlabel9 value: %phi_var2, 	bblock: setlabel17 value: %phi_var5, 
+         	     0:               GotoOP 	           goto setlabel7 	      null
+	setlabel7:
+         	     0:              LabelOP 	                setlabel7 	      null
+         	     0:            PhiFuncOp 	                %phi_var1 	size: 2 	bblock: setlabel4 value: 0, 	bblock: setlabel15 value: %phi_var4, 
+         	     0:                DivOP 	                  temp114 	    param1,         30
+         	     0:                DivOP 	                  temp117 	    param1,         30
+         	     0:      GetelementptrOP 	                  temp118 	    param0,    temp117
+         	     0:               LoadOP 	                  temp119 	   temp118
+         	     0:                AddOP 	                  temp121 	   temp119,  %phi_var1
+         	     0:      GetelementptrOP 	                  temp115 	    param0,    temp114
+         	     0:              StoreOP 	                   (null) 	   temp115,    temp121
          	     0:             ReturnOP 	                   return 	         0
 
-
-begin rename pass and delete alloca,store,load instruction!
-rename pass over
-delete alloca,store,load instruction over
-before optimization log!!!!!!!!!!!!!!!!!
-	labelID	number:               opcode 	                     name 	       use
-	dfsentry:
-         	     0:              LabelOP 	                 dfsentry 	      null
-         	     0:              EqualOP 	                   temp12 	    param0,     param1
-         	     0:  GotoWithConditionOP 	true:dfslabel2  false:dfslabel1 	    temp12
-	dfslabel2:
-         	     0:              LabelOP 	                dfslabel2 	      null
-         	     0:             ReturnOP 	                   return 	    param2
-	dfsendlabel:
-         	     0:              LabelOP 	              dfsendlabel 	      null
-         	     0:            PhiFuncOp 	                %phi_var7 	size: 3 	bblock: dfslabel2 value: 0, 	bblock: dfslabel6 value: %phi_var6, 	bblock: dfslabel17 value: %phi_var6, 
-         	     0:            PhiFuncOp 	                %phi_var4 	size: 3 	bblock: dfslabel2 value: 0, 	bblock: dfslabel6 value: %phi_var3, 	bblock: dfslabel17 value: %phi_var5, 
-         	     0:            PhiFuncOp 	                %phi_var2 	size: 3 	bblock: dfslabel2 value: 0, 	bblock: dfslabel6 value: %phi_var1, 	bblock: dfslabel17 value: temp58, 
-         	     0:            FuncEndOP 	          func_label_end1 	      null
-	dfslabel1:
-         	     0:              LabelOP 	                dfslabel1 	      null
-         	     0:      GetelementptrOP 	                   temp15 	   global6,     param0
-         	     0:              StoreOP 	                   (null) 	    temp15,          1
-         	     0:               GotoOP 	           goto dfslabel4 	      null
-	dfslabel4:
-         	     0:              LabelOP 	                dfslabel4 	      null
-         	     0:            PhiFuncOp 	                %phi_var6 	size: 4 	bblock: dfslabel1 value: 0, 	bblock: dfslabel8 value: temp29, 	bblock: dfslabel11 value: temp37, 	bblock: dfslabel16 value: temp101, 
-         	     0:            PhiFuncOp 	                %phi_var3 	size: 4 	bblock: dfslabel1 value: 0, 	bblock: dfslabel8 value: %phi_var3, 	bblock: dfslabel11 value: %phi_var3, 	bblock: dfslabel16 value: %phi_var5, 
-         	     0:            PhiFuncOp 	                %phi_var1 	size: 4 	bblock: dfslabel1 value: 0, 	bblock: dfslabel8 value: %phi_var1, 	bblock: dfslabel11 value: %phi_var1, 	bblock: dfslabel16 value: temp58, 
-         	     0:      GetelementptrOP 	                   temp18 	   global2,     param0
-         	     0:               LoadOP 	                   temp19 	    temp18
-         	     0:           LessThanOP 	                   temp20 	 %phi_var6,     temp19
-         	     0:  GotoWithConditionOP 	true:dfslabel5  false:dfslabel6 	    temp20
-	dfslabel5:
-         	     0:              LabelOP 	                dfslabel5 	      null
-         	     0:      GetelementptrOP 	                   temp22 	   global3,     param0
-         	     0:      GetelementptrOP 	                   temp24 	    temp22,  %phi_var6
-         	     0:               LoadOP 	                   temp25 	    temp24
-         	     0:      GetelementptrOP 	                   temp26 	   global6,     temp25
-         	     0:               LoadOP 	                   temp27 	    temp26
-         	     0:  GotoWithConditionOP 	true:dfslabel8  false:dfslabel7 	    temp27
-	dfslabel8:
-         	     0:              LabelOP 	                dfslabel8 	      null
-         	     0:                AddOP 	                   temp29 	 %phi_var6,          1
-         	     0:               GotoOP 	  (continue)br :dfslabel4 	      null
-	dfslabel7:
-         	     0:              LabelOP 	                dfslabel7 	      null
-         	     0:      GetelementptrOP 	                   temp31 	   global4,     param0
-         	     0:      GetelementptrOP 	                   temp33 	    temp31,  %phi_var6
-         	     0:               LoadOP 	                   temp34 	    temp33
-         	     0:          LessEqualOP 	                   temp35 	    temp34,          0
-         	     0:  GotoWithConditionOP 	true:dfslabel11  false:dfslabel10 	    temp35
-	dfslabel11:
-         	     0:              LabelOP 	               dfslabel11 	      null
-         	     0:                AddOP 	                   temp37 	 %phi_var6,          1
-         	     0:               GotoOP 	  (continue)br :dfslabel4 	      null
-	dfslabel10:
-         	     0:              LabelOP 	               dfslabel10 	      null
-         	     0:      GetelementptrOP 	                   temp40 	   global4,     param0
-         	     0:      GetelementptrOP 	                   temp42 	    temp40,  %phi_var6
-         	     0:               LoadOP 	                   temp43 	    temp42
-         	     0:           LessThanOP 	                   temp44 	    param2,     temp43
-         	     0:  GotoWithConditionOP 	true:dfslabel14  false:dfslabel13 	    temp44
-	dfslabel14:
-         	     0:              LabelOP 	               dfslabel14 	      null
-         	     0:               GotoOP 	          goto dfslabel15 	      null
-	dfslabel15:
-         	     0:              LabelOP 	               dfslabel15 	      null
-         	     0:            PhiFuncOp 	                %phi_var5 	size: 2 	bblock: dfslabel13 value: temp50, 	bblock: dfslabel14 value: param2, 
-         	     0:      GetelementptrOP 	                   temp52 	   global3,     param0
-         	     0:      GetelementptrOP 	                   temp54 	    temp52,  %phi_var6
-         	     0:               LoadOP 	                   temp55 	    temp54
-         	     0:              ParamOP 	                   param2 	 %phi_var5
-         	     0:              ParamOP 	                   param1 	    param1
-         	     0:              ParamOP 	                   param0 	    temp55
-         	     0: CallWithReturnValueOP 	                   temp58 	      null
-         	     0:          GreatThanOP 	                   temp60 	    temp58,          0
-         	     0:  GotoWithConditionOP 	true:dfslabel17  false:dfslabel16 	    temp60
-	dfslabel17:
-         	     0:              LabelOP 	               dfslabel17 	      null
-         	     0:      GetelementptrOP 	                   temp66 	   global4,     param0
-         	     0:      GetelementptrOP 	                   temp68 	    temp66,  %phi_var6
-         	     0:               LoadOP 	                   temp69 	    temp68
-         	     0:                SubOP 	                   temp71 	    temp69,     temp58
-         	     0:      GetelementptrOP 	                   temp62 	   global4,     param0
-         	     0:      GetelementptrOP 	                   temp64 	    temp62,  %phi_var6
-         	     0:              StoreOP 	                   (null) 	    temp64,     temp71
-         	     0:      GetelementptrOP 	                   temp73 	   global3,     param0
-         	     0:      GetelementptrOP 	                   temp75 	    temp73,  %phi_var6
-         	     0:               LoadOP 	                   temp76 	    temp75
-         	     0:      GetelementptrOP 	                   temp79 	   global5,     param0
-         	     0:      GetelementptrOP 	                   temp81 	    temp79,  %phi_var6
-         	     0:               LoadOP 	                   temp82 	    temp81
-         	     0:      GetelementptrOP 	                   temp85 	   global3,     param0
-         	     0:      GetelementptrOP 	                   temp87 	    temp85,  %phi_var6
-         	     0:               LoadOP 	                   temp88 	    temp87
-         	     0:      GetelementptrOP 	                   temp91 	   global5,     param0
-         	     0:      GetelementptrOP 	                   temp93 	    temp91,  %phi_var6
-         	     0:               LoadOP 	                   temp94 	    temp93
-         	     0:      GetelementptrOP 	                   temp89 	   global4,     temp88
-         	     0:      GetelementptrOP 	                   temp95 	    temp89,     temp94
-         	     0:               LoadOP 	                   temp96 	    temp95
-         	     0:                AddOP 	                   temp98 	    temp96,     temp58
-         	     0:      GetelementptrOP 	                   temp77 	   global4,     temp76
-         	     0:      GetelementptrOP 	                   temp83 	    temp77,     temp82
-         	     0:              StoreOP 	                   (null) 	    temp83,     temp98
-         	     0:             ReturnOP 	                   return 	    temp58
-	dfslabel16:
-         	     0:              LabelOP 	               dfslabel16 	      null
-         	     0:                AddOP 	                  temp101 	 %phi_var6,          1
-         	     0:               GotoOP 	           goto dfslabel4 	      null
-	dfslabel13:
-         	     0:              LabelOP 	               dfslabel13 	      null
-         	     0:      GetelementptrOP 	                   temp47 	   global4,     param0
-         	     0:      GetelementptrOP 	                   temp49 	    temp47,  %phi_var6
-         	     0:               LoadOP 	                   temp50 	    temp49
-         	     0:               GotoOP 	          goto dfslabel15 	      null
-	dfslabel6:
-         	     0:              LabelOP 	                dfslabel6 	      null
-         	     0:             ReturnOP 	                   return 	         0
 
 
 super log!!!!!!!!!!!!!!!!!
 	labelID	number:               opcode 	                     name 	       use
-	dfsentry:
-         	     0:              LabelOP 	                 dfsentry 	      null
-         	     0:              EqualOP 	                   temp12 	    param0,     param1
-         	     0:  GotoWithConditionOP 	true:dfslabel2  false:dfslabel1 	    temp12
-	dfslabel2:
-         	     0:              LabelOP 	                dfslabel2 	      null
-         	     0:             ReturnOP 	                   return 	    param2
-	dfsendlabel:
-         	     0:              LabelOP 	              dfsendlabel 	      null
-         	     0:            PhiFuncOp 	                %phi_var7 	size: 3 	bblock: dfslabel2 value: 0, 	bblock: dfslabel6 value: %phi_var6, 	bblock: dfslabel17 value: %phi_var6, 
-         	     0:            PhiFuncOp 	                %phi_var4 	size: 3 	bblock: dfslabel2 value: 0, 	bblock: dfslabel6 value: %phi_var3, 	bblock: dfslabel17 value: %phi_var5, 
-         	     0:            PhiFuncOp 	                %phi_var2 	size: 3 	bblock: dfslabel2 value: 0, 	bblock: dfslabel6 value: %phi_var1, 	bblock: dfslabel17 value: temp58, 
-         	     0:            FuncEndOP 	          func_label_end1 	      null
-	dfslabel1:
-         	     0:              LabelOP 	                dfslabel1 	      null
-         	     0:      GetelementptrOP 	                   temp15 	   global6,     param0
-         	     0:              StoreOP 	                   (null) 	    temp15,          1
-         	     0:               GotoOP 	           goto dfslabel4 	      null
-	dfslabel4:
-         	     0:              LabelOP 	                dfslabel4 	      null
-         	     0:            PhiFuncOp 	                %phi_var6 	size: 4 	bblock: dfslabel1 value: 0, 	bblock: dfslabel8 value: temp29, 	bblock: dfslabel11 value: temp37, 	bblock: dfslabel16 value: temp101, 
-         	     0:            PhiFuncOp 	                %phi_var3 	size: 4 	bblock: dfslabel1 value: 0, 	bblock: dfslabel8 value: %phi_var3, 	bblock: dfslabel11 value: %phi_var3, 	bblock: dfslabel16 value: %phi_var5, 
-         	     0:            PhiFuncOp 	                %phi_var1 	size: 4 	bblock: dfslabel1 value: 0, 	bblock: dfslabel8 value: %phi_var1, 	bblock: dfslabel11 value: %phi_var1, 	bblock: dfslabel16 value: temp58, 
-         	     0:      GetelementptrOP 	                   temp18 	   global2,     param0
-         	     0:               LoadOP 	                   temp19 	    temp18
-         	     0:           LessThanOP 	                   temp20 	 %phi_var6,     temp19
-         	     0:  GotoWithConditionOP 	true:dfslabel5  false:dfslabel6 	    temp20
-	dfslabel5:
-         	     0:              LabelOP 	                dfslabel5 	      null
-         	     0:      GetelementptrOP 	                   temp22 	   global3,     param0
-         	     0:      GetelementptrOP 	                   temp24 	    temp22,  %phi_var6
-         	     0:               LoadOP 	                   temp25 	    temp24
-         	     0:      GetelementptrOP 	                   temp26 	   global6,     temp25
-         	     0:               LoadOP 	                   temp27 	    temp26
-         	     0:  GotoWithConditionOP 	true:dfslabel8  false:dfslabel7 	    temp27
-	dfslabel8:
-         	     0:              LabelOP 	                dfslabel8 	      null
-         	     0:                AddOP 	                   temp29 	 %phi_var6,          1
-         	     0:               GotoOP 	  (continue)br :dfslabel4 	      null
-	dfslabel7:
-         	     0:              LabelOP 	                dfslabel7 	      null
-         	     0:      GetelementptrOP 	                   temp31 	   global4,     param0
-         	     0:      GetelementptrOP 	                   temp33 	    temp31,  %phi_var6
-         	     0:               LoadOP 	                   temp34 	    temp33
-         	     0:          LessEqualOP 	                   temp35 	    temp34,          0
-         	     0:  GotoWithConditionOP 	true:dfslabel11  false:dfslabel10 	    temp35
-	dfslabel11:
-         	     0:              LabelOP 	               dfslabel11 	      null
-         	     0:                AddOP 	                   temp37 	 %phi_var6,          1
-         	     0:               GotoOP 	  (continue)br :dfslabel4 	      null
-	dfslabel10:
-         	     0:              LabelOP 	               dfslabel10 	      null
-         	     0:      GetelementptrOP 	                   temp40 	   global4,     param0
-         	     0:      GetelementptrOP 	                   temp42 	    temp40,  %phi_var6
-         	     0:               LoadOP 	                   temp43 	    temp42
-         	     0:           LessThanOP 	                   temp44 	    param2,     temp43
-         	     0:  GotoWithConditionOP 	true:dfslabel14  false:dfslabel13 	    temp44
-	dfslabel14:
-         	     0:              LabelOP 	               dfslabel14 	      null
-         	     0:               GotoOP 	          goto dfslabel15 	      null
-	dfslabel15:
-         	     0:              LabelOP 	               dfslabel15 	      null
-         	     0:            PhiFuncOp 	                %phi_var5 	size: 2 	bblock: dfslabel13 value: temp50, 	bblock: dfslabel14 value: param2, 
-         	     0:      GetelementptrOP 	                   temp52 	   global3,     param0
-         	     0:      GetelementptrOP 	                   temp54 	    temp52,  %phi_var6
-         	     0:               LoadOP 	                   temp55 	    temp54
-         	     0:              ParamOP 	                   param2 	 %phi_var5
-         	     0:              ParamOP 	                   param1 	    param1
-         	     0:              ParamOP 	                   param0 	    temp55
-         	     0: CallWithReturnValueOP 	                   temp58 	      null
-         	     0:          GreatThanOP 	                   temp60 	    temp58,          0
-         	     0:  GotoWithConditionOP 	true:dfslabel17  false:dfslabel16 	    temp60
-	dfslabel17:
-         	     0:              LabelOP 	               dfslabel17 	      null
-         	     0:      GetelementptrOP 	                   temp66 	   global4,     param0
-         	     0:      GetelementptrOP 	                   temp68 	    temp66,  %phi_var6
-         	     0:               LoadOP 	                   temp69 	    temp68
-         	     0:                SubOP 	                   temp71 	    temp69,     temp58
-         	     0:      GetelementptrOP 	                   temp62 	   global4,     param0
-         	     0:      GetelementptrOP 	                   temp64 	    temp62,  %phi_var6
-         	     0:              StoreOP 	                   (null) 	    temp64,     temp71
-         	     0:      GetelementptrOP 	                   temp73 	   global3,     param0
-         	     0:      GetelementptrOP 	                   temp75 	    temp73,  %phi_var6
-         	     0:               LoadOP 	                   temp76 	    temp75
-         	     0:      GetelementptrOP 	                   temp79 	   global5,     param0
-         	     0:      GetelementptrOP 	                   temp81 	    temp79,  %phi_var6
-         	     0:               LoadOP 	                   temp82 	    temp81
-         	     0:      GetelementptrOP 	                   temp85 	   global3,     param0
-         	     0:      GetelementptrOP 	                   temp87 	    temp85,  %phi_var6
-         	     0:               LoadOP 	                   temp88 	    temp87
-         	     0:      GetelementptrOP 	                   temp91 	   global5,     param0
-         	     0:      GetelementptrOP 	                   temp93 	    temp91,  %phi_var6
-         	     0:               LoadOP 	                   temp94 	    temp93
-         	     0:      GetelementptrOP 	                   temp89 	   global4,     temp88
-         	     0:      GetelementptrOP 	                   temp95 	    temp89,     temp94
-         	     0:               LoadOP 	                   temp96 	    temp95
-         	     0:                AddOP 	                   temp98 	    temp96,     temp58
-         	     0:      GetelementptrOP 	                   temp77 	   global4,     temp76
-         	     0:      GetelementptrOP 	                   temp83 	    temp77,     temp82
-         	     0:              StoreOP 	                   (null) 	    temp83,     temp98
-         	     0:             ReturnOP 	                   return 	    temp58
-	dfslabel16:
-         	     0:              LabelOP 	               dfslabel16 	      null
-         	     0:                AddOP 	                  temp101 	 %phi_var6,          1
-         	     0:               GotoOP 	           goto dfslabel4 	      null
-	dfslabel13:
-         	     0:              LabelOP 	               dfslabel13 	      null
-         	     0:      GetelementptrOP 	                   temp47 	   global4,     param0
-         	     0:      GetelementptrOP 	                   temp49 	    temp47,  %phi_var6
-         	     0:               LoadOP 	                   temp50 	    temp49
-         	     0:               GotoOP 	          goto dfslabel15 	      null
-	dfslabel6:
-         	     0:              LabelOP 	                dfslabel6 	      null
-         	     0:             ReturnOP 	                   return 	         0
-
-
-performance is over!!!!!!!
-performance is over!!!!!!!
-performance is over!!!!!!!
-performance is over!!!!!!!
+	randentry:
+         	     0:              LabelOP 	                randentry 	      null
+         	     0:               LoadOP 	                  temp122 	   global2
+         	     0:      GetelementptrOP 	                  temp123 	   global1,          0
+         	     0:               LoadOP 	                  temp124 	   temp123
+         	     0:                MulOP 	                  temp125 	   temp122,    temp124
+         	     0:      GetelementptrOP 	                  temp126 	   global1,          1
+         	     0:               LoadOP 	                  temp127 	   temp126
+         	     0:                AddOP 	                  temp128 	   temp125,    temp127
+         	     0:              StoreOP 	                   (null) 	   global2,    temp128
+         	     0:               LoadOP 	                  temp129 	   global2
+         	     0:      GetelementptrOP 	                  temp130 	   global1,          2
+         	     0:               LoadOP 	                  temp131 	   temp130
+         	     0:                ModOP 	                  temp132 	   temp129,    temp131
+         	     0:              StoreOP 	                   (null) 	   global2,    temp132
+         	     0:               LoadOP 	                  temp133 	   global2
+         	     0:           LessThanOP 	                  temp134 	   temp133,          0
+         	     0:  GotoWithConditionOP 	true:randlabel23  false:randlabel22 	   temp134
+	randlabel23:
+         	     0:              LabelOP 	              randlabel23 	      null
+         	     0:      GetelementptrOP 	                  temp135 	   global1,          2
+         	     0:               LoadOP 	                  temp136 	   temp135
+         	     0:               LoadOP 	                  temp137 	   global2
+         	     0:                AddOP 	                  temp138 	   temp136,    temp137
+         	     0:              StoreOP 	                   (null) 	   global2,    temp138
+         	     0:               GotoOP 	         goto randlabel22 	      null
+	randlabel22:
+         	     0:              LabelOP 	              randlabel22 	      null
+         	     0:               LoadOP 	                  temp139 	   global2
+         	     0:             ReturnOP 	                   return 	   temp139
+	randendlabel:
+         	     0:              LabelOP 	             randendlabel 	      null
+         	     0:            FuncEndOP 	          func_label_end2 	      null
 
 
 
+super log!!!!!!!!!!!!!!!!!
 	labelID	number:               opcode 	                     name 	       use
-	dfsentry:
-         	     0:              LabelOP 	                 dfsentry 	      null
-         	     0:              EqualOP 	                   temp12 	    param0,     param1
-         	     0:  GotoWithConditionOP 	true:dfslabel2  false:dfslabel1 	    temp12
-	dfslabel2:
-         	     0:              LabelOP 	                dfslabel2 	      null
-         	     0:             AssignOP 	                %phi_var7 	         0
-         	     0:             AssignOP 	                %phi_var4 	 %phi_var7
-         	     0:             AssignOP 	                %phi_var2 	 %phi_var4
-         	     0:             ReturnOP 	                   return 	    param2
-	dfsendlabel:
-         	     0:              LabelOP 	              dfsendlabel 	      null
-         	     0:            FuncEndOP 	          func_label_end1 	      null
-	dfslabel1:
-         	     0:              LabelOP 	                dfslabel1 	      null
-         	     0:      GetelementptrOP 	                   temp15 	   global6,     param0
-         	     0:              StoreOP 	                   (null) 	    temp15,          1
-         	     0:             AssignOP 	                %phi_var6 	         0
-         	     0:             AssignOP 	                %phi_var3 	 %phi_var6
-         	     0:             AssignOP 	                %phi_var1 	 %phi_var3
-         	     0:               GotoOP 	           goto dfslabel4 	      null
-	dfslabel4:
-         	     0:              LabelOP 	                dfslabel4 	      null
-         	     0:      GetelementptrOP 	                   temp18 	   global2,     param0
-         	     0:               LoadOP 	                   temp19 	    temp18
-         	     0:           LessThanOP 	                   temp20 	 %phi_var6,     temp19
-         	     0:  GotoWithConditionOP 	true:dfslabel5  false:dfslabel6 	    temp20
-	dfslabel5:
-         	     0:              LabelOP 	                dfslabel5 	      null
-         	     0:      GetelementptrOP 	                   temp22 	   global3,     param0
-         	     0:      GetelementptrOP 	                   temp24 	    temp22,  %phi_var6
-         	     0:               LoadOP 	                   temp25 	    temp24
-         	     0:      GetelementptrOP 	                   temp26 	   global6,     temp25
-         	     0:               LoadOP 	                   temp27 	    temp26
-         	     0:  GotoWithConditionOP 	true:dfslabel8  false:dfslabel7 	    temp27
-	dfslabel8:
-         	     0:              LabelOP 	                dfslabel8 	      null
-         	     0:                AddOP 	                   temp29 	 %phi_var6,          1
-         	     0:             AssignOP 	                %phi_var6 	    temp29
-         	     0:             AssignOP 	                phi_temp1 	 %phi_var1
-         	     0:             AssignOP 	                %phi_var1 	 phi_temp1
-         	     0:             AssignOP 	                phi_temp2 	 %phi_var3
-         	     0:             AssignOP 	                %phi_var3 	 phi_temp2
-         	     0:               GotoOP 	  (continue)br :dfslabel4 	      null
-	dfslabel7:
-         	     0:              LabelOP 	                dfslabel7 	      null
-         	     0:      GetelementptrOP 	                   temp31 	   global4,     param0
-         	     0:      GetelementptrOP 	                   temp33 	    temp31,  %phi_var6
-         	     0:               LoadOP 	                   temp34 	    temp33
-         	     0:          LessEqualOP 	                   temp35 	    temp34,          0
-         	     0:  GotoWithConditionOP 	true:dfslabel11  false:dfslabel10 	    temp35
-	dfslabel11:
-         	     0:              LabelOP 	               dfslabel11 	      null
-         	     0:                AddOP 	                   temp37 	 %phi_var6,          1
-         	     0:             AssignOP 	                %phi_var6 	    temp37
-         	     0:             AssignOP 	                phi_temp3 	 %phi_var1
-         	     0:             AssignOP 	                %phi_var1 	 phi_temp3
-         	     0:             AssignOP 	                phi_temp4 	 %phi_var3
-         	     0:             AssignOP 	                %phi_var3 	 phi_temp4
-         	     0:               GotoOP 	  (continue)br :dfslabel4 	      null
-	dfslabel10:
-         	     0:              LabelOP 	               dfslabel10 	      null
-         	     0:      GetelementptrOP 	                   temp40 	   global4,     param0
-         	     0:      GetelementptrOP 	                   temp42 	    temp40,  %phi_var6
-         	     0:               LoadOP 	                   temp43 	    temp42
-         	     0:           LessThanOP 	                   temp44 	    param2,     temp43
-         	     0:  GotoWithConditionOP 	true:dfslabel14  false:dfslabel13 	    temp44
-	dfslabel14:
-         	     0:              LabelOP 	               dfslabel14 	      null
-         	     0:             AssignOP 	                %phi_var5 	    param2
-         	     0:               GotoOP 	          goto dfslabel15 	      null
-	dfslabel15:
-         	     0:              LabelOP 	               dfslabel15 	      null
-         	     0:      GetelementptrOP 	                   temp52 	   global3,     param0
-         	     0:      GetelementptrOP 	                   temp54 	    temp52,  %phi_var6
-         	     0:               LoadOP 	                   temp55 	    temp54
-         	     0:              ParamOP 	                   param2 	 %phi_var5
-         	     0:              ParamOP 	                   param1 	    param1
-         	     0:              ParamOP 	                   param0 	    temp55
-         	     0: CallWithReturnValueOP 	                   temp58 	      null
-         	     0:          GreatThanOP 	                   temp60 	    temp58,          0
-         	     0:  GotoWithConditionOP 	true:dfslabel17  false:dfslabel16 	    temp60
-	dfslabel17:
-         	     0:              LabelOP 	               dfslabel17 	      null
-         	     0:      GetelementptrOP 	                   temp66 	   global4,     param0
-         	     0:      GetelementptrOP 	                   temp68 	    temp66,  %phi_var6
-         	     0:               LoadOP 	                   temp69 	    temp68
-         	     0:                SubOP 	                   temp71 	    temp69,     temp58
-         	     0:      GetelementptrOP 	                   temp62 	   global4,     param0
-         	     0:      GetelementptrOP 	                   temp64 	    temp62,  %phi_var6
-         	     0:              StoreOP 	                   (null) 	    temp64,     temp71
-         	     0:      GetelementptrOP 	                   temp73 	   global3,     param0
-         	     0:      GetelementptrOP 	                   temp75 	    temp73,  %phi_var6
-         	     0:               LoadOP 	                   temp76 	    temp75
-         	     0:      GetelementptrOP 	                   temp79 	   global5,     param0
-         	     0:      GetelementptrOP 	                   temp81 	    temp79,  %phi_var6
-         	     0:               LoadOP 	                   temp82 	    temp81
-         	     0:      GetelementptrOP 	                   temp85 	   global3,     param0
-         	     0:      GetelementptrOP 	                   temp87 	    temp85,  %phi_var6
-         	     0:               LoadOP 	                   temp88 	    temp87
-         	     0:      GetelementptrOP 	                   temp91 	   global5,     param0
-         	     0:      GetelementptrOP 	                   temp93 	    temp91,  %phi_var6
-         	     0:               LoadOP 	                   temp94 	    temp93
-         	     0:      GetelementptrOP 	                   temp89 	   global4,     temp88
-         	     0:      GetelementptrOP 	                   temp95 	    temp89,     temp94
-         	     0:               LoadOP 	                   temp96 	    temp95
-         	     0:                AddOP 	                   temp98 	    temp96,     temp58
-         	     0:      GetelementptrOP 	                   temp77 	   global4,     temp76
-         	     0:      GetelementptrOP 	                   temp83 	    temp77,     temp82
-         	     0:              StoreOP 	                   (null) 	    temp83,     temp98
-         	     0:             AssignOP 	                %phi_var4 	 %phi_var5
-         	     0:             AssignOP 	                %phi_var7 	 %phi_var6
-         	     0:             AssignOP 	                %phi_var2 	    temp58
-         	     0:             ReturnOP 	                   return 	    temp58
-	dfslabel16:
-         	     0:              LabelOP 	               dfslabel16 	      null
-         	     0:                AddOP 	                  temp101 	 %phi_var6,          1
-         	     0:             AssignOP 	                %phi_var6 	   temp101
-         	     0:             AssignOP 	                %phi_var3 	 %phi_var5
-         	     0:             AssignOP 	                %phi_var1 	    temp58
-         	     0:               GotoOP 	           goto dfslabel4 	      null
-	dfslabel13:
-         	     0:              LabelOP 	               dfslabel13 	      null
-         	     0:      GetelementptrOP 	                   temp47 	   global4,     param0
-         	     0:      GetelementptrOP 	                   temp49 	    temp47,  %phi_var6
-         	     0:               LoadOP 	                   temp50 	    temp49
-         	     0:             AssignOP 	                %phi_var5 	    temp50
-         	     0:               GotoOP 	          goto dfslabel15 	      null
-	dfslabel6:
-         	     0:              LabelOP 	                dfslabel6 	      null
-         	     0:             AssignOP 	                %phi_var2 	 %phi_var1
-         	     0:             AssignOP 	                %phi_var4 	 %phi_var3
-         	     0:             AssignOP 	                %phi_var7 	 %phi_var6
+	mainentry:
+         	     0:              LabelOP 	                mainentry 	      null
+         	     0: CallWithReturnValueOP 	                  temp140 	      null
+         	     0: CallWithReturnValueOP 	                  temp141 	      null
+         	     0:              StoreOP 	                   (null) 	   global2,    temp141
+         	     0:              ParamOP 	                   param0 	        58
+         	     0:               CallOP 	                  temp142 	      null
+         	     0:               GotoOP 	         goto mainlabel25 	      null
+	mainlabel25:
+         	     0:              LabelOP 	              mainlabel25 	      null
+         	     0:            PhiFuncOp 	                %phi_var8 	size: 2 	bblock: mainentry value: temp140, 	bblock: mainlabel26 value: temp146, 
+         	     0:          GreatThanOP 	                  temp144 	 %phi_var8,          0
+         	     0:  GotoWithConditionOP 	true:mainlabel26  false:mainlabel27 	   temp144
+	mainlabel26:
+         	     0:              LabelOP 	              mainlabel26 	      null
+         	     0:                SubOP 	                  temp146 	 %phi_var8,          1
+         	     0: CallWithReturnValueOP 	                  temp147 	      null
+         	     0:                ModOP 	                  temp148 	   temp147,     300000
+         	     0: CallWithReturnValueOP 	                  temp149 	      null
+         	     0:                ModOP 	                  temp150 	   temp149,          2
+         	     0:              ParamOP 	                   param2 	   temp150
+         	     0:              ParamOP 	                   param1 	   temp148
+         	     0:              ParamOP 	                   param0 	   global3
+         	     0: CallWithReturnValueOP 	                  temp153 	      null
+         	     0:               GotoOP 	         goto mainlabel25 	      null
+	mainlabel27:
+         	     0:              LabelOP 	              mainlabel27 	      null
+         	     0:              ParamOP 	                   param0 	        66
+         	     0:               CallOP 	                  temp154 	      null
+         	     0:              ParamOP 	                   param1 	   global3
+         	     0:              ParamOP 	                   param0 	     10000
+         	     0:               CallOP 	                  temp155 	      null
          	     0:             ReturnOP 	                   return 	         0
-
-
-dfsentry live use add param0
-dfsentry live use add param1
-dfsentry live def add temp12
-dfslabel2 live def add %phi_var7
-dfslabel2 live def add %phi_var4
-dfslabel2 live def add %phi_var2
-dfslabel2 live use add param2
-dfslabel1 live use add global6
-dfslabel1 live use add param0
-dfslabel1 live def add temp15
-dfslabel1 live def add %phi_var6
-dfslabel1 live def add %phi_var3
-dfslabel1 live def add %phi_var1
-dfslabel4 live use add global2
-dfslabel4 live use add param0
-dfslabel4 live def add temp18
-dfslabel4 live def add temp19
-dfslabel4 live use add %phi_var6
-dfslabel4 live def add temp20
-dfslabel5 live use add global3
-dfslabel5 live use add param0
-dfslabel5 live def add temp22
-dfslabel5 live use add %phi_var6
-dfslabel5 live def add temp24
-dfslabel5 live def add temp25
-dfslabel5 live use add global6
-dfslabel5 live def add temp26
-dfslabel5 live def add temp27
-dfslabel8 live use add %phi_var6
-dfslabel8 live def add temp29
-dfslabel8 live def add %phi_var6
-dfslabel8 live use add %phi_var1
-dfslabel8 live def add phi_temp1
-dfslabel8 live def add %phi_var1
-dfslabel8 live use add %phi_var3
-dfslabel8 live def add phi_temp2
-dfslabel8 live def add %phi_var3
-dfslabel7 live use add global4
-dfslabel7 live use add param0
-dfslabel7 live def add temp31
-dfslabel7 live use add %phi_var6
-dfslabel7 live def add temp33
-dfslabel7 live def add temp34
-dfslabel7 live def add temp35
-dfslabel11 live use add %phi_var6
-dfslabel11 live def add temp37
-dfslabel11 live def add %phi_var6
-dfslabel11 live use add %phi_var1
-dfslabel11 live def add phi_temp3
-dfslabel11 live def add %phi_var1
-dfslabel11 live use add %phi_var3
-dfslabel11 live def add phi_temp4
-dfslabel11 live def add %phi_var3
-dfslabel10 live use add global4
-dfslabel10 live use add param0
-dfslabel10 live def add temp40
-dfslabel10 live use add %phi_var6
-dfslabel10 live def add temp42
-dfslabel10 live def add temp43
-dfslabel10 live use add param2
-dfslabel10 live def add temp44
-dfslabel14 live use add param2
-dfslabel14 live def add %phi_var5
-dfslabel15 live use add global3
-dfslabel15 live use add param0
-dfslabel15 live def add temp52
-dfslabel15 live use add %phi_var6
-dfslabel15 live def add temp54
-dfslabel15 live def add temp55
-dfslabel15 live use add %phi_var5
-dfslabel15 live use add param1
-dfslabel15 live def add temp58
-dfslabel15 live def add temp60
-dfslabel17 live use add global4
-dfslabel17 live use add param0
-dfslabel17 live def add temp66
-dfslabel17 live use add %phi_var6
-dfslabel17 live def add temp68
-dfslabel17 live def add temp69
-dfslabel17 live use add temp58
-dfslabel17 live def add temp71
-dfslabel17 live use add global4
-dfslabel17 live use add param0
-dfslabel17 live def add temp62
-dfslabel17 live use add %phi_var6
-dfslabel17 live def add temp64
-dfslabel17 live use add global3
-dfslabel17 live use add param0
-dfslabel17 live def add temp73
-dfslabel17 live use add %phi_var6
-dfslabel17 live def add temp75
-dfslabel17 live def add temp76
-dfslabel17 live use add global5
-dfslabel17 live use add param0
-dfslabel17 live def add temp79
-dfslabel17 live use add %phi_var6
-dfslabel17 live def add temp81
-dfslabel17 live def add temp82
-dfslabel17 live use add global3
-dfslabel17 live use add param0
-dfslabel17 live def add temp85
-dfslabel17 live use add %phi_var6
-dfslabel17 live def add temp87
-dfslabel17 live def add temp88
-dfslabel17 live use add global5
-dfslabel17 live use add param0
-dfslabel17 live def add temp91
-dfslabel17 live use add %phi_var6
-dfslabel17 live def add temp93
-dfslabel17 live def add temp94
-dfslabel17 live use add global4
-dfslabel17 live def add temp89
-dfslabel17 live def add temp95
-dfslabel17 live def add temp96
-dfslabel17 live use add temp58
-dfslabel17 live def add temp98
-dfslabel17 live use add global4
-dfslabel17 live def add temp77
-dfslabel17 live def add temp83
-dfslabel17 live use add %phi_var5
-dfslabel17 live def add %phi_var4
-dfslabel17 live use add %phi_var6
-dfslabel17 live def add %phi_var7
-dfslabel17 live use add temp58
-dfslabel17 live def add %phi_var2
-dfslabel17 live use add temp58
-dfslabel16 live use add %phi_var6
-dfslabel16 live def add temp101
-dfslabel16 live def add %phi_var6
-dfslabel16 live use add %phi_var5
-dfslabel16 live def add %phi_var3
-dfslabel16 live use add temp58
-dfslabel16 live def add %phi_var1
-dfslabel13 live use add global4
-dfslabel13 live use add param0
-dfslabel13 live def add temp47
-dfslabel13 live use add %phi_var6
-dfslabel13 live def add temp49
-dfslabel13 live def add temp50
-dfslabel13 live def add %phi_var5
-dfslabel6 live use add %phi_var1
-dfslabel6 live def add %phi_var2
-dfslabel6 live use add %phi_var3
-dfslabel6 live def add %phi_var4
-dfslabel6 live use add %phi_var6
-dfslabel6 live def add %phi_var7
+	mainendlabel:
+         	     0:              LabelOP 	             mainendlabel 	      null
+         	     0:            FuncEndOP 	          func_label_end3 	      null
 
 
 
-	labelID	number:               opcode 	                     name 	       use
-	dfsentry:
-         	     0:              LabelOP 	                 dfsentry 	      null
-         	     1:              EqualOP 	                   temp12 	    param0,     param1
-         	     2:  GotoWithConditionOP 	true:dfslabel2  false:dfslabel1 	    temp12
-	dfslabel2:
-         	     3:              LabelOP 	                dfslabel2 	      null
-         	     4:             AssignOP 	                %phi_var7 	         0
-         	     5:             AssignOP 	                %phi_var4 	 %phi_var7
-         	     6:             AssignOP 	                %phi_var2 	 %phi_var4
-         	     7:             ReturnOP 	                   return 	    param2
-	dfsendlabel:
-         	     8:              LabelOP 	              dfsendlabel 	      null
-         	     9:            FuncEndOP 	          func_label_end1 	      null
-	dfslabel1:
-         	     10:              LabelOP 	                dfslabel1 	      null
-         	     11:      GetelementptrOP 	                   temp15 	   global6,     param0
-         	     12:              StoreOP 	                   (null) 	    temp15,          1
-         	     13:             AssignOP 	                %phi_var6 	         0
-         	     14:             AssignOP 	                %phi_var3 	 %phi_var6
-         	     15:             AssignOP 	                %phi_var1 	 %phi_var3
-         	     16:               GotoOP 	           goto dfslabel4 	      null
-	dfslabel4:
-         	     17:              LabelOP 	                dfslabel4 	      null
-         	     18:      GetelementptrOP 	                   temp18 	   global2,     param0
-         	     19:               LoadOP 	                   temp19 	    temp18
-         	     20:           LessThanOP 	                   temp20 	 %phi_var6,     temp19
-         	     21:  GotoWithConditionOP 	true:dfslabel5  false:dfslabel6 	    temp20
-	dfslabel5:
-         	     22:              LabelOP 	                dfslabel5 	      null
-         	     23:      GetelementptrOP 	                   temp22 	   global3,     param0
-         	     24:      GetelementptrOP 	                   temp24 	    temp22,  %phi_var6
-         	     25:               LoadOP 	                   temp25 	    temp24
-         	     26:      GetelementptrOP 	                   temp26 	   global6,     temp25
-         	     27:               LoadOP 	                   temp27 	    temp26
-         	     28:  GotoWithConditionOP 	true:dfslabel8  false:dfslabel7 	    temp27
-	dfslabel8:
-         	     29:              LabelOP 	                dfslabel8 	      null
-         	     30:                AddOP 	                   temp29 	 %phi_var6,          1
-         	     31:             AssignOP 	                %phi_var6 	    temp29
-         	     32:             AssignOP 	                phi_temp1 	 %phi_var1
-         	     33:             AssignOP 	                %phi_var1 	 phi_temp1
-         	     34:             AssignOP 	                phi_temp2 	 %phi_var3
-         	     35:             AssignOP 	                %phi_var3 	 phi_temp2
-         	     36:               GotoOP 	  (continue)br :dfslabel4 	      null
-	dfslabel7:
-         	     37:              LabelOP 	                dfslabel7 	      null
-         	     38:      GetelementptrOP 	                   temp31 	   global4,     param0
-         	     39:      GetelementptrOP 	                   temp33 	    temp31,  %phi_var6
-         	     40:               LoadOP 	                   temp34 	    temp33
-         	     41:          LessEqualOP 	                   temp35 	    temp34,          0
-         	     42:  GotoWithConditionOP 	true:dfslabel11  false:dfslabel10 	    temp35
-	dfslabel11:
-         	     43:              LabelOP 	               dfslabel11 	      null
-         	     44:                AddOP 	                   temp37 	 %phi_var6,          1
-         	     45:             AssignOP 	                %phi_var6 	    temp37
-         	     46:             AssignOP 	                phi_temp3 	 %phi_var1
-         	     47:             AssignOP 	                %phi_var1 	 phi_temp3
-         	     48:             AssignOP 	                phi_temp4 	 %phi_var3
-         	     49:             AssignOP 	                %phi_var3 	 phi_temp4
-         	     50:               GotoOP 	  (continue)br :dfslabel4 	      null
-	dfslabel10:
-         	     51:              LabelOP 	               dfslabel10 	      null
-         	     52:      GetelementptrOP 	                   temp40 	   global4,     param0
-         	     53:      GetelementptrOP 	                   temp42 	    temp40,  %phi_var6
-         	     54:               LoadOP 	                   temp43 	    temp42
-         	     55:           LessThanOP 	                   temp44 	    param2,     temp43
-         	     56:  GotoWithConditionOP 	true:dfslabel14  false:dfslabel13 	    temp44
-	dfslabel14:
-         	     57:              LabelOP 	               dfslabel14 	      null
-         	     58:             AssignOP 	                %phi_var5 	    param2
-         	     59:               GotoOP 	          goto dfslabel15 	      null
-	dfslabel15:
-         	     60:              LabelOP 	               dfslabel15 	      null
-         	     61:      GetelementptrOP 	                   temp52 	   global3,     param0
-         	     62:      GetelementptrOP 	                   temp54 	    temp52,  %phi_var6
-         	     63:               LoadOP 	                   temp55 	    temp54
-         	     64:              ParamOP 	                   param2 	 %phi_var5
-         	     65:              ParamOP 	                   param1 	    param1
-         	     66:              ParamOP 	                   param0 	    temp55
-         	     67: CallWithReturnValueOP 	                   temp58 	      null
-         	     68:          GreatThanOP 	                   temp60 	    temp58,          0
-         	     69:  GotoWithConditionOP 	true:dfslabel17  false:dfslabel16 	    temp60
-	dfslabel17:
-         	     70:              LabelOP 	               dfslabel17 	      null
-         	     71:      GetelementptrOP 	                   temp66 	   global4,     param0
-         	     72:      GetelementptrOP 	                   temp68 	    temp66,  %phi_var6
-         	     73:               LoadOP 	                   temp69 	    temp68
-         	     74:                SubOP 	                   temp71 	    temp69,     temp58
-         	     75:      GetelementptrOP 	                   temp62 	   global4,     param0
-         	     76:      GetelementptrOP 	                   temp64 	    temp62,  %phi_var6
-         	     77:              StoreOP 	                   (null) 	    temp64,     temp71
-         	     78:      GetelementptrOP 	                   temp73 	   global3,     param0
-         	     79:      GetelementptrOP 	                   temp75 	    temp73,  %phi_var6
-         	     80:               LoadOP 	                   temp76 	    temp75
-         	     81:      GetelementptrOP 	                   temp79 	   global5,     param0
-         	     82:      GetelementptrOP 	                   temp81 	    temp79,  %phi_var6
-         	     83:               LoadOP 	                   temp82 	    temp81
-         	     84:      GetelementptrOP 	                   temp85 	   global3,     param0
-         	     85:      GetelementptrOP 	                   temp87 	    temp85,  %phi_var6
-         	     86:               LoadOP 	                   temp88 	    temp87
-         	     87:      GetelementptrOP 	                   temp91 	   global5,     param0
-         	     88:      GetelementptrOP 	                   temp93 	    temp91,  %phi_var6
-         	     89:               LoadOP 	                   temp94 	    temp93
-         	     90:      GetelementptrOP 	                   temp89 	   global4,     temp88
-         	     91:      GetelementptrOP 	                   temp95 	    temp89,     temp94
-         	     92:               LoadOP 	                   temp96 	    temp95
-         	     93:                AddOP 	                   temp98 	    temp96,     temp58
-         	     94:      GetelementptrOP 	                   temp77 	   global4,     temp76
-         	     95:      GetelementptrOP 	                   temp83 	    temp77,     temp82
-         	     96:              StoreOP 	                   (null) 	    temp83,     temp98
-         	     97:             AssignOP 	                %phi_var4 	 %phi_var5
-         	     98:             AssignOP 	                %phi_var7 	 %phi_var6
-         	     99:             AssignOP 	                %phi_var2 	    temp58
-         	     100:             ReturnOP 	                   return 	    temp58
-	dfslabel16:
-         	     101:              LabelOP 	               dfslabel16 	      null
-         	     102:                AddOP 	                  temp101 	 %phi_var6,          1
-         	     103:             AssignOP 	                %phi_var6 	   temp101
-         	     104:             AssignOP 	                %phi_var3 	 %phi_var5
-         	     105:             AssignOP 	                %phi_var1 	    temp58
-         	     106:               GotoOP 	           goto dfslabel4 	      null
-	dfslabel13:
-         	     107:              LabelOP 	               dfslabel13 	      null
-         	     108:      GetelementptrOP 	                   temp47 	   global4,     param0
-         	     109:      GetelementptrOP 	                   temp49 	    temp47,  %phi_var6
-         	     110:               LoadOP 	                   temp50 	    temp49
-         	     111:             AssignOP 	                %phi_var5 	    temp50
-         	     112:               GotoOP 	          goto dfslabel15 	      null
-	dfslabel6:
-         	     113:              LabelOP 	                dfslabel6 	      null
-         	     114:             AssignOP 	                %phi_var2 	 %phi_var1
-         	     115:             AssignOP 	                %phi_var4 	 %phi_var3
-         	     116:             AssignOP 	                %phi_var7 	 %phi_var6
-         	     117:             ReturnOP 	                   return 	         0
-
-
-	val:global2 	begin:0 	end:112 
-	val:global3 	begin:0 	end:112 
-	val:global4 	begin:0 	end:112 
-	val:global5 	begin:0 	end:112 
-	val:global6 	begin:0 	end:112 
-	val:param0 	begin:0 	end:112 
-	val:param1 	begin:0 	end:112 
-	val:param2 	begin:0 	end:112 
-	val:temp12 	begin:1 	end:2 
-	val:%phi_var7 	begin:4 	end:5 
-	val:%phi_var4 	begin:5 	end:6 
-	val:temp15 	begin:11 	end:12 
-	val:%phi_var6 	begin:13 	end:116 
-	val:%phi_var3 	begin:14 	end:115 
-	val:%phi_var1 	begin:15 	end:114 
-	val:temp18 	begin:18 	end:19 
-	val:temp19 	begin:19 	end:20 
-	val:temp20 	begin:20 	end:21 
-	val:temp22 	begin:23 	end:24 
-	val:temp24 	begin:24 	end:25 
-	val:temp25 	begin:25 	end:26 
-	val:temp26 	begin:26 	end:27 
-	val:temp27 	begin:27 	end:28 
-	val:temp29 	begin:30 	end:31 
-	val:phi_temp1 	begin:32 	end:33 
-	val:phi_temp2 	begin:34 	end:35 
-	val:temp31 	begin:38 	end:39 
-	val:temp33 	begin:39 	end:40 
-	val:temp34 	begin:40 	end:41 
-	val:temp35 	begin:41 	end:42 
-	val:temp37 	begin:44 	end:45 
-	val:phi_temp3 	begin:46 	end:47 
-	val:phi_temp4 	begin:48 	end:49 
-	val:temp40 	begin:52 	end:53 
-	val:temp42 	begin:53 	end:54 
-	val:temp43 	begin:54 	end:55 
-	val:temp44 	begin:55 	end:56 
-	val:%phi_var5 	begin:58 	end:112 
-	val:temp52 	begin:61 	end:62 
-	val:temp54 	begin:62 	end:63 
-	val:temp55 	begin:63 	end:66 
-	val:temp58 	begin:67 	end:105 
-	val:temp60 	begin:68 	end:69 
-	val:temp66 	begin:71 	end:72 
-	val:temp68 	begin:72 	end:73 
-	val:temp69 	begin:73 	end:74 
-	val:temp71 	begin:74 	end:77 
-	val:temp62 	begin:75 	end:76 
-	val:temp64 	begin:76 	end:77 
-	val:temp73 	begin:78 	end:79 
-	val:temp75 	begin:79 	end:80 
-	val:temp76 	begin:80 	end:94 
-	val:temp79 	begin:81 	end:82 
-	val:temp81 	begin:82 	end:83 
-	val:temp82 	begin:83 	end:95 
-	val:temp85 	begin:84 	end:85 
-	val:temp87 	begin:85 	end:86 
-	val:temp88 	begin:86 	end:90 
-	val:temp91 	begin:87 	end:88 
-	val:temp93 	begin:88 	end:89 
-	val:temp94 	begin:89 	end:91 
-	val:temp89 	begin:90 	end:91 
-	val:temp95 	begin:91 	end:92 
-	val:temp96 	begin:92 	end:93 
-	val:temp98 	begin:93 	end:96 
-	val:temp77 	begin:94 	end:95 
-	val:temp83 	begin:95 	end:96 
-	val:temp101 	begin:102 	end:103 
-	val:temp47 	begin:108 	end:109 
-	val:temp49 	begin:109 	end:110 
-	val:temp50 	begin:110 	end:111 
-
-	var:temp101	address:R6
- 	var:phi_temp1	address:R11
- 	var:phi_temp2	address:R11
- 	var:phi_temp3	address:R11
- 	var:phi_temp4	address:R11
- 	var:global2	address:M
- 	var:global3	address:M
- 	var:global4	address:M
- 	var:global5	address:M
- 	var:global6	address:M
- 	var:%phi_var1	address:M
- 	var:%phi_var3	address:M
- 	var:%phi_var4	address:R9
- 	var:%phi_var5	address:M
- 	var:%phi_var6	address:M
- 	var:%phi_var7	address:R8
- 	var:temp12	address:R8
- 	var:temp15	address:R8
- 	var:temp18	address:R11
- 	var:temp19	address:R12
- 	var:temp20	address:R11
- 	var:temp22	address:R11
- 	var:temp24	address:R12
- 	var:temp25	address:R11
- 	var:temp26	address:R12
- 	var:temp27	address:R11
- 	var:temp29	address:R11
- 	var:temp31	address:R11
- 	var:temp33	address:R12
- 	var:temp34	address:R11
- 	var:temp35	address:R12
- 	var:temp37	address:R11
- 	var:temp40	address:R11
- 	var:temp42	address:R12
- 	var:temp43	address:R11
- 	var:temp44	address:R12
- 	var:temp47	address:R6
- 	var:temp49	address:R8
- 	var:temp50	address:R6
- 	var:temp52	address:R12
- 	var:temp54	address:R8
- 	var:temp55	address:R12
- 	var:temp58	address:R8
- 	var:temp60	address:R12
- 	var:temp62	address:R12
- 	var:temp64	address:R10
- 	var:temp66	address:R12
- 	var:temp68	address:R9
- 	var:temp69	address:R12
- 	var:param0	address:R4
- 	var:param1	address:R5
- 	var:param2	address:M
- 	var:temp71	address:R9
- 	var:temp73	address:R9
- 	var:temp75	address:R10
- 	var:temp76	address:R9
- 	var:temp77	address:R6
- 	var:temp79	address:R10
- 	var:temp81	address:R12
- 	var:temp82	address:R10
- 	var:temp83	address:R9
- 	var:temp85	address:R12
- 	var:temp87	address:R11
- 	var:temp88	address:R12
- 	var:temp89	address:R6
- 	var:temp91	address:R11
- 	var:temp93	address:R6
- 	var:temp94	address:R11
- 	var:temp95	address:R12
- 	var:temp96	address:R6
- 	var:temp98	address:R11
- functional test All over!
+performance test All over!
