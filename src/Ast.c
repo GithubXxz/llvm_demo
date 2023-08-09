@@ -1302,7 +1302,6 @@ Value *post_eval(ast *a, Value *left, Value *right) {
           }
         } else if (a->r && SEQ(a->r->name, "ASSIGNOP")) {
 #ifdef PRINT_OK
-#endif
           ListFirst(array_init_assist.offset_list, false);
           global_array_init_item *element;
           printf("cur init array name \t%s\n", left->name);
@@ -1310,6 +1309,7 @@ Value *post_eval(ast *a, Value *left, Value *right) {
             printf("offset:\t%d ival:\t%d fval:\t%f\n", element->offset,
                    element->ival, element->fval);
           }
+#endif
 
           HashMapPut(global_array_init_hashmap, strdup(left->name),
                      array_init_assist.offset_list);

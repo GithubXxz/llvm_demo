@@ -9,6 +9,7 @@
 #include "type.h"
 #include "use.h"
 #include "user.h"
+#include <malloc/_malloc.h>
 #include <stdio.h>
 #include <string.h>
 #include <sys/_types/_intptr_t.h>
@@ -527,134 +528,6 @@ void delete_non_used_var_pass(Function *handle_func) {
   }
 }
 
-void array_replace_optimization(Function *handle_func) {
-  ALGraph *self_cfg = handle_func->self_cfg;
-
-  // List *entry_block_list = (self_cfg->node_set)[0]->bblock_head->inst_list;
-
-  for (int ii = 0; ii < self_cfg->node_num; ii++) {
-    List *cur_handle_list = (self_cfg->node_set)[ii]->bblock_head->inst_list;
-    ListSetClean(cur_handle_list, CommonCleanInstruction);
-    Instruction *element = NULL;
-    int i = 0;
-    ListNode *iter = cur_handle_list->data->head_;
-    element = iter->element_;
-
-    HashMap *array_replace = NULL;
-    hashmap_init(&array_replace);
-
-    while (i < ListSize(cur_handle_list)) {
-      if (element->opcode == GetelementptrOP &&
-
-          user_get_operand_use((User *)element, 0)
-                  ->Val->pdata->array_pdata.top_array ==
-              user_get_operand_use((User *)element, 0)->Val &&
-
-          user_get_operand_use((User *)element, 1)->Val->VTy->TID ==
-              ImmediateIntTyID) {
-        Value *cur_handle_array = user_get_operand_use((User *)element, 0)->Val;
-        HashMap *cur_replace = NULL;
-        if (HashMapContain(array_replace, cur_handle_array->name)) {
-          cur_replace = HashMapGet(array_replace, cur_handle_array->name);
-        } else {
-          hashmap_init(&cur_replace);
-          HashMapPut(array_replace, strdup(cur_handle_array->name),
-                     cur_replace);
-        }
-
-        Value *temp = user_get_operand_use((User *)element, 1)->Val;
-        int total_offset = temp->pdata->var_pdata.iVal *
-                           cur_handle_array->pdata->array_pdata.step_long;
-        Value *top_value = cur_handle_array;
-
-        if (ListSize(((Value *)element)->pdata->array_pdata.list_para) != 0) {
-          iter_next_ins(&iter, &i, &element);
-          while (i < ListSize(cur_handle_list)) {
-            if (element->opcode == GetelementptrOP &&
-
-                user_get_operand_use((User *)element, 0)
-                        ->Val->pdata->array_pdata.top_array == top_value &&
-
-                user_get_operand_use((User *)element, 1)->Val->VTy->TID ==
-                    ImmediateIntTyID) {
-              Value *cur_handle_array =
-                  user_get_operand_use((User *)element, 0)->Val;
-              Value *temp = user_get_operand_use((User *)element, 1)->Val;
-              total_offset += temp->pdata->var_pdata.iVal *
-                              cur_handle_array->pdata->array_pdata.step_long;
-              if (ListSize(((Value *)element)->pdata->array_pdata.list_para) ==
-                  0) {
-                char intptr_buffer[50];
-                sprintf(intptr_buffer, "%d", total_offset);
-                iter_next_ins(&iter, &i, &element);
-                if (element->opcode == StoreOP) {
-                  HashMapPut(cur_replace, strdup(intptr_buffer),
-                             user_get_operand_use((void *)element, 1)->Val);
-                } else if (element->opcode == LoadOP) {
-                  Value *val = NULL;
-                  if (HashMapContain(cur_replace, intptr_buffer)) {
-                    val = HashMapGet(cur_replace, intptr_buffer);
-                    replace_use_other_by_self((Value *)val, (Value *)element);
-                    delete_ins(cur_handle_list, &iter, &element);
-                  }
-                } else {
-                  assert(0 && "replace array ");
-                }
-                break;
-              }
-              iter_next_ins(&iter, &i, &element);
-            } else
-              break;
-          }
-        } else {
-          char intptr_buffer[50];
-          sprintf(intptr_buffer, "%d", total_offset);
-          iter_next_ins(&iter, &i, &element);
-          if (element->opcode == StoreOP) {
-            HashMapPut(cur_replace, strdup(intptr_buffer),
-                       user_get_operand_use((void *)element, 1)->Val);
-            iter_next_ins(&iter, &i, &element);
-          } else if (element->opcode == LoadOP) {
-            Value *val = NULL;
-            if (HashMapContain(cur_replace, intptr_buffer)) {
-              val = HashMapGet(cur_replace, intptr_buffer);
-              replace_use_other_by_self((Value *)val, (Value *)element);
-              delete_ins(cur_handle_list, &iter, &element);
-            }
-          } else {
-            assert(0 && "replace array ");
-          }
-        }
-      } else {
-        iter_next_ins(&iter, &i, &element);
-      }
-    }
-  }
-}
-
-void delete_non_used_block(Function *handle_func) {
-  ALGraph *self_cfg = handle_func->self_cfg;
-
-  // List *entry_block_list = (self_cfg->node_set)[0]->bblock_head->inst_list;
-
-  for (int ii = 0; ii < self_cfg->node_num; ii++) {
-    List *cur_handle_list = (self_cfg->node_set)[ii]->bblock_head->inst_list;
-    ListSetClean(cur_handle_list, CommonCleanInstruction);
-    Instruction *element;
-    int i = 0;
-    ListNode *iter = cur_handle_list->data->head_;
-    element = iter->element_;
-
-    while (i < ListSize(cur_handle_list)) {
-      if (element->opcode == LabelOP &&
-          iter_next_ins(&iter, &i, &element)->opcode == GotoOP) {
-        delete_ins(cur_handle_list, &iter, &element);
-      } else
-        iter_next_ins(&iter, &i, &element);
-    }
-  }
-}
-
 void immediate_num_calculate(Function *handle_func) {
   ALGraph *self_cfg = handle_func->self_cfg;
 
@@ -869,6 +742,134 @@ void immediate_num_calculate(Function *handle_func) {
   }
 }
 
+void array_replace_optimization(Function *handle_func) {
+  ALGraph *self_cfg = handle_func->self_cfg;
+
+  // List *entry_block_list = (self_cfg->node_set)[0]->bblock_head->inst_list;
+
+  for (int ii = 0; ii < self_cfg->node_num; ii++) {
+    List *cur_handle_list = (self_cfg->node_set)[ii]->bblock_head->inst_list;
+    ListSetClean(cur_handle_list, CommonCleanInstruction);
+    Instruction *element = NULL;
+    int i = 0;
+    ListNode *iter = cur_handle_list->data->head_;
+    element = iter->element_;
+
+    HashMap *array_replace = NULL;
+    hashmap_init(&array_replace);
+
+    while (i < ListSize(cur_handle_list)) {
+      if (element->opcode == GetelementptrOP &&
+
+          user_get_operand_use((User *)element, 0)
+                  ->Val->pdata->array_pdata.top_array ==
+              user_get_operand_use((User *)element, 0)->Val &&
+
+          user_get_operand_use((User *)element, 1)->Val->VTy->TID ==
+              ImmediateIntTyID) {
+        Value *cur_handle_array = user_get_operand_use((User *)element, 0)->Val;
+        HashMap *cur_replace = NULL;
+        if (HashMapContain(array_replace, cur_handle_array->name)) {
+          cur_replace = HashMapGet(array_replace, cur_handle_array->name);
+        } else {
+          hashmap_init(&cur_replace);
+          HashMapPut(array_replace, strdup(cur_handle_array->name),
+                     cur_replace);
+        }
+
+        Value *temp = user_get_operand_use((User *)element, 1)->Val;
+        int total_offset = temp->pdata->var_pdata.iVal *
+                           cur_handle_array->pdata->array_pdata.step_long;
+        Value *top_value = cur_handle_array;
+
+        if (ListSize(((Value *)element)->pdata->array_pdata.list_para) != 0) {
+          iter_next_ins(&iter, &i, &element);
+          while (i < ListSize(cur_handle_list)) {
+            if (element->opcode == GetelementptrOP &&
+
+                user_get_operand_use((User *)element, 0)
+                        ->Val->pdata->array_pdata.top_array == top_value &&
+
+                user_get_operand_use((User *)element, 1)->Val->VTy->TID ==
+                    ImmediateIntTyID) {
+              Value *cur_handle_array =
+                  user_get_operand_use((User *)element, 0)->Val;
+              Value *temp = user_get_operand_use((User *)element, 1)->Val;
+              total_offset += temp->pdata->var_pdata.iVal *
+                              cur_handle_array->pdata->array_pdata.step_long;
+              if (ListSize(((Value *)element)->pdata->array_pdata.list_para) ==
+                  0) {
+                char intptr_buffer[50];
+                sprintf(intptr_buffer, "%d", total_offset);
+                iter_next_ins(&iter, &i, &element);
+                if (element->opcode == StoreOP) {
+                  HashMapPut(cur_replace, strdup(intptr_buffer),
+                             user_get_operand_use((void *)element, 1)->Val);
+                } else if (element->opcode == LoadOP) {
+                  Value *val = NULL;
+                  if (HashMapContain(cur_replace, intptr_buffer)) {
+                    val = HashMapGet(cur_replace, intptr_buffer);
+                    replace_use_other_by_self((Value *)val, (Value *)element);
+                    delete_ins(cur_handle_list, &iter, &element);
+                  }
+                } else {
+                  assert(0 && "replace array ");
+                }
+                break;
+              }
+              iter_next_ins(&iter, &i, &element);
+            } else
+              break;
+          }
+        } else {
+          char intptr_buffer[50];
+          sprintf(intptr_buffer, "%d", total_offset);
+          iter_next_ins(&iter, &i, &element);
+          if (element->opcode == StoreOP) {
+            HashMapPut(cur_replace, strdup(intptr_buffer),
+                       user_get_operand_use((void *)element, 1)->Val);
+            iter_next_ins(&iter, &i, &element);
+          } else if (element->opcode == LoadOP) {
+            Value *val = NULL;
+            if (HashMapContain(cur_replace, intptr_buffer)) {
+              val = HashMapGet(cur_replace, intptr_buffer);
+              replace_use_other_by_self((Value *)val, (Value *)element);
+              delete_ins(cur_handle_list, &iter, &element);
+            }
+          } else {
+            assert(0 && "replace array ");
+          }
+        }
+      } else {
+        iter_next_ins(&iter, &i, &element);
+      }
+    }
+  }
+}
+
+void delete_non_used_block(Function *handle_func) {
+  ALGraph *self_cfg = handle_func->self_cfg;
+
+  // List *entry_block_list = (self_cfg->node_set)[0]->bblock_head->inst_list;
+
+  for (int ii = 0; ii < self_cfg->node_num; ii++) {
+    List *cur_handle_list = (self_cfg->node_set)[ii]->bblock_head->inst_list;
+    ListSetClean(cur_handle_list, CommonCleanInstruction);
+    Instruction *element;
+    int i = 0;
+    ListNode *iter = cur_handle_list->data->head_;
+    element = iter->element_;
+
+    while (i < ListSize(cur_handle_list)) {
+      if (element->opcode == LabelOP &&
+          iter_next_ins(&iter, &i, &element)->opcode == GotoOP) {
+        delete_ins(cur_handle_list, &iter, &element);
+      } else
+        iter_next_ins(&iter, &i, &element);
+    }
+  }
+}
+
 void gcm(Function *handle_func) {
   ALGraph *self_cfg = handle_func->self_cfg;
   HashMap *ins_subordinate_block;
@@ -904,6 +905,82 @@ void gcm(Function *handle_func) {
 
         while (i < ListSize(cur_handle_list)) {
         }
+      }
+    }
+  }
+}
+
+#define N_OP_NUM 12
+static char *NORMAL_OPERATOR[N_OP_NUM] = {
+    "ERROROP", "PLUS",     "MINUS", "MOD",  "STAR",       "DIV",
+    "EQUAL",   "NOTEQUAL", "GREAT", "LESS", "GREATEQUAL", "LESSEQUAL",
+};
+
+#define L_OP_NUM 2
+static char *LOGIC_OPERATOR[L_OP_NUM] = {"AND", "OR"};
+
+typedef struct _public_pair {
+  TAC_OP opcode;
+  Value *oprand1;
+  Value *oprand2;
+  Value *replace;
+} public_pair;
+
+unsigned HashKeyAddressPublicPair(public_pair *key) {
+  return (unsigned)((intptr_t)key->oprand1 + (intptr_t)key->oprand2);
+}
+
+int ComparePublic(public_pair *lhs, public_pair *rhs) {
+  return !(lhs->opcode == rhs->opcode &&
+           ((lhs->oprand1 == rhs->oprand1 && lhs->oprand2 == rhs->oprand2) ||
+            (lhs->oprand2 == rhs->oprand1 && lhs->oprand1 == rhs->oprand2)));
+}
+
+void hashmap_init_public_pair(HashMap **self) {
+  *self = HashMapInit();
+  HashMapSetHash(*self, (unsigned (*)(void *))HashKeyAddressPublicPair);
+  HashMapSetCompare(*self, (int (*)(void *, void *))ComparePublic);
+  HashMapSetCleanKey(*self, CleanHashSetKey);
+  HashMapSetCleanValue(*self, CleanHashSetKey);
+}
+
+void public_expression_substitution_opt(Function *handle_func) {
+  ALGraph *self_cfg = handle_func->self_cfg;
+
+  // List *entry_block_list = (self_cfg->node_set)[0]->bblock_head->inst_list;
+
+  for (int ii = 0; ii < self_cfg->node_num; ii++) {
+    List *cur_handle_list = (self_cfg->node_set)[ii]->bblock_head->inst_list;
+    ListSetClean(cur_handle_list, CommonCleanInstruction);
+    Instruction *element;
+    int i = 0;
+    ListNode *iter = cur_handle_list->data->head_;
+    element = iter->element_;
+    HashMap *public_expression_set;
+    hashmap_init_public_pair(&public_expression_set);
+
+    while (i < ListSize(cur_handle_list)) {
+      if (((User *)element)->num_oprands == 2) {
+        Value *oprand1 = user_get_operand_use((User *)element, 0)->Val;
+        Value *oprand2 = user_get_operand_use((User *)element, 1)->Val;
+        public_pair *fuckk = malloc(sizeof(public_pair));
+        fuckk->oprand1 = oprand1;
+        fuckk->oprand2 = oprand2;
+        fuckk->opcode = element->opcode;
+
+        if (HashMapContain(public_expression_set, fuckk)) {
+          public_pair *findd = NULL;
+          findd = HashMapGet(public_expression_set, fuckk);
+          replace_use_other_by_self(findd->replace, (Value *)element);
+          free(fuckk);
+          delete_ins(cur_handle_list, &iter, &element);
+        } else {
+          fuckk->replace = (Value *)element;
+          HashMapPut(public_expression_set, fuckk, fuckk);
+          iter_next_ins(&iter, &i, &element);
+        }
+      } else {
+        iter_next_ins(&iter, &i, &element);
       }
     }
   }

@@ -270,9 +270,9 @@ int main(int argc, char **argv) {
     is_functional_test = false;
     // is_functional_test = true;
     // choose_case = read_code_from_file(test_cases[75]);
-    choose_case = read_code_from_file(performance_test[0]);
+    // choose_case = read_code_from_file(performance_test[0]);
     // choose_case = read_code_from_file(hidden_cases[38]);
-    // choose_case = read_code_from_file("./my_cases/array_optimization.c");
+    choose_case = read_code_from_file("./my_cases/public_replace.c");
     // choose_case = read_code_from_file("./opt/loop1.c");
   }
   if (choose_case == NULL)
