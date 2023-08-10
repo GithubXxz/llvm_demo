@@ -1,11 +1,13 @@
 #include "optimization.h"
 #include "Pass.h"
+#include "bblock.h"
 #include "c_container_auxiliary.h"
 #include "container/hash_map.h"
 #include "container/hash_set.h"
 #include "container/list.h"
 #include "container/tree_map.h"
 #include "function.h"
+#include "math/hash.h"
 #include "type.h"
 #include "use.h"
 #include "user.h"
@@ -532,7 +534,8 @@ void immediate_num_calculate(Function *handle_func) {
   ALGraph *self_cfg = handle_func->self_cfg;
 
   for (int ii = 0; ii < self_cfg->node_num; ii++) {
-    List *cur_handle_list = (self_cfg->node_set)[ii]->bblock_head->inst_list;
+    BasicBlock *cur_handle_bblock = (self_cfg->node_set)[ii]->bblock_head;
+    List *cur_handle_list = cur_handle_bblock->inst_list;
     ListSetClean(cur_handle_list, CommonCleanInstruction);
     Instruction *element;
     int i = 0;
@@ -699,7 +702,7 @@ void immediate_num_calculate(Function *handle_func) {
               HashMapPut(constant_single_value_hashmap, strdup(buffer), cur);
             }
           }
-          replace_use_other_by_self(cur, (Value *)element);
+          replace_use_other_by_self(cur, (Value *)element, cur_handle_bblock);
           delete_ins(cur_handle_list, &iter, &element);
         } else {
           iter_next_ins(&iter, &i, &element);
@@ -730,7 +733,7 @@ void immediate_num_calculate(Function *handle_func) {
             cur->pdata->var_pdata.fVal = const_value;
             HashMapPut(constant_single_value_hashmap, strdup(buffer), cur);
           }
-          replace_use_other_by_self(cur, (Value *)element);
+          replace_use_other_by_self(cur, (Value *)element, cur_handle_bblock);
           delete_ins(cur_handle_list, &iter, &element);
         } else {
           iter_next_ins(&iter, &i, &element);
@@ -748,6 +751,7 @@ void array_replace_optimization(Function *handle_func) {
   // List *entry_block_list = (self_cfg->node_set)[0]->bblock_head->inst_list;
 
   for (int ii = 0; ii < self_cfg->node_num; ii++) {
+    BasicBlock *cur_handle_bblock = (self_cfg->node_set)[ii]->bblock_head;
     List *cur_handle_list = (self_cfg->node_set)[ii]->bblock_head->inst_list;
     ListSetClean(cur_handle_list, CommonCleanInstruction);
     Instruction *element = NULL;
@@ -809,7 +813,8 @@ void array_replace_optimization(Function *handle_func) {
                   Value *val = NULL;
                   if (HashMapContain(cur_replace, intptr_buffer)) {
                     val = HashMapGet(cur_replace, intptr_buffer);
-                    replace_use_other_by_self((Value *)val, (Value *)element);
+                    replace_use_other_by_self((Value *)val, (Value *)element,
+                                              cur_handle_bblock);
                     delete_ins(cur_handle_list, &iter, &element);
                   }
                 } else {
@@ -833,7 +838,8 @@ void array_replace_optimization(Function *handle_func) {
             Value *val = NULL;
             if (HashMapContain(cur_replace, intptr_buffer)) {
               val = HashMapGet(cur_replace, intptr_buffer);
-              replace_use_other_by_self((Value *)val, (Value *)element);
+              replace_use_other_by_self((Value *)val, (Value *)element,
+                                        cur_handle_bblock);
               delete_ins(cur_handle_list, &iter, &element);
             }
           } else {
@@ -927,7 +933,7 @@ typedef struct _public_pair {
 } public_pair;
 
 unsigned HashKeyAddressPublicPair(public_pair *key) {
-  return (unsigned)((intptr_t)key->oprand1 + (intptr_t)key->oprand2);
+  return HashDjb2(key->oprand1->name) + HashDjb2(key->oprand2->name);
 }
 
 int ComparePublic(public_pair *lhs, public_pair *rhs) {
@@ -948,19 +954,21 @@ void public_expression_substitution_opt(Function *handle_func) {
   ALGraph *self_cfg = handle_func->self_cfg;
 
   // List *entry_block_list = (self_cfg->node_set)[0]->bblock_head->inst_list;
+  HashMap *public_expression_set;
+  hashmap_init_public_pair(&public_expression_set);
 
   for (int ii = 0; ii < self_cfg->node_num; ii++) {
+    BasicBlock *cur_handle_bblock = (self_cfg->node_set)[ii]->bblock_head;
     List *cur_handle_list = (self_cfg->node_set)[ii]->bblock_head->inst_list;
     ListSetClean(cur_handle_list, CommonCleanInstruction);
     Instruction *element;
     int i = 0;
     ListNode *iter = cur_handle_list->data->head_;
     element = iter->element_;
-    HashMap *public_expression_set;
-    hashmap_init_public_pair(&public_expression_set);
 
     while (i < ListSize(cur_handle_list)) {
-      if (((User *)element)->num_oprands == 2) {
+      if (((User *)element)->num_oprands == 2 &&
+          element->opcode != GetelementptrOP && element->opcode != PhiFuncOp) {
         Value *oprand1 = user_get_operand_use((User *)element, 0)->Val;
         Value *oprand2 = user_get_operand_use((User *)element, 1)->Val;
         public_pair *fuckk = malloc(sizeof(public_pair));
@@ -971,7 +979,8 @@ void public_expression_substitution_opt(Function *handle_func) {
         if (HashMapContain(public_expression_set, fuckk)) {
           public_pair *findd = NULL;
           findd = HashMapGet(public_expression_set, fuckk);
-          replace_use_other_by_self(findd->replace, (Value *)element);
+          replace_use_other_by_self(findd->replace, (Value *)element,
+                                    cur_handle_bblock);
           free(fuckk);
           delete_ins(cur_handle_list, &iter, &element);
         } else {

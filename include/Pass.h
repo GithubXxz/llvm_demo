@@ -39,7 +39,8 @@ void print_bblock_pass_temp(BasicBlock *self);
 void delete_alloca_store_load_ins_pass(ALGraph *self);
 void printf_cur_func_ins(Function *self);
 
-void replace_use_other_by_self(Value *self, Value *other);
+void replace_use_other_by_self(Value *self, Value *other,
+                               BasicBlock *cur_handle_block);
 void delete_ins(List *self, ListNode **iter, Instruction **element);
 // inline void delete_ins(List *self, ListNode **iter, Instruction **element) {
 //   ListNode *pred = (*iter)->pred_;

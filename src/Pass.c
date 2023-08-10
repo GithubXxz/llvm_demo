@@ -540,11 +540,16 @@ void insert_phi_func_pass(Function *self) {
 }
 
 // 将所有用到other的地方全部用self替换
-void replace_use_other_by_self(Value *self, Value *other) {
+void replace_use_other_by_self(Value *self, Value *other,
+                               BasicBlock *cur_handle_block) {
   if (other->use_list != NULL) {
     Use *u1 = other->use_list;
     Use *u2 = u1->Next;
     while (u1 != NULL) {
+      if (((Instruction *)u1->Parent)->opcode == PhiFuncOp) {
+        HashMapPut(u1->Parent->value.pdata->phi_func_pdata.phi_value,
+                   strdup(cur_handle_block->label->name), self);
+      }
       value_add_use(self, u1);
       u1 = u2;
       u2 = (u2 == NULL ? NULL : u2->Next);
@@ -615,7 +620,8 @@ void rename_pass_help_new(HashMap *rename_var_stack_hashmap,
           StackTop(HashMapGet(rename_var_stack_hashmap, cur_handle->name),
                    &stack_top_var);
           // 使用栈顶Value替换使用当前instruction的value
-          replace_use_other_by_self(stack_top_var, (Value *)element);
+          replace_use_other_by_self(stack_top_var, (Value *)element,
+                                    cur_bblock->bblock_node->bblock_head);
         }
         break;
       default:
@@ -629,16 +635,23 @@ void rename_pass_help_new(HashMap *rename_var_stack_hashmap,
   HashMapFirst(cur_bblock->bblock_node->edge_list);
   while ((neighbor_bblock = (node_pair *)HashMapNext(
               cur_bblock->bblock_node->edge_list)) != NULL) {
-    void *neighbor_bblock_ins = NULL;
+    // if (SEQ(cur_bblock->bblock_node->bblock_head->label->name, "mainlabel8"))
+    // {
+    //   if (SEQ(neighbor_bblock->value->bblock_head->label->name,
+    //   "mainlabel7")) {
+    //     printf("wocaonima\n");
+    //   }
+    // }
+    Instruction *neighbor_bblock_ins = NULL;
     ListFirst(neighbor_bblock->value->bblock_head->inst_list, false);
     // 向前走一步跳过label的instruciton
     ListNext(neighbor_bblock->value->bblock_head->inst_list,
-             &neighbor_bblock_ins);
+             (void *)&neighbor_bblock_ins);
 
     // 三种情况同时满足则说明邻接bblock中需要修改含有该指针指向内存变量的phi函数
     while (ListNext(neighbor_bblock->value->bblock_head->inst_list,
-                    &neighbor_bblock_ins)) {
-      if (((Instruction *)neighbor_bblock_ins)->opcode == PhiFuncOp) {
+                    (void *)&neighbor_bblock_ins)) {
+      if (neighbor_bblock_ins->opcode == PhiFuncOp) {
         Value *cur_insert;
         if (StackSize(HashMapGet(
                 rename_var_stack_hashmap,
@@ -812,10 +825,15 @@ unsigned HashKeyAddressCopyPair(void *key) {
   return HashDjb2(((copy_pair *)key)->src->name);
 }
 
+int CompareCopyPairKeyAddress(void *lhs, void *rhs) {
+  return strcmp(((copy_pair *)lhs)->src->name, ((copy_pair *)rhs)->src->name) +
+         strcmp(((copy_pair *)lhs)->dest->name, ((copy_pair *)rhs)->dest->name);
+}
+
 void hashset_init_copy_pair(HashSet **self) {
   *self = HashSetInit();
   HashSetSetHash(*self, HashKeyAddressCopyPair);
-  HashSetSetCompare(*self, CompareKeyAddress);
+  HashSetSetCompare(*self, CompareCopyPairKeyAddress);
   HashSetSetCleanKey(*self, CleanHashSetKey);
 }
 
@@ -843,12 +861,12 @@ void insert_copies_help(HashMap *insert_copies_stack_hashmap,
   HashMapFirst(cur_bblock->bblock_node->edge_list);
   while ((neighbor_bblock = (node_pair *)HashMapNext(
               cur_bblock->bblock_node->edge_list)) != NULL) {
-    void *neighbor_bblock_ins = NULL;
+    Instruction *neighbor_bblock_ins = NULL;
     ListFirst(neighbor_bblock->value->bblock_head->inst_list, false);
 
     while (ListNext(neighbor_bblock->value->bblock_head->inst_list,
-                    &neighbor_bblock_ins)) {
-      if (((Instruction *)neighbor_bblock_ins)->opcode == PhiFuncOp &&
+                    (void *)&neighbor_bblock_ins)) {
+      if (neighbor_bblock_ins->opcode == PhiFuncOp &&
           HashMapContain(
               ((Value *)neighbor_bblock_ins)->pdata->phi_func_pdata.phi_value,
               cur_bblock->bblock_node->bblock_head->label->name)) {
@@ -1441,10 +1459,10 @@ void bblock_to_dom_graph_pass(Function *self) {
   bblock_pass_hashset = NULL;
   hashset_init(&(bblock_pass_hashset));
 
-  // #ifdef OPT_PRINT
-  //   printf("before optimization log!!!!!!!!!!!!!!!!!\n");
-  //   printf_cur_func_ins(self);
-  // #endif
+#ifdef OPT_PRINT
+  printf("before optimization log!!!!!!!!!!!!!!!!!\n");
+  printf_cur_func_ins(self);
+#endif
 
   // optimizization
   if (!is_functional_test) {

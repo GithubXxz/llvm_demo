@@ -19,7 +19,7 @@ extern List *global_var_list;
 SymbolTable *cur_symboltable = NULL;
 
 bool is_functional_test = true;
-bool global_optimization = false;
+bool global_optimization = true;
 
 int yyparse(void);
 
@@ -215,7 +215,7 @@ char *performance_test[] = {
     "./performance_test/hoist-1.c",
     "./performance_test/hoist-2.c",
     "./performance_test/hoist-3.c",
-    "./performance_test/instruction-combining-1.c",
+    "./performance_test/instruction-combining-1.c", // 39
     "./performance_test/instruction-combining-2.c",
     "./performance_test/instruction-combining-3.c",
     "./performance_test/integer-divide-optimization-1.c", // 42
@@ -270,9 +270,9 @@ int main(int argc, char **argv) {
     is_functional_test = false;
     // is_functional_test = true;
     // choose_case = read_code_from_file(test_cases[75]);
-    // choose_case = read_code_from_file(performance_test[0]);
+    choose_case = read_code_from_file(performance_test[51]);
     // choose_case = read_code_from_file(hidden_cases[38]);
-    choose_case = read_code_from_file("./my_cases/public_replace.c");
+    // choose_case = read_code_from_file("./my_cases/public_replace.c");
     // choose_case = read_code_from_file("./opt/loop1.c");
   }
   if (choose_case == NULL)

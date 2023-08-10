@@ -1013,28 +1013,29 @@ Value *post_eval(ast *a, Value *left, Value *right) {
           assert(pre_symboltable || load_var_pointer);
         };
 
-        if (global_optimization) {
-          if (load_var_pointer->IsGlobalVar && !load_var_pointer->IsConst &&
-              cur_construction_func) {
-            if (!HashMapContain(assist_is_local_val, load_var_pointer->name)) {
-              HashMapPut(assist_is_local_val, strdup(load_var_pointer->name),
-                         cur_construction_func);
-            } else {
-              Value *cur_func =
-                  HashMapGet(assist_is_local_val, load_var_pointer->name);
-              if (cur_func != cur_construction_func) {
-                HashMapPut(assist_is_local_val, strdup(load_var_pointer->name),
-                           NULL);
-              }
-            }
-          }
-        }
-
         if (load_var_pointer->VTy->TID == ArrayTyID) {
           return load_var_pointer;
         } else if (load_var_pointer->IsConst) {
           return load_var_pointer->pdata->allocate_pdata.point_value;
         } else {
+          if (global_optimization) {
+            if (load_var_pointer->IsGlobalVar && !load_var_pointer->IsConst &&
+                cur_construction_func) {
+              if (!HashMapContain(assist_is_local_val,
+                                  load_var_pointer->name)) {
+                HashMapPut(assist_is_local_val, strdup(load_var_pointer->name),
+                           cur_construction_func);
+              } else {
+                Value *cur_func =
+                    HashMapGet(assist_is_local_val, load_var_pointer->name);
+                if (cur_func != cur_construction_func) {
+                  HashMapPut(assist_is_local_val,
+                             strdup(load_var_pointer->name), NULL);
+                }
+              }
+            }
+          }
+
           // load instruction
           Value *load_ins =
               (Value *)ins_new_single_operator_v2(LoadOP, load_var_pointer);
@@ -1069,23 +1070,25 @@ Value *post_eval(ast *a, Value *left, Value *right) {
           assert(pre_symboltable || assign_var_pointer);
         };
 
-        if (global_optimization) {
-          if (assign_var_pointer->IsGlobalVar && !assign_var_pointer->IsConst &&
-              cur_construction_func) {
-            if (!HashMapContain(assist_is_local_val,
-                                assign_var_pointer->name)) {
-              HashMapPut(assist_is_local_val, strdup(assign_var_pointer->name),
-                         cur_construction_func);
-            } else {
-              Value *cur_func =
-                  HashMapGet(assist_is_local_val, assign_var_pointer->name);
-              if (cur_func != cur_construction_func) {
-                HashMapPut(assist_is_local_val,
-                           strdup(assign_var_pointer->name), NULL);
-              }
-            }
-          }
-        }
+        // if (global_optimization) {
+        //   if (assign_var_pointer->IsGlobalVar && !assign_var_pointer->IsConst
+        //   &&
+        //       cur_construction_func) {
+        //     if (!HashMapContain(assist_is_local_val,
+        //                         assign_var_pointer->name)) {
+        //       HashMapPut(assist_is_local_val,
+        //       strdup(assign_var_pointer->name),
+        //                  cur_construction_func);
+        //     } else {
+        //       Value *cur_func =
+        //           HashMapGet(assist_is_local_val, assign_var_pointer->name);
+        //       if (cur_func != cur_construction_func) {
+        //         HashMapPut(assist_is_local_val,
+        //                    strdup(assign_var_pointer->name), NULL);
+        //       }
+        //     }
+        //   }
+        // }
 
         return assign_var_pointer;
       } else if (SEQ(a->name, "INTEGER")) {
