@@ -1142,7 +1142,7 @@ void ins_toBBlock_pass(List *self) {
 
   while (ListNext(self, &element)) {
 
-    if (global_optimization) {
+    if (!is_functional_test && global_optimization) {
       while (((Instruction *)element)->opcode != FuncLabelOP) {
         Value *test_global;
         if (((Instruction *)element)->opcode == AllocateOP &&
@@ -1221,7 +1221,7 @@ void ins_toBBlock_pass(List *self) {
       cur_func->entry_bblock = cur_bblock;
       ListPushBack(cur_bblock->inst_list, element);
 
-      if (global_optimization) {
+      if (!is_functional_test && global_optimization) {
         if (HashMapContain(local_global, cur_func->label->name)) {
           List *namer = HashMapGet(local_global, cur_func->label->name);
           ListFirst(namer, false);

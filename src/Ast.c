@@ -1018,7 +1018,7 @@ Value *post_eval(ast *a, Value *left, Value *right) {
         } else if (load_var_pointer->IsConst) {
           return load_var_pointer->pdata->allocate_pdata.point_value;
         } else {
-          if (global_optimization) {
+          if (!is_functional_test && global_optimization) {
             if (load_var_pointer->IsGlobalVar && !load_var_pointer->IsConst &&
                 cur_construction_func) {
               if (!HashMapContain(assist_is_local_val,
@@ -1028,7 +1028,7 @@ Value *post_eval(ast *a, Value *left, Value *right) {
               } else {
                 Value *cur_func =
                     HashMapGet(assist_is_local_val, load_var_pointer->name);
-                if (cur_func != cur_construction_func) {
+                if (cur_func && cur_func != cur_construction_func) {
                   HashMapPut(assist_is_local_val,
                              strdup(load_var_pointer->name), NULL);
                 }
@@ -1070,25 +1070,13 @@ Value *post_eval(ast *a, Value *left, Value *right) {
           assert(pre_symboltable || assign_var_pointer);
         };
 
-        // if (global_optimization) {
-        //   if (assign_var_pointer->IsGlobalVar && !assign_var_pointer->IsConst
-        //   &&
-        //       cur_construction_func) {
-        //     if (!HashMapContain(assist_is_local_val,
-        //                         assign_var_pointer->name)) {
-        //       HashMapPut(assist_is_local_val,
-        //       strdup(assign_var_pointer->name),
-        //                  cur_construction_func);
-        //     } else {
-        //       Value *cur_func =
-        //           HashMapGet(assist_is_local_val, assign_var_pointer->name);
-        //       if (cur_func != cur_construction_func) {
-        //         HashMapPut(assist_is_local_val,
-        //                    strdup(assign_var_pointer->name), NULL);
-        //       }
-        //     }
-        //   }
-        // }
+        if (!is_functional_test && global_optimization) {
+          if (assign_var_pointer->IsGlobalVar && !assign_var_pointer->IsConst &&
+              cur_construction_func) {
+            HashMapPut(assist_is_local_val, strdup(assign_var_pointer->name),
+                       NULL);
+          }
+        }
 
         return assign_var_pointer;
       } else if (SEQ(a->name, "INTEGER")) {

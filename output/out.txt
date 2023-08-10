@@ -1,227 +1,553 @@
 before optimization log!!!!!!!!!!!!!!!!!
 	labelID	number:               opcode 	                     name 	       use
+	quick_readentry:
+         	     0:              LabelOP 	          quick_readentry 	      null
+         	     0: CallWithReturnValueOP 	                   temp10 	      null
+         	     0:               GotoOP 	    goto quick_readlabel1 	      null
+	quick_readlabel1:
+         	     0:              LabelOP 	         quick_readlabel1 	      null
+         	     0:            PhiFuncOp 	                %phi_var4 	size: 2 	bblock: quick_readentry value: temp10, 	bblock: quick_readlabel5 value: temp17, 
+         	     0:            PhiFuncOp 	                %phi_var1 	size: 2 	bblock: quick_readentry value: 0, 	bblock: quick_readlabel5 value: %phi_var2, 
+         	     0:           LessThanOP 	                   temp12 	 %phi_var4,         48
+         	     0:  GotoWithConditionOP 	true:quick_readlabel2  false:quick_readlabel4 	    temp12
+	quick_readlabel2:
+         	     0:              LabelOP 	         quick_readlabel2 	      null
+         	     0:              EqualOP 	                   temp16 	 %phi_var4,         45
+         	     0:  GotoWithConditionOP 	true:quick_readlabel6  false:quick_readlabel5 	    temp16
+	quick_readlabel6:
+         	     0:              LabelOP 	         quick_readlabel6 	      null
+         	     0:               GotoOP 	    goto quick_readlabel5 	      null
+	quick_readlabel5:
+         	     0:              LabelOP 	         quick_readlabel5 	      null
+         	     0:            PhiFuncOp 	                %phi_var2 	size: 2 	bblock: quick_readlabel2 value: %phi_var1, 	bblock: quick_readlabel6 value: 1, 
+         	     0: CallWithReturnValueOP 	                   temp17 	      null
+         	     0:               GotoOP 	    goto quick_readlabel1 	      null
+	quick_readlabel4:
+         	     0:              LabelOP 	         quick_readlabel4 	      null
+         	     0:          GreatThanOP 	                   temp14 	 %phi_var4,         57
+         	     0:  GotoWithConditionOP 	true:quick_readlabel2  false:quick_readlabel3 	    temp14
+	quick_readlabel3:
+         	     0:              LabelOP 	         quick_readlabel3 	      null
+         	     0:               GotoOP 	    goto quick_readlabel8 	      null
+	quick_readlabel8:
+         	     0:              LabelOP 	         quick_readlabel8 	      null
+         	     0:            PhiFuncOp 	                %phi_var5 	size: 2 	bblock: quick_readlabel3 value: %phi_var4, 	bblock: quick_readlabel9 value: temp27, 
+         	     0:            PhiFuncOp 	                %phi_var3 	size: 2 	bblock: quick_readlabel3 value: 0, 	bblock: quick_readlabel9 value: temp26, 
+         	     0:         GreatEqualOP 	                   temp19 	 %phi_var5,         48
+         	     0:  GotoWithConditionOP 	true:quick_readlabel11  false:quick_readlabel10 	    temp19
+	quick_readlabel11:
+         	     0:              LabelOP 	        quick_readlabel11 	      null
+         	     0:          LessEqualOP 	                   temp21 	 %phi_var5,         57
+         	     0:  GotoWithConditionOP 	true:quick_readlabel9  false:quick_readlabel10 	    temp21
+	quick_readlabel9:
+         	     0:              LabelOP 	         quick_readlabel9 	      null
+         	     0:                MulOP 	                   temp23 	 %phi_var3,         10
+         	     0:                AddOP 	                   temp25 	    temp23,  %phi_var5
+         	     0:                SubOP 	                   temp26 	    temp25,         48
+         	     0: CallWithReturnValueOP 	                   temp27 	      null
+         	     0:               GotoOP 	    goto quick_readlabel8 	      null
+	quick_readlabel10:
+         	     0:              LabelOP 	        quick_readlabel10 	      null
+         	     0:  GotoWithConditionOP 	true:quick_readlabel13  false:quick_readlabel12 	 %phi_var1
+	quick_readlabel13:
+         	     0:              LabelOP 	        quick_readlabel13 	      null
+         	     0:           NegativeOP 	                   temp30 	 %phi_var3
+         	     0:             ReturnOP 	                   return 	    temp30
+	quick_readendlabel:
+         	     0:              LabelOP 	       quick_readendlabel 	      null
+         	     0:            FuncEndOP 	          func_label_end1 	      null
+	quick_readlabel12:
+         	     0:              LabelOP 	        quick_readlabel12 	      null
+         	     0:             ReturnOP 	                   return 	 %phi_var3
+
+
+super log!!!!!!!!!!!!!!!!!
+	labelID	number:               opcode 	                     name 	       use
+	quick_readentry:
+         	     0:              LabelOP 	          quick_readentry 	      null
+         	     0: CallWithReturnValueOP 	                   temp10 	      null
+         	     0:               GotoOP 	    goto quick_readlabel1 	      null
+	quick_readlabel1:
+         	     0:              LabelOP 	         quick_readlabel1 	      null
+         	     0:            PhiFuncOp 	                %phi_var4 	size: 2 	bblock: quick_readentry value: temp10, 	bblock: quick_readlabel5 value: temp17, 
+         	     0:            PhiFuncOp 	                %phi_var1 	size: 2 	bblock: quick_readentry value: 0, 	bblock: quick_readlabel5 value: %phi_var2, 
+         	     0:           LessThanOP 	                   temp12 	 %phi_var4,         48
+         	     0:  GotoWithConditionOP 	true:quick_readlabel2  false:quick_readlabel4 	    temp12
+	quick_readlabel2:
+         	     0:              LabelOP 	         quick_readlabel2 	      null
+         	     0:              EqualOP 	                   temp16 	 %phi_var4,         45
+         	     0:  GotoWithConditionOP 	true:quick_readlabel6  false:quick_readlabel5 	    temp16
+	quick_readlabel6:
+         	     0:              LabelOP 	         quick_readlabel6 	      null
+         	     0:               GotoOP 	    goto quick_readlabel5 	      null
+	quick_readlabel5:
+         	     0:              LabelOP 	         quick_readlabel5 	      null
+         	     0:            PhiFuncOp 	                %phi_var2 	size: 2 	bblock: quick_readlabel2 value: %phi_var1, 	bblock: quick_readlabel6 value: 1, 
+         	     0: CallWithReturnValueOP 	                   temp17 	      null
+         	     0:               GotoOP 	    goto quick_readlabel1 	      null
+	quick_readlabel4:
+         	     0:              LabelOP 	         quick_readlabel4 	      null
+         	     0:          GreatThanOP 	                   temp14 	 %phi_var4,         57
+         	     0:  GotoWithConditionOP 	true:quick_readlabel2  false:quick_readlabel3 	    temp14
+	quick_readlabel3:
+         	     0:              LabelOP 	         quick_readlabel3 	      null
+         	     0:               GotoOP 	    goto quick_readlabel8 	      null
+	quick_readlabel8:
+         	     0:              LabelOP 	         quick_readlabel8 	      null
+         	     0:            PhiFuncOp 	                %phi_var5 	size: 2 	bblock: quick_readlabel3 value: %phi_var4, 	bblock: quick_readlabel9 value: temp27, 
+         	     0:            PhiFuncOp 	                %phi_var3 	size: 2 	bblock: quick_readlabel3 value: 0, 	bblock: quick_readlabel9 value: temp26, 
+         	     0:         GreatEqualOP 	                   temp19 	 %phi_var5,         48
+         	     0:  GotoWithConditionOP 	true:quick_readlabel11  false:quick_readlabel10 	    temp19
+	quick_readlabel11:
+         	     0:              LabelOP 	        quick_readlabel11 	      null
+         	     0:          LessEqualOP 	                   temp21 	 %phi_var5,         57
+         	     0:  GotoWithConditionOP 	true:quick_readlabel9  false:quick_readlabel10 	    temp21
+	quick_readlabel9:
+         	     0:              LabelOP 	         quick_readlabel9 	      null
+         	     0:                MulOP 	                   temp23 	 %phi_var3,         10
+         	     0:                AddOP 	                   temp25 	    temp23,  %phi_var5
+         	     0:                SubOP 	                   temp26 	    temp25,         48
+         	     0: CallWithReturnValueOP 	                   temp27 	      null
+         	     0:               GotoOP 	    goto quick_readlabel8 	      null
+	quick_readlabel10:
+         	     0:              LabelOP 	        quick_readlabel10 	      null
+         	     0:  GotoWithConditionOP 	true:quick_readlabel13  false:quick_readlabel12 	 %phi_var1
+	quick_readlabel13:
+         	     0:              LabelOP 	        quick_readlabel13 	      null
+         	     0:           NegativeOP 	                   temp30 	 %phi_var3
+         	     0:             ReturnOP 	                   return 	    temp30
+	quick_readendlabel:
+         	     0:              LabelOP 	       quick_readendlabel 	      null
+         	     0:            FuncEndOP 	          func_label_end1 	      null
+	quick_readlabel12:
+         	     0:              LabelOP 	        quick_readlabel12 	      null
+         	     0:             ReturnOP 	                   return 	 %phi_var3
+
+
+
+before optimization log!!!!!!!!!!!!!!!!!
+	labelID	number:               opcode 	                     name 	       use
+	add_edgeentry:
+         	     0:              LabelOP 	            add_edgeentry 	      null
+         	     0:               LoadOP 	                   temp32 	   global8
+         	     0:      GetelementptrOP 	                   temp33 	   global5,     temp32
+         	     0:              StoreOP 	                   (null) 	    temp33,     param1
+         	     0:               LoadOP 	                   temp35 	   global8
+         	     0:      GetelementptrOP 	                   temp38 	   global7,     param0
+         	     0:               LoadOP 	                   temp39 	    temp38
+         	     0:      GetelementptrOP 	                   temp36 	   global6,     temp35
+         	     0:              StoreOP 	                   (null) 	    temp36,     temp39
+         	     0:               LoadOP 	                   temp42 	   global8
+         	     0:      GetelementptrOP 	                   temp41 	   global7,     param0
+         	     0:              StoreOP 	                   (null) 	    temp41,     temp42
+         	     0:               LoadOP 	                   temp43 	   global8
+         	     0:                AddOP 	                   temp44 	    temp43,          1
+         	     0:              StoreOP 	                   (null) 	   global8,     temp44
+         	     0:               LoadOP 	                   temp45 	   global8
+         	     0:      GetelementptrOP 	                   temp46 	   global5,     temp45
+         	     0:              StoreOP 	                   (null) 	    temp46,     param0
+         	     0:               LoadOP 	                   temp48 	   global8
+         	     0:      GetelementptrOP 	                   temp51 	   global7,     param1
+         	     0:               LoadOP 	                   temp52 	    temp51
+         	     0:      GetelementptrOP 	                   temp49 	   global6,     temp48
+         	     0:              StoreOP 	                   (null) 	    temp49,     temp52
+         	     0:               LoadOP 	                   temp55 	   global8
+         	     0:      GetelementptrOP 	                   temp54 	   global7,     param1
+         	     0:              StoreOP 	                   (null) 	    temp54,     temp55
+         	     0:               LoadOP 	                   temp56 	   global8
+         	     0:                AddOP 	                   temp57 	    temp56,          1
+         	     0:              StoreOP 	                   (null) 	   global8,     temp57
+         	     0:               GotoOP 	    goto add_edgeendlabel 	      null
+	add_edgeendlabel:
+         	     0:              LabelOP 	         add_edgeendlabel 	      null
+         	     0:            FuncEndOP 	          func_label_end2 	      null
+
+
+super log!!!!!!!!!!!!!!!!!
+	labelID	number:               opcode 	                     name 	       use
+	add_edgeentry:
+         	     0:              LabelOP 	            add_edgeentry 	      null
+         	     0:               LoadOP 	                   temp32 	   global8
+         	     0:      GetelementptrOP 	                   temp33 	   global5,     temp32
+         	     0:              StoreOP 	                   (null) 	    temp33,     param1
+         	     0:               LoadOP 	                   temp35 	   global8
+         	     0:      GetelementptrOP 	                   temp38 	   global7,     param0
+         	     0:               LoadOP 	                   temp39 	    temp38
+         	     0:      GetelementptrOP 	                   temp36 	   global6,     temp35
+         	     0:              StoreOP 	                   (null) 	    temp36,     temp39
+         	     0:               LoadOP 	                   temp42 	   global8
+         	     0:      GetelementptrOP 	                   temp41 	   global7,     param0
+         	     0:              StoreOP 	                   (null) 	    temp41,     temp42
+         	     0:               LoadOP 	                   temp43 	   global8
+         	     0:                AddOP 	                   temp44 	    temp43,          1
+         	     0:              StoreOP 	                   (null) 	   global8,     temp44
+         	     0:               LoadOP 	                   temp45 	   global8
+         	     0:      GetelementptrOP 	                   temp46 	   global5,     temp45
+         	     0:              StoreOP 	                   (null) 	    temp46,     param0
+         	     0:               LoadOP 	                   temp48 	   global8
+         	     0:      GetelementptrOP 	                   temp51 	   global7,     param1
+         	     0:               LoadOP 	                   temp52 	    temp51
+         	     0:      GetelementptrOP 	                   temp49 	   global6,     temp48
+         	     0:              StoreOP 	                   (null) 	    temp49,     temp52
+         	     0:               LoadOP 	                   temp55 	   global8
+         	     0:      GetelementptrOP 	                   temp54 	   global7,     param1
+         	     0:              StoreOP 	                   (null) 	    temp54,     temp55
+         	     0:               LoadOP 	                   temp56 	   global8
+         	     0:                AddOP 	                   temp57 	    temp56,          1
+         	     0:              StoreOP 	                   (null) 	   global8,     temp57
+         	     0:               GotoOP 	    goto add_edgeendlabel 	      null
+	add_edgeendlabel:
+         	     0:              LabelOP 	         add_edgeendlabel 	      null
+         	     0:            FuncEndOP 	          func_label_end2 	      null
+
+
+
+before optimization log!!!!!!!!!!!!!!!!!
+	labelID	number:               opcode 	                     name 	       use
+	initentry:
+         	     0:              LabelOP 	                initentry 	      null
+         	     0:               GotoOP 	         goto initlabel15 	      null
+	initlabel15:
+         	     0:              LabelOP 	              initlabel15 	      null
+         	     0:            PhiFuncOp 	                %phi_var6 	size: 2 	bblock: initentry value: 0, 	bblock: initlabel16 value: temp63, 
+         	     0:           LessThanOP 	                   temp59 	 %phi_var6,       1005
+         	     0:  GotoWithConditionOP 	true:initlabel16  false:initlabel17 	    temp59
+	initlabel16:
+         	     0:              LabelOP 	              initlabel16 	      null
+         	     0:      GetelementptrOP 	                   temp61 	   global7,  %phi_var6
+         	     0:              StoreOP 	                   (null) 	    temp61,         -1
+         	     0:                AddOP 	                   temp63 	 %phi_var6,          1
+         	     0:               GotoOP 	         goto initlabel15 	      null
+	initlabel17:
+         	     0:              LabelOP 	              initlabel17 	      null
+         	     0:               GotoOP 	        goto initendlabel 	      null
+	initendlabel:
+         	     0:              LabelOP 	             initendlabel 	      null
+         	     0:            FuncEndOP 	          func_label_end3 	      null
+
+
+super log!!!!!!!!!!!!!!!!!
+	labelID	number:               opcode 	                     name 	       use
+	initentry:
+         	     0:              LabelOP 	                initentry 	      null
+         	     0:               GotoOP 	         goto initlabel15 	      null
+	initlabel15:
+         	     0:              LabelOP 	              initlabel15 	      null
+         	     0:            PhiFuncOp 	                %phi_var6 	size: 2 	bblock: initentry value: 0, 	bblock: initlabel16 value: temp63, 
+         	     0:           LessThanOP 	                   temp59 	 %phi_var6,       1005
+         	     0:  GotoWithConditionOP 	true:initlabel16  false:initlabel17 	    temp59
+	initlabel16:
+         	     0:              LabelOP 	              initlabel16 	      null
+         	     0:      GetelementptrOP 	                   temp61 	   global7,  %phi_var6
+         	     0:              StoreOP 	                   (null) 	    temp61,         -1
+         	     0:                AddOP 	                   temp63 	 %phi_var6,          1
+         	     0:               GotoOP 	         goto initlabel15 	      null
+	initlabel17:
+         	     0:              LabelOP 	              initlabel17 	      null
+         	     0:               GotoOP 	        goto initendlabel 	      null
+	initendlabel:
+         	     0:              LabelOP 	             initendlabel 	      null
+         	     0:            FuncEndOP 	          func_label_end3 	      null
+
+
+
+before optimization log!!!!!!!!!!!!!!!!!
+	labelID	number:               opcode 	                     name 	       use
+	clearentry:
+         	     0:              LabelOP 	               clearentry 	      null
+         	     0:               GotoOP 	        goto clearlabel18 	      null
+	clearlabel18:
+         	     0:              LabelOP 	             clearlabel18 	      null
+         	     0:            PhiFuncOp 	                %phi_var7 	size: 2 	bblock: clearlabel19 value: temp70, 	bblock: clearentry value: 1, 
+         	     0:               LoadOP 	                   temp65 	   global1
+         	     0:          LessEqualOP 	                   temp66 	 %phi_var7,     temp65
+         	     0:  GotoWithConditionOP 	true:clearlabel19  false:clearlabel20 	    temp66
+	clearlabel19:
+         	     0:              LabelOP 	             clearlabel19 	      null
+         	     0:      GetelementptrOP 	                   temp68 	   global9,  %phi_var7
+         	     0:              StoreOP 	                   (null) 	    temp68,          0
+         	     0:                AddOP 	                   temp70 	 %phi_var7,          1
+         	     0:               GotoOP 	        goto clearlabel18 	      null
+	clearlabel20:
+         	     0:              LabelOP 	             clearlabel20 	      null
+         	     0:               GotoOP 	       goto clearendlabel 	      null
+	clearendlabel:
+         	     0:              LabelOP 	            clearendlabel 	      null
+         	     0:            FuncEndOP 	          func_label_end4 	      null
+
+
+super log!!!!!!!!!!!!!!!!!
+	labelID	number:               opcode 	                     name 	       use
+	clearentry:
+         	     0:              LabelOP 	               clearentry 	      null
+         	     0:               GotoOP 	        goto clearlabel18 	      null
+	clearlabel18:
+         	     0:              LabelOP 	             clearlabel18 	      null
+         	     0:            PhiFuncOp 	                %phi_var7 	size: 2 	bblock: clearlabel19 value: temp70, 	bblock: clearentry value: 1, 
+         	     0:               LoadOP 	                   temp65 	   global1
+         	     0:          LessEqualOP 	                   temp66 	 %phi_var7,     temp65
+         	     0:  GotoWithConditionOP 	true:clearlabel19  false:clearlabel20 	    temp66
+	clearlabel19:
+         	     0:              LabelOP 	             clearlabel19 	      null
+         	     0:      GetelementptrOP 	                   temp68 	   global9,  %phi_var7
+         	     0:              StoreOP 	                   (null) 	    temp68,          0
+         	     0:                AddOP 	                   temp70 	 %phi_var7,          1
+         	     0:               GotoOP 	        goto clearlabel18 	      null
+	clearlabel20:
+         	     0:              LabelOP 	             clearlabel20 	      null
+         	     0:               GotoOP 	       goto clearendlabel 	      null
+	clearendlabel:
+         	     0:              LabelOP 	            clearendlabel 	      null
+         	     0:            FuncEndOP 	          func_label_end4 	      null
+
+
+
+before optimization log!!!!!!!!!!!!!!!!!
+	labelID	number:               opcode 	                     name 	       use
+	sameentry:
+         	     0:              LabelOP 	                sameentry 	      null
+         	     0:      GetelementptrOP 	                   temp72 	   global9,     param0
+         	     0:              StoreOP 	                   (null) 	    temp72,          1
+         	     0:              EqualOP 	                   temp75 	    param0,     param1
+         	     0:  GotoWithConditionOP 	true:samelabel22  false:samelabel21 	    temp75
+	samelabel22:
+         	     0:              LabelOP 	              samelabel22 	      null
+         	     0:             ReturnOP 	                   return 	         1
+	sameendlabel:
+         	     0:              LabelOP 	             sameendlabel 	      null
+         	     0:            PhiFuncOp 	               %phi_var10 	size: 3 	bblock: samelabel22 value: 0, 	bblock: samelabel26 value: %phi_var11, 	bblock: samelabel28 value: %phi_var11, 
+         	     0:            PhiFuncOp 	                %phi_var8 	size: 3 	bblock: samelabel22 value: 0, 	bblock: samelabel26 value: %phi_var9, 	bblock: samelabel28 value: temp83, 
+         	     0:            FuncEndOP 	          func_label_end5 	      null
+	samelabel21:
+         	     0:              LabelOP 	              samelabel21 	      null
+         	     0:      GetelementptrOP 	                   temp77 	   global7,     param0
+         	     0:               LoadOP 	                   temp78 	    temp77
+         	     0:               GotoOP 	         goto samelabel24 	      null
+	samelabel24:
+         	     0:              LabelOP 	              samelabel24 	      null
+         	     0:            PhiFuncOp 	               %phi_var11 	size: 2 	bblock: samelabel21 value: temp78, 	bblock: samelabel27 value: temp93, 
+         	     0:            PhiFuncOp 	                %phi_var9 	size: 2 	bblock: samelabel21 value: 0, 	bblock: samelabel27 value: temp83, 
+         	     0:           NotEqualOP 	                   temp80 	%phi_var11,         -1
+         	     0:  GotoWithConditionOP 	true:samelabel25  false:samelabel26 	    temp80
+	samelabel25:
+         	     0:              LabelOP 	              samelabel25 	      null
+         	     0:      GetelementptrOP 	                   temp82 	   global5, %phi_var11
+         	     0:               LoadOP 	                   temp83 	    temp82
+         	     0:      GetelementptrOP 	                   temp85 	   global9,     temp83
+         	     0:               LoadOP 	                   temp86 	    temp85
+         	     0:                NotOP 	                   temp87 	    temp86
+         	     0:  GotoWithConditionOP 	true:samelabel29  false:samelabel27 	    temp87
+	samelabel29:
+         	     0:              LabelOP 	              samelabel29 	      null
+         	     0:              ParamOP 	                   param1 	    param1
+         	     0:              ParamOP 	                   param0 	    temp83
+         	     0: CallWithReturnValueOP 	                   temp90 	      null
+         	     0:  GotoWithConditionOP 	true:samelabel28  false:samelabel27 	    temp90
+	samelabel28:
+         	     0:              LabelOP 	              samelabel28 	      null
+         	     0:             ReturnOP 	                   return 	         1
+	samelabel27:
+         	     0:              LabelOP 	              samelabel27 	      null
+         	     0:      GetelementptrOP 	                   temp92 	   global6, %phi_var11
+         	     0:               LoadOP 	                   temp93 	    temp92
+         	     0:               GotoOP 	         goto samelabel24 	      null
+	samelabel26:
+         	     0:              LabelOP 	              samelabel26 	      null
+         	     0:             ReturnOP 	                   return 	         0
+
+
+super log!!!!!!!!!!!!!!!!!
+	labelID	number:               opcode 	                     name 	       use
+	sameentry:
+         	     0:              LabelOP 	                sameentry 	      null
+         	     0:      GetelementptrOP 	                   temp72 	   global9,     param0
+         	     0:              StoreOP 	                   (null) 	    temp72,          1
+         	     0:              EqualOP 	                   temp75 	    param0,     param1
+         	     0:  GotoWithConditionOP 	true:samelabel22  false:samelabel21 	    temp75
+	samelabel22:
+         	     0:              LabelOP 	              samelabel22 	      null
+         	     0:             ReturnOP 	                   return 	         1
+	sameendlabel:
+         	     0:              LabelOP 	             sameendlabel 	      null
+         	     0:            FuncEndOP 	          func_label_end5 	      null
+	samelabel21:
+         	     0:              LabelOP 	              samelabel21 	      null
+         	     0:      GetelementptrOP 	                   temp77 	   global7,     param0
+         	     0:               LoadOP 	                   temp78 	    temp77
+         	     0:               GotoOP 	         goto samelabel24 	      null
+	samelabel24:
+         	     0:              LabelOP 	              samelabel24 	      null
+         	     0:            PhiFuncOp 	               %phi_var11 	size: 2 	bblock: samelabel21 value: temp78, 	bblock: samelabel27 value: temp93, 
+         	     0:           NotEqualOP 	                   temp80 	%phi_var11,         -1
+         	     0:  GotoWithConditionOP 	true:samelabel25  false:samelabel26 	    temp80
+	samelabel25:
+         	     0:              LabelOP 	              samelabel25 	      null
+         	     0:      GetelementptrOP 	                   temp82 	   global5, %phi_var11
+         	     0:               LoadOP 	                   temp83 	    temp82
+         	     0:      GetelementptrOP 	                   temp85 	   global9,     temp83
+         	     0:               LoadOP 	                   temp86 	    temp85
+         	     0:                NotOP 	                   temp87 	    temp86
+         	     0:  GotoWithConditionOP 	true:samelabel29  false:samelabel27 	    temp87
+	samelabel29:
+         	     0:              LabelOP 	              samelabel29 	      null
+         	     0:              ParamOP 	                   param1 	    param1
+         	     0:              ParamOP 	                   param0 	    temp83
+         	     0: CallWithReturnValueOP 	                   temp90 	      null
+         	     0:  GotoWithConditionOP 	true:samelabel28  false:samelabel27 	    temp90
+	samelabel28:
+         	     0:              LabelOP 	              samelabel28 	      null
+         	     0:             ReturnOP 	                   return 	         1
+	samelabel27:
+         	     0:              LabelOP 	              samelabel27 	      null
+         	     0:      GetelementptrOP 	                   temp92 	   global6, %phi_var11
+         	     0:               LoadOP 	                   temp93 	    temp92
+         	     0:               GotoOP 	         goto samelabel24 	      null
+	samelabel26:
+         	     0:              LabelOP 	              samelabel26 	      null
+         	     0:             ReturnOP 	                   return 	         0
+
+
+
+before optimization log!!!!!!!!!!!!!!!!!
+	labelID	number:               opcode 	                     name 	       use
 	mainentry:
          	     0:              LabelOP 	                mainentry 	      null
-         	     0: CallWithReturnValueOP 	                   temp10 	      null
-         	     0: CallWithReturnValueOP 	                   temp11 	      null
-         	     0:              ParamOP 	                   param0 	        12
-         	     0:               CallOP 	                   temp12 	      null
-         	     0:               GotoOP 	          goto mainlabel1 	      null
-	mainlabel1:
-         	     0:              LabelOP 	               mainlabel1 	      null
-         	     0:            PhiFuncOp 	                %phi_var6 	size: 2 	bblock: mainentry value: 1, 	bblock: mainlabel6 value: temp91, 
-         	     0:            PhiFuncOp 	                %phi_var4 	size: 2 	bblock: mainentry value: 1, 	bblock: mainlabel6 value: %phi_var5, 
-         	     0:            PhiFuncOp 	                %phi_var1 	size: 2 	bblock: mainentry value: 1, 	bblock: mainlabel6 value: %phi_var2, 
-         	     0:                SubOP 	                   temp15 	    temp10,          1
-         	     0:           LessThanOP 	                   temp16 	 %phi_var6,     temp15
-         	     0:  GotoWithConditionOP 	true:mainlabel2  false:mainlabel3 	    temp16
-	mainlabel2:
-         	     0:              LabelOP 	               mainlabel2 	      null
-         	     0:               GotoOP 	          goto mainlabel4 	      null
-	mainlabel4:
-         	     0:              LabelOP 	               mainlabel4 	      null
-         	     0:            PhiFuncOp 	                %phi_var5 	size: 2 	bblock: mainlabel2 value: 1, 	bblock: mainlabel9 value: temp89, 
-         	     0:            PhiFuncOp 	                %phi_var2 	size: 2 	bblock: mainlabel2 value: 1, 	bblock: mainlabel9 value: %phi_var3, 
-         	     0:                SubOP 	                   temp19 	    temp10,          1
-         	     0:           LessThanOP 	                   temp20 	 %phi_var5,     temp19
-         	     0:  GotoWithConditionOP 	true:mainlabel5  false:mainlabel6 	    temp20
-	mainlabel5:
-         	     0:              LabelOP 	               mainlabel5 	      null
-         	     0:               GotoOP 	          goto mainlabel7 	      null
-	mainlabel7:
-         	     0:              LabelOP 	               mainlabel7 	      null
-         	     0:            PhiFuncOp 	                %phi_var3 	size: 2 	bblock: mainlabel5 value: 1, 	bblock: mainlabel8 value: temp87, 
-         	     0:                SubOP 	                   temp23 	    temp10,          1
-         	     0:           LessThanOP 	                   temp24 	 %phi_var3,     temp23
-         	     0:  GotoWithConditionOP 	true:mainlabel8  false:mainlabel9 	    temp24
-	mainlabel8:
-         	     0:              LabelOP 	               mainlabel8 	      null
-         	     0:                SubOP 	                   temp32 	 %phi_var6,          1
-         	     0:      GetelementptrOP 	                   temp33 	   global1,     temp32
-         	     0:      GetelementptrOP 	                   temp35 	    temp33,  %phi_var5
-         	     0:      GetelementptrOP 	                   temp37 	    temp35,  %phi_var3
-         	     0:               LoadOP 	                   temp38 	    temp37
-         	     0:                AddOP 	                   temp40 	 %phi_var6,          1
-         	     0:      GetelementptrOP 	                   temp41 	   global1,     temp40
-         	     0:      GetelementptrOP 	                   temp43 	    temp41,  %phi_var5
-         	     0:      GetelementptrOP 	                   temp45 	    temp43,  %phi_var3
-         	     0:               LoadOP 	                   temp46 	    temp45
-         	     0:                AddOP 	                   temp47 	    temp38,     temp46
-         	     0:                SubOP 	                   temp51 	 %phi_var5,          1
-         	     0:      GetelementptrOP 	                   temp49 	   global1,  %phi_var6
-         	     0:      GetelementptrOP 	                   temp52 	    temp49,     temp51
-         	     0:      GetelementptrOP 	                   temp54 	    temp52,  %phi_var3
-         	     0:               LoadOP 	                   temp55 	    temp54
-         	     0:                AddOP 	                   temp56 	    temp47,     temp55
-         	     0:                AddOP 	                   temp60 	 %phi_var5,          1
-         	     0:      GetelementptrOP 	                   temp58 	   global1,  %phi_var6
-         	     0:      GetelementptrOP 	                   temp61 	    temp58,     temp60
-         	     0:      GetelementptrOP 	                   temp63 	    temp61,  %phi_var3
-         	     0:               LoadOP 	                   temp64 	    temp63
-         	     0:                AddOP 	                   temp65 	    temp56,     temp64
-         	     0:                SubOP 	                   temp71 	 %phi_var3,          1
-         	     0:      GetelementptrOP 	                   temp67 	   global1,  %phi_var6
-         	     0:      GetelementptrOP 	                   temp69 	    temp67,  %phi_var5
-         	     0:      GetelementptrOP 	                   temp72 	    temp69,     temp71
-         	     0:               LoadOP 	                   temp73 	    temp72
-         	     0:                AddOP 	                   temp74 	    temp65,     temp73
-         	     0:                AddOP 	                   temp80 	 %phi_var3,          1
-         	     0:      GetelementptrOP 	                   temp76 	   global1,  %phi_var6
-         	     0:      GetelementptrOP 	                   temp78 	    temp76,  %phi_var5
-         	     0:      GetelementptrOP 	                   temp81 	    temp78,     temp80
-         	     0:               LoadOP 	                   temp82 	    temp81
-         	     0:                AddOP 	                   temp83 	    temp74,     temp82
-         	     0:                DivOP 	                   temp85 	    temp83,     temp11
-         	     0:      GetelementptrOP 	                   temp26 	   global1,  %phi_var6
-         	     0:      GetelementptrOP 	                   temp28 	    temp26,  %phi_var5
-         	     0:      GetelementptrOP 	                   temp30 	    temp28,  %phi_var3
-         	     0:              StoreOP 	                   (null) 	    temp30,     temp85
-         	     0:                AddOP 	                   temp87 	 %phi_var3,          1
-         	     0:               GotoOP 	          goto mainlabel7 	      null
-	mainlabel9:
-         	     0:              LabelOP 	               mainlabel9 	      null
-         	     0:                AddOP 	                   temp89 	 %phi_var5,          1
-         	     0:               GotoOP 	          goto mainlabel4 	      null
-	mainlabel6:
-         	     0:              LabelOP 	               mainlabel6 	      null
-         	     0:                AddOP 	                   temp91 	 %phi_var6,          1
-         	     0:               GotoOP 	          goto mainlabel1 	      null
-	mainlabel3:
-         	     0:              LabelOP 	               mainlabel3 	      null
-         	     0:              ParamOP 	                   param0 	        53
-         	     0:               CallOP 	                   temp92 	      null
-         	     0:      GetelementptrOP 	                   temp94 	   global1,          0
-         	     0:      GetelementptrOP 	                   temp95 	    temp94,          0
-         	     0:              ParamOP 	                   param1 	    temp95
-         	     0:              ParamOP 	                   param0 	    temp10
+         	     0: CallWithReturnValueOP 	                   temp94 	      null
+         	     0:              StoreOP 	                   (null) 	   global1,     temp94
+         	     0: CallWithReturnValueOP 	                   temp95 	      null
+         	     0:              StoreOP 	                   (null) 	   global2,     temp95
          	     0:               CallOP 	                   temp96 	      null
-         	     0:                DivOP 	                   temp99 	    temp10,          2
-         	     0:                DivOP 	                  temp102 	    temp10,          2
-         	     0:      GetelementptrOP 	                  temp100 	   global1,     temp99
-         	     0:      GetelementptrOP 	                  temp103 	   temp100,    temp102
-         	     0:              ParamOP 	                   param1 	   temp103
-         	     0:              ParamOP 	                   param0 	    temp10
-         	     0:               CallOP 	                  temp104 	      null
-         	     0:                SubOP 	                  temp107 	 %phi_var6,          1
-         	     0:                SubOP 	                  temp110 	 %phi_var4,          1
-         	     0:      GetelementptrOP 	                  temp108 	   global1,    temp107
-         	     0:      GetelementptrOP 	                  temp111 	   temp108,    temp110
-         	     0:              ParamOP 	                   param1 	   temp111
-         	     0:              ParamOP 	                   param0 	    temp10
+         	     0:               GotoOP 	         goto mainlabel31 	      null
+	mainlabel31:
+         	     0:              LabelOP 	              mainlabel31 	      null
+         	     0:            PhiFuncOp 	               %phi_var12 	size: 2 	bblock: mainentry value: 0, 	bblock: mainlabel40 value: %phi_var13, 
+         	     0:               LoadOP 	                   temp97 	   global2
+         	     0:  GotoWithConditionOP 	true:mainlabel32  false:mainlabel33 	    temp97
+	mainlabel32:
+         	     0:              LabelOP 	              mainlabel32 	      null
+         	     0: CallWithReturnValueOP 	                   temp98 	      null
+         	     0:               GotoOP 	         goto mainlabel34 	      null
+	mainlabel34:
+         	     0:              LabelOP 	              mainlabel34 	      null
+         	     0:            PhiFuncOp 	               %phi_var13 	size: 2 	bblock: mainlabel32 value: temp98, 	bblock: mainlabel35 value: temp103, 
+         	     0:           NotEqualOP 	                  temp100 	%phi_var13,         81
+         	     0:  GotoWithConditionOP 	true:mainlabel37  false:mainlabel36 	   temp100
+	mainlabel37:
+         	     0:              LabelOP 	              mainlabel37 	      null
+         	     0:           NotEqualOP 	                  temp102 	%phi_var13,         85
+         	     0:  GotoWithConditionOP 	true:mainlabel35  false:mainlabel36 	   temp102
+	mainlabel35:
+         	     0:              LabelOP 	              mainlabel35 	      null
+         	     0: CallWithReturnValueOP 	                  temp103 	      null
+         	     0:               GotoOP 	         goto mainlabel34 	      null
+	mainlabel36:
+         	     0:              LabelOP 	              mainlabel36 	      null
+         	     0:              EqualOP 	                  temp105 	%phi_var13,         81
+         	     0:  GotoWithConditionOP 	true:mainlabel39  false:mainlabel38 	   temp105
+	mainlabel39:
+         	     0:              LabelOP 	              mainlabel39 	      null
+         	     0: CallWithReturnValueOP 	                  temp106 	      null
+         	     0: CallWithReturnValueOP 	                  temp107 	      null
+         	     0:               CallOP 	                  temp108 	      null
+         	     0:              ParamOP 	                   param1 	   temp107
+         	     0:              ParamOP 	                   param0 	   temp106
+         	     0: CallWithReturnValueOP 	                  temp111 	      null
+         	     0:              ParamOP 	                   param0 	   temp111
          	     0:               CallOP 	                  temp112 	      null
+         	     0:              ParamOP 	                   param0 	        10
+         	     0:               CallOP 	                  temp113 	      null
+         	     0:               GotoOP 	         goto mainlabel40 	      null
+	mainlabel40:
+         	     0:              LabelOP 	              mainlabel40 	      null
+         	     0:               LoadOP 	                  temp119 	   global2
+         	     0:                SubOP 	                  temp120 	   temp119,          1
+         	     0:              StoreOP 	                   (null) 	   global2,    temp120
+         	     0:               GotoOP 	         goto mainlabel31 	      null
+	mainlabel38:
+         	     0:              LabelOP 	              mainlabel38 	      null
+         	     0: CallWithReturnValueOP 	                  temp114 	      null
+         	     0: CallWithReturnValueOP 	                  temp115 	      null
+         	     0:              ParamOP 	                   param1 	   temp115
+         	     0:              ParamOP 	                   param0 	   temp114
+         	     0:               CallOP 	                  temp118 	      null
+         	     0:               GotoOP 	         goto mainlabel40 	      null
+	mainlabel33:
+         	     0:              LabelOP 	              mainlabel33 	      null
          	     0:             ReturnOP 	                   return 	         0
 	mainendlabel:
          	     0:              LabelOP 	             mainendlabel 	      null
-         	     0:            FuncEndOP 	          func_label_end1 	      null
+         	     0:            FuncEndOP 	          func_label_end6 	      null
 
 
 super log!!!!!!!!!!!!!!!!!
 	labelID	number:               opcode 	                     name 	       use
 	mainentry:
          	     0:              LabelOP 	                mainentry 	      null
-         	     0: CallWithReturnValueOP 	                   temp10 	      null
-         	     0: CallWithReturnValueOP 	                   temp11 	      null
-         	     0:              ParamOP 	                   param0 	        12
-         	     0:               CallOP 	                   temp12 	      null
-         	     0:               GotoOP 	          goto mainlabel1 	      null
-	mainlabel1:
-         	     0:              LabelOP 	               mainlabel1 	      null
-         	     0:            PhiFuncOp 	                %phi_var6 	size: 2 	bblock: mainentry value: 1, 	bblock: mainlabel6 value: temp40, 
-         	     0:            PhiFuncOp 	                %phi_var4 	size: 2 	bblock: mainentry value: 1, 	bblock: mainlabel6 value: %phi_var5, 
-         	     0:                SubOP 	                   temp15 	    temp10,          1
-         	     0:           LessThanOP 	                   temp16 	 %phi_var6,     temp15
-         	     0:  GotoWithConditionOP 	true:mainlabel2  false:mainlabel3 	    temp16
-	mainlabel2:
-         	     0:              LabelOP 	               mainlabel2 	      null
-         	     0:               GotoOP 	          goto mainlabel4 	      null
-	mainlabel4:
-         	     0:              LabelOP 	               mainlabel4 	      null
-         	     0:            PhiFuncOp 	                %phi_var5 	size: 2 	bblock: mainlabel2 value: 1, 	bblock: mainlabel9 value: temp60, 
-         	     0:           LessThanOP 	                   temp20 	 %phi_var5,     temp15
-         	     0:  GotoWithConditionOP 	true:mainlabel5  false:mainlabel6 	    temp20
-	mainlabel5:
-         	     0:              LabelOP 	               mainlabel5 	      null
-         	     0:               GotoOP 	          goto mainlabel7 	      null
-	mainlabel7:
-         	     0:              LabelOP 	               mainlabel7 	      null
-         	     0:            PhiFuncOp 	                %phi_var3 	size: 2 	bblock: mainlabel5 value: 1, 	bblock: mainlabel8 value: temp80, 
-         	     0:           LessThanOP 	                   temp24 	 %phi_var3,     temp15
-         	     0:  GotoWithConditionOP 	true:mainlabel8  false:mainlabel9 	    temp24
-	mainlabel8:
-         	     0:              LabelOP 	               mainlabel8 	      null
-         	     0:                SubOP 	                   temp32 	 %phi_var6,          1
-         	     0:      GetelementptrOP 	                   temp33 	   global1,     temp32
-         	     0:      GetelementptrOP 	                   temp35 	    temp33,  %phi_var5
-         	     0:      GetelementptrOP 	                   temp37 	    temp35,  %phi_var3
-         	     0:               LoadOP 	                   temp38 	    temp37
-         	     0:                AddOP 	                   temp40 	 %phi_var6,          1
-         	     0:      GetelementptrOP 	                   temp41 	   global1,     temp40
-         	     0:      GetelementptrOP 	                   temp43 	    temp41,  %phi_var5
-         	     0:      GetelementptrOP 	                   temp45 	    temp43,  %phi_var3
-         	     0:               LoadOP 	                   temp46 	    temp45
-         	     0:                AddOP 	                   temp47 	    temp38,     temp46
-         	     0:                SubOP 	                   temp51 	 %phi_var5,          1
-         	     0:      GetelementptrOP 	                   temp49 	   global1,  %phi_var6
-         	     0:      GetelementptrOP 	                   temp52 	    temp49,     temp51
-         	     0:      GetelementptrOP 	                   temp54 	    temp52,  %phi_var3
-         	     0:               LoadOP 	                   temp55 	    temp54
-         	     0:                AddOP 	                   temp56 	    temp47,     temp55
-         	     0:                AddOP 	                   temp60 	 %phi_var5,          1
-         	     0:      GetelementptrOP 	                   temp58 	   global1,  %phi_var6
-         	     0:      GetelementptrOP 	                   temp61 	    temp58,     temp60
-         	     0:      GetelementptrOP 	                   temp63 	    temp61,  %phi_var3
-         	     0:               LoadOP 	                   temp64 	    temp63
-         	     0:                AddOP 	                   temp65 	    temp56,     temp64
-         	     0:                SubOP 	                   temp71 	 %phi_var3,          1
-         	     0:      GetelementptrOP 	                   temp67 	   global1,  %phi_var6
-         	     0:      GetelementptrOP 	                   temp69 	    temp67,  %phi_var5
-         	     0:      GetelementptrOP 	                   temp72 	    temp69,     temp71
-         	     0:               LoadOP 	                   temp73 	    temp72
-         	     0:                AddOP 	                   temp74 	    temp65,     temp73
-         	     0:                AddOP 	                   temp80 	 %phi_var3,          1
-         	     0:      GetelementptrOP 	                   temp76 	   global1,  %phi_var6
-         	     0:      GetelementptrOP 	                   temp78 	    temp76,  %phi_var5
-         	     0:      GetelementptrOP 	                   temp81 	    temp78,     temp80
-         	     0:               LoadOP 	                   temp82 	    temp81
-         	     0:                AddOP 	                   temp83 	    temp74,     temp82
-         	     0:                DivOP 	                   temp85 	    temp83,     temp11
-         	     0:      GetelementptrOP 	                   temp26 	   global1,  %phi_var6
-         	     0:      GetelementptrOP 	                   temp28 	    temp26,  %phi_var5
-         	     0:      GetelementptrOP 	                   temp30 	    temp28,  %phi_var3
-         	     0:              StoreOP 	                   (null) 	    temp30,     temp85
-         	     0:               GotoOP 	          goto mainlabel7 	      null
-	mainlabel9:
-         	     0:              LabelOP 	               mainlabel9 	      null
-         	     0:               GotoOP 	          goto mainlabel4 	      null
-	mainlabel6:
-         	     0:              LabelOP 	               mainlabel6 	      null
-         	     0:               GotoOP 	          goto mainlabel1 	      null
-	mainlabel3:
-         	     0:              LabelOP 	               mainlabel3 	      null
-         	     0:              ParamOP 	                   param0 	        53
-         	     0:               CallOP 	                   temp92 	      null
-         	     0:      GetelementptrOP 	                   temp94 	   global1,          0
-         	     0:      GetelementptrOP 	                   temp95 	    temp94,          0
-         	     0:              ParamOP 	                   param1 	    temp95
-         	     0:              ParamOP 	                   param0 	    temp10
+         	     0: CallWithReturnValueOP 	                   temp94 	      null
+         	     0:              StoreOP 	                   (null) 	   global1,     temp94
+         	     0: CallWithReturnValueOP 	                   temp95 	      null
+         	     0:              StoreOP 	                   (null) 	   global2,     temp95
          	     0:               CallOP 	                   temp96 	      null
-         	     0:                DivOP 	                   temp99 	    temp10,          2
-         	     0:      GetelementptrOP 	                  temp100 	   global1,     temp99
-         	     0:      GetelementptrOP 	                  temp103 	   temp100,     temp99
-         	     0:              ParamOP 	                   param1 	   temp103
-         	     0:              ParamOP 	                   param0 	    temp10
-         	     0:               CallOP 	                  temp104 	      null
-         	     0:                SubOP 	                  temp110 	 %phi_var4,          1
-         	     0:      GetelementptrOP 	                  temp108 	   global1,     temp32
-         	     0:      GetelementptrOP 	                  temp111 	   temp108,    temp110
-         	     0:              ParamOP 	                   param1 	   temp111
-         	     0:              ParamOP 	                   param0 	    temp10
+         	     0:               GotoOP 	         goto mainlabel31 	      null
+	mainlabel31:
+         	     0:              LabelOP 	              mainlabel31 	      null
+         	     0:               LoadOP 	                   temp97 	   global2
+         	     0:  GotoWithConditionOP 	true:mainlabel32  false:mainlabel33 	    temp97
+	mainlabel32:
+         	     0:              LabelOP 	              mainlabel32 	      null
+         	     0: CallWithReturnValueOP 	                   temp98 	      null
+         	     0:               GotoOP 	         goto mainlabel34 	      null
+	mainlabel34:
+         	     0:              LabelOP 	              mainlabel34 	      null
+         	     0:            PhiFuncOp 	               %phi_var13 	size: 2 	bblock: mainlabel32 value: temp98, 	bblock: mainlabel35 value: temp103, 
+         	     0:           NotEqualOP 	                  temp100 	%phi_var13,         81
+         	     0:  GotoWithConditionOP 	true:mainlabel37  false:mainlabel36 	   temp100
+	mainlabel37:
+         	     0:              LabelOP 	              mainlabel37 	      null
+         	     0:           NotEqualOP 	                  temp102 	%phi_var13,         85
+         	     0:  GotoWithConditionOP 	true:mainlabel35  false:mainlabel36 	   temp102
+	mainlabel35:
+         	     0:              LabelOP 	              mainlabel35 	      null
+         	     0: CallWithReturnValueOP 	                  temp103 	      null
+         	     0:               GotoOP 	         goto mainlabel34 	      null
+	mainlabel36:
+         	     0:              LabelOP 	              mainlabel36 	      null
+         	     0:              EqualOP 	                  temp105 	%phi_var13,         81
+         	     0:  GotoWithConditionOP 	true:mainlabel39  false:mainlabel38 	   temp105
+	mainlabel39:
+         	     0:              LabelOP 	              mainlabel39 	      null
+         	     0: CallWithReturnValueOP 	                  temp106 	      null
+         	     0: CallWithReturnValueOP 	                  temp107 	      null
+         	     0:               CallOP 	                  temp108 	      null
+         	     0:              ParamOP 	                   param1 	   temp107
+         	     0:              ParamOP 	                   param0 	   temp106
+         	     0: CallWithReturnValueOP 	                  temp111 	      null
+         	     0:              ParamOP 	                   param0 	   temp111
          	     0:               CallOP 	                  temp112 	      null
+         	     0:              ParamOP 	                   param0 	        10
+         	     0:               CallOP 	                  temp113 	      null
+         	     0:               GotoOP 	         goto mainlabel40 	      null
+	mainlabel40:
+         	     0:              LabelOP 	              mainlabel40 	      null
+         	     0:               LoadOP 	                  temp119 	   global2
+         	     0:                SubOP 	                  temp120 	   temp119,          1
+         	     0:              StoreOP 	                   (null) 	   global2,    temp120
+         	     0:               GotoOP 	         goto mainlabel31 	      null
+	mainlabel38:
+         	     0:              LabelOP 	              mainlabel38 	      null
+         	     0: CallWithReturnValueOP 	                  temp114 	      null
+         	     0: CallWithReturnValueOP 	                  temp115 	      null
+         	     0:              ParamOP 	                   param1 	   temp115
+         	     0:              ParamOP 	                   param0 	   temp114
+         	     0:               CallOP 	                  temp118 	      null
+         	     0:               GotoOP 	         goto mainlabel40 	      null
+	mainlabel33:
+         	     0:              LabelOP 	              mainlabel33 	      null
          	     0:             ReturnOP 	                   return 	         0
 	mainendlabel:
          	     0:              LabelOP 	             mainendlabel 	      null
-         	     0:            FuncEndOP 	          func_label_end1 	      null
+         	     0:            FuncEndOP 	          func_label_end6 	      null
 
 
 
-performance test All over!
+functional test All over!
