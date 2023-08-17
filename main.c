@@ -267,11 +267,11 @@ int main(int argc, char **argv) {
     is_functional_test = false;
     choose_case = read_code_from_file(argv[1]);
   } else {
-    is_functional_test = true;
+    is_functional_test = false;
     // is_functional_test = true;
-    // choose_case = read_code_from_file(test_cases[75]);
+    choose_case = read_code_from_file(test_cases[33]);
     // choose_case = read_code_from_file(performance_test[51]);
-    choose_case = read_code_from_file(hidden_cases[10]);
+    // choose_case = read_code_from_file(hidden_cases[10]);
     // choose_case = read_code_from_file("./my_cases/public_replace.c");
     // choose_case = read_code_from_file("./opt/loop1.c");
   }

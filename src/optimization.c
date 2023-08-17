@@ -702,7 +702,7 @@ void immediate_num_calculate(Function *handle_func) {
               HashMapPut(constant_single_value_hashmap, strdup(buffer), cur);
             }
           }
-          replace_use_other_by_self(cur, (Value *)element, cur_handle_bblock);
+          replace_use_other_by_self(cur, (Value *)element);
           delete_ins(cur_handle_list, &iter, &element);
         } else {
           iter_next_ins(&iter, &i, &element);
@@ -733,7 +733,7 @@ void immediate_num_calculate(Function *handle_func) {
             cur->pdata->var_pdata.fVal = const_value;
             HashMapPut(constant_single_value_hashmap, strdup(buffer), cur);
           }
-          replace_use_other_by_self(cur, (Value *)element, cur_handle_bblock);
+          replace_use_other_by_self(cur, (Value *)element);
           delete_ins(cur_handle_list, &iter, &element);
         } else {
           iter_next_ins(&iter, &i, &element);
@@ -813,8 +813,7 @@ void array_replace_optimization(Function *handle_func) {
                   Value *val = NULL;
                   if (HashMapContain(cur_replace, intptr_buffer)) {
                     val = HashMapGet(cur_replace, intptr_buffer);
-                    replace_use_other_by_self((Value *)val, (Value *)element,
-                                              cur_handle_bblock);
+                    replace_use_other_by_self((Value *)val, (Value *)element);
                     delete_ins(cur_handle_list, &iter, &element);
                   }
                 } else {
@@ -838,8 +837,7 @@ void array_replace_optimization(Function *handle_func) {
             Value *val = NULL;
             if (HashMapContain(cur_replace, intptr_buffer)) {
               val = HashMapGet(cur_replace, intptr_buffer);
-              replace_use_other_by_self((Value *)val, (Value *)element,
-                                        cur_handle_bblock);
+              replace_use_other_by_self((Value *)val, (Value *)element);
               delete_ins(cur_handle_list, &iter, &element);
             }
           } else {
@@ -979,8 +977,7 @@ void public_expression_substitution_opt(Function *handle_func) {
         if (HashMapContain(public_expression_set, fuckk)) {
           public_pair *findd = NULL;
           findd = HashMapGet(public_expression_set, fuckk);
-          replace_use_other_by_self(findd->replace, (Value *)element,
-                                    cur_handle_bblock);
+          replace_use_other_by_self(findd->replace, (Value *)element);
           free(fuckk);
           delete_ins(cur_handle_list, &iter, &element);
         } else {

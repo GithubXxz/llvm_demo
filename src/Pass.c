@@ -540,15 +540,21 @@ void insert_phi_func_pass(Function *self) {
 }
 
 // 将所有用到other的地方全部用self替换
-void replace_use_other_by_self(Value *self, Value *other,
-                               BasicBlock *cur_handle_block) {
+void replace_use_other_by_self(Value *self, Value *other) {
   if (other->use_list != NULL) {
     Use *u1 = other->use_list;
     Use *u2 = u1->Next;
     while (u1 != NULL) {
       if (((Instruction *)u1->Parent)->opcode == PhiFuncOp) {
-        HashMapPut(u1->Parent->value.pdata->phi_func_pdata.phi_value,
-                   strdup(cur_handle_block->label->name), self);
+        Pair *element = NULL;
+        HashMapFirst(u1->Parent->value.pdata->phi_func_pdata.phi_value);
+        while ((element = HashMapNext(
+                    u1->Parent->value.pdata->phi_func_pdata.phi_value)) !=
+               NULL) {
+          if (element->value == other)
+            HashMapPut(u1->Parent->value.pdata->phi_func_pdata.phi_value,
+                       strdup((char *)element->key), self);
+        }
       }
       value_add_use(self, u1);
       u1 = u2;
@@ -620,8 +626,7 @@ void rename_pass_help_new(HashMap *rename_var_stack_hashmap,
           StackTop(HashMapGet(rename_var_stack_hashmap, cur_handle->name),
                    &stack_top_var);
           // 使用栈顶Value替换使用当前instruction的value
-          replace_use_other_by_self(stack_top_var, (Value *)element,
-                                    cur_bblock->bblock_node->bblock_head);
+          replace_use_other_by_self(stack_top_var, (Value *)element);
         }
         break;
       default:
@@ -905,6 +910,10 @@ void insert_copies_help(HashMap *insert_copies_stack_hashmap,
       copy_pair *cur_pick_pair = HashSetNext(worklist);
       HashSetRemove(worklist, cur_pick_pair);
       // If dest ∈ live_outb
+
+      if (SEQ(cur_pick_pair->dest->name, "phi_var3")) {
+        printf("what\n");
+      }
 
       Value *phi_assign_ins = (Value *)ins_new_single_operator_v2(
           AssignOP, HashMapGet(var_replace_hashmap, cur_pick_pair->src->name));
