@@ -22,8 +22,7 @@ int param32_rec(int a1, int a2, int a3, int a4, int a5, int a6, int a7, int a8,
                 int a30, int a31, int a32) {
   if (a1 == 0) {
     return a2;
-  }
-  else {
+  } else {
     return param32_rec(a1 - 1, (a2 + a3) % 998244353, a4, a5, a6, a7, a8, a9,
                        a10, a11, a12, a13, a14, a15, a16, a17, a18, a19, a20,
                        a21, a22, a23, a24, a25, a26, a27, a28, a29, a30, a31,
@@ -93,7 +92,6 @@ int main() {
       i = 1;
   while (i < 32) {
     arr[i][0] = arr[i - 1][1] - 1;
-    arr[i][1] = arr[i - 1][0] - 2;
     i = i + 1;
   }
   putint(param32_arr(arr[0], arr[1], arr[2], arr[3], arr[4], arr[5], arr[6],

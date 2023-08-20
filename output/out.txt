@@ -1,102 +1,724 @@
 before optimization log!!!!!!!!!!!!!!!!!
+
+
+before optimization log!!!!!!!!!!!!!!!!!
 	labelID	number:               opcode 	                     name 	       use
-	deepWhileBrentry:
-         	     0:              LabelOP 	         deepWhileBrentry 	      null
-         	     0:                AddOP 	                   temp12 	    param0,     param1
-         	     0:               GotoOP 	   goto deepWhileBrlabel1 	      null
-	deepWhileBrlabel1:
-         	     0:              LabelOP 	        deepWhileBrlabel1 	      null
-         	     0:            PhiFuncOp 	                %phi_var5 	size: 2 	bblock: deepWhileBrlabel4 value: %phi_var6, 	bblock: deepWhileBrentry value: temp12, 
-         	     0:            PhiFuncOp 	                %phi_var4 	size: 2 	bblock: deepWhileBrlabel4 value: 42, 	bblock: deepWhileBrentry value: 0, 
-         	     0:            PhiFuncOp 	                %phi_var1 	size: 2 	bblock: deepWhileBrlabel4 value: %phi_var2, 	bblock: deepWhileBrentry value: 0, 
-         	     0:           LessThanOP 	                   temp14 	 %phi_var5,         75
-         	     0:  GotoWithConditionOP 	true:deepWhileBrlabel2  false:deepWhileBrlabel3 	    temp14
-	deepWhileBrlabel2:
-         	     0:              LabelOP 	        deepWhileBrlabel2 	      null
-         	     0:           LessThanOP 	                   temp16 	 %phi_var5,        100
-         	     0:  GotoWithConditionOP 	true:deepWhileBrlabel5  false:deepWhileBrlabel4 	    temp16
-	deepWhileBrlabel5:
-         	     0:              LabelOP 	        deepWhileBrlabel5 	      null
-         	     0:                AddOP 	                   temp19 	 %phi_var5,         42
-         	     0:          GreatThanOP 	                   temp21 	    temp19,         99
-         	     0:  GotoWithConditionOP 	true:deepWhileBrlabel7  false:deepWhileBrlabel6 	    temp21
-	deepWhileBrlabel7:
-         	     0:              LabelOP 	        deepWhileBrlabel7 	      null
-         	     0:                MulOP 	                   temp23 	        42,          2
-         	     0:  GotoWithConditionOP 	true:deepWhileBrlabel9  false:deepWhileBrlabel8 	         1
-	deepWhileBrlabel9:
-         	     0:              LabelOP 	        deepWhileBrlabel9 	      null
-         	     0:                MulOP 	                   temp25 	    temp23,          2
-         	     0:               GotoOP 	   goto deepWhileBrlabel8 	      null
-	deepWhileBrlabel8:
-         	     0:              LabelOP 	        deepWhileBrlabel8 	      null
-         	     0:            PhiFuncOp 	                %phi_var8 	size: 2 	bblock: deepWhileBrlabel7 value: temp19, 	bblock: deepWhileBrlabel9 value: temp25, 
-         	     0:               GotoOP 	   goto deepWhileBrlabel6 	      null
-	deepWhileBrlabel6:
-         	     0:              LabelOP 	        deepWhileBrlabel6 	      null
-         	     0:            PhiFuncOp 	                %phi_var7 	size: 2 	bblock: deepWhileBrlabel5 value: temp19, 	bblock: deepWhileBrlabel8 value: %phi_var8, 
-         	     0:            PhiFuncOp 	                %phi_var3 	size: 2 	bblock: deepWhileBrlabel5 value: %phi_var1, 	bblock: deepWhileBrlabel8 value: temp23, 
-         	     0:               GotoOP 	   goto deepWhileBrlabel4 	      null
-	deepWhileBrlabel4:
-         	     0:              LabelOP 	        deepWhileBrlabel4 	      null
-         	     0:            PhiFuncOp 	                %phi_var6 	size: 2 	bblock: deepWhileBrlabel2 value: %phi_var5, 	bblock: deepWhileBrlabel6 value: %phi_var7, 
-         	     0:            PhiFuncOp 	                %phi_var2 	size: 2 	bblock: deepWhileBrlabel2 value: %phi_var1, 	bblock: deepWhileBrlabel6 value: %phi_var3, 
-         	     0:               GotoOP 	   goto deepWhileBrlabel1 	      null
-	deepWhileBrlabel3:
-         	     0:              LabelOP 	        deepWhileBrlabel3 	      null
-         	     0:             ReturnOP 	                   return 	 %phi_var5
-	deepWhileBrendlabel:
-         	     0:              LabelOP 	      deepWhileBrendlabel 	      null
-         	     0:            FuncEndOP 	          func_label_end1 	      null
+	my_sqrtentry:
+         	     0:              LabelOP 	             my_sqrtentry 	      null
+         	     0:                DivOP 	                   temp25 	    param0,   8.000000
+         	     0:                AddOP 	                   temp26 	    temp25,   0.500000
+         	     0:                MulOP 	                   temp28 	  2.000000,     param0
+         	     0:                AddOP 	                   temp30 	  4.000000,     param0
+         	     0:                DivOP 	                   temp31 	    temp28,     temp30
+         	     0:                AddOP 	                   temp32 	    temp26,     temp31
+         	     0:               GotoOP 	       goto my_sqrtlabel7 	      null
+	my_sqrtlabel7:
+         	     0:              LabelOP 	            my_sqrtlabel7 	      null
+         	     0:            PhiFuncOp 	                %phi_var2 	size: 2 	bblock: my_sqrtentry value: temp32, 	bblock: my_sqrtlabel8 value: temp39, 
+         	     0:            PhiFuncOp 	                %phi_var1 	size: 2 	bblock: my_sqrtentry value: 10, 	bblock: my_sqrtlabel8 value: temp41, 
+         	     0:  GotoWithConditionOP 	true:my_sqrtlabel8  false:my_sqrtlabel9 	 %phi_var1
+	my_sqrtlabel8:
+         	     0:              LabelOP 	            my_sqrtlabel8 	      null
+         	     0:                DivOP 	                   temp37 	    param0,  %phi_var2
+         	     0:                AddOP 	                   temp38 	 %phi_var2,     temp37
+         	     0:                DivOP 	                   temp39 	    temp38,   2.000000
+         	     0:                SubOP 	                   temp41 	 %phi_var1,          1
+         	     0:               GotoOP 	       goto my_sqrtlabel7 	      null
+	my_sqrtlabel9:
+         	     0:              LabelOP 	            my_sqrtlabel9 	      null
+         	     0:             ReturnOP 	                   return 	 %phi_var2
+	my_sqrtendlabel:
+         	     0:              LabelOP 	          my_sqrtendlabel 	      null
+         	     0:            FuncEndOP 	          func_label_end3 	      null
 
 
 super log!!!!!!!!!!!!!!!!!
 	labelID	number:               opcode 	                     name 	       use
-	deepWhileBrentry:
-         	     0:              LabelOP 	         deepWhileBrentry 	      null
-         	     0:                AddOP 	                   temp12 	    param0,     param1
-         	     0:               GotoOP 	   goto deepWhileBrlabel1 	      null
-	deepWhileBrlabel1:
-         	     0:              LabelOP 	        deepWhileBrlabel1 	      null
-         	     0:            PhiFuncOp 	                %phi_var5 	size: 2 	bblock: deepWhileBrlabel4 value: %phi_var6, 	bblock: deepWhileBrentry value: temp12, 
-         	     0:            PhiFuncOp 	                %phi_var1 	size: 2 	bblock: deepWhileBrlabel4 value: %phi_var2, 	bblock: deepWhileBrentry value: 0, 
-         	     0:           LessThanOP 	                   temp14 	 %phi_var5,         75
-         	     0:  GotoWithConditionOP 	true:deepWhileBrlabel2  false:deepWhileBrlabel3 	    temp14
-	deepWhileBrlabel2:
-         	     0:              LabelOP 	        deepWhileBrlabel2 	      null
-         	     0:           LessThanOP 	                   temp16 	 %phi_var5,        100
-         	     0:  GotoWithConditionOP 	true:deepWhileBrlabel5  false:deepWhileBrlabel4 	    temp16
-	deepWhileBrlabel5:
-         	     0:              LabelOP 	        deepWhileBrlabel5 	      null
-         	     0:                AddOP 	                   temp19 	 %phi_var5,         42
-         	     0:          GreatThanOP 	                   temp21 	    temp19,         99
-         	     0:  GotoWithConditionOP 	true:deepWhileBrlabel7  false:deepWhileBrlabel6 	    temp21
-	deepWhileBrlabel7:
-         	     0:              LabelOP 	        deepWhileBrlabel7 	      null
-         	     0:  GotoWithConditionOP 	true:deepWhileBrlabel9  false:deepWhileBrlabel8 	         1
-	deepWhileBrlabel9:
-         	     0:              LabelOP 	        deepWhileBrlabel9 	      null
-         	     0:               GotoOP 	   goto deepWhileBrlabel8 	      null
-	deepWhileBrlabel8:
-         	     0:              LabelOP 	        deepWhileBrlabel8 	      null
-         	     0:            PhiFuncOp 	                %phi_var8 	size: 2 	bblock: deepWhileBrlabel7 value: temp19, 	bblock: deepWhileBrlabel9 value: 168, 
-         	     0:               GotoOP 	   goto deepWhileBrlabel6 	      null
-	deepWhileBrlabel6:
-         	     0:              LabelOP 	        deepWhileBrlabel6 	      null
-         	     0:            PhiFuncOp 	                %phi_var7 	size: 2 	bblock: deepWhileBrlabel5 value: temp19, 	bblock: deepWhileBrlabel8 value: %phi_var8, 
-         	     0:            PhiFuncOp 	                %phi_var3 	size: 2 	bblock: deepWhileBrlabel5 value: %phi_var1, 	bblock: deepWhileBrlabel8 value: 84, 
-         	     0:               GotoOP 	   goto deepWhileBrlabel4 	      null
-	deepWhileBrlabel4:
-         	     0:              LabelOP 	        deepWhileBrlabel4 	      null
-         	     0:            PhiFuncOp 	                %phi_var6 	size: 2 	bblock: deepWhileBrlabel2 value: %phi_var5, 	bblock: deepWhileBrlabel6 value: %phi_var7, 
-         	     0:            PhiFuncOp 	                %phi_var2 	size: 2 	bblock: deepWhileBrlabel2 value: %phi_var1, 	bblock: deepWhileBrlabel6 value: %phi_var3, 
-         	     0:               GotoOP 	   goto deepWhileBrlabel1 	      null
-	deepWhileBrlabel3:
-         	     0:              LabelOP 	        deepWhileBrlabel3 	      null
-         	     0:             ReturnOP 	                   return 	 %phi_var5
-	deepWhileBrendlabel:
-         	     0:              LabelOP 	      deepWhileBrendlabel 	      null
-         	     0:            FuncEndOP 	          func_label_end1 	      null
+	my_sqrtentry:
+         	     0:              LabelOP 	             my_sqrtentry 	      null
+         	     0:                DivOP 	                   temp25 	    param0,   8.000000
+         	     0:                AddOP 	                   temp26 	    temp25,   0.500000
+         	     0:                MulOP 	                   temp28 	  2.000000,     param0
+         	     0:                AddOP 	                   temp30 	  4.000000,     param0
+         	     0:                DivOP 	                   temp31 	    temp28,     temp30
+         	     0:                AddOP 	                   temp32 	    temp26,     temp31
+         	     0:               GotoOP 	       goto my_sqrtlabel7 	      null
+	my_sqrtlabel7:
+         	     0:              LabelOP 	            my_sqrtlabel7 	      null
+         	     0:            PhiFuncOp 	                %phi_var2 	size: 2 	bblock: my_sqrtentry value: temp32, 	bblock: my_sqrtlabel8 value: temp39, 
+         	     0:            PhiFuncOp 	                %phi_var1 	size: 2 	bblock: my_sqrtentry value: 10, 	bblock: my_sqrtlabel8 value: temp41, 
+         	     0:  GotoWithConditionOP 	true:my_sqrtlabel8  false:my_sqrtlabel9 	 %phi_var1
+	my_sqrtlabel8:
+         	     0:              LabelOP 	            my_sqrtlabel8 	      null
+         	     0:                DivOP 	                   temp37 	    param0,  %phi_var2
+         	     0:                AddOP 	                   temp38 	 %phi_var2,     temp37
+         	     0:                DivOP 	                   temp39 	    temp38,   2.000000
+         	     0:                SubOP 	                   temp41 	 %phi_var1,          1
+         	     0:               GotoOP 	       goto my_sqrtlabel7 	      null
+	my_sqrtlabel9:
+         	     0:              LabelOP 	            my_sqrtlabel9 	      null
+         	     0:             ReturnOP 	                   return 	 %phi_var2
+	my_sqrtendlabel:
+         	     0:              LabelOP 	          my_sqrtendlabel 	      null
+         	     0:            FuncEndOP 	          func_label_end3 	      null
+
+
+
+before optimization log!!!!!!!!!!!!!!!!!
+	labelID	number:               opcode 	                     name 	       use
+	pentry:
+         	     0:              LabelOP 	                   pentry 	      null
+         	     0:                MulOP 	                   temp44 	  3.000000,     param0
+         	     0:                MulOP 	                   temp46 	  4.000000,     param0
+         	     0:                MulOP 	                   temp48 	    temp46,     param0
+         	     0:                MulOP 	                   temp50 	    temp48,     param0
+         	     0:                SubOP 	                   temp51 	    temp44,     temp50
+         	     0:             ReturnOP 	                   return 	    temp51
+	pendlabel:
+         	     0:              LabelOP 	                pendlabel 	      null
+         	     0:            FuncEndOP 	          func_label_end4 	      null
+
+
+super log!!!!!!!!!!!!!!!!!
+	labelID	number:               opcode 	                     name 	       use
+	pentry:
+         	     0:              LabelOP 	                   pentry 	      null
+         	     0:                MulOP 	                   temp44 	  3.000000,     param0
+         	     0:                MulOP 	                   temp46 	  4.000000,     param0
+         	     0:                MulOP 	                   temp48 	    temp46,     param0
+         	     0:                MulOP 	                   temp50 	    temp48,     param0
+         	     0:                SubOP 	                   temp51 	    temp44,     temp50
+         	     0:             ReturnOP 	                   return 	    temp51
+	pendlabel:
+         	     0:              LabelOP 	                pendlabel 	      null
+         	     0:            FuncEndOP 	          func_label_end4 	      null
+
+
+
+before optimization log!!!!!!!!!!!!!!!!!
+	labelID	number:               opcode 	                     name 	       use
+	my_sin_implentry:
+         	     0:              LabelOP 	         my_sin_implentry 	      null
+         	     0:              ParamOP 	                   param0 	    param0
+         	     0: CallWithReturnValueOP 	                   temp53 	      null
+         	     0:          LessEqualOP 	                   temp54 	    temp53,   0.000001
+         	     0:  GotoWithConditionOP 	true:my_sin_impllabel11  false:my_sin_impllabel10 	    temp54
+	my_sin_impllabel11:
+         	     0:              LabelOP 	       my_sin_impllabel11 	      null
+         	     0:             ReturnOP 	                   return 	    param0
+	my_sin_implendlabel:
+         	     0:              LabelOP 	      my_sin_implendlabel 	      null
+         	     0:            FuncEndOP 	          func_label_end5 	      null
+	my_sin_impllabel10:
+         	     0:              LabelOP 	       my_sin_impllabel10 	      null
+         	     0:                DivOP 	                   temp57 	    param0,   3.000000
+         	     0:              ParamOP 	                   param0 	    temp57
+         	     0: CallWithReturnValueOP 	                   temp58 	      null
+         	     0:              ParamOP 	                   param0 	    temp58
+         	     0: CallWithReturnValueOP 	                   temp59 	      null
+         	     0:             ReturnOP 	                   return 	    temp59
+
+
+super log!!!!!!!!!!!!!!!!!
+	labelID	number:               opcode 	                     name 	       use
+	my_sin_implentry:
+         	     0:              LabelOP 	         my_sin_implentry 	      null
+         	     0:              ParamOP 	                   param0 	    param0
+         	     0: CallWithReturnValueOP 	                   temp53 	      null
+         	     0:          LessEqualOP 	                   temp54 	    temp53,   0.000001
+         	     0:  GotoWithConditionOP 	true:my_sin_impllabel11  false:my_sin_impllabel10 	    temp54
+	my_sin_impllabel11:
+         	     0:              LabelOP 	       my_sin_impllabel11 	      null
+         	     0:             ReturnOP 	                   return 	    param0
+	my_sin_implendlabel:
+         	     0:              LabelOP 	      my_sin_implendlabel 	      null
+         	     0:            FuncEndOP 	          func_label_end5 	      null
+	my_sin_impllabel10:
+         	     0:              LabelOP 	       my_sin_impllabel10 	      null
+         	     0:                DivOP 	                   temp57 	    param0,   3.000000
+         	     0:              ParamOP 	                   param0 	    temp57
+         	     0: CallWithReturnValueOP 	                   temp58 	      null
+         	     0:              ParamOP 	                   param0 	    temp58
+         	     0: CallWithReturnValueOP 	                   temp59 	      null
+         	     0:             ReturnOP 	                   return 	    temp59
+
+
+
+before optimization log!!!!!!!!!!!!!!!!!
+	labelID	number:               opcode 	                     name 	       use
+	my_sinentry:
+         	     0:              LabelOP 	              my_sinentry 	      null
+         	     0:          GreatThanOP 	                   temp61 	    param0,   6.283185
+         	     0:  GotoWithConditionOP 	true:my_sinlabel14  false:my_sinlabel15 	    temp61
+	my_sinlabel14:
+         	     0:              LabelOP 	            my_sinlabel14 	      null
+         	     0:                DivOP 	                   temp65 	    param0,   6.283185
+         	     0:             AssignOP 	                   temp66 	    temp65
+         	     0:                MulOP 	                   temp69 	    temp66,   6.283185
+         	     0:                SubOP 	                   temp70 	    param0,     temp69
+         	     0:               GotoOP 	       goto my_sinlabel13 	      null
+	my_sinlabel13:
+         	     0:              LabelOP 	            my_sinlabel13 	      null
+         	     0:            PhiFuncOp 	                %phi_var3 	size: 2 	bblock: my_sinlabel14 value: temp70, 	bblock: my_sinlabel15 value: param0, 
+         	     0:          GreatThanOP 	                   temp72 	 %phi_var3,   3.141593
+         	     0:  GotoWithConditionOP 	true:my_sinlabel18  false:my_sinlabel17 	    temp72
+	my_sinlabel18:
+         	     0:              LabelOP 	            my_sinlabel18 	      null
+         	     0:                SubOP 	                   temp74 	 %phi_var3,   6.283185
+         	     0:               GotoOP 	       goto my_sinlabel17 	      null
+	my_sinlabel17:
+         	     0:              LabelOP 	            my_sinlabel17 	      null
+         	     0:            PhiFuncOp 	                %phi_var4 	size: 2 	bblock: my_sinlabel13 value: %phi_var3, 	bblock: my_sinlabel18 value: temp74, 
+         	     0:           LessThanOP 	                   temp76 	 %phi_var4,  -3.141593
+         	     0:  GotoWithConditionOP 	true:my_sinlabel21  false:my_sinlabel20 	    temp76
+	my_sinlabel21:
+         	     0:              LabelOP 	            my_sinlabel21 	      null
+         	     0:                AddOP 	                   temp78 	 %phi_var4,   6.283185
+         	     0:               GotoOP 	       goto my_sinlabel20 	      null
+	my_sinlabel20:
+         	     0:              LabelOP 	            my_sinlabel20 	      null
+         	     0:            PhiFuncOp 	                %phi_var5 	size: 2 	bblock: my_sinlabel17 value: %phi_var4, 	bblock: my_sinlabel21 value: temp78, 
+         	     0:              ParamOP 	                   param0 	 %phi_var5
+         	     0: CallWithReturnValueOP 	                   temp80 	      null
+         	     0:             ReturnOP 	                   return 	    temp80
+	my_sinendlabel:
+         	     0:              LabelOP 	           my_sinendlabel 	      null
+         	     0:            FuncEndOP 	          func_label_end6 	      null
+	my_sinlabel15:
+         	     0:              LabelOP 	            my_sinlabel15 	      null
+         	     0:           LessThanOP 	                   temp63 	    param0,  -6.283185
+         	     0:  GotoWithConditionOP 	true:my_sinlabel14  false:my_sinlabel13 	    temp63
+
+
+super log!!!!!!!!!!!!!!!!!
+	labelID	number:               opcode 	                     name 	       use
+	my_sinentry:
+         	     0:              LabelOP 	              my_sinentry 	      null
+         	     0:          GreatThanOP 	                   temp61 	    param0,   6.283185
+         	     0:  GotoWithConditionOP 	true:my_sinlabel14  false:my_sinlabel15 	    temp61
+	my_sinlabel14:
+         	     0:              LabelOP 	            my_sinlabel14 	      null
+         	     0:                DivOP 	                   temp65 	    param0,   6.283185
+         	     0:             AssignOP 	                   temp66 	    temp65
+         	     0:                MulOP 	                   temp69 	    temp66,   6.283185
+         	     0:                SubOP 	                   temp70 	    param0,     temp69
+         	     0:               GotoOP 	       goto my_sinlabel13 	      null
+	my_sinlabel13:
+         	     0:              LabelOP 	            my_sinlabel13 	      null
+         	     0:            PhiFuncOp 	                %phi_var3 	size: 2 	bblock: my_sinlabel14 value: temp70, 	bblock: my_sinlabel15 value: param0, 
+         	     0:          GreatThanOP 	                   temp72 	 %phi_var3,   3.141593
+         	     0:  GotoWithConditionOP 	true:my_sinlabel18  false:my_sinlabel17 	    temp72
+	my_sinlabel18:
+         	     0:              LabelOP 	            my_sinlabel18 	      null
+         	     0:                SubOP 	                   temp74 	 %phi_var3,   6.283185
+         	     0:               GotoOP 	       goto my_sinlabel17 	      null
+	my_sinlabel17:
+         	     0:              LabelOP 	            my_sinlabel17 	      null
+         	     0:            PhiFuncOp 	                %phi_var4 	size: 2 	bblock: my_sinlabel13 value: %phi_var3, 	bblock: my_sinlabel18 value: temp74, 
+         	     0:           LessThanOP 	                   temp76 	 %phi_var4,  -3.141593
+         	     0:  GotoWithConditionOP 	true:my_sinlabel21  false:my_sinlabel20 	    temp76
+	my_sinlabel21:
+         	     0:              LabelOP 	            my_sinlabel21 	      null
+         	     0:                AddOP 	                   temp78 	 %phi_var4,   6.283185
+         	     0:               GotoOP 	       goto my_sinlabel20 	      null
+	my_sinlabel20:
+         	     0:              LabelOP 	            my_sinlabel20 	      null
+         	     0:            PhiFuncOp 	                %phi_var5 	size: 2 	bblock: my_sinlabel17 value: %phi_var4, 	bblock: my_sinlabel21 value: temp78, 
+         	     0:              ParamOP 	                   param0 	 %phi_var5
+         	     0: CallWithReturnValueOP 	                   temp80 	      null
+         	     0:             ReturnOP 	                   return 	    temp80
+	my_sinendlabel:
+         	     0:              LabelOP 	           my_sinendlabel 	      null
+         	     0:            FuncEndOP 	          func_label_end6 	      null
+	my_sinlabel15:
+         	     0:              LabelOP 	            my_sinlabel15 	      null
+         	     0:           LessThanOP 	                   temp63 	    param0,  -6.283185
+         	     0:  GotoWithConditionOP 	true:my_sinlabel14  false:my_sinlabel13 	    temp63
+
+
+
+before optimization log!!!!!!!!!!!!!!!!!
+	labelID	number:               opcode 	                     name 	       use
+	my_cosentry:
+         	     0:              LabelOP 	              my_cosentry 	      null
+         	     0:                AddOP 	                   temp82 	    param0,   1.570796
+         	     0:              ParamOP 	                   param0 	    temp82
+         	     0: CallWithReturnValueOP 	                   temp83 	      null
+         	     0:             ReturnOP 	                   return 	    temp83
+	my_cosendlabel:
+         	     0:              LabelOP 	           my_cosendlabel 	      null
+         	     0:            FuncEndOP 	          func_label_end7 	      null
+
+
+super log!!!!!!!!!!!!!!!!!
+	labelID	number:               opcode 	                     name 	       use
+	my_cosentry:
+         	     0:              LabelOP 	              my_cosentry 	      null
+         	     0:                AddOP 	                   temp82 	    param0,   1.570796
+         	     0:              ParamOP 	                   param0 	    temp82
+         	     0: CallWithReturnValueOP 	                   temp83 	      null
+         	     0:             ReturnOP 	                   return 	    temp83
+	my_cosendlabel:
+         	     0:              LabelOP 	           my_cosendlabel 	      null
+         	     0:            FuncEndOP 	          func_label_end7 	      null
+
+
+
+before optimization log!!!!!!!!!!!!!!!!!
+	labelID	number:               opcode 	                     name 	       use
+	circle_sdfentry:
+         	     0:              LabelOP 	          circle_sdfentry 	      null
+         	     0:                SubOP 	                   temp86 	    param0,     param2
+         	     0:                SubOP 	                   temp89 	    param1,     param3
+         	     0:                MulOP 	                   temp92 	    temp86,     temp86
+         	     0:                MulOP 	                   temp95 	    temp89,     temp89
+         	     0:                AddOP 	                   temp96 	    temp92,     temp95
+         	     0:              ParamOP 	                   param0 	    temp96
+         	     0: CallWithReturnValueOP 	                   temp97 	      null
+         	     0:                SubOP 	                   temp99 	    temp97,     param4
+         	     0:             ReturnOP 	                   return 	    temp99
+	circle_sdfendlabel:
+         	     0:              LabelOP 	       circle_sdfendlabel 	      null
+         	     0:            FuncEndOP 	          func_label_end8 	      null
+
+
+super log!!!!!!!!!!!!!!!!!
+	labelID	number:               opcode 	                     name 	       use
+	circle_sdfentry:
+         	     0:              LabelOP 	          circle_sdfentry 	      null
+         	     0:                SubOP 	                   temp86 	    param0,     param2
+         	     0:                SubOP 	                   temp89 	    param1,     param3
+         	     0:                MulOP 	                   temp92 	    temp86,     temp86
+         	     0:                MulOP 	                   temp95 	    temp89,     temp89
+         	     0:                AddOP 	                   temp96 	    temp92,     temp95
+         	     0:              ParamOP 	                   param0 	    temp96
+         	     0: CallWithReturnValueOP 	                   temp97 	      null
+         	     0:                SubOP 	                   temp99 	    temp97,     param4
+         	     0:             ReturnOP 	                   return 	    temp99
+	circle_sdfendlabel:
+         	     0:              LabelOP 	       circle_sdfendlabel 	      null
+         	     0:            FuncEndOP 	          func_label_end8 	      null
+
+
+
+before optimization log!!!!!!!!!!!!!!!!!
+	labelID	number:               opcode 	                     name 	       use
+	sceneentry:
+         	     0:              LabelOP 	               sceneentry 	      null
+         	     0:           AllocateOP 	                   param2 	      null
+         	     0:              ParamOP 	                   param4 	  0.100000
+         	     0:              ParamOP 	                   param3 	  0.400000
+         	     0:              ParamOP 	                   param2 	  0.400000
+         	     0:              ParamOP 	                   param1 	    param1
+         	     0:              ParamOP 	                   param0 	    param0
+         	     0: CallWithReturnValueOP 	                  temp102 	      null
+         	     0:              ParamOP 	                   param4 	  0.050000
+         	     0:              ParamOP 	                   param3 	  0.600000
+         	     0:              ParamOP 	                   param2 	  0.600000
+         	     0:              ParamOP 	                   param1 	    param1
+         	     0:              ParamOP 	                   param0 	    param0
+         	     0: CallWithReturnValueOP 	                  temp105 	      null
+         	     0:           LessThanOP 	                  temp108 	   temp102,    temp105
+         	     0:  GotoWithConditionOP 	true:scenelabel24  false:scenelabel23 	   temp108
+	scenelabel24:
+         	     0:              LabelOP 	             scenelabel24 	      null
+         	     0:      GetelementptrOP 	                  temp109 	    param2,          0
+         	     0:              StoreOP 	                   (null) 	   temp109,    temp102
+         	     0:      GetelementptrOP 	                  temp111 	    param2,          1
+         	     0:              StoreOP 	                   (null) 	   temp111,   3.000000
+         	     0:               GotoOP 	        goto scenelabel25 	      null
+	scenelabel25:
+         	     0:              LabelOP 	             scenelabel25 	      null
+         	     0:               GotoOP 	       goto sceneendlabel 	      null
+	sceneendlabel:
+         	     0:              LabelOP 	            sceneendlabel 	      null
+         	     0:            FuncEndOP 	          func_label_end9 	      null
+	scenelabel23:
+         	     0:              LabelOP 	             scenelabel23 	      null
+         	     0:      GetelementptrOP 	                  temp112 	    param2,          0
+         	     0:              StoreOP 	                   (null) 	   temp112,    temp105
+         	     0:      GetelementptrOP 	                  temp114 	    param2,          1
+         	     0:              StoreOP 	                   (null) 	   temp114,   0.000000
+         	     0:               GotoOP 	        goto scenelabel25 	      null
+
+
+super log!!!!!!!!!!!!!!!!!
+	labelID	number:               opcode 	                     name 	       use
+	sceneentry:
+         	     0:              LabelOP 	               sceneentry 	      null
+         	     0:           AllocateOP 	                   param2 	      null
+         	     0:              ParamOP 	                   param4 	  0.100000
+         	     0:              ParamOP 	                   param3 	  0.400000
+         	     0:              ParamOP 	                   param2 	  0.400000
+         	     0:              ParamOP 	                   param1 	    param1
+         	     0:              ParamOP 	                   param0 	    param0
+         	     0: CallWithReturnValueOP 	                  temp102 	      null
+         	     0:              ParamOP 	                   param4 	  0.050000
+         	     0:              ParamOP 	                   param3 	  0.600000
+         	     0:              ParamOP 	                   param2 	  0.600000
+         	     0:              ParamOP 	                   param1 	    param1
+         	     0:              ParamOP 	                   param0 	    param0
+         	     0: CallWithReturnValueOP 	                  temp105 	      null
+         	     0:           LessThanOP 	                  temp108 	   temp102,    temp105
+         	     0:  GotoWithConditionOP 	true:scenelabel24  false:scenelabel23 	   temp108
+	scenelabel24:
+         	     0:              LabelOP 	             scenelabel24 	      null
+         	     0:      GetelementptrOP 	                  temp109 	    param2,          0
+         	     0:              StoreOP 	                   (null) 	   temp109,    temp102
+         	     0:      GetelementptrOP 	                  temp111 	    param2,          1
+         	     0:              StoreOP 	                   (null) 	   temp111,   3.000000
+         	     0:               GotoOP 	        goto scenelabel25 	      null
+	scenelabel25:
+         	     0:              LabelOP 	             scenelabel25 	      null
+         	     0:               GotoOP 	       goto sceneendlabel 	      null
+	sceneendlabel:
+         	     0:              LabelOP 	            sceneendlabel 	      null
+         	     0:            FuncEndOP 	          func_label_end9 	      null
+	scenelabel23:
+         	     0:              LabelOP 	             scenelabel23 	      null
+         	     0:      GetelementptrOP 	                  temp112 	    param2,          0
+         	     0:              StoreOP 	                   (null) 	   temp112,    temp105
+         	     0:      GetelementptrOP 	                  temp114 	    param2,          1
+         	     0:              StoreOP 	                   (null) 	   temp114,   0.000000
+         	     0:               GotoOP 	        goto scenelabel25 	      null
+
+
+
+before optimization log!!!!!!!!!!!!!!!!!
+	labelID	number:               opcode 	                     name 	       use
+	traceentry:
+         	     0:              LabelOP 	               traceentry 	      null
+         	     0:           AllocateOP 	                   array2 	      null
+         	     0:               GotoOP 	        goto tracelabel26 	      null
+	tracelabel26:
+         	     0:              LabelOP 	             tracelabel26 	      null
+         	     0:            PhiFuncOp 	                %phi_var7 	size: 2 	bblock: tracelabel30 value: temp138, 	bblock: traceentry value: 0.000000, 
+         	     0:            PhiFuncOp 	                %phi_var6 	size: 2 	bblock: tracelabel30 value: temp140, 	bblock: traceentry value: 0, 
+         	     0:           LessThanOP 	                  temp116 	 %phi_var6,         10
+         	     0:  GotoWithConditionOP 	true:tracelabel29  false:tracelabel28 	   temp116
+	tracelabel29:
+         	     0:              LabelOP 	             tracelabel29 	      null
+         	     0:           LessThanOP 	                  temp118 	 %phi_var7,   2.000000
+         	     0:  GotoWithConditionOP 	true:tracelabel27  false:tracelabel28 	   temp118
+	tracelabel27:
+         	     0:              LabelOP 	             tracelabel27 	      null
+         	     0:                MulOP 	                  temp122 	    param2,  %phi_var7
+         	     0:                AddOP 	                  temp123 	    param0,    temp122
+         	     0:                MulOP 	                  temp127 	    param3,  %phi_var7
+         	     0:                AddOP 	                  temp128 	    param1,    temp127
+         	     0:              ParamOP 	                   param2 	    array2
+         	     0:              ParamOP 	                   param1 	   temp128
+         	     0:              ParamOP 	                   param0 	   temp123
+         	     0:               CallOP 	                  temp129 	      null
+         	     0:      GetelementptrOP 	                  temp130 	    array2,          0
+         	     0:               LoadOP 	                  temp131 	   temp130
+         	     0:           LessThanOP 	                  temp132 	   temp131,   0.000001
+         	     0:  GotoWithConditionOP 	true:tracelabel31  false:tracelabel30 	   temp132
+	tracelabel31:
+         	     0:              LabelOP 	             tracelabel31 	      null
+         	     0:      GetelementptrOP 	                  temp133 	    array2,          1
+         	     0:               LoadOP 	                  temp134 	   temp133
+         	     0:             ReturnOP 	                   return 	   temp134
+	traceendlabel:
+         	     0:              LabelOP 	            traceendlabel 	      null
+         	     0:            FuncEndOP 	         func_label_end10 	      null
+	tracelabel30:
+         	     0:              LabelOP 	             tracelabel30 	      null
+         	     0:      GetelementptrOP 	                  temp136 	    array2,          0
+         	     0:               LoadOP 	                  temp137 	   temp136
+         	     0:                AddOP 	                  temp138 	 %phi_var7,    temp137
+         	     0:                AddOP 	                  temp140 	 %phi_var6,          1
+         	     0:               GotoOP 	        goto tracelabel26 	      null
+	tracelabel28:
+         	     0:              LabelOP 	             tracelabel28 	      null
+         	     0:             ReturnOP 	                   return 	  0.000000
+
+
+super log!!!!!!!!!!!!!!!!!
+	labelID	number:               opcode 	                     name 	       use
+	traceentry:
+         	     0:              LabelOP 	               traceentry 	      null
+         	     0:           AllocateOP 	                   array2 	      null
+         	     0:               GotoOP 	        goto tracelabel26 	      null
+	tracelabel26:
+         	     0:              LabelOP 	             tracelabel26 	      null
+         	     0:            PhiFuncOp 	                %phi_var7 	size: 2 	bblock: tracelabel30 value: temp138, 	bblock: traceentry value: 0.000000, 
+         	     0:            PhiFuncOp 	                %phi_var6 	size: 2 	bblock: tracelabel30 value: temp140, 	bblock: traceentry value: 0, 
+         	     0:           LessThanOP 	                  temp116 	 %phi_var6,         10
+         	     0:  GotoWithConditionOP 	true:tracelabel29  false:tracelabel28 	   temp116
+	tracelabel29:
+         	     0:              LabelOP 	             tracelabel29 	      null
+         	     0:           LessThanOP 	                  temp118 	 %phi_var7,   2.000000
+         	     0:  GotoWithConditionOP 	true:tracelabel27  false:tracelabel28 	   temp118
+	tracelabel27:
+         	     0:              LabelOP 	             tracelabel27 	      null
+         	     0:                MulOP 	                  temp122 	    param2,  %phi_var7
+         	     0:                AddOP 	                  temp123 	    param0,    temp122
+         	     0:                MulOP 	                  temp127 	    param3,  %phi_var7
+         	     0:                AddOP 	                  temp128 	    param1,    temp127
+         	     0:              ParamOP 	                   param2 	    array2
+         	     0:              ParamOP 	                   param1 	   temp128
+         	     0:              ParamOP 	                   param0 	   temp123
+         	     0:               CallOP 	                  temp129 	      null
+         	     0:      GetelementptrOP 	                  temp130 	    array2,          0
+         	     0:               LoadOP 	                  temp131 	   temp130
+         	     0:           LessThanOP 	                  temp132 	   temp131,   0.000001
+         	     0:  GotoWithConditionOP 	true:tracelabel31  false:tracelabel30 	   temp132
+	tracelabel31:
+         	     0:              LabelOP 	             tracelabel31 	      null
+         	     0:      GetelementptrOP 	                  temp133 	    array2,          1
+         	     0:               LoadOP 	                  temp134 	   temp133
+         	     0:             ReturnOP 	                   return 	   temp134
+	traceendlabel:
+         	     0:              LabelOP 	            traceendlabel 	      null
+         	     0:            FuncEndOP 	         func_label_end10 	      null
+	tracelabel30:
+         	     0:              LabelOP 	             tracelabel30 	      null
+         	     0:      GetelementptrOP 	                  temp136 	    array2,          0
+         	     0:               LoadOP 	                  temp137 	   temp136
+         	     0:                AddOP 	                  temp138 	 %phi_var7,    temp137
+         	     0:                AddOP 	                  temp140 	 %phi_var6,          1
+         	     0:               GotoOP 	        goto tracelabel26 	      null
+	tracelabel28:
+         	     0:              LabelOP 	             tracelabel28 	      null
+         	     0:             ReturnOP 	                   return 	  0.000000
+
+
+
+before optimization log!!!!!!!!!!!!!!!!!
+	labelID	number:               opcode 	                     name 	       use
+	sampleentry:
+         	     0:              LabelOP 	              sampleentry 	      null
+         	     0:               GotoOP 	       goto samplelabel33 	      null
+	samplelabel33:
+         	     0:              LabelOP 	            samplelabel33 	      null
+         	     0:            PhiFuncOp 	                %phi_var9 	size: 2 	bblock: sampleentry value: 0.000000, 	bblock: samplelabel34 value: temp159, 
+         	     0:            PhiFuncOp 	                %phi_var8 	size: 2 	bblock: sampleentry value: 0, 	bblock: samplelabel34 value: temp161, 
+         	     0:           LessThanOP 	                  temp142 	 %phi_var8,         24
+         	     0:  GotoWithConditionOP 	true:samplelabel34  false:samplelabel35 	   temp142
+	samplelabel34:
+         	     0:              LabelOP 	            samplelabel34 	      null
+         	     0: CallWithReturnValueOP 	                  temp143 	      null
+         	     0:             AssignOP 	                  temp144 	   temp143
+         	     0:                DivOP 	                  temp147 	   temp144, 100000008.000000
+         	     0:                AddOP 	                  temp148 	 %phi_var8,    temp147
+         	     0:                MulOP 	                  temp149 	  6.283185,    temp148
+         	     0:                DivOP 	                  temp150 	   temp149,  24.000000
+         	     0:              ParamOP 	                   param0 	   temp150
+         	     0: CallWithReturnValueOP 	                  temp155 	      null
+         	     0:              ParamOP 	                   param0 	   temp150
+         	     0: CallWithReturnValueOP 	                  temp157 	      null
+         	     0:              ParamOP 	                   param3 	   temp157
+         	     0:              ParamOP 	                   param2 	   temp155
+         	     0:              ParamOP 	                   param1 	    param1
+         	     0:              ParamOP 	                   param0 	    param0
+         	     0: CallWithReturnValueOP 	                  temp158 	      null
+         	     0:                AddOP 	                  temp159 	 %phi_var9,    temp158
+         	     0:                AddOP 	                  temp161 	 %phi_var8,          1
+         	     0:               GotoOP 	       goto samplelabel33 	      null
+	samplelabel35:
+         	     0:              LabelOP 	            samplelabel35 	      null
+         	     0:                DivOP 	                  temp163 	 %phi_var9,  24.000000
+         	     0:             ReturnOP 	                   return 	   temp163
+	sampleendlabel:
+         	     0:              LabelOP 	           sampleendlabel 	      null
+         	     0:            FuncEndOP 	         func_label_end11 	      null
+
+
+super log!!!!!!!!!!!!!!!!!
+	labelID	number:               opcode 	                     name 	       use
+	sampleentry:
+         	     0:              LabelOP 	              sampleentry 	      null
+         	     0:               GotoOP 	       goto samplelabel33 	      null
+	samplelabel33:
+         	     0:              LabelOP 	            samplelabel33 	      null
+         	     0:            PhiFuncOp 	                %phi_var9 	size: 2 	bblock: sampleentry value: 0.000000, 	bblock: samplelabel34 value: temp159, 
+         	     0:            PhiFuncOp 	                %phi_var8 	size: 2 	bblock: sampleentry value: 0, 	bblock: samplelabel34 value: temp161, 
+         	     0:           LessThanOP 	                  temp142 	 %phi_var8,         24
+         	     0:  GotoWithConditionOP 	true:samplelabel34  false:samplelabel35 	   temp142
+	samplelabel34:
+         	     0:              LabelOP 	            samplelabel34 	      null
+         	     0: CallWithReturnValueOP 	                  temp143 	      null
+         	     0:             AssignOP 	                  temp144 	   temp143
+         	     0:                DivOP 	                  temp147 	   temp144, 100000008.000000
+         	     0:                AddOP 	                  temp148 	 %phi_var8,    temp147
+         	     0:                MulOP 	                  temp149 	  6.283185,    temp148
+         	     0:                DivOP 	                  temp150 	   temp149,  24.000000
+         	     0:              ParamOP 	                   param0 	   temp150
+         	     0: CallWithReturnValueOP 	                  temp155 	      null
+         	     0:              ParamOP 	                   param0 	   temp150
+         	     0: CallWithReturnValueOP 	                  temp157 	      null
+         	     0:              ParamOP 	                   param3 	   temp157
+         	     0:              ParamOP 	                   param2 	   temp155
+         	     0:              ParamOP 	                   param1 	    param1
+         	     0:              ParamOP 	                   param0 	    param0
+         	     0: CallWithReturnValueOP 	                  temp158 	      null
+         	     0:                AddOP 	                  temp159 	 %phi_var9,    temp158
+         	     0:                AddOP 	                  temp161 	 %phi_var8,          1
+         	     0:               GotoOP 	       goto samplelabel33 	      null
+	samplelabel35:
+         	     0:              LabelOP 	            samplelabel35 	      null
+         	     0:                DivOP 	                  temp163 	 %phi_var9,  24.000000
+         	     0:             ReturnOP 	                   return 	   temp163
+	sampleendlabel:
+         	     0:              LabelOP 	           sampleendlabel 	      null
+         	     0:            FuncEndOP 	         func_label_end11 	      null
+
+
+
+before optimization log!!!!!!!!!!!!!!!!!
+	labelID	number:               opcode 	                     name 	       use
+	write_pgmentry:
+         	     0:              LabelOP 	           write_pgmentry 	      null
+         	     0:              ParamOP 	                   param0 	        80
+         	     0:               CallOP 	                  temp164 	      null
+         	     0:              ParamOP 	                   param0 	        50
+         	     0:               CallOP 	                  temp165 	      null
+         	     0:              ParamOP 	                   param0 	        10
+         	     0:               CallOP 	                  temp166 	      null
+         	     0:              ParamOP 	                   param0 	       192
+         	     0:               CallOP 	                  temp167 	      null
+         	     0:              ParamOP 	                   param0 	        32
+         	     0:               CallOP 	                  temp168 	      null
+         	     0:              ParamOP 	                   param0 	       192
+         	     0:               CallOP 	                  temp169 	      null
+         	     0:              ParamOP 	                   param0 	        32
+         	     0:               CallOP 	                  temp170 	      null
+         	     0:              ParamOP 	                   param0 	       255
+         	     0:               CallOP 	                  temp171 	      null
+         	     0:              ParamOP 	                   param0 	        10
+         	     0:               CallOP 	                  temp172 	      null
+         	     0:               GotoOP 	    goto write_pgmlabel36 	      null
+	write_pgmlabel36:
+         	     0:              LabelOP 	         write_pgmlabel36 	      null
+         	     0:            PhiFuncOp 	               %phi_var15 	size: 2 	bblock: write_pgmlabel41 value: temp197, 	bblock: write_pgmentry value: 0, 
+         	     0:            PhiFuncOp 	               %phi_var13 	size: 2 	bblock: write_pgmlabel41 value: %phi_var14, 	bblock: write_pgmentry value: 0, 
+         	     0:            PhiFuncOp 	               %phi_var10 	size: 2 	bblock: write_pgmlabel41 value: %phi_var11, 	bblock: write_pgmentry value: 0, 
+         	     0:           LessThanOP 	                  temp174 	%phi_var15,        192
+         	     0:  GotoWithConditionOP 	true:write_pgmlabel37  false:write_pgmlabel38 	   temp174
+	write_pgmlabel37:
+         	     0:              LabelOP 	         write_pgmlabel37 	      null
+         	     0:               GotoOP 	    goto write_pgmlabel39 	      null
+	write_pgmlabel39:
+         	     0:              LabelOP 	         write_pgmlabel39 	      null
+         	     0:            PhiFuncOp 	               %phi_var14 	size: 2 	bblock: write_pgmlabel37 value: 0, 	bblock: write_pgmlabel42 value: temp194, 
+         	     0:            PhiFuncOp 	               %phi_var11 	size: 2 	bblock: write_pgmlabel37 value: %phi_var10, 	bblock: write_pgmlabel42 value: %phi_var12, 
+         	     0:           LessThanOP 	                  temp176 	%phi_var14,        192
+         	     0:  GotoWithConditionOP 	true:write_pgmlabel40  false:write_pgmlabel41 	   temp176
+	write_pgmlabel40:
+         	     0:              LabelOP 	         write_pgmlabel40 	      null
+         	     0:             AssignOP 	                  temp178 	%phi_var14
+         	     0:             AssignOP 	                  temp180 	%phi_var15
+         	     0:                DivOP 	                  temp182 	   temp178, 192.000000
+         	     0:                DivOP 	                  temp184 	   temp180, 192.000000
+         	     0:              ParamOP 	                   param1 	   temp184
+         	     0:              ParamOP 	                   param0 	   temp182
+         	     0: CallWithReturnValueOP 	                  temp185 	      null
+         	     0:                MulOP 	                  temp186 	   temp185, 255.000000
+         	     0:             AssignOP 	                  temp187 	   temp186
+         	     0:          GreatThanOP 	                  temp189 	   temp187,        255
+         	     0:  GotoWithConditionOP 	true:write_pgmlabel43  false:write_pgmlabel42 	   temp189
+	write_pgmlabel43:
+         	     0:              LabelOP 	         write_pgmlabel43 	      null
+         	     0:               GotoOP 	    goto write_pgmlabel42 	      null
+	write_pgmlabel42:
+         	     0:              LabelOP 	         write_pgmlabel42 	      null
+         	     0:            PhiFuncOp 	               %phi_var12 	size: 2 	bblock: write_pgmlabel40 value: temp187, 	bblock: write_pgmlabel43 value: 255, 
+         	     0:              ParamOP 	                   param0 	%phi_var12
+         	     0:               CallOP 	                  temp191 	      null
+         	     0:              ParamOP 	                   param0 	        32
+         	     0:               CallOP 	                  temp192 	      null
+         	     0:                AddOP 	                  temp194 	%phi_var14,          1
+         	     0:               GotoOP 	    goto write_pgmlabel39 	      null
+	write_pgmlabel41:
+         	     0:              LabelOP 	         write_pgmlabel41 	      null
+         	     0:              ParamOP 	                   param0 	        10
+         	     0:               CallOP 	                  temp195 	      null
+         	     0:                AddOP 	                  temp197 	%phi_var15,          1
+         	     0:               GotoOP 	    goto write_pgmlabel36 	      null
+	write_pgmlabel38:
+         	     0:              LabelOP 	         write_pgmlabel38 	      null
+         	     0:               GotoOP 	   goto write_pgmendlabel 	      null
+	write_pgmendlabel:
+         	     0:              LabelOP 	        write_pgmendlabel 	      null
+         	     0:            FuncEndOP 	         func_label_end12 	      null
+
+
+super log!!!!!!!!!!!!!!!!!
+	labelID	number:               opcode 	                     name 	       use
+	write_pgmentry:
+         	     0:              LabelOP 	           write_pgmentry 	      null
+         	     0:              ParamOP 	                   param0 	        80
+         	     0:               CallOP 	                  temp164 	      null
+         	     0:              ParamOP 	                   param0 	        50
+         	     0:               CallOP 	                  temp165 	      null
+         	     0:              ParamOP 	                   param0 	        10
+         	     0:               CallOP 	                  temp166 	      null
+         	     0:              ParamOP 	                   param0 	       192
+         	     0:               CallOP 	                  temp167 	      null
+         	     0:              ParamOP 	                   param0 	        32
+         	     0:               CallOP 	                  temp168 	      null
+         	     0:              ParamOP 	                   param0 	       192
+         	     0:               CallOP 	                  temp169 	      null
+         	     0:              ParamOP 	                   param0 	        32
+         	     0:               CallOP 	                  temp170 	      null
+         	     0:              ParamOP 	                   param0 	       255
+         	     0:               CallOP 	                  temp171 	      null
+         	     0:              ParamOP 	                   param0 	        10
+         	     0:               CallOP 	                  temp172 	      null
+         	     0:               GotoOP 	    goto write_pgmlabel36 	      null
+	write_pgmlabel36:
+         	     0:              LabelOP 	         write_pgmlabel36 	      null
+         	     0:            PhiFuncOp 	               %phi_var15 	size: 2 	bblock: write_pgmlabel41 value: temp197, 	bblock: write_pgmentry value: 0, 
+         	     0:            PhiFuncOp 	               %phi_var10 	size: 2 	bblock: write_pgmlabel41 value: %phi_var11, 	bblock: write_pgmentry value: 0, 
+         	     0:           LessThanOP 	                  temp174 	%phi_var15,        192
+         	     0:  GotoWithConditionOP 	true:write_pgmlabel37  false:write_pgmlabel38 	   temp174
+	write_pgmlabel37:
+         	     0:              LabelOP 	         write_pgmlabel37 	      null
+         	     0:               GotoOP 	    goto write_pgmlabel39 	      null
+	write_pgmlabel39:
+         	     0:              LabelOP 	         write_pgmlabel39 	      null
+         	     0:            PhiFuncOp 	               %phi_var14 	size: 2 	bblock: write_pgmlabel37 value: 0, 	bblock: write_pgmlabel42 value: temp194, 
+         	     0:            PhiFuncOp 	               %phi_var11 	size: 2 	bblock: write_pgmlabel37 value: %phi_var10, 	bblock: write_pgmlabel42 value: %phi_var12, 
+         	     0:           LessThanOP 	                  temp176 	%phi_var14,        192
+         	     0:  GotoWithConditionOP 	true:write_pgmlabel40  false:write_pgmlabel41 	   temp176
+	write_pgmlabel40:
+         	     0:              LabelOP 	         write_pgmlabel40 	      null
+         	     0:             AssignOP 	                  temp178 	%phi_var14
+         	     0:             AssignOP 	                  temp180 	%phi_var15
+         	     0:                DivOP 	                  temp182 	   temp178, 192.000000
+         	     0:                DivOP 	                  temp184 	   temp180, 192.000000
+         	     0:              ParamOP 	                   param1 	   temp184
+         	     0:              ParamOP 	                   param0 	   temp182
+         	     0: CallWithReturnValueOP 	                  temp185 	      null
+         	     0:                MulOP 	                  temp186 	   temp185, 255.000000
+         	     0:             AssignOP 	                  temp187 	   temp186
+         	     0:          GreatThanOP 	                  temp189 	   temp187,        255
+         	     0:  GotoWithConditionOP 	true:write_pgmlabel43  false:write_pgmlabel42 	   temp189
+	write_pgmlabel43:
+         	     0:              LabelOP 	         write_pgmlabel43 	      null
+         	     0:               GotoOP 	    goto write_pgmlabel42 	      null
+	write_pgmlabel42:
+         	     0:              LabelOP 	         write_pgmlabel42 	      null
+         	     0:            PhiFuncOp 	               %phi_var12 	size: 2 	bblock: write_pgmlabel40 value: temp187, 	bblock: write_pgmlabel43 value: 255, 
+         	     0:              ParamOP 	                   param0 	%phi_var12
+         	     0:               CallOP 	                  temp191 	      null
+         	     0:              ParamOP 	                   param0 	        32
+         	     0:               CallOP 	                  temp192 	      null
+         	     0:                AddOP 	                  temp194 	%phi_var14,          1
+         	     0:               GotoOP 	    goto write_pgmlabel39 	      null
+	write_pgmlabel41:
+         	     0:              LabelOP 	         write_pgmlabel41 	      null
+         	     0:              ParamOP 	                   param0 	        10
+         	     0:               CallOP 	                  temp195 	      null
+         	     0:                AddOP 	                  temp197 	%phi_var15,          1
+         	     0:               GotoOP 	    goto write_pgmlabel36 	      null
+	write_pgmlabel38:
+         	     0:              LabelOP 	         write_pgmlabel38 	      null
+         	     0:               GotoOP 	   goto write_pgmendlabel 	      null
+	write_pgmendlabel:
+         	     0:              LabelOP 	        write_pgmendlabel 	      null
+         	     0:            FuncEndOP 	         func_label_end12 	      null
 
 
 
@@ -104,27 +726,22 @@ before optimization log!!!!!!!!!!!!!!!!!
 	labelID	number:               opcode 	                     name 	       use
 	mainentry:
          	     0:              LabelOP 	                mainentry 	      null
-         	     0:              ParamOP 	                   param1 	         2
-         	     0:              ParamOP 	                   param0 	         2
-         	     0: CallWithReturnValueOP 	                   temp29 	      null
-         	     0:             ReturnOP 	                   return 	    temp29
+         	     0:               CallOP 	                  temp198 	      null
+         	     0:             ReturnOP 	                   return 	         0
 	mainendlabel:
          	     0:              LabelOP 	             mainendlabel 	      null
-         	     0:            FuncEndOP 	          func_label_end2 	      null
+         	     0:            FuncEndOP 	         func_label_end13 	      null
 
 
 super log!!!!!!!!!!!!!!!!!
 	labelID	number:               opcode 	                     name 	       use
 	mainentry:
          	     0:              LabelOP 	                mainentry 	      null
-         	     0:              ParamOP 	                   param1 	         2
-         	     0:              ParamOP 	                   param0 	         2
-         	     0: CallWithReturnValueOP 	                   temp29 	      null
-         	     0:             ReturnOP 	                   return 	    temp29
+         	     0:               CallOP 	                  temp198 	      null
+         	     0:             ReturnOP 	                   return 	         0
 	mainendlabel:
          	     0:              LabelOP 	             mainendlabel 	      null
-         	     0:            FuncEndOP 	          func_label_end2 	      null
-
+         	     0:            FuncEndOP 	         func_label_end13 	      null
 
 
 performance test All over!
